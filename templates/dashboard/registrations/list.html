@@ -3,12 +3,12 @@
 {% block header_title %}Registration Logs Directory{% endblock %}
 
 {% block content %}
-<div class="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-6">
+<div class="p-3 sm:p-4 max-w-[1600px] w-full mx-auto h-full flex flex-col space-y-3 overflow-hidden">
 
-    <!-- Top Filter & Search Bar (Google Style) -->
-    <div class="google-card p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Top Filter & Search Bar (Google Style - Fixed Top) -->
+    <div class="google-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
-            <h2 class="text-lg sm:text-xl font-bold font-display text-[#202124] flex items-center gap-2">
+            <h2 class="text-base sm:text-lg font-bold font-display text-[#202124] flex items-center gap-2">
                 <span>All Registration Logs</span>
                 <span class="bg-[#e8f0fe] text-[#1a73e8] text-xs font-semibold px-2.5 py-0.5 rounded-full">{{ registrations|length }} Records</span>
             </h2>
@@ -48,9 +48,9 @@
         </form>
     </div>
 
-    <!-- Google Table Container (Sticky Header & Freeze Columns up to Event) -->
-    <div class="google-card overflow-hidden">
-        <div class="table-scroll-container">
+    <!-- Google Table Container (Sticky Header & Freeze Columns up to Event - Bottom Scroll Alone) -->
+    <div class="google-card flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div class="table-scroll-container flex-1 min-h-0 overflow-auto">
             <table class="w-full text-left text-xs border-collapse min-w-[1050px]">
                 <thead class="bg-[#f8f9fa] border-b border-[#dadce0] text-[#5f6368] font-medium text-[11px] uppercase tracking-wider">
                     <tr>
