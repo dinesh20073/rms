@@ -13,7 +13,7 @@
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     }
 
-    /* Strict Full A4 Sheet Print / PDF Styling (Zero Margin, No Top White Space) */
+    /* Strict Single A4 Sheet Print / PDF Styling */
     @media print {
         @page {
             size: A4 portrait;
@@ -25,52 +25,66 @@
             color-adjust: exact !important;
         }
         html, body {
-            width: 100% !important;
-            height: auto !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            max-height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
             color: #000000 !important;
+            overflow: hidden !important;
         }
         .no-print {
             display: none !important;
         }
         .a4-sheet-container {
-            width: 100% !important;
-            max-width: 100% !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            max-height: 297mm !important;
             padding: 0 !important;
             margin: 0 !important;
             background: #ffffff !important;
-            display: block !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
             box-shadow: none !important;
             page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            overflow: hidden !important;
         }
         .a4-voucher-page {
-            width: 100% !important;
-            max-width: 100% !important;
+            width: 210mm !important;
+            max-width: 210mm !important;
+            height: 297mm !important;
+            max-height: 297mm !important;
             box-shadow: none !important;
             border: none !important;
             margin: 0 !important;
             padding: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
             page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            overflow: hidden !important;
         }
     }
 </style>
 {% endblock %}
 
 {% block body_content %}
-<div class="min-h-screen bg-[#edf2f7] flex flex-col items-center justify-start py-4 sm:py-8 px-2 sm:px-4 a4-sheet-container">
+<div class="min-h-screen bg-[#edf2f7] flex flex-col items-center justify-start py-4 sm:py-6 px-2 sm:px-4 a4-sheet-container">
 
     <!-- Top Action Toolbar (Hidden in Print / PDF) -->
-    <div class="w-full max-w-[780px] mb-4 flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 border border-slate-300 shadow-sm no-print">
+    <div class="w-full max-w-[780px] mb-3 flex flex-wrap items-center justify-between gap-3 bg-white p-3 border border-slate-300 shadow-sm no-print">
         <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-900 font-display">Booking Confirmation Voucher ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
+            <span class="text-xs font-bold text-slate-900 font-display">Single-Page A4 Voucher ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
         </div>
         <div class="flex items-center gap-2">
             <button id="print-pass-btn" type="button" onclick="triggerPrintPass()" class="google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold cursor-pointer">
                 <i data-lucide="printer" class="w-4 h-4"></i>
-                <span>Print Official Voucher</span>
+                <span>Print Official A4 Pass</span>
             </button>
             <a href="{% url 'public-register' event.slug %}" class="google-btn-outlined px-3 py-2 text-xs flex items-center gap-1 font-bold">
                 <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -79,282 +93,251 @@
         </div>
     </div>
 
-    <!-- Official Confirmation Voucher Page -->
-    <div class="a4-voucher-page bg-white text-slate-800 font-sans overflow-hidden">
+    <!-- Official Single-Page A4 Confirmation Voucher -->
+    <div class="a4-voucher-page bg-white text-slate-800 font-sans overflow-hidden flex flex-col justify-between">
         
-        <!-- 1. Top Brand Bar -->
-        <div class="px-6 py-3.5 bg-white flex items-center justify-between border-b border-slate-200">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#1a73e8] to-[#34a853] flex items-center justify-center text-white font-black font-display text-base shadow-sm">
-                    E
+        <!-- TOP & MIDDLE CONTENT WRAPPER -->
+        <div>
+            <!-- 1. Top Brand Bar -->
+            <div class="px-5 py-2.5 bg-white flex items-center justify-between border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded bg-gradient-to-tr from-[#1a73e8] to-[#34a853] flex items-center justify-center text-white font-black font-display text-sm shadow-xs">
+                        E
+                    </div>
+                    <div>
+                        <span class="text-xs font-black font-display text-slate-900 tracking-tight block leading-tight">EMS PASS</span>
+                        <span class="text-[8px] uppercase font-bold text-slate-400 tracking-widest block font-mono">OFFICIAL ADMISSION</span>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-sm font-black font-display text-slate-900 tracking-tight block leading-tight">EMS PASS</span>
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-widest block font-mono">OFFICIAL ADMISSION</span>
+                <div class="text-right font-mono text-xs text-slate-600">
+                    <span class="text-slate-400 text-[9px]">Booking ID: </span>
+                    <strong class="text-slate-900 font-bold select-all">{{ attendee.pass_code }}</strong>
                 </div>
             </div>
-            <div class="text-right font-mono text-xs text-slate-600">
-                <span class="text-slate-400 text-[10px]">Booking ID: </span>
-                <strong class="text-slate-900 font-bold select-all">{{ attendee.pass_code }}</strong>
+
+            <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + QR Code) -->
+            <div class="bg-gradient-to-br from-[#1a73e8] via-[#1557b0] to-[#0d47a1] px-5 py-4 text-white relative overflow-hidden">
+                <div class="grid grid-cols-12 gap-3 items-center relative z-10">
+                    <!-- Left Title -->
+                    <div class="col-span-7 sm:col-span-8 space-y-1">
+                        <h1 class="text-2xl sm:text-3xl font-black font-display tracking-tight text-white leading-tight">
+                            Booking<br>confirmed!
+                        </h1>
+                        <p class="text-xs text-blue-100 max-w-sm leading-tight">
+                            From keynotes to networking sessions — enjoy full verified access to <strong>{{ event.title }}</strong>.
+                        </p>
+                        <div class="pt-1">
+                            <span class="inline-flex items-center gap-1 bg-white/20 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-white/30 font-mono">
+                                <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-300"></i>
+                                <span>VERIFIED ENTRY PASS</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Right Prominent QR Box -->
+                    <div class="col-span-5 sm:col-span-4 flex justify-end">
+                        <div class="bg-white p-2 rounded-lg shadow-xl border border-white text-center space-y-1 shrink-0">
+                            {% if qr_base64 %}
+                            <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Pass" class="w-24 h-24 sm:w-28 sm:h-28 object-contain block mx-auto">
+                            {% else %}
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ attendee.pass_code }}" alt="QR Pass" class="w-24 h-24 sm:w-28 sm:h-28 object-contain block mx-auto">
+                            {% endif %}
+                            <div class="font-mono text-[10px] font-black text-slate-900 tracking-wider">
+                                {{ attendee.pass_code }}
+                            </div>
+                            <div class="text-[8px] font-bold text-[#1a73e8] uppercase font-mono tracking-wider">
+                                SCAN AT TURNSTILE
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + Big QR Code) -->
-        <div class="bg-gradient-to-br from-[#1a73e8] via-[#1557b0] to-[#0d47a1] p-6 text-white relative overflow-hidden">
-            <!-- Background glow -->
-            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+            <!-- 3. Dark Info Strip (Date, Time, Venue) -->
+            <div class="bg-[#0f172a] text-slate-200 px-5 py-2 text-[11px] flex flex-wrap items-center justify-between gap-2 font-medium">
+                <div class="flex items-center gap-1.5">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                    <span>Date: <strong class="text-white">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                    <span>Time: <strong class="text-white">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                    <span><strong class="text-white">{{ event.venue|default:"BIEC Convention Centre" }}</strong></span>
+                </div>
+            </div>
 
-            <div class="grid grid-cols-12 gap-4 items-center relative z-10">
-                <!-- Left Title & Mascot -->
-                <div class="col-span-7 sm:col-span-8 space-y-2">
-                    <h1 class="text-2xl sm:text-4xl font-black font-display tracking-tight text-white leading-tight">
-                        Booking<br>confirmed!
-                    </h1>
-                    <p class="text-xs sm:text-sm text-blue-100 max-w-sm leading-snug">
-                        From keynotes to networking sessions — enjoy full verified access to <strong>{{ event.title }}</strong>.
-                    </p>
-                    
-                    <div class="pt-2 flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1 bg-white/20 text-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur-xs border border-white/30">
-                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-300"></i>
-                            <span>Verified Entry Pass</span>
+            <!-- 4. Three Colorful Summary KPI Cards -->
+            <div class="px-5 py-3 grid grid-cols-3 gap-2.5 bg-slate-50 border-b border-slate-200">
+                <!-- Card 1: Location / Venue (Red/Coral) -->
+                <div class="bg-gradient-to-br from-[#ff5252] to-[#e53935] p-2.5 text-white rounded-lg shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-black font-display leading-tight truncate">
+                            {{ event.venue|truncatewords:2|default:"Venue Access" }}
+                        </h3>
+                        <p class="text-[10px] text-rose-100 font-medium">Location</p>
+                    </div>
+                    <div class="pt-1.5">
+                        <span class="inline-block bg-white text-[#e53935] font-bold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded font-mono">
+                            VENUE
                         </span>
                     </div>
                 </div>
 
-                <!-- Right Prominent QR Box -->
-                <div class="col-span-5 sm:col-span-4 flex justify-end">
-                    <div class="bg-white p-3 rounded-xl shadow-2xl border border-white text-center space-y-1.5 shrink-0">
-                        {% if qr_base64 %}
-                        <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Pass" class="w-32 h-32 sm:w-36 sm:h-36 object-contain block mx-auto">
-                        {% else %}
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data={{ attendee.pass_code }}" alt="QR Pass" class="w-32 h-32 sm:w-36 sm:h-36 object-contain block mx-auto">
-                        {% endif %}
-                        <div class="font-mono text-[11px] font-black text-slate-900 tracking-wider">
-                            {{ attendee.pass_code }}
-                        </div>
-                        <div class="text-[8px] font-bold text-[#1a73e8] uppercase font-mono tracking-wider">
-                            SCAN AT TURNSTILE
-                        </div>
+                <!-- Card 2: Tickets / Quantity (Blue) -->
+                <div class="bg-gradient-to-br from-[#42a5f5] to-[#1e88e5] p-2.5 text-white rounded-lg shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-black font-display leading-tight">
+                            {{ ticket_count }}
+                        </h3>
+                        <p class="text-[10px] text-blue-100 font-medium">Tickets / Person{{ ticket_count|pluralize }}</p>
+                    </div>
+                    <div class="pt-1.5">
+                        <span class="inline-block bg-white/20 text-white font-bold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-white/30 font-mono">
+                            ADMITTED
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Paid / Free (Amber/Gold) -->
+                <div class="bg-gradient-to-br from-[#ffa726] to-[#fb8c00] p-2.5 text-white rounded-lg shadow-2xs flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black font-display leading-tight">
+                            {% if registration.amount == 0 %}FREE{% else %}₹{{ registration.amount|floatformat:0 }}{% endif %}
+                        </h3>
+                        <p class="text-[10px] text-amber-100 font-medium">Amount Paid</p>
+                    </div>
+                    <div class="pt-1.5">
+                        <span class="inline-block bg-white text-[#fb8c00] font-bold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded font-mono">
+                            CONFIRMED
+                        </span>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 3. Dark Info Strip (Date, Time, Venue) -->
-        <div class="bg-[#0f172a] text-slate-200 px-6 py-2.5 text-xs flex flex-wrap items-center justify-between gap-3 font-medium">
-            <div class="flex items-center gap-1.5">
-                <i data-lucide="calendar" class="w-4 h-4 text-blue-400 shrink-0"></i>
-                <span>Date: <strong class="text-white">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></span>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <i data-lucide="clock" class="w-4 h-4 text-blue-400 shrink-0"></i>
-                <span>Time: <strong class="text-white">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></span>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <i data-lucide="map-pin" class="w-4 h-4 text-blue-400 shrink-0"></i>
-                <span><strong class="text-white">{{ event.venue|default:"BIEC Convention Centre" }}</strong></span>
-            </div>
-        </div>
-
-        <!-- 4. Three Colorful Summary KPI Cards -->
-        <div class="p-6 grid grid-cols-1 sm:grid-cols-3 gap-3.5 bg-slate-50 border-b border-slate-200">
-            <!-- Card 1: Location / Venue (Red/Coral) -->
-            <div class="bg-gradient-to-br from-[#ff5252] to-[#e53935] p-4 text-white rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+            <!-- 5. Delegate Greeting & Booking Details -->
+            <div class="px-5 py-3 space-y-2 bg-white">
                 <div>
-                    <h3 class="text-xl font-black font-display leading-tight truncate">
-                        {{ event.venue|truncatewords:2|default:"Convention Centre" }}
-                    </h3>
-                    <p class="text-xs text-rose-100 font-medium mt-0.5">Location</p>
-                </div>
-                <div class="pt-3">
-                    <span class="inline-block bg-white text-[#e53935] font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded shadow-2xs font-mono">
-                        VENUE ACCESS
-                    </span>
-                </div>
-            </div>
-
-            <!-- Card 2: Tickets / Quantity (Blue) -->
-            <div class="bg-gradient-to-br from-[#42a5f5] to-[#1e88e5] p-4 text-white rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
-                <div>
-                    <h3 class="text-3xl font-black font-display leading-tight">
-                        {{ ticket_count }}
-                    </h3>
-                    <p class="text-xs text-blue-100 font-medium mt-0.5">Ticket{{ ticket_count|pluralize }} / Person Pass{{ ticket_count|pluralize }}</p>
-                </div>
-                <div class="pt-3">
-                    <span class="inline-block bg-white/20 text-white font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded border border-white/30 font-mono">
-                        ALL ADMITTED
-                    </span>
-                </div>
-            </div>
-
-            <!-- Card 3: Total Paid / Free (Amber/Gold) -->
-            <div class="bg-gradient-to-br from-[#ffa726] to-[#fb8c00] p-4 text-white rounded-xl shadow-sm relative overflow-hidden flex flex-col justify-between">
-                <div>
-                    <h3 class="text-2xl sm:text-3xl font-black font-display leading-tight">
-                        {% if registration.amount == 0 %}FREE{% else %}₹{{ registration.amount|floatformat:0 }}{% endif %}
-                    </h3>
-                    <p class="text-xs text-amber-100 font-medium mt-0.5">Admission Fee Paid</p>
-                </div>
-                <div class="pt-3">
-                    <span class="inline-block bg-white text-[#fb8c00] font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded shadow-2xs font-mono">
-                        PAID & VERIFIED
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. Delegate Greeting & Booking Details -->
-        <div class="p-6 space-y-4 bg-white">
-            <div class="space-y-1">
-                <h2 class="text-base font-bold text-slate-900">
-                    Hi {{ customer.name|title }},
-                </h2>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                    Welcome to <strong>{{ event.title }}</strong>! Your booking has been <strong class="text-emerald-700">confirmed</strong>. Here are your booking details:
-                </p>
-            </div>
-
-            <!-- Booking Details 2x2 Box -->
-            <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-                <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">
-                    <span>Booking Details</span>
-                    <span class="font-mono text-slate-500 font-normal text-[11px]">Booking ID: <strong class="text-slate-800">{{ attendee.pass_code }}</strong></span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 text-xs">
-                    <div class="p-3.5 space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Name:</span>
-                            <strong class="text-slate-900 font-medium">{{ customer.name|title }}</strong>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Email:</span>
-                            <span class="font-mono text-slate-700">{{ customer.email }}</span>
-                        </div>
-                    </div>
-                    <div class="p-3.5 space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Phone number:</span>
-                            <strong class="text-slate-900 font-mono">{{ customer.phone|default:"+91 9876543210" }}</strong>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Date of visit:</span>
-                            <span class="text-slate-800 font-medium">{{ event.start_time|date:"d F Y"|default:"28 August 2026" }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 6. Ticket Details & Persons Roster Table -->
-        <div class="px-6 pb-6 space-y-3 bg-white">
-            <div class="border border-slate-300 rounded-lg overflow-hidden shadow-2xs">
-                <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-300 flex items-center justify-between text-xs font-bold text-slate-800">
-                    <span>Ticket Details</span>
-                    <span class="font-mono text-slate-500 font-normal text-[11px]">Sales Order ID: <strong class="text-slate-800">{{ registration.registration_code }}</strong></span>
-                </div>
-                
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead class="bg-[#1e293b] text-white font-bold text-[10px] uppercase tracking-wider font-mono">
-                        <tr>
-                            <th class="py-2.5 px-3">Ticket Type / Person Name</th>
-                            <th class="py-2.5 px-3 w-16 text-center">Age</th>
-                            <th class="py-2.5 px-3 w-20">Gender</th>
-                            <th class="py-2.5 px-3 w-28">Category</th>
-                            <th class="py-2.5 px-3 w-24 text-right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 text-slate-800">
-                        {% for person in attendee_list %}
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="py-2.5 px-3 font-semibold text-slate-900">
-                                <span>{{ person.name|title }}</span>
-                                {% if person.index == 1 %}
-                                <span class="ml-1 text-[9px] font-bold text-[#1a73e8] bg-blue-50 border border-blue-200 px-1 py-0.2 rounded">Primary</span>
-                                {% endif %}
-                            </td>
-                            <td class="py-2.5 px-3 text-center font-mono font-bold text-slate-800">
-                                {{ person.age }}
-                            </td>
-                            <td class="py-2.5 px-3 text-slate-600">
-                                {{ person.gender|title }}
-                            </td>
-                            <td class="py-2.5 px-3 text-slate-500 text-[11px]">
-                                {{ person.type }}
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-mono font-semibold text-slate-800">
-                                {% if registration.amount == 0 %}₹0.00{% else %}₹{{ event.registration_fee|floatformat:2 }}{% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        
-                        <!-- Summary Rows -->
-                        <tr class="bg-slate-50 font-bold border-t-2 border-slate-300">
-                            <td colspan="4" class="py-2.5 px-3 text-slate-900 font-display text-xs">
-                                Total Amount Paid
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-mono text-sm text-[#1a73e8] font-black">
-                                ₹{{ registration.amount|floatformat:2 }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Manage Booking Pill -->
-            <div class="pt-1 no-print">
-                <button type="button" onclick="triggerPrintPass()" class="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-5 py-2 text-xs font-bold rounded shadow-sm flex items-center gap-1.5 transition">
-                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-                    <span>PRINT / DOWNLOAD VOUCHER</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- 7. Important Information Box -->
-        <div class="px-6 pb-6 bg-white">
-            <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-4 space-y-2 text-xs text-slate-700">
-                <h4 class="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                    <i data-lucide="info" class="w-4 h-4 text-[#1a73e8]"></i>
-                    <span>Important Information</span>
-                </h4>
-                <ul class="space-y-1 text-[11px] text-slate-600 list-disc list-inside">
-                    <li>Please show your <strong>QR code</strong> at the entry turnstile or gate to enter the venue.</li>
-                    <li>Primary delegate must carry a valid photo ID (Aadhaar / Driving License / Passport / Company ID).</li>
-                    <li>Guests with VIP / Speaker passes should collect access badges at the registration helpdesk.</li>
-                    <li>Gates open 45 minutes prior to event schedule ({{ event.start_time|date:"h:i A" }}).</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- 8. Visual Highlights / Must Experience Grid -->
-        <div class="px-6 pb-6 space-y-3 bg-white">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <!-- Highlight 1: Food & Networking -->
-                <div class="bg-gradient-to-r from-amber-100 to-amber-50 border border-amber-200 p-4 rounded-xl space-y-1 text-slate-800">
-                    <h5 class="font-black text-sm text-amber-900 font-display">Networking & High Tea!</h5>
-                    <p class="text-[11px] text-amber-800 leading-tight">
-                        Enjoy curated refreshments, coffee and networking lounge access throughout the summit.
+                    <h2 class="text-xs font-bold text-slate-900">
+                        Hi {{ customer.name|title }},
+                    </h2>
+                    <p class="text-[11px] text-slate-600 leading-tight">
+                        Welcome to <strong>{{ event.title }}</strong>! Your registration is <strong class="text-emerald-700 font-bold">confirmed</strong>. Here are your booking details:
                     </p>
                 </div>
-                <!-- Highlight 2: Keynotes & Expo -->
-                <div class="bg-gradient-to-r from-blue-100 to-blue-50 border border-blue-200 p-4 rounded-xl space-y-1 text-slate-800">
-                    <h5 class="font-black text-sm text-blue-900 font-display">Keynotes & Innovation Expo</h5>
-                    <p class="text-[11px] text-blue-800 leading-tight">
-                        Explore exclusive tech exhibits, keynote stages and industry partner lounges.
-                    </p>
+
+                <!-- Booking Details 2x2 Box -->
+                <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs text-[11px]">
+                    <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-200 flex items-center justify-between font-bold text-slate-700 text-[10px] uppercase">
+                        <span>Booking Information</span>
+                        <span class="font-mono text-slate-500 font-normal">Pass Generated: <strong class="text-slate-800">{{ registration.created_at|date:"d M Y, h:i A" }}</strong></span>
+                    </div>
+                    <div class="grid grid-cols-2 divide-x divide-slate-200">
+                        <div class="p-2.5 space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Name:</span>
+                                <strong class="text-slate-900 font-semibold">{{ customer.name|title }}</strong>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Email:</span>
+                                <span class="font-mono text-slate-700">{{ customer.email }}</span>
+                            </div>
+                        </div>
+                        <div class="p-2.5 space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Phone:</span>
+                                <strong class="text-slate-900 font-mono">{{ customer.phone|default:"+91 9876543210" }}</strong>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Date of visit:</span>
+                                <span class="text-slate-800 font-medium">{{ event.start_time|date:"d F Y"|default:"28 August 2026" }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Bottom Brand Sign-off -->
-            <div class="pt-2 text-center">
-                <span class="inline-block bg-[#0f172a] text-white px-5 py-1.5 rounded-full text-xs font-bold font-display shadow-sm">
-                    See you there! • {{ event.title }}
-                </span>
-                <div class="text-[9px] text-slate-400 font-mono mt-1.5">
-                    AUTHENTICATED TICKET VOUCHER • EMS-AUTH-{{ attendee.id|stringformat:"06d" }}
+            <!-- 6. Ticket Details & Persons Table -->
+            <div class="px-5 pb-3 bg-white">
+                <div class="border border-slate-300 rounded-lg overflow-hidden shadow-2xs">
+                    <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-300 flex items-center justify-between text-[10px] font-bold text-slate-800 uppercase">
+                        <span>Ticket Details</span>
+                        <span class="font-mono text-slate-500 font-normal">Sales Order: <strong class="text-slate-800">{{ registration.registration_code }}</strong></span>
+                    </div>
+                    
+                    <table class="w-full text-left text-[11px] border-collapse">
+                        <thead class="bg-[#1e293b] text-white font-bold text-[9px] uppercase tracking-wider font-mono">
+                            <tr>
+                                <th class="py-1.5 px-3">Ticket Type / Person Name</th>
+                                <th class="py-1.5 px-3 w-16 text-center">Age</th>
+                                <th class="py-1.5 px-3 w-20">Gender</th>
+                                <th class="py-1.5 px-3 w-28">Category</th>
+                                <th class="py-1.5 px-3 w-24 text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-800">
+                            {% for person in attendee_list %}
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="py-1.5 px-3 font-semibold text-slate-900">
+                                    <span>{{ person.name|title }}</span>
+                                    {% if person.index == 1 %}
+                                    <span class="ml-1 text-[8px] font-bold text-[#1a73e8] bg-blue-50 border border-blue-200 px-1 py-0.2 rounded">Primary</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-1.5 px-3 text-center font-mono font-bold text-slate-800">
+                                    {{ person.age }}
+                                </td>
+                                <td class="py-1.5 px-3 text-slate-600">
+                                    {{ person.gender|title }}
+                                </td>
+                                <td class="py-1.5 px-3 text-slate-500 text-[10px]">
+                                    {{ person.type }}
+                                </td>
+                                <td class="py-1.5 px-3 text-right font-mono font-semibold text-slate-800">
+                                    {% if registration.amount == 0 %}₹0.00{% else %}₹{{ event.registration_fee|floatformat:2 }}{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            
+                            <!-- Summary Row -->
+                            <tr class="bg-slate-50 font-bold border-t-2 border-slate-300">
+                                <td colspan="4" class="py-2 px-3 text-slate-900 font-display text-xs">
+                                    Total Amount Paid
+                                </td>
+                                <td class="py-2 px-3 text-right font-mono text-sm text-[#1a73e8] font-black">
+                                    ₹{{ registration.amount|floatformat:2 }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
+            <!-- 7. Important Information Box -->
+            <div class="px-5 pb-3 bg-white">
+                <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-3 space-y-1 text-[10px] text-slate-700">
+                    <h4 class="font-bold text-slate-900 text-[11px] flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                        <span>Important Information</span>
+                    </h4>
+                    <ul class="space-y-0.5 text-slate-600 list-disc list-inside">
+                        <li>Please show your <strong>QR code</strong> at the entry turnstile or gate for admission.</li>
+                        <li>Primary attendee must carry a valid photo ID (Aadhaar / Driving License / College ID).</li>
+                        <li>Gates open 45 minutes prior to event schedule ({{ event.start_time|date:"h:i A" }}).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. BOTTOM FOOTER BAR (Anchored at exact bottom of A4) -->
+        <div class="bg-[#0f172a] text-white py-2.5 px-5 text-[10px] font-mono flex items-center justify-between shrink-0">
+            <span class="font-bold text-emerald-400 flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>VERIFIED & ACTIVE • OFFICIAL 1-PAGE A4 PASS</span>
+            </span>
+            <span class="text-slate-400 font-mono">EMS-AUTH-{{ attendee.id|stringformat:"06d" }}</span>
         </div>
 
     </div>
