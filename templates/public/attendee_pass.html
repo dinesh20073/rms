@@ -7,13 +7,13 @@
     /* Screen View Container */
     .a4-voucher-page {
         width: 100%;
-        max-width: 780px;
+        max-width: 740px;
         margin: 0 auto;
         background: #ffffff;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     }
 
-    /* Strict Single A4 Sheet Print / PDF Styling */
+    /* Strict Single A4 Sheet Print / PDF Styling (Guaranteed 100% Exactly 1 Page) */
     @media print {
         @page {
             size: A4 portrait;
@@ -23,6 +23,7 @@
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
+            box-sizing: border-box !important;
         }
         html, body {
             width: 210mm !important;
@@ -33,6 +34,9 @@
             background: #ffffff !important;
             color: #000000 !important;
             overflow: hidden !important;
+            page-break-after: avoid !important;
+            page-break-before: avoid !important;
+            page-break-inside: avoid !important;
         }
         .no-print {
             display: none !important;
@@ -41,8 +45,8 @@
             width: 210mm !important;
             height: 297mm !important;
             max-height: 297mm !important;
-            padding: 0 !important;
-            margin: 0 !important;
+            padding: 5mm 7mm !important;
+            margin: 0 auto !important;
             background: #ffffff !important;
             display: flex !important;
             flex-direction: column !important;
@@ -53,12 +57,12 @@
             overflow: hidden !important;
         }
         .a4-voucher-page {
-            width: 210mm !important;
-            max-width: 210mm !important;
-            height: 297mm !important;
-            max-height: 297mm !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100% !important;
+            max-height: 287mm !important;
             box-shadow: none !important;
-            border: none !important;
+            border: 1.5px solid #0f172a !important;
             margin: 0 !important;
             padding: 0 !important;
             display: flex !important;
@@ -73,79 +77,80 @@
 {% endblock %}
 
 {% block body_content %}
-<div class="min-h-screen bg-[#edf2f7] flex flex-col items-center justify-start py-4 sm:py-6 px-2 sm:px-4 a4-sheet-container">
+<div class="min-h-screen bg-[#edf2f7] flex flex-col items-center justify-start py-3 sm:py-5 px-2 a4-sheet-container">
 
     <!-- Top Action Toolbar (Hidden in Print / PDF) -->
-    <div class="w-full max-w-[780px] mb-3 flex flex-wrap items-center justify-between gap-3 bg-white p-3 border border-slate-300 shadow-sm no-print">
+    <div class="w-full max-w-[740px] mb-2.5 flex flex-wrap items-center justify-between gap-2 bg-white p-2.5 border border-slate-300 shadow-sm no-print">
         <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-900 font-display">Single-Page A4 Voucher ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
+            <span class="text-xs font-bold text-slate-900 font-display">Strictly 1-Page A4 Voucher ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
         </div>
         <div class="flex items-center gap-2">
-            <button id="print-pass-btn" type="button" onclick="triggerPrintPass()" class="google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold cursor-pointer">
-                <i data-lucide="printer" class="w-4 h-4"></i>
-                <span>Print Official A4 Pass</span>
+            <button id="print-pass-btn" type="button" onclick="triggerPrintPass()" class="google-btn-primary px-3.5 py-1.5 text-xs flex items-center gap-1.5 shadow-md font-bold cursor-pointer">
+                <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                <span>Print Pass (1 Page A4)</span>
             </button>
-            <a href="{% url 'public-register' event.slug %}" class="google-btn-outlined px-3 py-2 text-xs flex items-center gap-1 font-bold">
-                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <a href="{% url 'public-register' event.slug %}" class="google-btn-outlined px-3 py-1.5 text-xs flex items-center gap-1 font-bold">
+                <i data-lucide="arrow-left" class="w-3 h-3"></i>
                 <span>Event Home</span>
             </a>
         </div>
     </div>
 
-    <!-- Official Single-Page A4 Confirmation Voucher -->
-    <div class="a4-voucher-page bg-white text-slate-800 font-sans overflow-hidden flex flex-col justify-between">
+    <!-- Official Strictly Single-Page A4 Confirmation Voucher -->
+    <div class="a4-voucher-page bg-white text-slate-800 font-sans overflow-hidden flex flex-col justify-between border border-slate-300">
         
-        <!-- TOP & MIDDLE CONTENT WRAPPER -->
-        <div>
-            <!-- 1. Top Brand Bar -->
-            <div class="px-5 py-2.5 bg-white flex items-center justify-between border-b border-slate-200">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded bg-gradient-to-tr from-[#1a73e8] to-[#34a853] flex items-center justify-center text-white font-black font-display text-sm shadow-xs">
+        <!-- TOP & MAIN CONTENT SECTION -->
+        <div class="flex-1 flex flex-col justify-start">
+            
+            <!-- 1. Top Brand Header Bar -->
+            <div class="px-4 py-2 bg-white flex items-center justify-between border-b border-slate-200">
+                <div class="flex items-center gap-1.5">
+                    <div class="w-6 h-6 rounded bg-gradient-to-tr from-[#1a73e8] to-[#34a853] flex items-center justify-center text-white font-black font-display text-xs shadow-2xs">
                         E
                     </div>
                     <div>
-                        <span class="text-xs font-black font-display text-slate-900 tracking-tight block leading-tight">EMS PASS</span>
-                        <span class="text-[8px] uppercase font-bold text-slate-400 tracking-widest block font-mono">OFFICIAL ADMISSION</span>
+                        <span class="text-xs font-black font-display text-slate-900 tracking-tight block leading-none">EMS PASS</span>
+                        <span class="text-[7px] uppercase font-bold text-slate-400 tracking-widest block font-mono mt-0.5">OFFICIAL ADMISSION</span>
                     </div>
                 </div>
-                <div class="text-right font-mono text-xs text-slate-600">
+                <div class="text-right font-mono text-[11px] text-slate-600">
                     <span class="text-slate-400 text-[9px]">Booking ID: </span>
                     <strong class="text-slate-900 font-bold select-all">{{ attendee.pass_code }}</strong>
                 </div>
             </div>
 
-            <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + QR Code) -->
-            <div class="bg-gradient-to-br from-[#1a73e8] via-[#1557b0] to-[#0d47a1] px-5 py-4 text-white relative overflow-hidden">
-                <div class="grid grid-cols-12 gap-3 items-center relative z-10">
+            <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + Top QR Code) -->
+            <div class="bg-gradient-to-br from-[#1a73e8] via-[#1557b0] to-[#0d47a1] px-4 py-3 text-white relative overflow-hidden">
+                <div class="grid grid-cols-12 gap-2.5 items-center relative z-10">
                     <!-- Left Title -->
-                    <div class="col-span-7 sm:col-span-8 space-y-1">
-                        <h1 class="text-2xl sm:text-3xl font-black font-display tracking-tight text-white leading-tight">
-                            Booking<br>confirmed!
+                    <div class="col-span-8 space-y-1">
+                        <h1 class="text-xl sm:text-2xl font-black font-display tracking-tight text-white leading-tight">
+                            Booking confirmed!
                         </h1>
-                        <p class="text-xs text-blue-100 max-w-sm leading-tight">
-                            From keynotes to networking sessions — enjoy full verified access to <strong>{{ event.title }}</strong>.
+                        <p class="text-[11px] text-blue-100 max-w-sm leading-tight">
+                            Enjoy full verified access to <strong>{{ event.title }}</strong>.
                         </p>
-                        <div class="pt-1">
-                            <span class="inline-flex items-center gap-1 bg-white/20 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-white/30 font-mono">
+                        <div class="pt-0.5">
+                            <span class="inline-flex items-center gap-1 bg-white/20 text-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border border-white/30 font-mono">
                                 <i data-lucide="check-circle-2" class="w-3 h-3 text-emerald-300"></i>
-                                <span>VERIFIED ENTRY PASS</span>
+                                <span>VERIFIED ENTRY PASS • {{ ticket_count }} PERSON{{ ticket_count|pluralize|upper }}</span>
                             </span>
                         </div>
                     </div>
 
                     <!-- Right Prominent QR Box -->
-                    <div class="col-span-5 sm:col-span-4 flex justify-end">
-                        <div class="bg-white p-2 rounded-lg shadow-xl border border-white text-center space-y-1 shrink-0">
+                    <div class="col-span-4 flex justify-end">
+                        <div class="bg-white p-1.5 rounded-lg shadow-lg border border-white text-center space-y-0.5 shrink-0">
                             {% if qr_base64 %}
-                            <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Pass" class="w-24 h-24 sm:w-28 sm:h-28 object-contain block mx-auto">
+                            <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Pass" class="w-20 h-20 sm:w-22 sm:h-22 object-contain block mx-auto">
                             {% else %}
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ attendee.pass_code }}" alt="QR Pass" class="w-24 h-24 sm:w-28 sm:h-28 object-contain block mx-auto">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code }}" alt="QR Pass" class="w-20 h-20 sm:w-22 sm:h-22 object-contain block mx-auto">
                             {% endif %}
-                            <div class="font-mono text-[10px] font-black text-slate-900 tracking-wider">
+                            <div class="font-mono text-[9px] font-black text-slate-900 tracking-wider leading-tight">
                                 {{ attendee.pass_code }}
                             </div>
-                            <div class="text-[8px] font-bold text-[#1a73e8] uppercase font-mono tracking-wider">
+                            <div class="text-[7px] font-bold text-[#1a73e8] uppercase font-mono tracking-wider leading-none">
                                 SCAN AT TURNSTILE
                             </div>
                         </div>
@@ -154,88 +159,88 @@
             </div>
 
             <!-- 3. Dark Info Strip (Date, Time, Venue) -->
-            <div class="bg-[#0f172a] text-slate-200 px-5 py-2 text-[11px] flex flex-wrap items-center justify-between gap-2 font-medium">
-                <div class="flex items-center gap-1.5">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+            <div class="bg-[#0f172a] text-slate-200 px-4 py-1.5 text-[10px] flex flex-wrap items-center justify-between gap-2 font-medium">
+                <div class="flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3 h-3 text-blue-400 shrink-0"></i>
                     <span>Date: <strong class="text-white">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                <div class="flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3 h-3 text-blue-400 shrink-0"></i>
                     <span>Time: <strong class="text-white">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                <div class="flex items-center gap-1">
+                    <i data-lucide="map-pin" class="w-3 h-3 text-blue-400 shrink-0"></i>
                     <span><strong class="text-white">{{ event.venue|default:"BIEC Convention Centre" }}</strong></span>
                 </div>
             </div>
 
             <!-- 4. Three Colorful Summary KPI Cards -->
-            <div class="px-5 py-3 grid grid-cols-3 gap-2.5 bg-slate-50 border-b border-slate-200">
-                <!-- Card 1: Location / Venue (Red/Coral) -->
-                <div class="bg-gradient-to-br from-[#ff5252] to-[#e53935] p-2.5 text-white rounded-lg shadow-2xs flex flex-col justify-between">
+            <div class="px-4 py-2 grid grid-cols-3 gap-2 bg-slate-50 border-b border-slate-200">
+                <!-- Card 1: Location -->
+                <div class="bg-gradient-to-br from-[#ff5252] to-[#e53935] p-2 text-white rounded shadow-2xs flex flex-col justify-between">
                     <div>
-                        <h3 class="text-sm font-black font-display leading-tight truncate">
+                        <h3 class="text-xs font-black font-display leading-tight truncate">
                             {{ event.venue|truncatewords:2|default:"Venue Access" }}
                         </h3>
-                        <p class="text-[10px] text-rose-100 font-medium">Location</p>
+                        <p class="text-[9px] text-rose-100 font-medium">Location</p>
                     </div>
-                    <div class="pt-1.5">
-                        <span class="inline-block bg-white text-[#e53935] font-bold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded font-mono">
-                            VENUE
+                    <div class="pt-1">
+                        <span class="inline-block bg-white text-[#e53935] font-bold text-[7px] uppercase tracking-wider px-1 py-0.2 rounded font-mono">
+                            VENUE ACCESS
                         </span>
                     </div>
                 </div>
 
-                <!-- Card 2: Tickets / Quantity (Blue) -->
-                <div class="bg-gradient-to-br from-[#42a5f5] to-[#1e88e5] p-2.5 text-white rounded-lg shadow-2xs flex flex-col justify-between">
+                <!-- Card 2: Tickets -->
+                <div class="bg-gradient-to-br from-[#42a5f5] to-[#1e88e5] p-2 text-white rounded shadow-2xs flex flex-col justify-between">
                     <div>
-                        <h3 class="text-xl font-black font-display leading-tight">
+                        <h3 class="text-base font-black font-display leading-tight">
                             {{ ticket_count }}
                         </h3>
-                        <p class="text-[10px] text-blue-100 font-medium">Tickets / Person{{ ticket_count|pluralize }}</p>
+                        <p class="text-[9px] text-blue-100 font-medium">Ticket{{ ticket_count|pluralize }} / Pass{{ ticket_count|pluralize }}</p>
                     </div>
-                    <div class="pt-1.5">
-                        <span class="inline-block bg-white/20 text-white font-bold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded border border-white/30 font-mono">
-                            ADMITTED
+                    <div class="pt-1">
+                        <span class="inline-block bg-white/20 text-white font-bold text-[7px] uppercase tracking-wider px-1 py-0.2 rounded border border-white/30 font-mono">
+                            ALL ADMITTED
                         </span>
                     </div>
                 </div>
 
-                <!-- Card 3: Total Paid / Free (Amber/Gold) -->
-                <div class="bg-gradient-to-br from-[#ffa726] to-[#fb8c00] p-2.5 text-white rounded-lg shadow-2xs flex flex-col justify-between">
+                <!-- Card 3: Amount Paid -->
+                <div class="bg-gradient-to-br from-[#ffa726] to-[#fb8c00] p-2 text-white rounded shadow-2xs flex flex-col justify-between">
                     <div>
-                        <h3 class="text-base sm:text-lg font-black font-display leading-tight">
+                        <h3 class="text-sm font-black font-display leading-tight">
                             {% if registration.amount == 0 %}FREE{% else %}₹{{ registration.amount|floatformat:0 }}{% endif %}
                         </h3>
-                        <p class="text-[10px] text-amber-100 font-medium">Amount Paid</p>
+                        <p class="text-[9px] text-amber-100 font-medium">Amount Paid</p>
                     </div>
-                    <div class="pt-1.5">
-                        <span class="inline-block bg-white text-[#fb8c00] font-bold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded font-mono">
-                            CONFIRMED
+                    <div class="pt-1">
+                        <span class="inline-block bg-white text-[#fb8c00] font-bold text-[7px] uppercase tracking-wider px-1 py-0.2 rounded font-mono">
+                            PAID & VERIFIED
                         </span>
                     </div>
                 </div>
             </div>
 
             <!-- 5. Delegate Greeting & Booking Details -->
-            <div class="px-5 py-3 space-y-2 bg-white">
+            <div class="px-4 py-2 space-y-1.5 bg-white">
                 <div>
-                    <h2 class="text-xs font-bold text-slate-900">
+                    <h2 class="text-xs font-bold text-slate-900 leading-tight">
                         Hi {{ customer.name|title }},
                     </h2>
-                    <p class="text-[11px] text-slate-600 leading-tight">
-                        Welcome to <strong>{{ event.title }}</strong>! Your registration is <strong class="text-emerald-700 font-bold">confirmed</strong>. Here are your booking details:
+                    <p class="text-[10px] text-slate-600 leading-tight">
+                        Welcome to <strong>{{ event.title }}</strong>! Your registration is <strong class="text-emerald-700 font-bold">confirmed</strong>.
                     </p>
                 </div>
 
                 <!-- Booking Details 2x2 Box -->
-                <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs text-[11px]">
-                    <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-200 flex items-center justify-between font-bold text-slate-700 text-[10px] uppercase">
+                <div class="border border-slate-200 rounded overflow-hidden bg-white shadow-2xs text-[10px]">
+                    <div class="bg-slate-100 px-3 py-1 border-b border-slate-200 flex items-center justify-between font-bold text-slate-700 text-[9px] uppercase">
                         <span>Booking Information</span>
                         <span class="font-mono text-slate-500 font-normal">Pass Generated: <strong class="text-slate-800">{{ registration.created_at|date:"d M Y, h:i A" }}</strong></span>
                     </div>
                     <div class="grid grid-cols-2 divide-x divide-slate-200">
-                        <div class="p-2.5 space-y-1">
+                        <div class="p-1.5 space-y-0.5">
                             <div class="flex justify-between">
                                 <span class="text-slate-400">Name:</span>
                                 <strong class="text-slate-900 font-semibold">{{ customer.name|title }}</strong>
@@ -245,7 +250,7 @@
                                 <span class="font-mono text-slate-700">{{ customer.email }}</span>
                             </div>
                         </div>
-                        <div class="p-2.5 space-y-1">
+                        <div class="p-1.5 space-y-0.5">
                             <div class="flex justify-between">
                                 <span class="text-slate-400">Phone:</span>
                                 <strong class="text-slate-900 font-mono">{{ customer.phone|default:"+91 9876543210" }}</strong>
@@ -260,53 +265,53 @@
             </div>
 
             <!-- 6. Ticket Details & Persons Table -->
-            <div class="px-5 pb-3 bg-white">
-                <div class="border border-slate-300 rounded-lg overflow-hidden shadow-2xs">
-                    <div class="bg-slate-100 px-3 py-1.5 border-b border-slate-300 flex items-center justify-between text-[10px] font-bold text-slate-800 uppercase">
+            <div class="px-4 pb-2 bg-white">
+                <div class="border border-slate-300 rounded overflow-hidden shadow-2xs">
+                    <div class="bg-slate-100 px-3 py-1 border-b border-slate-300 flex items-center justify-between text-[9px] font-bold text-slate-800 uppercase">
                         <span>Ticket Details</span>
                         <span class="font-mono text-slate-500 font-normal">Sales Order: <strong class="text-slate-800">{{ registration.registration_code }}</strong></span>
                     </div>
                     
-                    <table class="w-full text-left text-[11px] border-collapse">
-                        <thead class="bg-[#1e293b] text-white font-bold text-[9px] uppercase tracking-wider font-mono">
+                    <table class="w-full text-left text-[10px] border-collapse">
+                        <thead class="bg-[#1e293b] text-white font-bold text-[8px] uppercase tracking-wider font-mono">
                             <tr>
-                                <th class="py-1.5 px-3">Ticket Type / Person Name</th>
-                                <th class="py-1.5 px-3 w-16 text-center">Age</th>
-                                <th class="py-1.5 px-3 w-20">Gender</th>
-                                <th class="py-1.5 px-3 w-28">Category</th>
-                                <th class="py-1.5 px-3 w-24 text-right">Amount</th>
+                                <th class="py-1 px-2.5">Ticket Type / Person Name</th>
+                                <th class="py-1 px-2.5 w-14 text-center">Age</th>
+                                <th class="py-1 px-2.5 w-16">Gender</th>
+                                <th class="py-1 px-2.5 w-24">Category</th>
+                                <th class="py-1 px-2.5 w-20 text-right">Amount</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 text-slate-800">
                             {% for person in attendee_list %}
                             <tr class="hover:bg-slate-50 transition">
-                                <td class="py-1.5 px-3 font-semibold text-slate-900">
+                                <td class="py-1 px-2.5 font-semibold text-slate-900">
                                     <span>{{ person.name|title }}</span>
                                     {% if person.index == 1 %}
-                                    <span class="ml-1 text-[8px] font-bold text-[#1a73e8] bg-blue-50 border border-blue-200 px-1 py-0.2 rounded">Primary</span>
+                                    <span class="ml-1 text-[7px] font-bold text-[#1a73e8] bg-blue-50 border border-blue-200 px-1 py-0.1 rounded">Primary</span>
                                     {% endif %}
                                 </td>
-                                <td class="py-1.5 px-3 text-center font-mono font-bold text-slate-800">
+                                <td class="py-1 px-2.5 text-center font-mono font-bold text-slate-800">
                                     {{ person.age }}
                                 </td>
-                                <td class="py-1.5 px-3 text-slate-600">
+                                <td class="py-1 px-2.5 text-slate-600">
                                     {{ person.gender|title }}
                                 </td>
-                                <td class="py-1.5 px-3 text-slate-500 text-[10px]">
+                                <td class="py-1 px-2.5 text-slate-500 text-[9px]">
                                     {{ person.type }}
                                 </td>
-                                <td class="py-1.5 px-3 text-right font-mono font-semibold text-slate-800">
+                                <td class="py-1 px-2.5 text-right font-mono font-semibold text-slate-800">
                                     {% if registration.amount == 0 %}₹0.00{% else %}₹{{ event.registration_fee|floatformat:2 }}{% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
                             
                             <!-- Summary Row -->
-                            <tr class="bg-slate-50 font-bold border-t-2 border-slate-300">
-                                <td colspan="4" class="py-2 px-3 text-slate-900 font-display text-xs">
+                            <tr class="bg-slate-50 font-bold border-t border-slate-300">
+                                <td colspan="4" class="py-1.5 px-2.5 text-slate-900 font-display text-[10px]">
                                     Total Amount Paid
                                 </td>
-                                <td class="py-2 px-3 text-right font-mono text-sm text-[#1a73e8] font-black">
+                                <td class="py-1.5 px-2.5 text-right font-mono text-xs text-[#1a73e8] font-black">
                                     ₹{{ registration.amount|floatformat:2 }}
                                 </td>
                             </tr>
@@ -316,25 +321,26 @@
             </div>
 
             <!-- 7. Important Information Box -->
-            <div class="px-5 pb-3 bg-white">
-                <div class="bg-blue-50/70 border border-blue-200 rounded-lg p-3 space-y-1 text-[10px] text-slate-700">
-                    <h4 class="font-bold text-slate-900 text-[11px] flex items-center gap-1.5">
-                        <i data-lucide="info" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+            <div class="px-4 pb-2 bg-white">
+                <div class="bg-blue-50/70 border border-blue-200 rounded p-2 space-y-0.5 text-[9px] text-slate-700">
+                    <h4 class="font-bold text-slate-900 text-[10px] flex items-center gap-1">
+                        <i data-lucide="info" class="w-3 h-3 text-[#1a73e8]"></i>
                         <span>Important Information</span>
                     </h4>
                     <ul class="space-y-0.5 text-slate-600 list-disc list-inside">
-                        <li>Please show your <strong>QR code</strong> at the entry turnstile or gate for admission.</li>
+                        <li>Please show your <strong>QR code</strong> at the entry turnstile or security gate for admission.</li>
                         <li>Primary attendee must carry a valid photo ID (Aadhaar / Driving License / College ID).</li>
                         <li>Gates open 45 minutes prior to event schedule ({{ event.start_time|date:"h:i A" }}).</li>
                     </ul>
                 </div>
             </div>
+
         </div>
 
-        <!-- 8. BOTTOM FOOTER BAR (Anchored at exact bottom of A4) -->
-        <div class="bg-[#0f172a] text-white py-2.5 px-5 text-[10px] font-mono flex items-center justify-between shrink-0">
+        <!-- 8. BOTTOM FOOTER BAR (Anchored at exact bottom) -->
+        <div class="bg-[#0f172a] text-white py-2 px-4 text-[9px] font-mono flex items-center justify-between shrink-0">
             <span class="font-bold text-emerald-400 flex items-center gap-1">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
                 <span>VERIFIED & ACTIVE • OFFICIAL 1-PAGE A4 PASS</span>
             </span>
             <span class="text-slate-400 font-mono">EMS-AUTH-{{ attendee.id|stringformat:"06d" }}</span>
