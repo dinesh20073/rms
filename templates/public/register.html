@@ -6,8 +6,8 @@
 {% block main_content %}
 <div class="w-full survey-card-container bg-white">
 
-    <!-- 1. Responsive Form Header Banner (Fixed at top of window) -->
-    <div class="w-full overflow-hidden bg-[#FFF7F5] border-b border-[#E8C7C7] shrink-0">
+    <!-- 1. Responsive Form Header Banner -->
+    <div class="w-full overflow-hidden bg-[#FFF7F5] border-b border-[#E8C7C7]">
         <picture class="w-full block">
             <!-- Mobile Screen Banner (2:1 Ratio) -->
             <source media="(max-width: 639px)" srcset="{% static 'images/banners/form_header_mobile.png' %}">
@@ -18,10 +18,8 @@
         </picture>
     </div>
 
-    <!-- Scrollable Window Body -->
-    <div class="survey-card-scroll-body">
-        <!-- 2. Event Details Bar with Official Google Material UI Symbols -->
-        <div class="px-6 sm:px-10 pt-6 pb-5 bg-[#FAF4F3] border-b border-[#E8C7C7] space-y-3.5">
+    <!-- 2. Event Details Bar with Official Google Material UI Symbols -->
+    <div class="px-6 sm:px-10 pt-6 pb-5 bg-[#FAF4F3] border-b border-[#E8C7C7] space-y-3.5">
         <div>
             <h1 class="text-xl sm:text-2xl font-bold font-display text-[#8F414B] tracking-tight">
                 {{ event.title }}
@@ -138,8 +136,6 @@
                 </button>
             </div>
         </form>
-
-    </div>
 
     </div>
 
