@@ -343,21 +343,93 @@
             background-color: #f8fafc !important;
         }
 
-        tbody td.table-freeze-col-1,
-        tbody td.table-freeze-col-2,
-        tbody td.table-freeze-col-3,
-        tbody td.table-freeze-col-4,
-        tbody td.table-freeze-col-5,
-        tbody td.table-freeze-col-6 {
-            background-color: #ffffff;
+        /* Status-Based Row Background Coloring */
+        tbody tr.row-verified {
+            background-color: #f6fdf8 !important;
+            border-left: 3px solid #16a34a !important;
         }
-        tbody tr:hover td.table-freeze-col-1,
-        tbody tr:hover td.table-freeze-col-2,
-        tbody tr:hover td.table-freeze-col-3,
-        tbody tr:hover td.table-freeze-col-4,
-        tbody tr:hover td.table-freeze-col-5,
-        tbody tr:hover td.table-freeze-col-6 {
-            background-color: #f8fafc !important;
+        tbody tr.row-verified td.table-freeze-col-1,
+        tbody tr.row-verified td.table-freeze-col-2,
+        tbody tr.row-verified td.table-freeze-col-3,
+        tbody tr.row-verified td.table-freeze-col-4,
+        tbody tr.row-verified td.table-freeze-col-5,
+        tbody tr.row-verified td.table-freeze-col-6 {
+            background-color: #f6fdf8 !important;
+        }
+        tbody tr.row-verified:hover,
+        tbody tr.row-verified:hover td.table-freeze-col-1,
+        tbody tr.row-verified:hover td.table-freeze-col-2,
+        tbody tr.row-verified:hover td.table-freeze-col-3,
+        tbody tr.row-verified:hover td.table-freeze-col-4,
+        tbody tr.row-verified:hover td.table-freeze-col-5,
+        tbody tr.row-verified:hover td.table-freeze-col-6 {
+            background-color: #ecfdf5 !important;
+        }
+
+        tbody tr.row-review {
+            background-color: #fffdf5 !important;
+            border-left: 3px solid #f59e0b !important;
+        }
+        tbody tr.row-review td.table-freeze-col-1,
+        tbody tr.row-review td.table-freeze-col-2,
+        tbody tr.row-review td.table-freeze-col-3,
+        tbody tr.row-review td.table-freeze-col-4,
+        tbody tr.row-review td.table-freeze-col-5,
+        tbody tr.row-review td.table-freeze-col-6 {
+            background-color: #fffdf5 !important;
+        }
+        tbody tr.row-review:hover,
+        tbody tr.row-review:hover td.table-freeze-col-1,
+        tbody tr.row-review:hover td.table-freeze-col-2,
+        tbody tr.row-review:hover td.table-freeze-col-3,
+        tbody tr.row-review:hover td.table-freeze-col-4,
+        tbody tr.row-review:hover td.table-freeze-col-5,
+        tbody tr.row-review:hover td.table-freeze-col-6 {
+            background-color: #fef9c3 !important;
+        }
+
+        tbody tr.row-pending {
+            background-color: #ffffff !important;
+            border-left: 3px solid #60a5fa !important;
+        }
+        tbody tr.row-pending td.table-freeze-col-1,
+        tbody tr.row-pending td.table-freeze-col-2,
+        tbody tr.row-pending td.table-freeze-col-3,
+        tbody tr.row-pending td.table-freeze-col-4,
+        tbody tr.row-pending td.table-freeze-col-5,
+        tbody tr.row-pending td.table-freeze-col-6 {
+            background-color: #ffffff !important;
+        }
+        tbody tr.row-pending:hover,
+        tbody tr.row-pending:hover td.table-freeze-col-1,
+        tbody tr.row-pending:hover td.table-freeze-col-2,
+        tbody tr.row-pending:hover td.table-freeze-col-3,
+        tbody tr.row-pending:hover td.table-freeze-col-4,
+        tbody tr.row-pending:hover td.table-freeze-col-5,
+        tbody tr.row-pending:hover td.table-freeze-col-6 {
+            background-color: #eff6ff !important;
+        }
+
+        tbody tr.row-failed {
+            background-color: #fff5f5 !important;
+            border-left: 3px solid #ef4444 !important;
+        }
+        tbody tr.row-failed td.table-freeze-col-1,
+        tbody tr.row-failed td.table-freeze-col-2,
+        tbody tr.row-failed td.table-freeze-col-3,
+        tbody tr.row-failed td.table-freeze-col-4,
+        tbody tr.row-failed td.table-freeze-col-5,
+        tbody tr.row-failed td.table-freeze-col-6 {
+            background-color: #fff5f5 !important;
+        }
+        tbody tr.row-failed:hover,
+        tbody tr.row-failed:hover td.table-freeze-col-1,
+        tbody tr.row-failed:hover td.table-freeze-col-2,
+        tbody tr.row-failed:hover td.table-freeze-col-3,
+        tbody tr.row-failed:hover td.table-freeze-col-4,
+        tbody tr.row-failed:hover td.table-freeze-col-5,
+        tbody tr.row-failed:hover td.table-freeze-col-6 {
+            background-color: #fee2e2 !important;
         }
     </style>
     {% block extra_head %}{% endblock %}
