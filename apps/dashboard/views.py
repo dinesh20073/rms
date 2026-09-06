@@ -486,9 +486,47 @@ def revenue_analytics_view(request):
 
 def email_logs_view(request):
     tenant = get_current_tenant(request)
-    logs = EmailLog.objects.filter(tenant=tenant).order_by('-sent_at')[:50]
+    logs_qs = EmailLog.objects.filter(tenant=tenant).order_by('-sent_at')
+
+    search_query = request.GET.get('q', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+    event_type_filter = request.GET.get('event_type', '').strip()
+
+    total_count = logs_qs.count()
+    sent_count = logs_qs.filter(status='SENT').count()
+    simulated_count = logs_qs.filter(status='SIMULATED').count()
+    failed_count = logs_qs.filter(status='FAILED').count()
+
+    if status_filter:
+        logs_qs = logs_qs.filter(status=status_filter)
+    if event_type_filter:
+        logs_qs = logs_qs.filter(event_type=event_type_filter)
+    if search_query:
+        logs_qs = logs_qs.filter(
+            Q(subject__icontains=search_query) |
+            Q(recipient_name__icontains=search_query) |
+            Q(recipient_email__icontains=search_query) |
+            Q(body_html__icontains=search_query)
+        )
+
+    logs = list(logs_qs[:100])
+    selected_id = request.GET.get('id', '')
+    selected_email = None
+    if selected_id:
+        selected_email = next((e for e in logs if str(e.id) == selected_id), None)
+    if not selected_email and logs:
+        selected_email = logs[0]
+
     return render(request, 'dashboard/notifications/emails.html', {
         'email_logs': logs,
+        'selected_email': selected_email,
+        'total_count': total_count,
+        'sent_count': sent_count,
+        'simulated_count': simulated_count,
+        'failed_count': failed_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
+        'event_type_filter': event_type_filter,
         'tenant': tenant
     })
 
