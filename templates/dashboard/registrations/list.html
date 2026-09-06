@@ -3,7 +3,7 @@
 {% block header_title %}Registration Logs Directory{% endblock %}
 
 {% block content %}
-<div class="p-3 sm:p-4 max-w-[1600px] w-full mx-auto h-full flex flex-col space-y-3 overflow-hidden">
+<div class="p-2.5 sm:p-4 max-w-[1600px] w-full mx-auto min-h-full lg:h-full flex flex-col space-y-3 overflow-y-auto lg:overflow-hidden">
 
     <!-- Top Multi-Column Filter & Search Bar (Google Style - Fixed Top) -->
     <div class="google-card p-4 flex flex-col gap-3 shrink-0">
@@ -208,7 +208,7 @@
     </div>
 
     <!-- Google Table Container (Sticky Header & Freeze Columns up to Event - Bottom Scroll Alone) -->
-    <div class="google-card flex-1 min-h-0 flex flex-col overflow-hidden">
+    <div class="google-card flex-1 min-h-[420px] lg:min-h-0 flex flex-col overflow-hidden">
         <div class="table-scroll-container flex-1 min-h-0 overflow-auto">
             <table class="w-full text-left text-xs border-collapse min-w-[1050px]">
                 <thead class="bg-[#f8f9fa] border-b border-[#dadce0] text-[#5f6368] font-medium text-[11px] uppercase tracking-wider">

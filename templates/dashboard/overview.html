@@ -3,7 +3,7 @@
 {% block header_title %}Financial Analytics, Collections & Database Overview{% endblock %}
 
 {% block content %}
-<div class="p-3 sm:p-4 max-w-[1600px] w-full mx-auto h-full flex flex-col space-y-3 overflow-hidden">
+<div class="p-2.5 sm:p-4 max-w-[1600px] w-full mx-auto min-h-full lg:h-full flex flex-col space-y-3 overflow-y-auto lg:overflow-hidden">
 
     <!-- 1. Financial Analytics & Collections KPI Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
@@ -169,7 +169,7 @@
     </div>
 
     <!-- 3. Main Registered Users Database Explorer Card -->
-    <div class="google-card flex-1 min-h-0 flex flex-col overflow-hidden">
+    <div class="google-card flex-1 min-h-[420px] lg:min-h-0 flex flex-col overflow-hidden">
         
         <!-- Short Segmented Tabs: All | Pending | Verified | Review -->
         <div class="border-b border-[#e2e8f0] px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-slate-600 bg-white shrink-0">
