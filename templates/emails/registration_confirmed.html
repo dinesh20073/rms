@@ -1,0 +1,118 @@
+{% extends 'emails/email_base.html' %}
+
+{% block email_title %}Registration Confirmed: {{ event.title }}{% endblock %}
+
+{% block email_content %}
+<div style="text-align: left;">
+    
+    <!-- Greeting & Status Headline -->
+    <div style="margin-bottom: 24px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #1e8e3e; background-color: #e6f4ea; border: 1px solid #ceead6; padding: 3px 10px; border-radius: 12px; display: inline-block; margin-bottom: 8px;">
+            Booking Confirmed & Verified
+        </span>
+        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #202124; line-height: 1.3;">
+            You're registered for {{ event.title }}
+        </h1>
+        <p style="margin: 8px 0 0 0; font-size: 14px; color: #5f6368; line-height: 1.5;">
+            Hi <strong>{{ customer.name }}</strong>, your registration and payment have been confirmed. Below is your official individual attendee pass and entry QR code.
+        </p>
+    </div>
+
+    <!-- Official Ticket / Pass Box with Embedded Individual QR Code -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border: 2px solid #1a73e8; border-radius: 16px; margin: 24px 0; overflow: hidden; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.08);">
+        
+        <!-- Header Ribbon inside Pass Box -->
+        <tr>
+            <td style="background: linear-gradient(90deg, #1a73e8, #1557b0); color: #ffffff; padding: 14px 20px; font-size: 13px; font-weight: 700;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="left" style="color: #ffffff; font-family: 'Plus Jakarta Sans', Arial, sans-serif;">OFFICIAL ATTENDEE BADGE PASS</td>
+                        <td align="right" style="color: #d2e3fc; font-family: monospace; font-size: 12px;">{{ order.order_code|default:"ORD-CONFIRMED" }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <!-- Individual QR Code Centerpiece Section -->
+        <tr>
+            <td align="center" style="background-color: #f8fafc; padding: 24px 20px 16px 20px; border-bottom: 1px dashed #cbd5e1;">
+                <div style="display: inline-block; background-color: #ffffff; padding: 12px; border: 2px solid #dadce0; border-radius: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+                    {% if qr_base64 %}
+                    <img src="data:image/png;base64,{{ qr_base64 }}" alt="Attendee Check-In QR" width="168" height="168" style="display: block; border-radius: 8px;" />
+                    {% elif attendee %}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=168x168&data={{ attendee.pass_code }}" alt="Attendee Check-In QR" width="168" height="168" style="display: block; border-radius: 8px;" />
+                    {% else %}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=168x168&data={{ registration.registration_code }}" alt="Attendee Check-In QR" width="168" height="168" style="display: block; border-radius: 8px;" />
+                    {% endif %}
+                </div>
+                
+                <!-- Individual Pass Code -->
+                <div style="font-family: monospace; font-size: 17px; font-weight: 800; color: #1a73e8; letter-spacing: 1.5px; margin-top: 10px;">
+                    {{ pass_code|default:registration.registration_code }}
+                </div>
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">
+                    Scan at entrance desk for instant check-in
+                </div>
+            </td>
+        </tr>
+
+        <!-- Pass Key Details -->
+        <tr>
+            <td style="padding: 20px; background-color: #ffffff;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 13px; color: #334155;">
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b; width: 40%;">Attendee Name:</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;">{{ customer.name }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Event Name:</td>
+                        <td style="padding: 6px 0; font-weight: 600; color: #0f172a; text-align: right;">{{ event.title }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Amount Paid:</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #15803d; font-family: monospace; text-align: right;">
+                            ₹{{ registration.amount|floatformat:2 }} (UPI Verified)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Event Venue:</td>
+                        <td style="padding: 6px 0; font-weight: 500; color: #0f172a; text-align: right;">
+                            {{ event.venue|default:"Main Campus / Online" }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Order Reference:</td>
+                        <td style="padding: 6px 0; font-family: monospace; color: #64748b; text-align: right;">
+                            {{ order.order_code|default:"ORD-VERIFIED" }}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+    </table>
+
+    <!-- Direct Full Screen Action Button -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0 24px 0;">
+        <tr>
+            <td align="center">
+                {% if attendee %}
+                <a href="http://127.0.0.1:8000/pass/{{ attendee.pass_code }}/" target="_blank" style="display: inline-block; background-color: #1a73e8; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 11px 26px; border-radius: 24px; box-shadow: 0 2px 6px rgba(26, 115, 232, 0.35);">
+                    Open Full-Screen Digital Badge ↗
+                </a>
+                {% else %}
+                <a href="http://127.0.0.1:8000/status/{{ registration.registration_code }}/" target="_blank" style="display: inline-block; background-color: #1a73e8; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 11px 26px; border-radius: 24px; box-shadow: 0 2px 6px rgba(26, 115, 232, 0.35);">
+                    Track Registration Status ↗
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Entry Instructions Notice -->
+    <div style="background-color: #f1f5f9; border-left: 4px solid #1a73e8; border-radius: 6px; padding: 12px 16px; font-size: 12px; color: #475569; line-height: 1.5;">
+        <strong style="color: #0f172a;">Entry Instructions:</strong> Present this email or screenshot of your individual QR code above on your mobile device at the entrance check-in counter for immediate admission.
+    </div>
+
+</div>
+{% endblock %}

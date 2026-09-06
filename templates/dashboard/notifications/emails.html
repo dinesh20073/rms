@@ -1,0 +1,78 @@
+{% extends 'dashboard_base.html' %}
+
+{% block header_title %}Email Notification Logs & Simulator{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+
+    <!-- Header banner -->
+    <div class="google-card p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-white to-[#fce8e6]/30">
+        <div>
+            <h2 class="text-xl font-bold font-display text-[#202124] flex items-center gap-2">
+                <i data-lucide="mail-check" class="w-5 h-5 text-[#d93025]"></i>
+                <span>Email Notification Logs</span>
+            </h2>
+            <p class="text-xs text-[#5f6368] mt-1">Track transactional confirmation emails, digital badges, and payment reminders sent to attendees.</p>
+        </div>
+        <span class="text-xs font-bold text-[#1a73e8] bg-[#e8f0fe] border border-[#d2e3fc] px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-2xs">
+            <i data-lucide="database" class="w-3.5 h-3.5"></i>
+            <span>{{ email_logs.count }} Outbound Logs</span>
+        </span>
+    </div>
+
+    <!-- Email List -->
+    <div class="google-card p-5 sm:p-6 space-y-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#5f6368] flex items-center gap-1.5">
+            <i data-lucide="send" class="w-4 h-4 text-[#1a73e8]"></i>
+            <span>Outbound Message Deliveries</span>
+        </h3>
+
+        <div class="space-y-4">
+            {% for email in email_logs %}
+            <div class="bg-[#f8f9fa] border border-[#dadce0] rounded-2xl p-4 sm:p-5 flex flex-col gap-3 hover:border-[#1a73e8] transition">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#dadce0] pb-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] flex items-center justify-center shadow-2xs">
+                            <i data-lucide="mail" class="w-4 h-4 text-[#1a73e8]"></i>
+                        </span>
+                        <div>
+                            <div class="text-xs font-bold text-[#202124]">{{ email.subject }}</div>
+                            <div class="text-[11px] text-[#5f6368] mt-0.5">
+                                Recipient: <strong class="text-[#202124]">{{ email.recipient_name }}</strong> &lt;<span class="text-[#1a73e8]">{{ email.recipient_email }}</span>&gt;
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        {% if email.status == 'SENT' %}
+                        <span class="pill-green">Delivered</span>
+                        {% else %}
+                        <span class="pill-blue">Simulated</span>
+                        {% endif %}
+                        <span class="font-mono text-[11px] text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                            <span>{{ email.sent_at|date:"d M Y H:i:s" }}</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Preview container -->
+                <div class="bg-white p-3 rounded-xl border border-[#dadce0] overflow-hidden">
+                    <div class="text-[10px] font-bold text-[#5f6368] uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <i data-lucide="eye" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                        <span>Rendered Google Email Preview</span>
+                    </div>
+                    <div class="border border-[#dadce0] rounded-xl p-2 max-h-[260px] overflow-y-auto bg-[#f8f9fa]">
+                        <iframe srcdoc="{{ email.body_html }}" class="w-full h-56 border-0 rounded-lg"></iframe>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="py-12 text-center text-xs text-[#5f6368]">
+                No email notifications have been logged yet.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

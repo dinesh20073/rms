@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block email_title %}Google EMS Notification{% endblock %}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #202124; -webkit-font-smoothing: antialiased;">
+
+    <!-- Wrapper Table for Universal Email Client Compatibility -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8f9fa; padding: 32px 16px;">
+        <tr>
+            <td align="center">
+                
+                <!-- Main Email Card (Max width 600px) -->
+                <table role="presentation" width="100%" max-width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(60,64,67,0.15);">
+                    
+                    <!-- Google 4-Color Top Border Stripe -->
+                    <tr>
+                        <td style="padding: 0; height: 4px; line-height: 4px; font-size: 0;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td width="25%" style="background-color: #4285F4; height: 4px;"></td>
+                                    <td width="25%" style="background-color: #EA4335; height: 4px;"></td>
+                                    <td width="25%" style="background-color: #FBBC05; height: 4px;"></td>
+                                    <td width="25%" style="background-color: #34A853; height: 4px;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Header with Google EMS Logo -->
+                    <tr>
+                        <td style="padding: 24px 32px 16px 32px; border-bottom: 1px solid #f1f3f4;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td align="left" style="vertical-align: middle;">
+                                        <div style="font-size: 18px; font-weight: 700; color: #202124; letter-spacing: -0.2px;">
+                                            <span style="color: #4285F4;">E</span><span style="color: #EA4335;">M</span><span style="color: #FBBC05;">S</span>
+                                            <span style="color: #5f6368; font-weight: 400; font-size: 15px; margin-left: 4px;">Events Platform</span>
+                                        </div>
+                                    </td>
+                                    <td align="right" style="vertical-align: middle;">
+                                        <span style="font-size: 11px; font-weight: 600; color: #137333; background-color: #e6f4ea; border: 1px solid #ceead6; padding: 3px 10px; border-radius: 12px; display: inline-block;">
+                                            ✓ Verified Event
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Email Body Slot -->
+                    <tr>
+                        <td style="padding: 32px;">
+                            {% block email_content %}{% endblock %}
+                        </td>
+                    </tr>
+
+                    <!-- Google Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 24px 32px; border-top: 1px solid #dadce0; text-align: center; color: #5f6368; font-size: 12px; line-height: 1.6;">
+                            <p style="margin: 0 0 6px 0; font-weight: 500; color: #202124;">
+                                {{ event.tenant.name|default:"EMS Platform" }}
+                            </p>
+                            <p style="margin: 0 0 12px 0;">
+                                This is an automated transactional message sent by the EMS Event Verification Engine.
+                            </p>
+                            <p style="margin: 0; font-size: 11px; color: #80868b;">
+                                © {% now "Y" %} EMS Event Management. Powered by Google Cloud & UPI.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

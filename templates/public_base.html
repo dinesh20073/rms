@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block body_content %}
+<style>
+    /* Nizhal Palette Canvas (Sharp Edges) */
+    :root {
+        --nizhal-bg: #FFF7F5;
+        --nizhal-card: #FFFFFF;
+        --nizhal-primary: #B85C68;
+        --nizhal-primary-hover: #9F4C58;
+        --nizhal-heading: #8F414B;
+        --nizhal-text: #3F3A3A;
+        --nizhal-border: #E8C7C7;
+        --nizhal-focus: #C96D77;
+        --nizhal-required: #C45A64;
+        --nizhal-olive: #999A78;
+        --nizhal-peach: #F5A477;
+    }
+
+    .survey-bg-canvas {
+        background: linear-gradient(180deg, #FFF7F5 0%, #FDF2F0 50%, #FAF0EE 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+    
+    /* Decorative Ambient Glow Spheres */
+    .ambient-sphere-1 {
+        position: fixed;
+        width: 380px;
+        height: 380px;
+        border-radius: 50% !important;
+        background: radial-gradient(circle, rgba(245, 164, 119, 0.2) 0%, rgba(184, 92, 104, 0.05) 70%, transparent 100%);
+        top: 5%;
+        right: 5%;
+        pointer-events: none;
+        filter: blur(50px);
+        z-index: 1;
+    }
+    .ambient-sphere-2 {
+        position: fixed;
+        width: 450px;
+        height: 450px;
+        border-radius: 50% !important;
+        background: radial-gradient(circle, rgba(184, 92, 104, 0.12) 0%, rgba(153, 154, 120, 0.05) 70%, transparent 100%);
+        bottom: 5%;
+        left: 5%;
+        pointer-events: none;
+        filter: blur(60px);
+        z-index: 1;
+    }
+
+    /* Strict Sharp Form Card */
+    .survey-card-container {
+        position: relative;
+        z-index: 10;
+        background-color: #FFFFFF;
+        box-shadow: 0 10px 30px rgba(143, 65, 75, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+        border-radius: 0px !important;
+        border: 1px solid #E8C7C7;
+    }
+
+    .survey-header-banner {
+        background: linear-gradient(135deg, #B85C68 0%, #8F414B 100%);
+        color: #ffffff;
+        padding: 28px 36px;
+        border-radius: 0px !important;
+    }
+
+    /* Sharp Inputs */
+    .survey-input {
+        width: 100%;
+        background-color: #FFFFFF !important;
+        color: #3F3A3A !important;
+        border: 1px solid #E8C7C7 !important;
+        border-radius: 0px !important;
+        padding: 11px 14px !important;
+        font-size: 14px !important;
+        outline: none !important;
+        transition: all 0.15s ease-in-out !important;
+    }
+    .survey-input:hover {
+        border-color: #C96D77 !important;
+    }
+    .survey-input:focus {
+        border-color: #C96D77 !important;
+        box-shadow: 0 0 0 3px rgba(201, 109, 119, 0.2) !important;
+    }
+    .survey-input::placeholder {
+        color: #a8a29e !important;
+    }
+
+    /* Exact Website Palette Submit Button (Nizhal Rose - No Blue) */
+    .survey-btn-submit {
+        background-color: #B85C68 !important;
+        background-image: linear-gradient(135deg, #B85C68 0%, #A34E5A 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+        padding: 14px 32px !important;
+        border-radius: 0px !important;
+        border: 1px solid #8F414B !important;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out !important;
+        box-shadow: 0 4px 14px rgba(184, 92, 104, 0.3) !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        text-decoration: none !important;
+    }
+    .survey-btn-submit:hover {
+        background-color: #9F4C58 !important;
+        background-image: linear-gradient(135deg, #9F4C58 0%, #8F414B 100%) !important;
+        box-shadow: 0 6px 18px rgba(159, 76, 88, 0.4) !important;
+    }
+    .survey-btn-submit i, .survey-btn-submit svg {
+        color: #ffffff !important;
+        stroke: #ffffff !important;
+    }
+</style>
+
+<div class="survey-bg-canvas flex flex-col justify-center items-center py-10 px-4 sm:px-6 relative min-h-screen">
+    
+    <!-- Ambient Soft Glow Spheres -->
+    <div class="ambient-sphere-1"></div>
+    <div class="ambient-sphere-2"></div>
+
+    <!-- Main Content Container -->
+    <main class="relative z-10 w-full max-w-3xl my-auto">
+        {% block main_content %}{% endblock %}
+    </main>
+
+</div>
+{% endblock %}

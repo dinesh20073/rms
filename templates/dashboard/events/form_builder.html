@@ -1,0 +1,193 @@
+{% extends 'dashboard_base.html' %}
+
+{% block header_title %}Form Builder • {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+
+    <!-- Top Navigation & Info (Google Forms Theme) -->
+    <div class="google-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-medium text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc]">{{ event.event_code }}</span>
+                <h2 class="text-lg font-bold font-display text-[#202124]">{{ event.title }}</h2>
+            </div>
+            <p class="text-xs text-[#5f6368] mt-1">Customize attendee registration form fields, requirements, and questions.</p>
+        </div>
+        <div class="flex items-center gap-2.5">
+            <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-outlined text-xs">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <span>Live Form</span>
+            </a>
+            <a href="{% url 'dashboard-event-detail' event.id %}" class="google-btn-tonal text-xs">
+                <span>Back to Event</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Builder Split Grid: Configurator on Left, Live Preview on Right -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Fields List & Add Field Form (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Existing Fields List -->
+            <div class="google-card p-5 sm:p-6 space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-[#5f6368] flex items-center justify-between">
+                    <span>Configured Form Questions ({{ fields.count }})</span>
+                    <span class="text-[11px] text-[#80868b] font-normal">Order top-to-bottom</span>
+                </h3>
+
+                <div class="space-y-2.5">
+                    {% for field in fields %}
+                    <div class="bg-[#f8f9fa] border border-[#dadce0] hover:border-[#1a73e8] rounded-xl p-3.5 flex items-center justify-between gap-4 transition">
+                        <div class="flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-full bg-white border border-[#dadce0] text-[#5f6368] flex items-center justify-center text-xs font-mono font-medium">
+                                {{ forloop.counter }}
+                            </span>
+                            <div>
+                                <div class="text-xs font-bold text-[#202124] flex items-center gap-2">
+                                    <span>{{ field.label }}</span>
+                                    {% if field.is_required %}
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#fce8e6] text-[#c5221f] border border-[#fad2cf] font-medium">Required</span>
+                                    {% else %}
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#f1f3f4] text-[#5f6368] border border-[#dadce0] font-medium">Optional</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-[11px] text-[#5f6368] mt-0.5 flex items-center gap-2">
+                                    <span class="font-mono text-[#1a73e8] font-medium">{{ field.field_type }}</span>
+                                    {% if field.options %}
+                                    <span>• {{ field.options|length }} options</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delete field action -->
+                        <form method="POST" onsubmit="return confirm('Remove field {{ field.label }}?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_field">
+                            <input type="hidden" name="field_id" value="{{ field.id }}">
+                            <button type="submit" class="p-2 text-[#5f6368] hover:text-[#d93025] hover:bg-[#fce8e6] rounded-full transition" title="Delete Field">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="py-8 text-center text-xs text-[#5f6368]">No custom fields added yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Add Field Card -->
+            <div class="google-card p-5 sm:p-6">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-[#1a73e8] mb-4 flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Add Custom Question / Field</span>
+                </h3>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_field">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">Field Label *</label>
+                            <input type="text" name="label" required placeholder="e.g. GitHub URL / Dietary Requirements" class="google-input">
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">Field Type *</label>
+                            <select name="field_type" class="google-select w-full">
+                                <option value="text">Short Text</option>
+                                <option value="email">Email Address</option>
+                                <option value="phone">Phone Number</option>
+                                <option value="number">Number</option>
+                                <option value="textarea">Paragraph</option>
+                                <option value="dropdown">Dropdown</option>
+                                <option value="checkbox">Checkbox</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-[#202124] block mb-1">Placeholder Text</label>
+                        <input type="text" name="placeholder" placeholder="e.g. https://github.com/username" class="google-input">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-[#202124] block mb-1">Options (Comma-separated for Dropdown)</label>
+                        <input type="text" name="options_csv" placeholder="e.g. Vegetarian, Non-Vegetarian, Vegan" class="google-input">
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="is_req" name="is_required" class="rounded border-[#dadce0] text-[#1a73e8] focus:ring-0 cursor-pointer">
+                        <label for="is_req" class="text-xs font-medium text-[#202124] cursor-pointer">Mark this question as required</label>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="google-btn-primary w-full py-2.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Add Question to Form</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Right: Live Customer Form Preview (Google Forms Device Mockup) -->
+        <div class="lg:col-span-5">
+            <div class="sticky top-6">
+                <span class="text-xs font-bold uppercase tracking-wider text-[#5f6368] mb-3 block flex items-center gap-2">
+                    <i data-lucide="eye" class="w-4 h-4 text-[#1a73e8]"></i>
+                    <span>Live Form Preview</span>
+                </span>
+
+                <div class="google-card p-6 space-y-4 border-t-4 border-t-[#1a73e8]">
+                    <div class="border-b border-[#dadce0] pb-3">
+                        <div class="text-[11px] font-mono font-medium text-[#1a73e8] uppercase">{{ event.event_code }}</div>
+                        <h4 class="text-lg font-bold font-display text-[#202124] mt-0.5">{{ event.title }}</h4>
+                        <div class="text-xs text-[#5f6368] mt-1">Fee: <strong class="text-[#202124] font-mono">₹{{ event.registration_fee }}</strong></div>
+                    </div>
+
+                    <div class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+                        {% for field in fields %}
+                        <div>
+                            <label class="block text-xs font-medium text-[#202124] mb-1">
+                                {{ field.label }} {% if field.is_required %}<span class="text-[#d93025]">*</span>{% endif %}
+                            </label>
+                            {% if field.field_type == 'textarea' %}
+                            <textarea rows="2" placeholder="{{ field.placeholder }}" class="google-input bg-[#f8f9fa] pointer-events-none" disabled></textarea>
+                            {% elif field.field_type == 'dropdown' %}
+                            <select class="google-select w-full bg-[#f8f9fa] pointer-events-none" disabled>
+                                <option>Select an option...</option>
+                                {% for opt in field.options %}
+                                <option>{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                            {% elif field.field_type == 'checkbox' %}
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" disabled class="rounded border-[#dadce0]">
+                                <span class="text-xs text-[#5f6368]">{{ field.placeholder|default:field.label }}</span>
+                            </div>
+                            {% else %}
+                            <input type="{{ field.field_type }}" placeholder="{{ field.placeholder }}" class="google-input bg-[#f8f9fa] pointer-events-none" disabled>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="pt-2 border-t border-[#f1f3f4]">
+                        <button disabled class="google-btn-primary w-full py-2.5 opacity-75 cursor-not-allowed">
+                            <span>Continue to Payment (₹{{ event.registration_fee|floatformat:0 }})</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

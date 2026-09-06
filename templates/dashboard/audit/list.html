@@ -1,0 +1,67 @@
+{% extends 'dashboard_base.html' %}
+
+{% block header_title %}System Audit Trail{% endblock %}
+
+{% block content %}
+<div class="p-8 max-w-7xl mx-auto space-y-6">
+
+    <!-- Header bar -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold font-display text-slate-900">Security & Lifecycle Audit Trail</h2>
+            <p class="text-xs text-slate-500">Chronological activity log: registration creation, UPI generation, OCR extraction, auto-verification, and manual reviews.</p>
+        </div>
+
+        <form method="GET" class="flex items-center gap-3">
+            <select name="action" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-brand-600">
+                <option value="">All Action Types</option>
+                {% for key, label in action_choices %}
+                <option value="{{ key }}" {% if action_filter == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-sm transition">
+                Filter
+            </button>
+        </form>
+    </div>
+
+    <!-- Audit Stream List -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">Recorded Audit Events ({{ audit_logs.count }})</h3>
+
+        <div class="space-y-2.5">
+            {% for log in audit_logs %}
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-300 transition">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg shrink-0 mt-0.5 flex items-center justify-center bg-white border border-slate-200 text-brand-600 shadow-xs">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-900 flex items-center gap-2">
+                            <span>{{ log.action }}</span>
+                            {% if log.reference_id %}
+                            <span class="font-mono text-brand-700 text-[11px] bg-brand-50 px-2 py-0.5 rounded border border-brand-200">{{ log.reference_id }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-[11px] text-slate-500 mt-1">
+                            Actor: <strong class="text-slate-700">{{ log.actor }}</strong>
+                            {% if log.details %}
+                            <span class="text-slate-500 font-mono text-[10px] ml-2">{{ log.details }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                    <div class="font-mono text-xs text-slate-700 font-medium">{{ log.timestamp|date:"d M Y" }}</div>
+                    <div class="font-mono text-[11px] text-slate-400">{{ log.timestamp|time:"H:i:s" }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="py-12 text-center text-xs text-slate-400">No audit events match your filter.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

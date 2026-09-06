@@ -1,0 +1,261 @@
+{% extends 'public_base.html' %}
+{% load static %}
+
+{% block title %}Payment Checkout • {{ order.order_code }} | EMS{% endblock %}
+
+{% block main_content %}
+<div class="w-full survey-card-container bg-white">
+
+    <!-- 1. Header Banner (Nizhal Rose) -->
+    <div class="survey-header-banner">
+        <div class="flex items-start justify-between gap-4">
+            <div class="space-y-1.5">
+                <div class="inline-flex items-center gap-2 px-2.5 py-0.5 text-xs font-mono font-bold bg-white/20 text-rose-100 border border-white/20">
+                    <span>Order Reference: {{ order.order_code }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-normal font-display text-white tracking-tight">
+                    {{ event.title }}
+                </h1>
+                <p class="text-xs sm:text-sm text-rose-50 opacity-95">
+                    {% if order.status != 'PENDING' %}
+                    Your registration payment receipt has been received.
+                    {% else %}
+                    Complete your registration payment via UPI to receive your event entry pass.
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="hidden sm:flex w-14 h-14 bg-white p-1.5 items-center justify-center shrink-0 shadow-sm border border-[#E8C7C7]">
+                <img src="{% static 'images/logos/upi.png' %}" alt="UPI" class="w-full h-full object-contain">
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Main Body Section -->
+    <div class="p-6 sm:p-10 space-y-8 bg-white text-[#3F3A3A]">
+
+        {% if order.status != 'PENDING' %}
+        <!-- ==================== POST-SUBMISSION STATE (ALWAYS COURTEOUS WAITING NOTICE) ==================== -->
+        <div class="space-y-6 text-center">
+            <div class="w-14 h-14 bg-[#FFF0ED] border border-[#E8C7C7] text-[#B85C68] flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                <span class="material-symbols-outlined text-[32px]">schedule</span>
+            </div>
+            <h2 class="text-2xl font-bold font-display text-[#8F414B]">Payment Submitted</h2>
+            <p class="text-xs text-[#3F3A3A] mt-2 max-w-md mx-auto leading-relaxed">
+                Your payment receipt has been submitted. Kindly wait a few hours for your order status. Our team will verify the transaction and email your official entry pass to <strong class="text-slate-900 font-mono">{{ customer.email }}</strong> shortly.
+            </p>
+
+            <!-- Order Information Summary -->
+            <div class="p-5 bg-[#FAF4F3] border border-[#E8C7C7] text-left text-xs space-y-2.5">
+                <div class="flex justify-between border-b border-[#E8C7C7]/60 pb-2 font-bold text-[#999A78] uppercase text-[10px]">
+                    <span>Order Information</span>
+                    <span class="text-[#B85C68] font-bold font-mono">{{ order.order_code }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#999A78]">Primary Attendee:</span>
+                    <span class="font-bold text-slate-900">{{ customer.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#999A78]">Email:</span>
+                    <span class="font-mono text-slate-800">{{ customer.email }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#999A78]">Total Amount:</span>
+                    <span class="font-mono font-bold text-[#8F414B]">₹{{ order.amount|floatformat:0 }} INR</span>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- ==================== PENDING CHECKOUT STATE ==================== -->
+        <!-- Summary Strip: Amount Due & Attendee -->
+        <div class="bg-[#FFF7F5] border border-[#E8C7C7] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[#999A78] block">Primary Attendee:</span>
+                <span class="text-sm font-bold text-[#3F3A3A]">{{ registration.customer.name }} ({{ registration.customer.email }})</span>
+            </div>
+            <div class="sm:text-right">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-[#999A78] block">Total Payable:</span>
+                <div class="flex items-center sm:justify-end gap-1.5">
+                    <span class="text-2xl sm:text-3xl font-black font-display text-[#8F414B] font-mono">₹{{ order.amount|floatformat:2 }}</span>
+                    <span class="text-xs font-bold text-[#8F414B] bg-[#FFF0ED] border border-[#E8C7C7] px-1.5 py-0.5">INR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: UPI Payment (QR & 1-Tap App Buttons) -->
+        <div class="space-y-5">
+            <div class="border-b border-[#E8C7C7] pb-2 flex items-center justify-between">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-[#8F414B] flex items-center gap-2">
+                    <span class="w-6 h-6 bg-[#B85C68] text-white flex items-center justify-center text-xs font-bold">1</span>
+                    <span>Scan Event QR or Pay with UPI App</span>
+                </h2>
+                <span class="text-xs text-[#999A78] font-semibold">Official UPI Gateway</span>
+            </div>
+
+            <!-- QR Code Card -->
+            <div class="flex flex-col items-center justify-center space-y-3 pt-1">
+                <div class="p-3.5 bg-white border-2 border-[#E8C7C7] shadow-sm">
+                    {% if event.upi_qr_code %}
+                    <img src="{{ event.upi_qr_code.url }}" alt="Event UPI QR" class="w-52 h-52 sm:w-60 sm:h-60 object-contain">
+                    {% elif order.qr_code_image %}
+                    <img src="{{ order.qr_code_image.url }}" alt="Event UPI QR" class="w-52 h-52 sm:w-60 sm:h-60 object-contain">
+                    {% else %}
+                    <div class="w-52 h-52 flex items-center justify-center text-xs text-slate-400">Loading QR...</div>
+                    {% endif %}
+                </div>
+
+                <!-- UPI ID Copy Bar -->
+                <div class="flex items-center gap-2 bg-[#FFF7F5] border border-[#E8C7C7] px-4 py-2">
+                    <span class="text-xs text-[#3F3A3A] font-medium">Payee UPI ID:</span>
+                    <span class="font-mono text-xs font-bold text-[#8F414B] select-all">{{ event.upi_id }}</span>
+                    <button type="button" onclick="navigator.clipboard.writeText('{{ event.upi_id }}'); this.innerText='COPIED'; setTimeout(() => this.innerText='COPY', 2000);" class="ml-2 text-xs font-bold text-[#B85C68] hover:underline">
+                        COPY
+                    </button>
+                </div>
+                <div class="text-xs text-[#3F3A3A]/70">
+                    Payee Name: <strong class="text-[#3F3A3A]">{{ event.upi_name }}</strong>
+                </div>
+            </div>
+
+            <!-- 1-Tap App Action Buttons -->
+            <div class="pt-3">
+                <span class="text-xs font-bold text-[#3F3A3A] block mb-2.5 text-center">
+                    Or Tap to Open UPI App Directly:
+                </span>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    
+                    <!-- Google Pay -->
+                    <a href="{{ order.gpay_intent }}" onclick="handleAppClick('Google Pay')" class="flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-[#E8C7C7] p-3 transition text-xs font-bold text-slate-800 shadow-2xs hover:border-[#4285F4]">
+                        <img src="{% static 'images/logos/gpay.png' %}" alt="Google Pay" class="h-6 w-auto object-contain">
+                        <span>Google Pay</span>
+                    </a>
+
+                    <!-- PhonePe -->
+                    <a href="{{ order.phonepe_intent }}" onclick="handleAppClick('PhonePe')" class="flex items-center justify-center gap-2.5 bg-white hover:bg-purple-50/40 border border-[#E8C7C7] p-3 transition text-xs font-bold text-[#5F259F] shadow-2xs hover:border-[#5F259F]">
+                        <img src="{% static 'images/logos/phonepe.png' %}" alt="PhonePe" class="h-6 w-auto object-contain">
+                        <span>PhonePe</span>
+                    </a>
+
+                    <!-- Other UPI Apps -->
+                    <a href="{{ order.upi_intent_url }}" onclick="handleAppClick('UPI App')" class="flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-[#E8C7C7] p-3 transition text-xs font-bold text-[#3F3A3A] shadow-2xs hover:border-[#8F414B]">
+                        <img src="{% static 'images/logos/upi.png' %}" alt="UPI" class="h-6 w-auto object-contain">
+                        <span>Other UPI Apps</span>
+                    </a>
+
+                </div>
+
+                <!-- Reassuring Message Box -->
+                <div id="app-redirect-notice" class="hidden mt-4 p-4 bg-[#FFF7F5] border border-[#E8C7C7] text-left flex items-start gap-3">
+                    <span class="material-symbols-outlined text-[20px] text-[#B85C68] shrink-0 mt-0.5">schedule</span>
+                    <div class="text-xs text-[#3F3A3A] leading-relaxed">
+                        <strong>Payment initiated in UPI app!</strong> Once completed, please upload your screenshot below or kindly wait a few hours for your order status.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Upload Payment Proof Screenshot -->
+        <div class="pt-6 border-t border-[#E8C7C7] space-y-4">
+            <div class="border-b border-[#E8C7C7] pb-2">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-[#8F414B] flex items-center gap-2">
+                    <span class="w-6 h-6 bg-[#B85C68] text-white flex items-center justify-center text-xs font-bold">2</span>
+                    <span>Submit Payment Proof Screenshot</span>
+                </h2>
+            </div>
+            <p class="text-xs text-[#3F3A3A] leading-relaxed">
+                Upload your payment success receipt screenshot from your UPI app. The verification team will process your transaction and issue your digital check-in pass.
+            </p>
+
+            <form method="POST" action="{% url 'payment-proof-upload' order.order_code %}" enctype="multipart/form-data" class="space-y-4" onsubmit="handleProofFormSubmit(this)">
+                {% csrf_token %}
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-[#3F3A3A]">
+                        Select Screenshot Receipt File (JPG / PNG) <span class="text-[#C45A64]">*</span>
+                    </label>
+
+                    <!-- Single File Picker Input -->
+                    <input type="file" id="screenshot-input" name="screenshot" accept="image/png, image/jpeg, image/jpg" required class="survey-input file:mr-4 file:py-1.5 file:px-4 file:border-0 file:text-xs file:font-bold file:bg-[#B85C68] file:text-white hover:file:bg-[#9F4C58] cursor-pointer" onchange="handleProofSelection(this)">
+
+                    <!-- Selected Image Preview Box with Remove Trigger -->
+                    <div id="selected-file-preview" class="hidden p-3 bg-[#FFF7F5] border border-[#E8C7C7] flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <img id="preview-thumbnail" src="" alt="Selected Receipt" class="w-12 h-12 object-cover border border-[#E8C7C7] shrink-0 bg-white">
+                            <div class="min-w-0">
+                                <div id="preview-filename" class="text-xs font-bold text-[#8F414B] truncate font-mono">receipt.png</div>
+                                <div id="preview-filesize" class="text-[10px] text-[#999A78]">1 File Selected</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removeProofFile()" class="px-3 py-1 bg-white hover:bg-rose-50 border border-[#E8C7C7] hover:border-[#C45A64] text-xs font-bold text-[#C45A64] transition flex items-center gap-1 shrink-0">
+                            <span class="material-symbols-outlined text-[15px] text-[#C45A64] align-middle">delete</span>
+                            <span>Remove</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="verify-submit-btn" class="survey-btn-submit py-3.5">
+                    <span class="material-symbols-outlined text-[18px] text-white align-middle">check</span>
+                    <span id="verify-btn-text">Verify Payment & Issue Pass (₹{{ order.amount|floatformat:0 }})</span>
+                </button>
+
+                <!-- Post-Submission Waiting Notice -->
+                <div id="submitting-wait-notice" class="hidden p-4 bg-[#FFF7F5] border border-[#E8C7C7] text-left flex items-start gap-3">
+                    <span class="material-symbols-outlined text-[20px] text-[#B85C68] shrink-0 mt-0.5">schedule</span>
+                    <div class="text-xs text-[#3F3A3A] leading-relaxed">
+                        <strong>Receipt submitted!</strong> Kindly wait a few hours for your order status. Our verification engine is processing your payment.
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+    function handleAppClick(appName) {
+        const notice = document.getElementById('app-redirect-notice');
+        if (notice) {
+            notice.classList.remove('hidden');
+        }
+    }
+
+    function handleProofSelection(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            document.getElementById('preview-filename').innerText = file.name;
+            document.getElementById('preview-filesize').innerText = `${(file.size / 1024).toFixed(1)} KB • Image Ready`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-thumbnail').src = e.target.result;
+                document.getElementById('selected-file-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeProofFile() {
+        const input = document.getElementById('screenshot-input');
+        if (input) {
+            input.value = '';
+        }
+        document.getElementById('preview-thumbnail').src = '';
+        document.getElementById('selected-file-preview').classList.add('hidden');
+    }
+
+    function handleProofFormSubmit(form) {
+        const btnText = document.getElementById('verify-btn-text');
+        const notice = document.getElementById('submitting-wait-notice');
+        
+        if (btnText) {
+            btnText.innerText = "Submitting... Kindly wait a few hours for your order status";
+        }
+        if (notice) {
+            notice.classList.remove('hidden');
+        }
+    }
+</script>
+{% endblock %}

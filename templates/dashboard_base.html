@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+
+{% block body_content %}
+<style>
+    /* Sharp SaaS Navigation Styling */
+    .google-sidebar {
+        background-color: #0b132b !important;
+        border-right: 1px solid #1e293b !important;
+        border-radius: 0px !important;
+    }
+    .google-topbar {
+        background: linear-gradient(90deg, #1a73e8 0%, #1d4ed8 50%, #1e40af 100%) !important;
+        border-bottom: 1px solid #1e3a8a !important;
+        border-radius: 0px !important;
+    }
+    .sidebar-nav-btn {
+        color: #94a3b8;
+        transition: all 0.15s ease-in-out;
+        position: relative;
+        border-radius: 0px !important;
+    }
+    .sidebar-nav-btn:hover {
+        color: #ffffff !important;
+        background-color: #1e293b !important;
+    }
+    .sidebar-nav-btn.active {
+        background: linear-gradient(135deg, #1a73e8, #2563eb) !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 12px rgba(26, 115, 232, 0.5) !important;
+        font-weight: 700;
+        border-radius: 0px !important;
+    }
+    .sidebar-nav-btn.active i {
+        color: #ffffff !important;
+    }
+    .sidebar-tooltip {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        transform: translateX(-4px);
+        border-radius: 0px !important;
+    }
+    .sidebar-item-wrap:hover .sidebar-tooltip {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    /* Mobile Drawer */
+    #mobile-drawer {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 0px !important;
+    }
+    #mobile-drawer.open {
+        transform: translateX(0) !important;
+    }
+    #mobile-backdrop {
+        transition: opacity 0.2s ease;
+    }
+    #mobile-backdrop.open {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+</style>
+
+<div class="flex h-screen overflow-hidden bg-[#f4f7fb] font-sans">
+
+    <!-- 1. Left Slim Navigation Dock (Desktop lg+) -->
+    <aside class="google-sidebar hidden lg:flex w-16 flex-col items-center justify-between py-3.5 shrink-0 z-30 select-none">
+        
+        <!-- Top Section: Brand Logo & Navigation Icons -->
+        <div class="flex flex-col items-center gap-3 w-full">
+            <!-- Brand Logo -->
+            <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 bg-white border border-slate-700 shadow-md flex items-center justify-center p-1.5 transition hover:scale-105" title="EMS Console">
+                <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                    <path d="M18 4C10.268 4 4 10.268 4 18H18V4Z" fill="#4285F4"/>
+                    <path d="M32 18C32 10.268 25.732 4 18 4V18H32Z" fill="#EA4335"/>
+                    <path d="M18 32C25.732 32 32 25.732 32 18H18V32Z" fill="#FBBC05"/>
+                    <path d="M4 18C4 25.732 10.268 32 18 32V18H4Z" fill="#34A853"/>
+                    <circle cx="18" cy="18" r="7.5" fill="#FFFFFF"/>
+                    <path d="M14.5 16H21.5M14.5 18.5H19.5M14.5 21H21.5" stroke="#1A73E8" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+            </a>
+
+            <div class="w-8 h-[1px] bg-slate-800 my-0.5"></div>
+
+            <!-- Sharp Nav Icons List -->
+            <div class="flex flex-col items-center gap-2 w-full px-2">
+                
+                <!-- Overview -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-overview' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if request.resolver_match.url_name == 'dashboard-overview' %}active{% endif %}">
+                        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                    </a>
+                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                        Overview
+                    </div>
+                </div>
+
+                <!-- Logs -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-registrations-list' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}active{% endif %}">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                    </a>
+                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                        Logs
+                    </div>
+                </div>
+
+                <!-- Events -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-events-list' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'event' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                    </a>
+                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                        Events
+                    </div>
+                </div>
+
+                <!-- Queue -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-verification-queue' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center relative {% if 'verification' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        {% if pending_reviews_count > 0 %}
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400"></span>
+                        {% endif %}
+                    </a>
+                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                        Queue {% if pending_reviews_count > 0 %}({{ pending_reviews_count }}){% endif %}
+                    </div>
+                </div>
+
+                <!-- Revenue -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-revenue-analytics' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'revenue' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                    </a>
+                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                        Revenue
+                    </div>
+                </div>
+
+                <!-- Emails -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-email-logs' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'email' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    </a>
+                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                        Emails
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Developer API & User Profile -->
+        <div class="flex flex-col items-center gap-2.5 w-full px-2">
+            <!-- API -->
+            <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                <a href="{% url 'dashboard-partner-api' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'partner' in request.resolver_match.url_name %}active{% endif %}">
+                    <i data-lucide="code" class="w-5 h-5"></i>
+                </a>
+                <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                    API
+                </div>
+            </div>
+
+            <!-- Profile Avatar -->
+            <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-600 border border-slate-700 text-white flex items-center justify-center text-xs font-bold font-display shadow-sm cursor-pointer" title="Admin">
+                A
+            </div>
+        </div>
+    </aside>
+
+    <!-- 2. Mobile Slide-Over Drawer Navigation -->
+    <div id="mobile-backdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-950/60 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity duration-200"></div>
+    <div id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-72 bg-slate-900 text-white z-50 lg:hidden -translate-x-full shadow-2xl flex flex-col justify-between p-5 border-r border-slate-800">
+        <div>
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                {% include 'components/logo.html' %}
+                <button onclick="toggleMobileMenu()" class="p-1.5 text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <nav class="mt-4 space-y-1 text-xs font-semibold">
+                <a href="{% url 'dashboard-overview' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if request.resolver_match.url_name == 'dashboard-overview' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="{% url 'dashboard-registrations-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                    <i data-lucide="receipt" class="w-4 h-4"></i>
+                    <span>Logs</span>
+                </a>
+                <a href="{% url 'dashboard-events-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'event' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span>Events</span>
+                </a>
+                <a href="{% url 'dashboard-verification-queue' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'verification' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <span>Queue</span>
+                    {% if pending_reviews_count > 0 %}
+                    <span class="ml-auto bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5">{{ pending_reviews_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'dashboard-revenue-analytics' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'revenue' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                    <span>Revenue</span>
+                </a>
+                <a href="{% url 'dashboard-email-logs' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'email' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    <span>Emails</span>
+                </a>
+                <a href="{% url 'dashboard-partner-api' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'partner' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                    <i data-lucide="code" class="w-4 h-4"></i>
+                    <span>API</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+            <span class="font-display font-bold text-white">EMS Console</span>
+        </div>
+    </div>
+
+    <!-- 3. Main Application Container -->
+    <div class="flex-1 flex flex-col overflow-hidden bg-[#f4f7fb]">
+        
+        <!-- Top Header Bar -->
+        <header class="google-topbar h-14 px-4 sm:px-6 flex items-center justify-between text-white shrink-0 z-20 shadow-sm">
+            <!-- Left: Mobile Menu + Header Title -->
+            <div class="flex items-center gap-3">
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-1.5 text-blue-100 hover:text-white">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <span class="font-display font-extrabold text-base tracking-tight text-white">
+                        {% block header_title %}Overview{% endblock %}
+                    </span>
+                    <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500/20 text-emerald-100 border border-emerald-400/40">
+                        <span class="w-1.5 h-1.5 bg-emerald-300"></span>
+                        <span>UPI Engine Online</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right: New Event Action Button -->
+            <div class="flex items-center gap-2.5 text-xs">
+                <a href="{% url 'dashboard-event-create' %}" class="bg-white hover:bg-blue-50 text-[#1a73e8] font-bold px-4 py-1.5 transition shadow-sm flex items-center gap-1.5">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                    <span>New Event</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Body Scroll Area -->
+        <main class="flex-1 overflow-y-auto bg-[#f4f7fb] pb-20 lg:pb-8">
+            {% block content %}{% endblock %}
+        </main>
+
+    </div>
+
+    <!-- 4. Mobile Bottom Navigation Bar -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#dbeafe] flex items-center justify-around py-1.5 px-2 text-[10px] font-semibold text-slate-500 shadow-xl">
+        <a href="{% url 'dashboard-overview' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-overview' %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            <span>Overview</span>
+        </a>
+        <a href="{% url 'dashboard-registrations-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+            <span>Logs</span>
+        </a>
+        <a href="{% url 'dashboard-events-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'event' in request.resolver_match.url_name %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+            <span>Events</span>
+        </a>
+        <a href="{% url 'dashboard-verification-queue' %}" class="flex flex-col items-center gap-0.5 p-1 relative {% if 'verification' in request.resolver_match.url_name %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+            <span>Queue</span>
+            {% if pending_reviews_count > 0 %}
+            <span class="absolute top-0 right-1 w-2 h-2 bg-amber-400"></span>
+            {% endif %}
+        </a>
+        <a href="{% url 'dashboard-revenue-analytics' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'revenue' in request.resolver_match.url_name %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+            <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+            <span>Revenue</span>
+        </a>
+    </nav>
+
+</div>
+
+<script>
+    function toggleMobileMenu() {
+        const drawer = document.getElementById('mobile-drawer');
+        const backdrop = document.getElementById('mobile-backdrop');
+        if (drawer && backdrop) {
+            drawer.classList.toggle('open');
+            backdrop.classList.toggle('open');
+        }
+    }
+</script>
+{% endblock %}
