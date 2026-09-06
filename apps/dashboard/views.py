@@ -157,6 +157,7 @@ def overview_dashboard_view(request):
 
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = today_start - timedelta(days=now.weekday())
     month_start = today_start.replace(day=1)
 
     # Base QuerySets scoped to tenant
@@ -165,13 +166,18 @@ def overview_dashboard_view(request):
     order_qs = Order.objects.filter(registration__event__tenant=tenant)
     verified_orders = order_qs.filter(status='VERIFIED')
 
-    # Revenue Metrics
-    total_revenue = verified_orders.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    # Comprehensive Financial & Collections Analytics
     today_revenue = verified_orders.filter(created_at__gte=today_start).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    week_revenue = verified_orders.filter(created_at__gte=week_start).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
     month_revenue = verified_orders.filter(created_at__gte=month_start).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-    
+    total_revenue = verified_orders.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+
+    # Database Registered User Statistics
     total_events = events_qs.count()
     total_registrations = reg_qs.count()
+    total_customers = Customer.objects.filter(tenant=tenant).count()
+    total_passes = Attendee.objects.filter(registration__event__tenant=tenant).count()
+    verified_reg_count = reg_qs.filter(status='COMPLETED').count()
     total_payments_count = verified_orders.count()
     pending_payments_count = order_qs.filter(status__in=['PENDING', 'UPLOADED', 'VERIFYING']).count()
     review_queue_count = Verification.objects.filter(order__registration__event__tenant=tenant, decision='MANUAL_REVIEW').count()
@@ -180,14 +186,14 @@ def overview_dashboard_view(request):
     auto_verified_count = Verification.objects.filter(order__registration__event__tenant=tenant, decision='AUTO_VERIFIED').count()
     auto_rate = round((auto_verified_count / max(total_payments_count, 1)) * 100, 1)
 
-    # Top Events Breakdown by Revenue
-    top_events = events_qs.annotate(
-        revenue=Sum('registrations__order__amount', filter=Q(registrations__order__status='VERIFIED')),
+    # Event-wise Collections Breakdown
+    events_breakdown = events_qs.annotate(
         paid_count=Count('registrations__order', filter=Q(registrations__order__status='VERIFIED')),
+        total_collected=Sum('registrations__order__amount', filter=Q(registrations__order__status='VERIFIED')),
         total_reg=Count('registrations')
-    ).order_by('-revenue')[:4]
+    ).order_by('-total_collected')
 
-    # Filterable Registrations
+    # Filterable Registrations with full database details
     table_qs = reg_qs.select_related('customer', 'event', 'order', 'attendee_pass').order_by('-created_at')
     table_qs, filter_params, active_filters_count = filter_registrations_queryset(table_qs, request)
     recent_registrations = table_qs[:100]
@@ -198,10 +204,14 @@ def overview_dashboard_view(request):
         'tenant': tenant,
         'total_events': total_events,
         'total_registrations': total_registrations,
+        'total_customers': total_customers,
+        'total_passes': total_passes,
+        'verified_reg_count': verified_reg_count,
         'total_revenue': total_revenue,
         'today_revenue': today_revenue,
+        'week_revenue': week_revenue,
         'month_revenue': month_revenue,
-        'top_events': top_events,
+        'events_breakdown': events_breakdown,
         'total_payments_count': total_payments_count,
         'pending_payments_count': pending_payments_count,
         'review_queue_count': review_queue_count,
