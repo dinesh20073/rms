@@ -193,15 +193,22 @@ def attendee_badge_view(request, pass_code):
     registration = attendee.registration
     responses = registration.form_responses or {}
 
+    # Helper for strict proper case
+    def to_proper_case(val):
+        if not val or val == '-':
+            return '-'
+        return str(val).strip().title()
+
     # Extract Person list (Person 1 + Person 2 to Person N)
     attendee_list = []
 
     # Person 1 (Primary Attendee)
     p1_age = responses.get('age') or responses.get('age_category') or responses.get('Age') or '-'
-    p1_gender = responses.get('gender') or responses.get('Gender') or '-'
+    p1_gender = to_proper_case(responses.get('gender') or responses.get('Gender') or '-')
+    p1_name = to_proper_case(registration.customer.name)
     attendee_list.append({
         'index': 1,
-        'name': registration.customer.name,
+        'name': p1_name,
         'age': p1_age,
         'gender': p1_gender,
         'type': 'Primary Attendee',
@@ -217,9 +224,11 @@ def attendee_badge_view(request, pass_code):
         ticket_count = 1
 
     for i in range(2, ticket_count + 1):
-        name = responses.get(f'person_{i}_name') or f"Attendee #{i}"
+        raw_name = responses.get(f'person_{i}_name') or f"Attendee #{i}"
+        name = to_proper_case(raw_name)
         age = responses.get(f'person_{i}_age') or '-'
-        gender = responses.get(f'person_{i}_gender') or '-'
+        raw_gender = responses.get(f'person_{i}_gender') or '-'
+        gender = to_proper_case(raw_gender)
         attendee_list.append({
             'index': i,
             'name': name,

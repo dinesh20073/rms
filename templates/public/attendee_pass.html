@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Official Entry Pass • {{ customer.name }} | {{ event.title }}{% endblock %}
+{% block title %}Official Entry Pass • {{ customer.name|title }} | {{ event.title }}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -13,11 +13,11 @@
         background: #ffffff;
     }
 
-    /* Strict Full A4 Sheet Print Styling */
+    /* Strict Full A4 Sheet Print Styling (Zero Top Margin for PDF & Print) */
     @media print {
         @page {
             size: A4 portrait;
-            margin: 6mm 8mm;
+            margin: 0mm !important;
         }
         *, *:before, *:after {
             -webkit-print-color-adjust: exact !important;
@@ -31,7 +31,7 @@
             padding: 0 !important;
             background: #ffffff !important;
             color: #000000 !important;
-            overflow: visible !important;
+            overflow: hidden !important;
         }
         .no-print {
             display: none !important;
@@ -40,7 +40,8 @@
             width: 100% !important;
             max-width: 100% !important;
             height: 100% !important;
-            min-height: 280mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
             padding: 0 !important;
             margin: 0 !important;
             background: #ffffff !important;
@@ -50,20 +51,24 @@
             box-shadow: none !important;
             page-break-inside: avoid !important;
             page-break-after: avoid !important;
+            overflow: hidden !important;
         }
         .a4-page-wrapper {
             width: 100% !important;
             max-width: 100% !important;
-            min-height: 280mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
             height: 100% !important;
-            border: 2px solid #0f172a !important;
+            border: none !important;
             box-shadow: none !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important;
             page-break-inside: avoid !important;
             page-break-after: avoid !important;
-            margin: 0 auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
         }
     }
 </style>
@@ -72,11 +77,11 @@
 {% block body_content %}
 <div class="min-h-screen bg-[#f1f5f9] flex flex-col items-center justify-start py-4 sm:py-8 px-2 sm:px-4 a4-sheet-container">
 
-    <!-- Top Action Toolbar (Hidden in Print) -->
+    <!-- Top Action Toolbar (Hidden in Print / PDF) -->
     <div class="w-full max-w-[820px] mb-4 flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 border border-slate-300 shadow-sm no-print">
         <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-900 font-display">Official Admission Pass • Full A4 Document ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
+            <span class="text-xs font-bold text-slate-900 font-display">Official Entry Pass ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
         </div>
         <div class="flex items-center gap-2">
             <button id="print-pass-btn" type="button" onclick="triggerPrintPass()" class="google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold cursor-pointer">
@@ -95,18 +100,10 @@
         
         <!-- TOP SECTION: HEADER + DELEGATE INFO & QR -->
         <div>
-            <!-- 1. Top Organization & Event Header Bar -->
-            <div class="bg-gradient-to-r from-[#1a73e8] via-[#1557b0] to-[#0d47a1] p-5 text-white relative border-b-2 border-slate-900">
+            <!-- 1. Top Event Header Bar (Clean, Starts right at top) -->
+            <div class="bg-gradient-to-r from-[#1a73e8] via-[#1557b0] to-[#0d47a1] p-5 sm:p-6 text-white relative border-b-2 border-slate-900">
                 <div class="flex items-start justify-between gap-4">
-                    <div class="space-y-1.5 flex-1">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="inline-block bg-white text-[#1a73e8] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider font-mono">
-                                OFFICIAL ADMISSION PASS
-                            </span>
-                            <span class="inline-block bg-white/20 text-white px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-white/30">
-                                {{ ticket_count }} PERSON{{ ticket_count|pluralize|upper }} ADMIT
-                            </span>
-                        </div>
+                    <div class="space-y-1 flex-1">
                         <h1 class="text-2xl sm:text-3xl font-black font-display tracking-tight text-white leading-tight">
                             {{ event.title }}
                         </h1>
@@ -152,10 +149,10 @@
                     <div>
                         <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Primary Delegate / Contact Person</div>
                         <h2 class="text-2xl font-black font-display text-slate-900 tracking-tight mt-0.5">
-                            {{ customer.name }}
+                            {{ customer.name|title }}
                         </h2>
                         <div class="text-xs font-bold text-slate-700 mt-1">
-                            {{ customer.designation|default:"Registered Attendee" }}{% if customer.company %} • {{ customer.company }}{% endif %}
+                            {{ customer.designation|title|default:"Registered Attendee" }}{% if customer.company %} • {{ customer.company|title }}{% endif %}
                         </div>
                         <div class="text-xs text-slate-600 font-mono mt-0.5">
                             {{ customer.email }}{% if customer.phone %} • {{ customer.phone }}{% endif %}
@@ -194,7 +191,7 @@
 
             </div>
 
-            <!-- 3. All Persons Name, Age & Details Table -->
+            <!-- 3. All Persons Name, Age & Details Table (All Names in Strict Proper Case) -->
             <div class="p-5 bg-white space-y-3 border-b-2 border-slate-200">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5 font-display">
@@ -223,7 +220,7 @@
                                     #{{ person.index }}
                                 </td>
                                 <td class="py-2.5 px-3 font-bold text-slate-900">
-                                    <span>{{ person.name }}</span>
+                                    <span>{{ person.name|title }}</span>
                                     {% if person.index == 1 %}
                                     <span class="ml-1.5 text-[10px] font-bold text-[#1a73e8] bg-blue-50 border border-blue-200 px-1.5 py-0.2">Primary</span>
                                     {% endif %}
@@ -297,7 +294,7 @@
             <div class="px-5 py-3 bg-white grid grid-cols-1 sm:grid-cols-12 gap-3 items-center text-xs">
                 <div class="sm:col-span-4 space-y-0.5">
                     <div class="text-[9px] uppercase font-bold text-slate-400">Attendee Name</div>
-                    <div class="font-bold text-slate-900 text-sm">{{ customer.name }}</div>
+                    <div class="font-bold text-slate-900 text-sm">{{ customer.name|title }}</div>
                     <div class="text-[10px] font-mono text-slate-500">{{ attendee.pass_code }}</div>
                 </div>
                 <div class="sm:col-span-4 space-y-0.5">
