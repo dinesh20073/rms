@@ -439,6 +439,17 @@
     {% block body_content %}{% endblock %}
 
     <script>
+        function toggleDateCustom(val, prefix) {
+            var el = document.getElementById(prefix + '_date_custom');
+            if (el) {
+                if (val === 'custom') {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            }
+        }
+
         function copyToClipboard(text, element) {
             navigator.clipboard.writeText(text);
             const original = element.innerHTML;

@@ -141,30 +141,204 @@
             </div>
         </div>
 
-        <!-- Google Search Toolbar with Google Input & Buttons -->
-        <div class="px-4 sm:px-6 py-2.5 border-b border-[#e2e8f0] bg-white flex flex-wrap items-center justify-between gap-3 shrink-0">
-            <form method="GET" action="{% url 'dashboard-overview' %}" class="flex-1 min-w-[260px] max-w-2xl flex items-center gap-2.5">
-                {% if status_filter %}
-                <input type="hidden" name="status" value="{{ status_filter }}">
-                {% endif %}
-                <div class="relative flex-1">
-                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none"></i>
-                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search name, email, code, order ID..." class="google-search-pill">
-                </div>
-                <button type="submit" class="google-btn-primary py-1.5">
-                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
-                    <span>Search</span>
-                </button>
-                {% if search_query or status_filter %}
-                <a href="{% url 'dashboard-overview' %}" class="google-btn-outlined py-1.5">
-                    <span>Reset</span>
-                </a>
-                {% endif %}
-            </form>
+        <!-- Google Multi-Column Search & Filter Toolbar -->
+        <div class="px-4 sm:px-6 py-3 border-b border-[#e2e8f0] bg-white shrink-0 space-y-3">
+            <form method="GET" action="{% url 'dashboard-overview' %}" id="overviewFilterForm" class="space-y-3">
+                
+                <!-- Primary Search & Action Row -->
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex-1 min-w-[240px] max-w-xl flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none"></i>
+                            <input type="text" name="q" value="{{ filter_params.q }}" placeholder="Quick search name, email, reg code, event, pass..." class="google-search-pill">
+                        </div>
+                        <button type="submit" class="google-btn-primary py-1.5 px-3 flex items-center gap-1.5 shadow-2xs">
+                            <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                            <span>Search</span>
+                        </button>
+                    </div>
 
-            <div class="flex items-center gap-2 text-xs text-slate-500">
-                <span><strong class="text-slate-900">{{ recent_registrations|length }}</strong> records</span>
-            </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="document.getElementById('advancedFilterPanel').classList.toggle('hidden')" class="google-btn-outlined py-1.5 px-3 flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100">
+                            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                            <span>Column Filters</span>
+                            {% if active_filters_count > 0 %}
+                            <span class="bg-[#1a73e8] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">{{ active_filters_count }}</span>
+                            {% endif %}
+                        </button>
+                        {% if active_filters_count > 0 %}
+                        <a href="{% url 'dashboard-overview' %}" class="google-btn-outlined py-1.5 px-2.5 text-xs text-rose-600 hover:text-rose-700 hover:border-rose-300 flex items-center gap-1">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            <span>Reset</span>
+                        </a>
+                        {% endif %}
+                        <div class="text-xs text-slate-500 font-medium pl-2 hidden sm:block">
+                            <span><strong class="text-slate-900 font-bold">{{ recent_registrations|length }}</strong> records</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column-Specific Multi Filters Grid -->
+                <div id="advancedFilterPanel" class="{% if active_filters_count == 0 or active_filters_count == 1 and filter_params.q %}hidden{% endif %} pt-2 pb-1 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2.5 bg-[#f8fafc] p-3 border border-slate-200">
+                    
+                    <!-- 1. Date / Time Filter -->
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                            <i data-lucide="calendar" class="w-3 h-3 text-[#1a73e8]"></i>
+                            <span>Date / Time</span>
+                        </label>
+                        <select name="date_preset" onchange="toggleDateCustom(this.value, 'overview')" class="google-select text-xs py-1.5 px-2 h-8">
+                            <option value="">All Dates</option>
+                            <option value="today" {% if filter_params.date_preset == 'today' %}selected{% endif %}>Today</option>
+                            <option value="7days" {% if filter_params.date_preset == '7days' %}selected{% endif %}>Last 7 Days</option>
+                            <option value="30days" {% if filter_params.date_preset == '30days' %}selected{% endif %}>Last 30 Days</option>
+                            <option value="custom" {% if filter_params.date_preset == 'custom' or filter_params.date_from or filter_params.date_to %}selected{% endif %}>Custom Range</option>
+                        </select>
+                        <div id="overview_date_custom" class="{% if filter_params.date_preset != 'custom' and not filter_params.date_from and not filter_params.date_to %}hidden{% endif %} flex items-center gap-1 pt-1">
+                            <input type="date" name="date_from" value="{{ filter_params.date_from }}" class="google-input text-[10px] py-1 px-1 h-7 flex-1" title="From Date">
+                            <span class="text-slate-400 text-[10px]">-</span>
+                            <input type="date" name="date_to" value="{{ filter_params.date_to }}" class="google-input text-[10px] py-1 px-1 h-7 flex-1" title="To Date">
+                        </div>
+                    </div>
+
+                    <!-- 2. Status Filter -->
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                            <i data-lucide="check-circle-2" class="w-3 h-3 text-[#1e8e3e]"></i>
+                            <span>Status</span>
+                        </label>
+                        <select name="status" class="google-select text-xs py-1.5 px-2 h-8">
+                            <option value="">All Statuses</option>
+                            <option value="COMPLETED" {% if filter_params.status == 'COMPLETED' %}selected{% endif %}>Verified & Active</option>
+                            <option value="PENDING" {% if filter_params.status == 'PENDING' %}selected{% endif %}>Payment Required</option>
+                            <option value="MANUAL_REVIEW" {% if filter_params.status == 'MANUAL_REVIEW' %}selected{% endif %}>Manual Review</option>
+                            <option value="FAILED" {% if filter_params.status == 'FAILED' %}selected{% endif %}>Failed</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. Reg Code Filter -->
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                            <i data-lucide="hash" class="w-3 h-3 text-indigo-600"></i>
+                            <span>Reg Code</span>
+                        </label>
+                        <input type="text" name="reg_code" value="{{ filter_params.reg_code }}" placeholder="e.g. REG-000001" class="google-input text-xs py-1.5 px-2 font-mono h-8">
+                    </div>
+
+                    <!-- 4. Customer Filter -->
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                            <i data-lucide="user" class="w-3 h-3 text-cyan-600"></i>
+                            <span>Customer</span>
+                        </label>
+                        <input type="text" name="customer" value="{{ filter_params.customer }}" placeholder="Name or email..." class="google-input text-xs py-1.5 px-2 h-8">
+                    </div>
+
+                    <!-- 5. Event Filter -->
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                            <i data-lucide="calendar-days" class="w-3 h-3 text-purple-600"></i>
+                            <span>Event</span>
+                        </label>
+                        <select name="event_id" class="google-select text-xs py-1.5 px-2 h-8">
+                            <option value="">All Events</option>
+                            {% for ev in events %}
+                            <option value="{{ ev.id }}" {% if filter_params.event_id == ev.id|stringformat:"s" %}selected{% endif %}>{{ ev.title|truncatechars:18 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- 6. Amount Filter -->
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                            <i data-lucide="indian-rupee" class="w-3 h-3 text-emerald-600"></i>
+                            <span>Amount</span>
+                        </label>
+                        <select name="amount_type" class="google-select text-xs py-1.5 px-2 h-8">
+                            <option value="">All Amounts</option>
+                            <option value="free" {% if filter_params.amount_type == 'free' %}selected{% endif %}>Free Entry (₹0)</option>
+                            <option value="paid" {% if filter_params.amount_type == 'paid' %}selected{% endif %}>Paid Entry (> ₹0)</option>
+                        </select>
+                    </div>
+
+                    <!-- 7. Pass Badge Filter & Action -->
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1">
+                            <i data-lucide="badge-check" class="w-3 h-3 text-amber-600"></i>
+                            <span>Pass Badge</span>
+                        </label>
+                        <div class="flex items-center gap-1">
+                            <select name="pass_filter" class="google-select text-xs py-1.5 px-2 h-8 flex-1">
+                                <option value="">All Passes</option>
+                                <option value="with_pass" {% if filter_params.pass_filter == 'with_pass' %}selected{% endif %}>Pass Issued</option>
+                                <option value="without_pass" {% if filter_params.pass_filter == 'without_pass' %}selected{% endif %}>No Pass</option>
+                            </select>
+                            <button type="submit" class="google-btn-primary h-8 px-2.5 text-xs shrink-0" title="Apply Column Filters">
+                                <span>Apply</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Active Filter Tags / Chips -->
+                {% if active_filters_count > 0 %}
+                <div class="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
+                    <span class="text-slate-500 font-bold text-[11px] mr-1">Active Filters:</span>
+                    
+                    {% if filter_params.q %}
+                    <span class="inline-flex items-center gap-1 bg-blue-50 text-[#1a73e8] border border-blue-200 px-2 py-0.5 text-[11px] font-medium">
+                        <span>Search: <strong>{{ filter_params.q }}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    {% if filter_params.status %}
+                    <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 text-[11px] font-medium">
+                        <span>Status: <strong>{{ filter_params.status }}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    {% if filter_params.reg_code %}
+                    <span class="inline-flex items-center gap-1 bg-indigo-50 text-indigo-800 border border-indigo-200 px-2 py-0.5 text-[11px] font-medium font-mono">
+                        <span>Code: <strong>{{ filter_params.reg_code }}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    {% if filter_params.customer %}
+                    <span class="inline-flex items-center gap-1 bg-cyan-50 text-cyan-800 border border-cyan-200 px-2 py-0.5 text-[11px] font-medium">
+                        <span>Customer: <strong>{{ filter_params.customer }}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    {% if filter_params.event_id %}
+                    <span class="inline-flex items-center gap-1 bg-purple-50 text-purple-800 border border-purple-200 px-2 py-0.5 text-[11px] font-medium">
+                        <span>Event ID: <strong>{{ filter_params.event_id }}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    {% if filter_params.amount_type %}
+                    <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 text-[11px] font-medium">
+                        <span>Amount: <strong>{% if filter_params.amount_type == 'free' %}Free (₹0){% else %}Paid (> ₹0){% endif %}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    {% if filter_params.pass_filter %}
+                    <span class="inline-flex items-center gap-1 bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 text-[11px] font-medium">
+                        <span>Pass: <strong>{% if filter_params.pass_filter == 'with_pass' %}Issued{% else %}No Pass{% endif %}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    {% if filter_params.date_preset or filter_params.date_from %}
+                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-800 border border-slate-300 px-2 py-0.5 text-[11px] font-medium">
+                        <span>Date: <strong>{{ filter_params.date_preset|default:"Custom" }}{% if filter_params.date_from %} ({{ filter_params.date_from }} to {{ filter_params.date_to }}){% endif %}</strong></span>
+                    </span>
+                    {% endif %}
+
+                    <a href="{% url 'dashboard-overview' %}" class="text-[11px] font-bold text-rose-600 hover:underline ml-1">Clear All</a>
+                </div>
+                {% endif %}
+
+            </form>
         </div>
 
         <!-- Google Material Data Table (Sticky Header & Freeze Columns up to Event - Bottom Scroll Alone) -->

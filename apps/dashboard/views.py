@@ -36,10 +36,122 @@ def tenant_switch_view(request, tenant_id):
     messages.success(request, f"Switched active tenant to {tenant.name}")
     return redirect(request.META.get('HTTP_REFERER', 'dashboard-overview'))
 
+def filter_registrations_queryset(reg_qs, request):
+    search_query = request.GET.get('q', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+    reg_code_filter = request.GET.get('reg_code', '').strip()
+    customer_filter = request.GET.get('customer', '').strip()
+    event_filter = request.GET.get('event_id', '').strip()
+    amount_filter = request.GET.get('amount_type', '').strip()
+    amount_min = request.GET.get('amount_min', '').strip()
+    amount_max = request.GET.get('amount_max', '').strip()
+    pass_filter = request.GET.get('pass_filter', '').strip()
+    date_preset = request.GET.get('date_preset', '').strip()
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+
+    # Status filter
+    if status_filter:
+        reg_qs = reg_qs.filter(status=status_filter)
+
+    # Reg Code filter
+    if reg_code_filter:
+        reg_qs = reg_qs.filter(registration_code__icontains=reg_code_filter)
+
+    # Customer filter (name, email, phone)
+    if customer_filter:
+        reg_qs = reg_qs.filter(
+            Q(customer__name__icontains=customer_filter) |
+            Q(customer__email__icontains=customer_filter) |
+            Q(customer__phone__icontains=customer_filter)
+        )
+
+    # Event filter
+    if event_filter:
+        reg_qs = reg_qs.filter(event_id=event_filter)
+
+    # Amount filter
+    if amount_filter == 'free':
+        reg_qs = reg_qs.filter(amount=0)
+    elif amount_filter == 'paid':
+        reg_qs = reg_qs.filter(amount__gt=0)
+
+    if amount_min:
+        try:
+            reg_qs = reg_qs.filter(amount__gte=Decimal(amount_min))
+        except Exception:
+            pass
+    if amount_max:
+        try:
+            reg_qs = reg_qs.filter(amount__lte=Decimal(amount_max))
+        except Exception:
+            pass
+
+    # Pass Badge filter
+    if pass_filter == 'with_pass':
+        reg_qs = reg_qs.filter(attendee_pass__isnull=False)
+    elif pass_filter == 'without_pass':
+        reg_qs = reg_qs.filter(attendee_pass__isnull=True)
+
+    # Date filters
+    now = timezone.now()
+    if date_preset == 'today':
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        reg_qs = reg_qs.filter(created_at__gte=today_start)
+    elif date_preset == '7days':
+        reg_qs = reg_qs.filter(created_at__gte=now - timedelta(days=7))
+    elif date_preset == '30days':
+        reg_qs = reg_qs.filter(created_at__gte=now - timedelta(days=30))
+    elif date_from or date_to:
+        if date_from:
+            try:
+                df = timezone.datetime.strptime(date_from, "%Y-%m-%d")
+                df_aware = timezone.make_aware(df) if timezone.is_naive(df) else df
+                reg_qs = reg_qs.filter(created_at__gte=df_aware)
+            except Exception:
+                pass
+        if date_to:
+            try:
+                dt = timezone.datetime.strptime(date_to, "%Y-%m-%d").replace(hour=23, minute=59, second=59)
+                dt_aware = timezone.make_aware(dt) if timezone.is_naive(dt) else dt
+                reg_qs = reg_qs.filter(created_at__lte=dt_aware)
+            except Exception:
+                pass
+
+    # Global text search query
+    if search_query:
+        reg_qs = reg_qs.filter(
+            Q(registration_code__icontains=search_query) |
+            Q(customer__name__icontains=search_query) |
+            Q(customer__email__icontains=search_query) |
+            Q(customer__phone__icontains=search_query) |
+            Q(order__order_code__icontains=search_query) |
+            Q(event__title__icontains=search_query) |
+            Q(attendee_pass__pass_code__icontains=search_query)
+        )
+
+    filter_params = {
+        'q': search_query,
+        'status': status_filter,
+        'reg_code': reg_code_filter,
+        'customer': customer_filter,
+        'event_id': event_filter,
+        'amount_type': amount_filter,
+        'amount_min': amount_min,
+        'amount_max': amount_max,
+        'pass_filter': pass_filter,
+        'date_preset': date_preset,
+        'date_from': date_from,
+        'date_to': date_to,
+    }
+
+    active_filters_count = sum(1 for k, v in filter_params.items() if v)
+
+    return reg_qs, filter_params, active_filters_count
+
 def overview_dashboard_view(request):
     tenant = get_current_tenant(request)
     if not tenant:
-        # Create default tenant if none exists
         tenant = Tenant.objects.create(name="Acme Tech Events", slug="acme-tech-events")
         request.session['active_tenant_id'] = tenant.id
 
@@ -75,28 +187,12 @@ def overview_dashboard_view(request):
         total_reg=Count('registrations')
     ).order_by('-revenue')[:4]
 
-    # Filterable Registrations on Home Dashboard
-    search_query = request.GET.get('q', '').strip()
-    status_filter = request.GET.get('status', '').strip()
-
+    # Filterable Registrations
     table_qs = reg_qs.select_related('customer', 'event', 'order', 'attendee_pass').order_by('-created_at')
-    if status_filter == 'PENDING':
-        table_qs = table_qs.filter(status='PENDING')
-    elif status_filter == 'COMPLETED':
-        table_qs = table_qs.filter(status='COMPLETED')
-    elif status_filter == 'MANUAL_REVIEW':
-        table_qs = table_qs.filter(status='MANUAL_REVIEW')
+    table_qs, filter_params, active_filters_count = filter_registrations_queryset(table_qs, request)
+    recent_registrations = table_qs[:100]
 
-    if search_query:
-        table_qs = table_qs.filter(
-            Q(registration_code__icontains=search_query) |
-            Q(customer__name__icontains=search_query) |
-            Q(customer__email__icontains=search_query) |
-            Q(order__order_code__icontains=search_query) |
-            Q(event__title__icontains=search_query)
-        )
-
-    recent_registrations = table_qs[:25]
+    all_events = events_qs.all()
 
     context = {
         'tenant': tenant,
@@ -111,8 +207,11 @@ def overview_dashboard_view(request):
         'review_queue_count': review_queue_count,
         'auto_rate': auto_rate,
         'recent_registrations': recent_registrations,
-        'search_query': search_query,
-        'status_filter': status_filter,
+        'events': all_events,
+        'filter_params': filter_params,
+        'active_filters_count': active_filters_count,
+        'search_query': filter_params.get('q', ''),
+        'status_filter': filter_params.get('status', ''),
     }
     return render(request, 'dashboard/overview.html', context)
 
@@ -332,31 +431,17 @@ def verification_action_view(request, verification_id):
 
 def registrations_list_view(request):
     tenant = get_current_tenant(request)
-    status_filter = request.GET.get('status', '')
-    event_filter = request.GET.get('event_id', '')
-    search_query = request.GET.get('q', '').strip()
-
     qs = Registration.objects.filter(event__tenant=tenant).select_related('customer', 'event', 'order', 'attendee_pass').order_by('-created_at')
-
-    if status_filter:
-        qs = qs.filter(status=status_filter)
-    if event_filter:
-        qs = qs.filter(event_id=event_filter)
-    if search_query:
-        qs = qs.filter(
-            Q(registration_code__icontains=search_query) |
-            Q(customer__name__icontains=search_query) |
-            Q(customer__email__icontains=search_query) |
-            Q(order__order_code__icontains=search_query)
-        )
-
+    qs, filter_params, active_filters_count = filter_registrations_queryset(qs, request)
     events = Event.objects.filter(tenant=tenant)
     return render(request, 'dashboard/registrations/list.html', {
         'registrations': qs,
         'events': events,
-        'status_filter': status_filter,
-        'event_filter': event_filter,
-        'search_query': search_query,
+        'filter_params': filter_params,
+        'active_filters_count': active_filters_count,
+        'search_query': filter_params.get('q', ''),
+        'status_filter': filter_params.get('status', ''),
+        'event_filter': filter_params.get('event_id', ''),
         'tenant': tenant
     })
 
