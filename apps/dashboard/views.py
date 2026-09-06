@@ -458,3 +458,17 @@ def export_attendees_csv(request, event_id):
         ])
 
     return response
+
+def send_registration_email_view(request, registration_code):
+    tenant = get_current_tenant(request)
+    registration = get_object_or_404(Registration, registration_code=registration_code, event__tenant=tenant)
+    from apps.notifications.services import send_registration_success_email, send_payment_reminder_email
+    
+    if registration.status == 'COMPLETED':
+        send_registration_success_email(registration)
+        messages.success(request, f"Confirmation & pass email sent to {registration.customer.email}!")
+    else:
+        send_payment_reminder_email(registration)
+        messages.success(request, f"Payment reminder email sent to {registration.customer.email}!")
+        
+    return redirect(request.META.get('HTTP_REFERER', 'dashboard-overview'))

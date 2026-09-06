@@ -99,6 +99,36 @@ def submit_registration_view(request, slug):
 
     total_amount = event.registration_fee * ticket_count
 
+    if total_amount == 0:
+        # Direct Instant Confirmation for Free Events
+        registration = Registration.objects.create(
+            event=event,
+            customer=customer,
+            amount=0,
+            form_responses=form_responses,
+            status='COMPLETED'
+        )
+        order = Order.objects.create(
+            registration=registration,
+            amount=0,
+            currency=event.currency,
+            status='VERIFIED'
+        )
+        attendee, _ = Attendee.objects.get_or_create(registration=registration)
+        
+        from apps.notifications.services import send_registration_success_email
+        send_registration_success_email(registration)
+
+        log_audit_event(
+            'FREE_REGISTRATION_CONFIRMED',
+            registration.registration_code,
+            {'customer': email, 'event': event.title, 'pass_code': attendee.pass_code},
+            tenant=event.tenant,
+            actor=name
+        )
+
+        return redirect('attendee-badge', pass_code=attendee.pass_code)
+
     registration = Registration.objects.create(
         event=event,
         customer=customer,

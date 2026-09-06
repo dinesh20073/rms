@@ -58,7 +58,11 @@
             <!-- Fee in INR Material Symbol -->
             <div class="inline-flex items-center gap-2 bg-[#FFF0ED] border border-[#E8C7C7] px-3.5 py-1.5 text-xs font-bold text-[#8F414B] shadow-2xs self-start md:self-auto shrink-0">
                 <span class="material-symbols-outlined text-[17px] text-[#B85C68] select-none">confirmation_number</span>
+                {% if event.registration_fee == 0 %}
+                <span>Fee: <strong class="text-xs font-bold text-emerald-700 bg-emerald-100/70 border border-emerald-300 px-2 py-0.5">FREE Entry</strong></span>
+                {% else %}
                 <span>Fee: <strong class="font-mono text-sm text-[#8F414B]">₹<span id="unit-fee-display">{{ event.registration_fee|floatformat:0 }}</span></strong> <span class="text-[10px] uppercase font-mono">INR</span> / person</span>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -131,8 +135,8 @@
             <!-- Submit Action with Dynamic Amount Calculation -->
             <div class="pt-6 border-t border-[#E8C7C7] flex items-center justify-between">
                 <button type="submit" class="survey-btn-submit">
-                    <span id="submit-btn-label">Submit & Continue to Payment (₹{{ event.registration_fee|floatformat:0 }})</span>
-                    <span class="material-symbols-outlined text-[18px] text-white select-none">arrow_forward</span>
+                    <span id="submit-btn-label">{% if event.registration_fee == 0 %}Confirm Free Registration & Get Pass{% else %}Submit & Continue to Payment (₹{{ event.registration_fee|floatformat:0 }}){% endif %}</span>
+                    <span class="material-symbols-outlined text-[18px] text-white select-none">{% if event.registration_fee == 0 %}check_circle{% else %}arrow_forward{% endif %}</span>
                 </button>
             </div>
         </form>
@@ -156,10 +160,14 @@
         }
 
         // 1. Update Price Label
-        const total = (count * unitPrice).toLocaleString('en-IN');
         const btnLabel = document.getElementById('submit-btn-label');
         if (btnLabel) {
-            btnLabel.innerText = `Submit & Continue to Payment (₹${total} • ${count} Pass${count > 1 ? 'es' : ''})`;
+            if (unitPrice === 0) {
+                btnLabel.innerText = `Confirm Free Registration (${count} Pass${count > 1 ? 'es' : ''})`;
+            } else {
+                const total = (count * unitPrice).toLocaleString('en-IN');
+                btnLabel.innerText = `Submit & Continue to Payment (₹${total} • ${count} Pass${count > 1 ? 'es' : ''})`;
+            }
         }
 
         // 2. Render Person 2 to Person N Subforms

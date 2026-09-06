@@ -148,7 +148,7 @@
                     <div class="border-b border-[#dadce0] pb-3">
                         <div class="text-[11px] font-mono font-medium text-[#1a73e8] uppercase">{{ event.event_code }}</div>
                         <h4 class="text-lg font-bold font-display text-[#202124] mt-0.5">{{ event.title }}</h4>
-                        <div class="text-xs text-[#5f6368] mt-1">Fee: <strong class="text-[#202124] font-mono">₹{{ event.registration_fee }}</strong></div>
+                        <div class="text-xs text-[#5f6368] mt-1">Fee: <strong class="text-[#202124] font-mono">{% if event.registration_fee == 0 %}FREE Entry{% else %}₹{{ event.registration_fee }}{% endif %}</strong></div>
                     </div>
 
                     <div class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
@@ -180,7 +180,7 @@
 
                     <div class="pt-2 border-t border-[#f1f3f4]">
                         <button disabled class="google-btn-primary w-full py-2.5 opacity-75 cursor-not-allowed">
-                            <span>Continue to Payment (₹{{ event.registration_fee|floatformat:0 }})</span>
+                            <span>{% if event.registration_fee == 0 %}Confirm Free Registration & Get Pass{% else %}Continue to Payment (₹{{ event.registration_fee|floatformat:0 }}){% endif %}</span>
                         </button>
                     </div>
                 </div>
