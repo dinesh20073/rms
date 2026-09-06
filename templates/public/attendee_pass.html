@@ -3,52 +3,54 @@
 {% block title %}Official Entry Pass • {{ customer.name }} | {{ event.title }}{% endblock %}
 
 {% block extra_head %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
     /* Strict Single Page Full A4 Print Styling */
     @media print {
         @page {
             size: A4 portrait;
-            margin: 0mm !important;
+            margin: 6mm 8mm;
+        }
+        *, *:before, *:after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
         html, body {
-            width: 210mm !important;
-            height: 297mm !important;
-            max-height: 297mm !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
             color: #000000 !important;
-            overflow: hidden !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+            overflow: visible !important;
         }
         .no-print {
             display: none !important;
         }
         .a4-sheet-container {
-            width: 210mm !important;
-            height: 297mm !important;
-            max-height: 297mm !important;
-            padding: 10mm 12mm !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            padding: 0 !important;
             margin: 0 auto !important;
-            box-sizing: border-box !important;
             background: #ffffff !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-            page-break-after: avoid !important;
+            display: block !important;
+            box-shadow: none !important;
             page-break-inside: avoid !important;
-            overflow: hidden !important;
+            page-break-after: avoid !important;
         }
         .a4-main-card {
+            width: 100% !important;
+            max-width: 100% !important;
             border: 2px solid #0f172a !important;
             box-shadow: none !important;
             page-break-inside: avoid !important;
-            flex: 1 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
+            page-break-after: avoid !important;
+            margin: 0 auto !important;
+        }
+        .a4-print-footer {
+            display: block !important;
         }
     }
 </style>
@@ -64,7 +66,7 @@
             <span class="text-xs font-bold text-slate-900 font-display">Single-Page A4 Entry Pass ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="window.print()" class="google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold">
+            <button id="print-pass-btn" type="button" onclick="triggerPrintPass()" class="google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold cursor-pointer">
                 <i data-lucide="printer" class="w-4 h-4"></i>
                 <span>Print This Badge (100% A4)</span>
             </button>
@@ -153,7 +155,13 @@
 
             <!-- Right QR Code (5 cols) -->
             <div class="sm:col-span-5 bg-[#f8fafc] p-3.5 border-2 border-slate-900 flex flex-col items-center justify-center text-center space-y-1.5">
-                <div id="qrcode" class="p-2 bg-white border border-slate-300 shadow-2xs"></div>
+                <div class="p-2 bg-white border border-slate-300 shadow-2xs inline-block">
+                    {% if qr_base64 %}
+                    <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Pass {{ attendee.pass_code }}" class="w-32 h-32 object-contain block mx-auto">
+                    {% else %}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ attendee.pass_code }}" alt="QR Pass {{ attendee.pass_code }}" class="w-32 h-32 object-contain block mx-auto">
+                    {% endif %}
+                </div>
                 <div class="font-mono text-base font-black text-slate-900 tracking-widest">
                     {{ attendee.pass_code }}
                 </div>
@@ -237,32 +245,26 @@
     </div>
 
     <!-- Print-Only Scissor Cut Notice -->
-    <div class="hidden a4-print-footer text-center text-[9px] text-slate-400 font-mono pt-2">
+    <div class="hidden a4-print-footer text-center text-[9px] text-slate-400 font-mono pt-2 no-print">
         <span>✂ OFFICIAL A4 EVENT PASS DOCUMENT • EMS PLATFORM • VERIFIED AT CHECK-IN TERMINAL</span>
     </div>
 
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        new QRCode(document.getElementById("qrcode"), {
-            text: "{{ attendee.pass_code }}",
-            width: 120,
-            height: 120,
-            colorDark : "#0f172a",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
+    function triggerPrintPass() {
+        window.focus();
+        window.print();
+    }
 
+    document.addEventListener('DOMContentLoaded', function() {
         // Automatically trigger print dialog if ?print=1 or ?auto_print=1 in URL
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('print') === '1' || urlParams.get('auto_print') === '1') {
             setTimeout(function() {
-                window.print();
-            }, 600);
+                triggerPrintPass();
+            }, 400);
         }
     });
 </script>
 {% endblock %}
-
-

@@ -173,7 +173,23 @@ def registration_status_view(request, registration_code):
     return redirect('public-register', slug=registration.event.slug)
 
 def attendee_badge_view(request, pass_code):
-    attendee = get_object_or_404(Attendee, pass_code=pass_code)
+    from apps.notifications.services import generate_attendee_qr_base64
+    from apps.payments.models import Order
+    
+    # Resilient lookup: pass_code -> registration_code -> order_code
+    attendee = Attendee.objects.filter(pass_code=pass_code).first()
+    if not attendee:
+        reg = Registration.objects.filter(registration_code=pass_code).first()
+        if not reg:
+            order = Order.objects.filter(order_code=pass_code).first()
+            if order:
+                reg = order.registration
+        if reg:
+            attendee, _ = Attendee.objects.get_or_create(registration=reg)
+            
+    if not attendee:
+        return get_object_or_404(Attendee, pass_code=pass_code)
+
     registration = attendee.registration
     responses = registration.form_responses or {}
 
@@ -214,11 +230,18 @@ def attendee_badge_view(request, pass_code):
             'phone': '-'
         })
 
+    # Generate embedded Base64 QR code
+    try:
+        qr_base64 = generate_attendee_qr_base64(attendee.pass_code)
+    except Exception:
+        qr_base64 = None
+
     return render(request, 'public/attendee_pass.html', {
         'attendee': attendee,
         'registration': registration,
         'event': registration.event,
         'customer': registration.customer,
         'attendee_list': attendee_list,
-        'ticket_count': max(ticket_count, len(attendee_list))
+        'ticket_count': max(ticket_count, len(attendee_list)),
+        'qr_base64': qr_base64,
     })

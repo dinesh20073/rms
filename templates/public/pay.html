@@ -32,9 +32,46 @@
     </div>
 
     <!-- 2. Main Body Section -->
-    <div class="p-6 sm:p-10 space-y-8 bg-white text-[#3F3A3A]">
+    <div class="p-6 sm:p-10 space-y-8 bg-white text-[#3F3A3A]">        {% if registration.status == 'COMPLETED' or attendee %}
+        <!-- ==================== VERIFIED & COMPLETED PASS STATE ==================== -->
+        <div class="space-y-6 text-center">
+            <div class="w-14 h-14 bg-emerald-50 border border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                <span class="material-symbols-outlined text-[32px]">check_circle</span>
+            </div>
+            <h2 class="text-2xl font-bold font-display text-emerald-900">Registration Verified & Active!</h2>
+            <p class="text-xs text-[#3F3A3A] mt-2 max-w-md mx-auto leading-relaxed">
+                Your payment has been verified. Your official entry pass is ready for download and print.
+            </p>
 
-        {% if order.status != 'PENDING' %}
+            <div class="flex items-center justify-center gap-3 pt-2">
+                <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}?print=1" target="_blank" class="google-btn-primary px-5 py-2.5 text-xs font-bold flex items-center gap-2 shadow-md">
+                    <span class="material-symbols-outlined text-[18px]">print</span>
+                    <span>Print Official Entry Pass (100% A4)</span>
+                </a>
+            </div>
+
+            <!-- Order Information Summary -->
+            <div class="p-5 bg-[#FAF4F3] border border-[#E8C7C7] text-left text-xs space-y-2.5">
+                <div class="flex justify-between border-b border-[#E8C7C7]/60 pb-2 font-bold text-[#999A78] uppercase text-[10px]">
+                    <span>Order Information</span>
+                    <span class="text-[#B85C68] font-bold font-mono">{{ order.order_code }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#999A78]">Primary Attendee:</span>
+                    <span class="font-bold text-slate-900">{{ customer.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#999A78]">Email:</span>
+                    <span class="font-mono text-slate-800">{{ customer.email }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#999A78]">Total Amount:</span>
+                    <span class="font-mono font-bold text-[#8F414B]">₹{{ order.amount|floatformat:0 }} INR</span>
+                </div>
+            </div>
+        </div>
+
+        {% elif order.status != 'PENDING' %}
         <!-- ==================== POST-SUBMISSION STATE (ALWAYS COURTEOUS WAITING NOTICE) ==================== -->
         <div class="space-y-6 text-center">
             <div class="w-14 h-14 bg-[#FFF0ED] border border-[#E8C7C7] text-[#B85C68] flex items-center justify-center mx-auto mb-3 shadow-2xs">
@@ -63,7 +100,6 @@
                     <span class="text-[#999A78]">Total Amount:</span>
                     <span class="font-mono font-bold text-[#8F414B]">₹{{ order.amount|floatformat:0 }} INR</span>
                 </div>
-            </div>
         </div>
 
         {% else %}

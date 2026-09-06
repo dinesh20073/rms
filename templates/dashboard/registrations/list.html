@@ -289,12 +289,10 @@
                         </td>
                         <td class="py-3 px-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1.5">
-                                {% if reg.attendee_pass %}
-                                <a href="{% url 'attendee-badge' reg.attendee_pass.pass_code %}?print=1" target="_blank" class="google-btn-outlined text-xs py-1 px-2.5 hover:border-[#1e8e3e] hover:text-[#137333] flex items-center gap-1 shadow-2xs font-bold text-emerald-800 bg-emerald-50/70 border-emerald-300" title="Print Official Attendee Pass Badge">
+                                <a href="{% url 'attendee-badge' reg.attendee_pass.pass_code|default:reg.registration_code %}?print=1" target="_blank" class="google-btn-outlined text-xs py-1 px-2.5 hover:border-[#1e8e3e] hover:text-[#137333] flex items-center gap-1 shadow-2xs font-bold text-emerald-800 bg-emerald-50/70 border-emerald-300" title="Print Official Attendee Pass Badge (A4 Sheet)">
                                     <i data-lucide="printer" class="w-3.5 h-3.5 text-emerald-700"></i>
                                     <span>Print</span>
                                 </a>
-                                {% endif %}
                                 <a href="{% url 'dashboard-registration-send-email' reg.registration_code %}" class="google-btn-outlined text-xs py-1 px-2.5 hover:border-[#1a73e8] hover:text-[#1a73e8] flex items-center gap-1 shadow-2xs" title="Send Official Confirmation & Pass Email">
                                     <i data-lucide="mail" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                                     <span>Send Email</span>

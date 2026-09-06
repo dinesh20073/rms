@@ -30,6 +30,13 @@
             <p class="text-[11px] text-[#3F3A3A]/80 max-w-xs leading-tight">
                 Scan this QR code at the entrance terminal or present your pass PIN to event staff for instant admission.
             </p>
+
+            <div class="pt-2">
+                <a href="{% url 'attendee-badge' attendee.pass_code %}?print=1" target="_blank" class="google-btn-primary px-5 py-2.5 text-xs font-bold flex items-center justify-center gap-2 shadow-md w-full sm:w-auto">
+                    <span class="material-symbols-outlined text-[18px]">print</span>
+                    <span>Print Official Entry Pass (100% A4)</span>
+                </a>
+            </div>
         </div>
         {% endif %}
 
