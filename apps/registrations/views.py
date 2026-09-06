@@ -175,9 +175,50 @@ def registration_status_view(request, registration_code):
 def attendee_badge_view(request, pass_code):
     attendee = get_object_or_404(Attendee, pass_code=pass_code)
     registration = attendee.registration
+    responses = registration.form_responses or {}
+
+    # Extract Person list (Person 1 + Person 2 to Person N)
+    attendee_list = []
+
+    # Person 1 (Primary Attendee)
+    p1_age = responses.get('age') or responses.get('age_category') or responses.get('Age') or '-'
+    p1_gender = responses.get('gender') or responses.get('Gender') or '-'
+    attendee_list.append({
+        'index': 1,
+        'name': registration.customer.name,
+        'age': p1_age,
+        'gender': p1_gender,
+        'type': 'Primary Attendee',
+        'email': registration.customer.email,
+        'phone': registration.customer.phone
+    })
+
+    # Person 2 to N
+    try:
+        raw_ticket_count = responses.get('ticket_count', 1)
+        ticket_count = int(raw_ticket_count)
+    except (ValueError, TypeError):
+        ticket_count = 1
+
+    for i in range(2, ticket_count + 1):
+        name = responses.get(f'person_{i}_name') or f"Attendee #{i}"
+        age = responses.get(f'person_{i}_age') or '-'
+        gender = responses.get(f'person_{i}_gender') or '-'
+        attendee_list.append({
+            'index': i,
+            'name': name,
+            'age': age,
+            'gender': gender,
+            'type': f'Co-Attendee #{i}',
+            'email': '-',
+            'phone': '-'
+        })
+
     return render(request, 'public/attendee_pass.html', {
         'attendee': attendee,
         'registration': registration,
         'event': registration.event,
-        'customer': registration.customer
+        'customer': registration.customer,
+        'attendee_list': attendee_list,
+        'ticket_count': max(ticket_count, len(attendee_list))
     })

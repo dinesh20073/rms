@@ -1,69 +1,67 @@
 {% extends 'base.html' %}
 
-{% block title %}Attendee Pass • {{ customer.name }} | {{ event.title }}{% endblock %}
+{% block title %}Official Entry Pass • {{ customer.name }} | {{ event.title }}{% endblock %}
 
 {% block extra_head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
+    /* Strict Single Page Full A4 Print Styling */
     @media print {
         @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 0mm !important;
         }
         html, body {
             width: 210mm !important;
             height: 297mm !important;
+            max-height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
             color: #000000 !important;
+            overflow: hidden !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
         .no-print {
             display: none !important;
         }
-        .badge-print-container {
+        .a4-sheet-container {
             width: 210mm !important;
-            min-height: 297mm !important;
+            height: 297mm !important;
             max-height: 297mm !important;
-            padding: 12mm 15mm !important;
+            padding: 10mm 12mm !important;
             margin: 0 auto !important;
             box-sizing: border-box !important;
             background: #ffffff !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: flex-start !important;
-            align-items: center !important;
+            justify-content: space-between !important;
             page-break-after: avoid !important;
             page-break-inside: avoid !important;
+            overflow: hidden !important;
         }
-        .badge-card {
-            width: 100% !important;
-            max-width: 180mm !important;
-            box-shadow: none !important;
+        .a4-main-card {
             border: 2px solid #0f172a !important;
+            box-shadow: none !important;
             page-break-inside: avoid !important;
-            margin: 0 auto !important;
-        }
-        .a4-print-footer {
-            display: block !important;
-            margin-top: 8mm !important;
-            width: 100% !important;
-            max-width: 180mm !important;
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
         }
     }
 </style>
 {% endblock %}
 
 {% block body_content %}
-<div class="min-h-screen bg-[#f4f7fb] flex flex-col items-center justify-center p-3 sm:p-6 badge-print-container">
+<div class="min-h-screen bg-[#f4f7fb] flex flex-col items-center justify-center p-3 sm:p-6 a4-sheet-container">
 
     <!-- Top Action Toolbar (No-Print) -->
-    <div class="w-full max-w-lg mb-4 flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 border border-slate-300 shadow-sm no-print">
+    <div class="w-full max-w-2xl mb-4 flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 border border-slate-300 shadow-sm no-print">
         <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-800 font-display">Official Verified Attendee Pass (A4 Ready)</span>
+            <span class="text-xs font-bold text-slate-900 font-display">Single-Page A4 Entry Pass ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
         </div>
         <div class="flex items-center gap-2">
             <button onclick="window.print()" class="google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold">
@@ -72,120 +70,175 @@
             </button>
             <a href="{% url 'public-register' event.slug %}" class="google-btn-outlined px-3 py-2 text-xs flex items-center gap-1 font-bold">
                 <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-                <span>Back</span>
+                <span>Event Home</span>
             </a>
         </div>
     </div>
 
-    <!-- Official Printable Pass Card (Fits 100% A4 Sheet) -->
-    <div class="w-full max-w-lg bg-white border-2 border-slate-900 shadow-xl overflow-hidden relative transition badge-card">
+    <!-- Official Full A4 Sheet Pass Card -->
+    <div class="w-full max-w-2xl bg-white border-2 border-slate-900 shadow-xl overflow-hidden relative transition a4-main-card flex flex-col">
         
-        <!-- Top Lanyard Slot Punch Cutout Indicator (Physical Event Convention) -->
-        <div class="bg-slate-900 pt-2.5 pb-1.5 text-center flex flex-col items-center justify-center">
-            <div class="w-14 h-2.5 bg-white/30 border border-white/40 mb-1.5"></div>
-            <div class="text-[10px] font-mono tracking-widest text-blue-200 uppercase font-bold">
-                OFFICIAL ENTRY PASS • {{ event.event_code|default:"EMS-2026" }}
+        <!-- 1. Top Event Header Bar -->
+        <div class="bg-gradient-to-r from-[#1a73e8] via-[#1557b0] to-[#0d47a1] p-4 sm:p-5 text-white relative">
+            <div class="flex items-start justify-between gap-3">
+                <div class="space-y-1">
+                    <div class="inline-block bg-white/20 text-white px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border border-white/30">
+                        OFFICIAL ADMISSION PASS • {{ ticket_count }} PERSON{{ ticket_count|pluralize|upper }}
+                    </div>
+                    <h1 class="text-xl sm:text-2xl font-black font-display tracking-tight text-white leading-tight">
+                        {{ event.title }}
+                    </h1>
+                </div>
+                <div class="text-right shrink-0">
+                    <div class="font-mono text-xs font-bold bg-white text-[#1a73e8] px-2.5 py-1 border border-white">
+                        {{ attendee.pass_code }}
+                    </div>
+                    <div class="text-[10px] text-blue-100 font-mono mt-0.5">
+                        {{ registration.registration_code }}
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Badge Header (Event Title & Venue) -->
-        <div class="bg-gradient-to-r from-[#1a73e8] via-[#1557b0] to-[#0d47a1] p-5 sm:p-6 text-center text-white relative">
-            <div class="inline-block bg-white/20 text-white px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider mb-2 border border-white/30">
-                ALL-ACCESS PASS
-            </div>
-            <h1 class="text-2xl sm:text-3xl font-black font-display tracking-tight text-white leading-snug">
-                {{ event.title }}
-            </h1>
-            <div class="text-xs text-blue-100 mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-medium">
-                <span class="flex items-center gap-1">
+            <!-- Venue & Date Meta Bar -->
+            <div class="mt-3 pt-2.5 border-t border-white/20 flex flex-wrap items-center justify-between gap-2 text-xs text-blue-100">
+                <div class="flex items-center gap-1.5 font-medium">
                     <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-200"></i>
-                    <span>{{ event.start_time|date:"d M Y"|default:"28 Aug 2026" }}</span>
-                </span>
-                <span>•</span>
-                <span class="flex items-center gap-1">
+                    <span><strong>Date & Time:</strong> {{ event.start_time|date:"d M Y, h:i A"|default:"28 Aug 2026, 09:30 AM" }} IST</span>
+                </div>
+                <div class="flex items-center gap-1.5 font-medium">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-200"></i>
-                    <span>{{ event.venue|default:"Main Hall / Auditorium" }}</span>
-                </span>
+                    <span><strong>Venue:</strong> {{ event.venue|default:"BIEC Convention Centre & Auditorium" }}</span>
+                </div>
             </div>
         </div>
 
-        <!-- Badge Main Body -->
-        <div class="p-6 sm:p-7 space-y-5 text-center bg-white">
+        <!-- 2. Primary Attendee & Scannable QR Code Middle Section -->
+        <div class="p-4 sm:p-5 bg-white border-b border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
             
-            <!-- Attendee Details -->
-            <div>
-                <div class="w-16 h-16 bg-[#e8f0fe] text-[#1a73e8] border-2 border-[#1a73e8] flex items-center justify-center font-display font-black text-2xl mx-auto mb-3 shadow-2xs">
-                    {{ customer.name|slice:":1"|upper }}
-                </div>
-                <h2 class="text-2xl sm:text-3xl font-black font-display text-slate-900 tracking-tight">
-                    {{ customer.name }}
-                </h2>
-                
-                <!-- Dynamic Person / Ticket Count Label -->
-                <div class="mt-1.5 flex flex-wrap items-center justify-center gap-1.5">
-                    <span class="inline-block bg-blue-50 text-[#1a73e8] border border-blue-200 px-3 py-0.5 text-xs font-black font-mono uppercase tracking-wider">
-                        {{ registration.form_responses.ticket_count|default:"1" }} x Person Pass
+            <!-- Left Info (7 cols) -->
+            <div class="sm:col-span-7 space-y-2.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-black font-mono uppercase tracking-wider bg-blue-50 text-[#1a73e8] border border-blue-200 px-2 py-0.5">
+                        {{ ticket_count }} x Person Pass
                     </span>
-                    {% if customer.designation %}
-                    <span class="text-xs font-bold text-slate-700">• {{ customer.designation }}</span>
-                    {% endif %}
-                    {% if customer.company %}
-                    <span class="text-xs font-bold text-slate-600">({{ customer.company }})</span>
-                    {% endif %}
+                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                        {% if registration.amount == 0 %}FREE ENTRY{% else %}PAID ₹{{ registration.amount|floatformat:0 }}{% endif %}
+                    </span>
                 </div>
 
-                <div class="text-xs text-slate-500 font-mono mt-1">
-                    {{ customer.email }}
-                    {% if customer.phone %} • {{ customer.phone }}{% endif %}
+                <div>
+                    <h2 class="text-2xl font-black font-display text-slate-900 tracking-tight">
+                        {{ customer.name }}
+                    </h2>
+                    <div class="text-xs font-bold text-slate-700 mt-0.5">
+                        {{ customer.designation|default:"Registered Attendee" }}{% if customer.company %} • {{ customer.company }}{% endif %}
+                    </div>
+                    <div class="text-xs text-slate-500 font-mono mt-0.5">
+                        {{ customer.email }}{% if customer.phone %} • {{ customer.phone }}{% endif %}
+                    </div>
+                </div>
+
+                <!-- Registration Meta Pills -->
+                <div class="grid grid-cols-2 gap-2 text-[11px] pt-1 font-mono">
+                    <div class="bg-slate-50 p-1.5 border border-slate-200">
+                        <span class="text-slate-400 text-[9px] block uppercase">Booking Code</span>
+                        <strong class="text-slate-900">{{ registration.registration_code }}</strong>
+                    </div>
+                    <div class="bg-slate-50 p-1.5 border border-slate-200">
+                        <span class="text-slate-400 text-[9px] block uppercase">Issue Date</span>
+                        <strong class="text-slate-900">{{ registration.created_at|date:"d-M-Y" }}</strong>
+                    </div>
                 </div>
             </div>
 
-            <!-- Scannable QR Code & Pass Code -->
-            <div class="bg-slate-50 p-4 sm:p-5 border border-slate-300 flex flex-col items-center justify-center space-y-2">
-                <div id="qrcode" class="p-2.5 bg-white border border-slate-400 shadow-2xs"></div>
-                <div class="font-mono text-xl sm:text-2xl font-black text-slate-900 tracking-widest mt-1">
+            <!-- Right QR Code (5 cols) -->
+            <div class="sm:col-span-5 bg-[#f8fafc] p-3.5 border-2 border-slate-900 flex flex-col items-center justify-center text-center space-y-1.5">
+                <div id="qrcode" class="p-2 bg-white border border-slate-300 shadow-2xs"></div>
+                <div class="font-mono text-base font-black text-slate-900 tracking-widest">
                     {{ attendee.pass_code }}
                 </div>
-                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-2">
-                    <span>CODE: {{ registration.registration_code }}</span>
-                    <span>•</span>
-                    <span>AMOUNT: {% if registration.amount == 0 %}FREE Entry{% else %}₹{{ registration.amount|floatformat:0 }}{% endif %}</span>
+                <div class="text-[9px] font-bold text-emerald-700 uppercase tracking-wider font-mono">
+                    ✓ SECURE ENTRANCE QR
                 </div>
-            </div>
-
-            <!-- Explicit Turnstile & Check-in Text -->
-            <div class="text-xs sm:text-[13px] text-slate-700 font-medium leading-relaxed max-w-md mx-auto bg-slate-50 p-3 border border-slate-200">
-                Please display this pass at entrance turnstiles or security checkpoints for instant QR verification and check-in.
-            </div>
-
-            <!-- On-Screen Print Button (No-Print) -->
-            <div class="pt-2 flex items-center justify-center gap-2 no-print">
-                <button onclick="window.print()" class="google-btn-primary px-6 py-3 text-xs sm:text-sm flex items-center gap-2 font-bold shadow-md hover:scale-102 transition">
-                    <i data-lucide="printer" class="w-4 h-4"></i>
-                    <span>Print This Badge</span>
-                </button>
             </div>
 
         </div>
 
-        <!-- Badge Footer Bar -->
-        <div class="bg-slate-100 py-3 px-5 text-center text-xs text-slate-600 border-t-2 border-slate-900 font-mono flex items-center justify-between">
-            <span class="font-bold text-emerald-700 flex items-center gap-1">
-                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
-                <span>STATUS: VERIFIED & ACTIVE</span>
+        <!-- 3. All Persons Name & Age Table (Person 1, Person 2 to Person N) -->
+        <div class="p-4 sm:p-5 bg-white space-y-2.5">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                    <i data-lucide="users" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                    <span>All Registered Persons & Age Details ({{ attendee_list|length }} Person{{ attendee_list|length|pluralize }})</span>
+                </h3>
+                <span class="text-[10px] font-mono font-bold text-slate-500">Admit Quantity: {{ ticket_count }}</span>
+            </div>
+
+            <div class="border border-slate-300 overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead class="bg-[#f1f5f9] border-b border-slate-300 text-slate-700 font-bold text-[10px] uppercase tracking-wider">
+                        <tr>
+                            <th class="py-2 px-3 w-12 text-center">Slot</th>
+                            <th class="py-2 px-3">Person Full Name</th>
+                            <th class="py-2 px-3 w-24">Age</th>
+                            <th class="py-2 px-3 w-28">Gender</th>
+                            <th class="py-2 px-3 text-right">Pass Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-800">
+                        {% for person in attendee_list %}
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-2 px-3 text-center font-mono font-bold text-[#1a73e8]">
+                                #{{ person.index }}
+                            </td>
+                            <td class="py-2 px-3 font-bold text-slate-900">
+                                <span>{{ person.name }}</span>
+                                {% if person.index == 1 %}
+                                <span class="ml-1.5 text-[10px] font-bold text-[#1a73e8] bg-blue-50 border border-blue-200 px-1.5 py-0.2">Primary</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-2 px-3 font-mono font-semibold text-slate-800">
+                                {{ person.age }}
+                            </td>
+                            <td class="py-2 px-3 text-slate-600">
+                                {{ person.gender|title }}
+                            </td>
+                            <td class="py-2 px-3 text-right font-mono font-bold text-emerald-700 text-[11px]">
+                                ✓ VALID
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. Explicit Turnstile Verification Notice -->
+        <div class="px-4 sm:px-5 pb-4">
+            <div class="bg-blue-50/80 border border-blue-200 p-3 text-center space-y-1">
+                <div class="text-xs sm:text-[13px] text-slate-900 font-bold leading-relaxed">
+                    Please display this pass at entrance turnstiles or security checkpoints for instant QR verification and check-in.
+                </div>
+                <div class="text-[10px] text-slate-500 font-mono">
+                    Valid for all {{ ticket_count }} registered person{{ ticket_count|pluralize }} listed above. Re-entry governed by event venue policy.
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Badge Footer Seal (A4 Bottom) -->
+        <div class="bg-slate-900 text-white py-2.5 px-4 text-[10px] font-mono flex items-center justify-between shrink-0">
+            <span class="font-bold text-emerald-400 flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>VERIFIED & ACTIVE • 100% AUTHENTICATED PASS</span>
             </span>
-            <span class="text-slate-500 font-bold">ID: {{ attendee.id|stringformat:"06d" }}</span>
+            <span class="text-slate-400 font-mono">EMS-AUTH-{{ attendee.id|stringformat:"06d" }}</span>
         </div>
 
     </div>
 
-    <!-- Print-Only Cut Lines & Additional Info (A4 Layout) -->
-    <div class="hidden a4-print-footer text-center text-[10px] text-slate-500 font-mono space-y-1">
-        <div class="border-t-2 border-dashed border-slate-400 pt-2 flex items-center justify-between text-slate-400">
-            <span>✂ Cut along dashed line for lanyard pouch insertion</span>
-            <span>Generated via EMS Event Pass Portal</span>
-        </div>
-        <div>Booking Reference: {{ registration.registration_code }} • Attendee: {{ customer.name }} &lt;{{ customer.email }}&gt;</div>
+    <!-- Print-Only Scissor Cut Notice -->
+    <div class="hidden a4-print-footer text-center text-[9px] text-slate-400 font-mono pt-2">
+        <span>✂ OFFICIAL A4 EVENT PASS DOCUMENT • EMS PLATFORM • VERIFIED AT CHECK-IN TERMINAL</span>
     </div>
 
 </div>
@@ -194,8 +247,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         new QRCode(document.getElementById("qrcode"), {
             text: "{{ attendee.pass_code }}",
-            width: 140,
-            height: 140,
+            width: 120,
+            height: 120,
             colorDark : "#0f172a",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
@@ -211,4 +264,5 @@
     });
 </script>
 {% endblock %}
+
 
