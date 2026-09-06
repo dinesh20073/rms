@@ -19,9 +19,11 @@
 
     .survey-bg-canvas {
         background: linear-gradient(180deg, #FFF7F5 0%, #FDF2F0 50%, #FAF0EE 100%);
-        min-height: 100vh;
+        height: 100vh;
+        height: 100dvh;
+        width: 100%;
         position: relative;
-        overflow-x: hidden;
+        overflow: hidden;
     }
     
     /* Decorative Ambient Glow Spheres */
@@ -50,7 +52,7 @@
         z-index: 1;
     }
 
-    /* Strict Sharp Form Card */
+    /* Strict Sharp Form Card Window (Fixed max height with inner scroll) */
     .survey-card-container {
         position: relative;
         z-index: 10;
@@ -58,13 +60,38 @@
         box-shadow: 0 10px 30px rgba(143, 65, 75, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
         border-radius: 0px !important;
         border: 1px solid #E8C7C7;
+        display: flex;
+        flex-direction: column;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    /* Scrollable Container Window */
+    .survey-card-scroll-body {
+        overflow-y: auto;
+        flex: 1 1 auto;
+        scrollbar-width: thin;
+        scrollbar-color: #E8C7C7 #FAF4F3;
+    }
+    .survey-card-scroll-body::-webkit-scrollbar {
+        width: 6px;
+    }
+    .survey-card-scroll-body::-webkit-scrollbar-track {
+        background: #FAF4F3;
+    }
+    .survey-card-scroll-body::-webkit-scrollbar-thumb {
+        background: #E8C7C7;
+    }
+    .survey-card-scroll-body::-webkit-scrollbar-thumb:hover {
+        background: #B85C68;
     }
 
     .survey-header-banner {
         background: linear-gradient(135deg, #B85C68 0%, #8F414B 100%);
         color: #ffffff;
-        padding: 28px 36px;
+        padding: 24px 32px;
         border-radius: 0px !important;
+        flex-shrink: 0;
     }
 
     /* Sharp Inputs */
@@ -121,14 +148,14 @@
     }
 </style>
 
-<div class="survey-bg-canvas flex flex-col justify-center items-center py-10 px-4 sm:px-6 relative min-h-screen">
+<div class="survey-bg-canvas flex flex-col justify-center items-center p-3 sm:p-6 relative h-screen h-[100dvh] overflow-hidden">
     
     <!-- Ambient Soft Glow Spheres -->
     <div class="ambient-sphere-1"></div>
     <div class="ambient-sphere-2"></div>
 
-    <!-- Main Content Container -->
-    <main class="relative z-10 w-full max-w-3xl my-auto">
+    <!-- Main Content Container: Fixed Screen Window -->
+    <main class="relative z-10 w-full max-w-3xl my-auto flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)]">
         {% block main_content %}{% endblock %}
     </main>
 

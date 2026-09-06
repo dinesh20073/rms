@@ -23,38 +23,41 @@
         </div>
     </div>
 
-    <!-- Polling Status Body -->
-    <div class="p-6 sm:p-8 space-y-6 bg-white"
-         {% if registration.status == 'MANUAL_REVIEW' or registration.status == 'PROCESSING' or registration.status == 'PENDING' %}
-         hx-get="{% url 'registration-status' registration.registration_code %}?snippet=1"
-         hx-trigger="every 5s"
-         hx-swap="innerHTML"
-         {% endif %}>
-        
-        {% include 'public/partials/status_card.html' %}
+    <!-- Scrollable Body Window -->
+    <div class="survey-card-scroll-body">
+        <!-- Polling Status Body -->
+        <div class="p-6 sm:p-8 space-y-6 bg-white"
+             {% if registration.status == 'MANUAL_REVIEW' or registration.status == 'PROCESSING' or registration.status == 'PENDING' %}
+             hx-get="{% url 'registration-status' registration.registration_code %}?snippet=1"
+             hx-trigger="every 5s"
+             hx-swap="innerHTML"
+             {% endif %}>
+            
+            {% include 'public/partials/status_card.html' %}
 
-    </div>
+        </div>
 
-    <!-- Attendee Summary Card -->
-    <div class="p-6 bg-[#FAF4F3] border-t border-[#E8C7C7] text-xs text-[#3F3A3A] space-y-2">
-        <div class="flex justify-between border-b border-[#E8C7C7]/60 pb-2 font-bold text-[#999A78] uppercase text-[10px]">
-            <span>Attendee Information</span>
-            <span>Verified</span>
+        <!-- Attendee Summary Card -->
+        <div class="p-6 bg-[#FAF4F3] border-t border-[#E8C7C7] text-xs text-[#3F3A3A] space-y-2">
+            <div class="flex justify-between border-b border-[#E8C7C7]/60 pb-2 font-bold text-[#999A78] uppercase text-[10px]">
+                <span>Attendee Information</span>
+                <span>Verified</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[#999A78]">Primary Contact:</span>
+                <span class="font-bold text-slate-900">{{ customer.name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[#999A78]">Email:</span>
+                <span class="font-mono text-slate-800">{{ customer.email }}</span>
+            </div>
+            {% if customer.phone %}
+            <div class="flex justify-between">
+                <span class="text-[#999A78]">Phone:</span>
+                <span class="font-mono text-slate-800">{{ customer.phone }}</span>
+            </div>
+            {% endif %}
         </div>
-        <div class="flex justify-between">
-            <span class="text-[#999A78]">Primary Contact:</span>
-            <span class="font-bold text-slate-900">{{ customer.name }}</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="text-[#999A78]">Email:</span>
-            <span class="font-mono text-slate-800">{{ customer.email }}</span>
-        </div>
-        {% if customer.phone %}
-        <div class="flex justify-between">
-            <span class="text-[#999A78]">Phone:</span>
-            <span class="font-mono text-slate-800">{{ customer.phone }}</span>
-        </div>
-        {% endif %}
     </div>
 
 </div>
