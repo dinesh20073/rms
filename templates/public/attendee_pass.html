@@ -95,8 +95,8 @@
                     <div class="font-mono text-xs font-bold bg-white text-[#1a73e8] px-2.5 py-1 border border-white">
                         {{ attendee.pass_code }}
                     </div>
-                    <div class="text-[10px] text-blue-100 font-mono mt-0.5">
-                        {{ registration.registration_code }}
+                    <div class="text-[10px] text-blue-100 font-mono mt-0.5 whitespace-nowrap">
+                        Pass Generated On: {{ registration.created_at|date:"d M Y, h:i A" }}
                     </div>
                 </div>
             </div>
@@ -105,7 +105,7 @@
             <div class="mt-3 pt-2.5 border-t border-white/20 flex flex-wrap items-center justify-between gap-2 text-xs text-blue-100">
                 <div class="flex items-center gap-1.5 font-medium">
                     <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-200"></i>
-                    <span><strong>Date & Time:</strong> {{ event.start_time|date:"d M Y, h:i A"|default:"28 Aug 2026, 09:30 AM" }} IST</span>
+                    <span><strong>Event Date:</strong> {{ event.start_time|date:"d M Y, h:i A"|default:"28 Aug 2026, 09:30 AM" }} IST</span>
                 </div>
                 <div class="flex items-center gap-1.5 font-medium">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-200"></i>
@@ -143,12 +143,12 @@
                 <!-- Registration Meta Pills -->
                 <div class="grid grid-cols-2 gap-2 text-[11px] pt-1 font-mono">
                     <div class="bg-slate-50 p-1.5 border border-slate-200">
-                        <span class="text-slate-400 text-[9px] block uppercase">Booking Code</span>
-                        <strong class="text-slate-900">{{ registration.registration_code }}</strong>
+                        <span class="text-slate-400 text-[9px] block uppercase">Pass Generated On</span>
+                        <strong class="text-slate-900">{{ registration.created_at|date:"d M Y, h:i A" }}</strong>
                     </div>
                     <div class="bg-slate-50 p-1.5 border border-slate-200">
-                        <span class="text-slate-400 text-[9px] block uppercase">Issue Date</span>
-                        <strong class="text-slate-900">{{ registration.created_at|date:"d-M-Y" }}</strong>
+                        <span class="text-slate-400 text-[9px] block uppercase">Booking Code</span>
+                        <strong class="text-slate-900">{{ registration.registration_code }}</strong>
                     </div>
                 </div>
             </div>
