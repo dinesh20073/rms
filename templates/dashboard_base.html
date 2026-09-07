@@ -142,20 +142,14 @@
         
         <!-- Google Console Top Header Bar -->
         <header class="google-topbar h-14 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
-            <!-- Left: Header Title + Breadcrumb -->
+            <!-- Left: Nizhal Logo & Nizhal Community Only -->
             <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2.5">
-                    <a href="{% url 'dashboard-overview' %}" class="lg:hidden w-8 h-8 rounded-full flex items-center justify-center p-1" title="Nizhal Console">
-                        <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-6 h-6 object-contain">
-                    </a>
-                    <h1 class="font-display font-semibold text-base sm:text-lg text-[#202124] tracking-tight m-0">
-                        {% block header_title %}Overview{% endblock %}
-                    </h1>
-                    <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e]"></span>
-                        <span>UPI Engine Online</span>
+                <a href="{% url 'dashboard-overview' %}" class="flex items-center gap-2.5 hover:opacity-90 transition select-none" title="Nizhal Community">
+                    <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-7 h-7 object-contain">
+                    <span class="font-display font-semibold text-sm sm:text-base text-[#202124] tracking-tight">
+                        Nizhal Community
                     </span>
-                </div>
+                </a>
             </div>
 
             <!-- Right: Profile & Actions -->
