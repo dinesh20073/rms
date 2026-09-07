@@ -68,6 +68,18 @@
             font-family: 'Roboto Mono', 'SFMono-Regular', Consolas, Menlo, monospace !important;
         }
 
+        /* Mobile Responsiveness */
+        @media only screen and (max-width: 620px) {
+            .email-card, table[class*="email-card"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 100% !important;
+            }
+            .outer-wrapper-td {
+                padding: 0 !important;
+            }
+        }
+
         /* 1. Universal Dark Mode Media Query Lock */
         @media (prefers-color-scheme: dark) {
             body, .force-white-bg, .email-card, .email-body {
@@ -94,85 +106,94 @@
         }
     </style>
 </head>
-<body class="body force-white-bg" bgcolor="#ffffff" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; background: #ffffff !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased; border-radius: 0px !important;">
+<body class="body force-white-bg" bgcolor="#f1f5f9" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; background-color: #f1f5f9 !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
 
-    <!-- Direct 600px Email Card (Zero Outer Margin, Zero Border Top/Bottom/Left/Right) -->
-    <table role="presentation" class="email-card force-white-bg" align="center" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 600px; margin: 0 auto !important; padding: 0 !important; border: 0 !important; border: none !important; outline: none !important; border-collapse: collapse !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; background: #ffffff !important;">
-        
-        <!-- 1. Top Event Banner (Fixed 600px Width) -->
+    <!-- Outer Centering Table -->
+    <table role="presentation" width="100%" bgcolor="#f1f5f9" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; min-width: 100% !important; margin: 0 auto !important; padding: 0 !important; border: 0 !important; background-color: #f1f5f9 !important;">
         <tr>
-            <td bgcolor="#ffffff" class="force-white-bg" style="padding: 0 !important; margin: 0 !important; line-height: 0 !important; font-size: 0 !important; border: 0 !important; border: none !important; background-color: #ffffff !important;">
-                <img src="{{ banner_src|default:'https://iili.io/ndZKclf.jpg' }}" alt="Nizhal Event Header" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; border: 0 !important; margin: 0 !important; padding: 0 !important;" />
-            </td>
-        </tr>
+            <td align="center" valign="top" class="outer-wrapper-td" bgcolor="#f1f5f9" style="padding: 20px 0 !important; margin: 0 !important; border: 0 !important; background-color: #f1f5f9 !important;">
 
-        <!-- 2. Email Body Slot -->
-        <tr>
-            <td bgcolor="#ffffff" class="force-white-bg" style="padding: 24px; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
-                {% block email_content %}{% endblock %}
-            </td>
-        </tr>
-
-        <!-- 3. Important Information & Contacts Box (Sharp 0px Edges) -->
-        <tr>
-            <td bgcolor="#ffffff" class="force-white-bg" style="padding: 0 24px 18px 24px; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; border: 0 !important;">
-                <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #cbd5e1; overflow: hidden; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; font-family: 'Roboto', sans-serif;">
+                <!-- Direct 600px Email Card -->
+                <table role="presentation" class="email-card force-white-bg" align="center" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 600px !important; max-width: 600px !important; min-width: 600px; margin: 0 auto !important; padding: 0 !important; border: 0 !important; border-collapse: collapse !important; background-color: #ffffff !important; box-shadow: 0 1px 4px rgba(0,0,0,0.12);">
+                    
+                    <!-- 1. Top Event Banner (Fixed 600px Width) -->
                     <tr>
-                        <td bgcolor="#f1f5f9" class="font-mono" style="background-color: #f1f5f9 !important; background-image: linear-gradient(#f1f5f9, #f1f5f9) !important; padding: 6px 12px; border-bottom: 1px solid #cbd5e1; font-size: 10px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase;">
-                            ℹ️ IMPORTANT INFORMATION
+                        <td bgcolor="#ffffff" class="force-white-bg" style="padding: 0 !important; margin: 0 !important; line-height: 0 !important; font-size: 0 !important; border: 0 !important; background-color: #ffffff !important;">
+                            <img src="{{ banner_src|default:'https://iili.io/ndZKclf.jpg' }}" alt="Nizhal Event Header" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; border: 0 !important; margin: 0 !important; padding: 0 !important;" />
                         </td>
                     </tr>
+
+                    <!-- 2. Email Body Slot -->
                     <tr>
-                        <td bgcolor="#ffffff" style="padding: 12px 14px; font-size: 11px; color: #334155 !important; line-height: 1.5; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
-                            <ul style="margin: 0; padding-left: 16px;">
-                                <li style="margin-bottom: 5px;">
-                                    Join our official 
-                                    <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" style="color: #15803d !important; font-weight: 700; text-decoration: underline;">WhatsApp Community</a>
-                                    for real-time event updates and announcements.
-                                </li>
-                                <li style="margin-bottom: 5px;">
-                                    Follow our official 
-                                    <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #db2777 !important; font-weight: 700; text-decoration: underline;">Instagram Page</a>
-                                    for event photos, highlights, and updates.
-                                </li>
-                                <li>
-                                    For directions or on-ground coordination, call: 
-                                    <a href="tel:9944488286" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Priyadharshini (9944488286)</a> / 
-                                    <a href="tel:9003429590" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Lakshanya (9003429590)</a> / 
-                                    <a href="tel:9042674924" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Lakshanaa (9042674924)</a>.
-                                </li>
-                            </ul>
+                        <td bgcolor="#ffffff" class="force-white-bg" style="padding: 24px; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                            {% block email_content %}{% endblock %}
                         </td>
                     </tr>
+
+                    <!-- 3. Important Information & Contacts Box (Sharp 0px Edges) -->
+                    <tr>
+                        <td bgcolor="#ffffff" class="force-white-bg" style="padding: 0 24px 18px 24px; background-color: #ffffff !important; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #cbd5e1; overflow: hidden; background-color: #ffffff !important; font-family: 'Roboto', sans-serif;">
+                                <tr>
+                                    <td bgcolor="#f1f5f9" class="font-mono" style="background-color: #f1f5f9 !important; padding: 6px 12px; border-bottom: 1px solid #cbd5e1; font-size: 10px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase;">
+                                        ℹ️ IMPORTANT INFORMATION
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td bgcolor="#ffffff" style="padding: 12px 14px; font-size: 11px; color: #334155 !important; line-height: 1.5; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                                        <ul style="margin: 0; padding-left: 16px;">
+                                            <li style="margin-bottom: 5px;">
+                                                Join our official 
+                                                <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" style="color: #15803d !important; font-weight: 700; text-decoration: underline;">WhatsApp Community</a>
+                                                for real-time event updates and announcements.
+                                            </li>
+                                            <li style="margin-bottom: 5px;">
+                                                Follow our official 
+                                                <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #db2777 !important; font-weight: 700; text-decoration: underline;">Instagram Page</a>
+                                                for event photos, highlights, and updates.
+                                            </li>
+                                            <li>
+                                                For directions or on-ground coordination, call: 
+                                                <a href="tel:9944488286" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Priyadharshini (9944488286)</a> / 
+                                                <a href="tel:9003429590" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Lakshanya (9003429590)</a> / 
+                                                <a href="tel:9042674924" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Lakshanaa (9042674924)</a>.
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Brand Sign-off & Clean Footer (Sharp 0px Edges) -->
+                            <div style="padding-top: 14px; text-align: center; background-color: #ffffff !important;">
+                                <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 10px auto; border: 0 !important;">
+                                    <tr>
+                                        <td bgcolor="#0f172a" class="font-display" style="background-color: #0f172a !important; color: #ffffff !important; padding: 4px 18px; font-size: 11px; font-weight: 800; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; border: 0 !important;">
+                                            See you there!
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; border-bottom: 0 !important; border-left: 0 !important; border-right: 0 !important;">
+                                    <tr>
+                                        <td align="left" bgcolor="#ffffff" style="background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                                            <a href="http://127.0.0.1:8000/register/{{ event.slug }}/" target="_blank" style="text-decoration: none; color: #0f172a !important;">
+                                                <strong class="font-display" style="font-size: 12px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif;">Nizhal</strong>
+                                                <span style="font-size: 11px; color: #64748b !important;">| The Circle of Warmth</span>
+                                            </a>
+                                        </td>
+                                        <td align="right" bgcolor="#ffffff" class="font-mono" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important;">
+                                            Booking ID: <strong style="color: #0f172a !important;">{{ order.order_code|default:registration.registration_code }}</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
                 </table>
 
-                <!-- Brand Sign-off & Clean Footer (Sharp 0px Edges) -->
-                <div style="padding-top: 14px; text-align: center; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important;">
-                    <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 10px auto; border: 0 !important;">
-                        <tr>
-                            <td bgcolor="#0f172a" class="font-display" style="background-color: #0f172a !important; background-image: linear-gradient(#0f172a, #0f172a) !important; color: #ffffff !important; padding: 4px 18px; font-size: 11px; font-weight: 800; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; border: 0 !important;">
-                                See you there!
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; border-bottom: 0 !important; border-left: 0 !important; border-right: 0 !important;">
-                        <tr>
-                            <td align="left" bgcolor="#ffffff" style="background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
-                                <a href="http://127.0.0.1:8000/register/{{ event.slug }}/" target="_blank" style="text-decoration: none; color: #0f172a !important;">
-                                    <strong class="font-display" style="font-size: 12px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif;">Nizhal</strong>
-                                    <span style="font-size: 11px; color: #64748b !important;">| The Circle of Warmth</span>
-                                </a>
-                            </td>
-                            <td align="right" bgcolor="#ffffff" class="font-mono" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; border: 0 !important;">
-                                Booking ID: <strong style="color: #0f172a !important;">{{ order.order_code|default:registration.registration_code }}</strong>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
             </td>
         </tr>
-
     </table>
 
 </body>
