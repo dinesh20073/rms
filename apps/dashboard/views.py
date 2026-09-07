@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
 from django.utils.text import slugify
@@ -30,6 +31,7 @@ def get_current_tenant(request):
             request.session['active_tenant_id'] = tenant.id
     return tenant
 
+@login_required(login_url='login')
 def tenant_switch_view(request, tenant_id):
     tenant = get_object_or_404(Tenant, id=tenant_id)
     request.session['active_tenant_id'] = tenant.id
@@ -149,6 +151,7 @@ def filter_registrations_queryset(reg_qs, request):
 
     return reg_qs, filter_params, active_filters_count
 
+@login_required(login_url='login')
 def overview_dashboard_view(request):
     tenant = get_current_tenant(request)
     if not tenant:
@@ -225,6 +228,7 @@ def overview_dashboard_view(request):
     }
     return render(request, 'dashboard/overview.html', context)
 
+@login_required(login_url='login')
 def events_list_view(request):
     tenant = get_current_tenant(request)
     events = Event.objects.filter(tenant=tenant).annotate(
@@ -237,6 +241,7 @@ def events_list_view(request):
         'tenant': tenant
     })
 
+@login_required(login_url='login')
 def create_event_view(request):
     tenant = get_current_tenant(request)
     if request.method == 'POST':
@@ -276,6 +281,7 @@ def create_event_view(request):
 
     return render(request, 'dashboard/events/create.html', {'tenant': tenant})
 
+@login_required(login_url='login')
 def event_detail_view(request, event_id):
     tenant = get_current_tenant(request)
     event = get_object_or_404(Event, id=event_id, tenant=tenant)
@@ -358,6 +364,7 @@ def event_detail_view(request, event_id):
     }
     return render(request, 'dashboard/events/detail.html', context)
 
+@login_required(login_url='login')
 def form_builder_view(request, event_id):
     tenant = get_current_tenant(request)
     event = get_object_or_404(Event, id=event_id, tenant=tenant)
@@ -402,6 +409,7 @@ def form_builder_view(request, event_id):
         'fields': fields
     })
 
+@login_required(login_url='login')
 def manual_verification_queue_view(request):
     tenant = get_current_tenant(request)
     verifications_qs = Verification.objects.filter(order__registration__event__tenant=tenant)
@@ -429,6 +437,7 @@ def manual_verification_queue_view(request):
         'tenant': tenant
     })
 
+@login_required(login_url='login')
 def verification_action_view(request, verification_id):
     if request.method != 'POST':
         return redirect('dashboard-verification-queue')
@@ -449,6 +458,7 @@ def verification_action_view(request, verification_id):
 
     return redirect('dashboard-verification-queue')
 
+@login_required(login_url='login')
 def registrations_list_view(request):
     tenant = get_current_tenant(request)
     qs = Registration.objects.filter(event__tenant=tenant).select_related('customer', 'event', 'order', 'attendee_pass').order_by('-created_at')
@@ -465,6 +475,7 @@ def registrations_list_view(request):
         'tenant': tenant
     })
 
+@login_required(login_url='login')
 def revenue_analytics_view(request):
     tenant = get_current_tenant(request)
     now = timezone.now()
@@ -494,6 +505,7 @@ def revenue_analytics_view(request):
         'tenant': tenant
     })
 
+@login_required(login_url='login')
 def email_logs_view(request):
     tenant = get_current_tenant(request)
     logs_qs = EmailLog.objects.filter(tenant=tenant).order_by('-sent_at')
@@ -540,6 +552,7 @@ def email_logs_view(request):
         'tenant': tenant
     })
 
+@login_required(login_url='login')
 def audit_logs_view(request):
     tenant = get_current_tenant(request)
     action_filter = request.GET.get('action', '')
@@ -555,6 +568,7 @@ def audit_logs_view(request):
         'tenant': tenant
     })
 
+@login_required(login_url='login')
 def partner_api_view(request):
     tenant = get_current_tenant(request)
     if request.method == 'POST' and 'generate_key' in request.POST:
@@ -572,6 +586,7 @@ def partner_api_view(request):
         'sample_event': sample_event
     })
 
+@login_required(login_url='login')
 def export_attendees_csv(request, event_id):
     tenant = get_current_tenant(request)
     event = get_object_or_404(Event, id=event_id, tenant=tenant)
@@ -602,6 +617,7 @@ def export_attendees_csv(request, event_id):
 
     return response
 
+@login_required(login_url='login')
 def send_registration_email_view(request, registration_code):
     tenant = get_current_tenant(request)
     registration = get_object_or_404(Registration, registration_code=registration_code, event__tenant=tenant)
@@ -622,6 +638,7 @@ def send_registration_email_view(request, registration_code):
         
     return redirect(request.META.get('HTTP_REFERER', 'dashboard-overview'))
 
+@login_required(login_url='login')
 def resend_email_log_view(request, email_id):
     tenant = get_current_tenant(request)
     email_log = get_object_or_404(EmailLog, id=email_id, tenant=tenant)

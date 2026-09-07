@@ -1,7 +1,10 @@
 from django.urls import path
 from . import views
+from . import auth_views
 
 urlpatterns = [
+    path('login/', auth_views.login_view, name='dashboard-login'),
+    path('logout/', auth_views.logout_view, name='dashboard-logout'),
     path('', views.overview_dashboard_view, name='dashboard-overview'),
     path('tenant/switch/<int:tenant_id>/', views.tenant_switch_view, name='dashboard-tenant-switch'),
     path('events/', views.events_list_view, name='dashboard-events-list'),

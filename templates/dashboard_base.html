@@ -97,8 +97,28 @@
                     </div>
                 </div>
 
+                <!-- Emails -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-email-logs' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'email' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    </a>
+                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                        Emails
+                    </div>
+                </div>
 
+            </div>
+        </div>
 
+        <!-- Sidebar Bottom: User & Logout -->
+        <div class="flex flex-col items-center gap-2 w-full px-2 pt-2 border-t border-slate-800">
+            <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                <a href="{% url 'logout' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-950/40" title="Sign Out">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </a>
+                <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-red-950 text-red-200 text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-red-800">
+                    Sign Out ({{ request.user.username|default:'Nizhal' }})
+                </div>
             </div>
         </div>
     </aside>
@@ -108,7 +128,10 @@
     <div id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-72 bg-slate-900 text-white z-50 lg:hidden -translate-x-full shadow-2xl flex flex-col justify-between p-5 border-r border-slate-800">
         <div>
             <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                {% include 'components/logo.html' %}
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 bg-blue-600 flex items-center justify-center font-black text-white text-xs">N</div>
+                    <span class="font-display font-bold text-sm text-white">Nizhal Console</span>
+                </div>
                 <button onclick="toggleMobileMenu()" class="p-1.5 text-slate-400 hover:text-white">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -141,8 +164,19 @@
             </nav>
         </div>
 
-        <div class="pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
-            <span class="font-display font-bold text-white">EMS Console</span>
+        <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600/30 border border-blue-500/50 flex items-center justify-center font-bold text-xs text-blue-300">
+                    {{ request.user.username|slice:":1"|upper|default:'N' }}
+                </div>
+                <div>
+                    <span class="font-bold text-xs text-white block">{{ request.user.username|default:'Nizhal' }}</span>
+                    <span class="text-[10px] text-emerald-400">Authenticated</span>
+                </div>
+            </div>
+            <a href="{% url 'logout' %}" class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 transition" title="Sign Out">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+            </a>
         </div>
     </div>
 
@@ -167,12 +201,30 @@
                 </div>
             </div>
 
-            <!-- Right: New Event Action Button -->
-            <div class="flex items-center gap-2.5 text-xs">
-                <a href="{% url 'dashboard-event-create' %}" class="bg-white hover:bg-blue-50 text-[#1a73e8] font-bold px-4 py-1.5 transition shadow-sm flex items-center gap-1.5">
+            <!-- Right: Actions & User Menu -->
+            <div class="flex items-center gap-3 text-xs">
+                <a href="{% url 'dashboard-event-create' %}" class="bg-white hover:bg-blue-50 text-[#1a73e8] font-bold px-3.5 py-1.5 transition shadow-sm flex items-center gap-1.5">
                     <i data-lucide="plus" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                     <span>New Event</span>
                 </a>
+
+                <!-- User Pill & Sign Out -->
+                <div class="hidden sm:flex items-center gap-2 pl-2 border-l border-blue-400/30">
+                    <div class="flex items-center gap-2 px-2.5 py-1 bg-white/10 border border-white/20">
+                        <div class="w-5 h-5 bg-white text-[#1a73e8] flex items-center justify-center font-bold text-[10px]">
+                            {{ request.user.username|slice:":1"|upper|default:'N' }}
+                        </div>
+                        <div class="flex flex-col leading-tight text-left">
+                            <span class="font-bold text-white text-[11px]">{{ request.user.username|default:'Nizhal' }}</span>
+                        </div>
+                        <span class="ml-1 px-1.5 py-0.2 bg-emerald-400/30 text-emerald-200 border border-emerald-300/40 text-[9px] font-mono font-bold">ADMIN</span>
+                    </div>
+
+                    <a href="{% url 'logout' %}" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-600 text-white font-semibold border border-red-400/30 transition flex items-center gap-1" title="Sign Out">
+                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                        <span class="hidden md:inline text-[11px]">Sign Out</span>
+                    </a>
+                </div>
             </div>
         </header>
 

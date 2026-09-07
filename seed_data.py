@@ -20,13 +20,23 @@ from apps.audit.services import log_audit_event
 def seed():
     print(">> Seeding EMS Platform Database...")
 
-    # 1. Admin User
+    # 1. Admin Users
+    nizhal_user, created_nizhal = User.objects.get_or_create(username='Nizhal')
+    nizhal_user.set_password('Community4all')
+    nizhal_user.is_superuser = True
+    nizhal_user.is_staff = True
+    nizhal_user.first_name = 'Nizhal'
+    nizhal_user.last_name = 'Admin'
+    nizhal_user.email = 'nizhalcommunity@gmail.com'
+    nizhal_user.save()
+    print("  [+] Configured Superuser 'Nizhal' (Password: Community4all)")
+
     admin_user, created = User.objects.get_or_create(username='admin')
     if created:
         admin_user.set_password('admin123')
         admin_user.is_superuser = True
         admin_user.is_staff = True
-        admin_user.email = 'nizhal.community@gmail.com'
+        admin_user.email = 'nizhalcommunity@gmail.com'
         admin_user.save()
         print("  [+] Created Admin User (admin / admin123)")
 

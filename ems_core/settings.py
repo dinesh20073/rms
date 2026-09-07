@@ -118,3 +118,15 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000', 'http://127.0.0.1:8001', 'http://localhost:8001']
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
+# Authentication & Session Security
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard-overview'
+LOGOUT_REDIRECT_URL = 'login'
+
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+

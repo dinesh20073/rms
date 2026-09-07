@@ -6,9 +6,14 @@ from django.shortcuts import redirect
 
 from apps.registrations import views as reg_views
 from apps.payments import views as pay_views
+from apps.dashboard import auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Secure Authentication
+    path('login/', auth_views.login_view, name='login'),
+    path('logout/', auth_views.logout_view, name='logout'),
     
     # Root redirects to Dashboard
     path('', lambda req: redirect('dashboard-overview'), name='root-home'),
