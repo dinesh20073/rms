@@ -645,6 +645,28 @@ def resend_email_log_view(request, email_id):
     from django.core.mail import send_mail
     from django.conf import settings
     
+    # If this is a registration pass, re-render fresh HTML with latest centered template
+    if email_log.event_type == 'REGISTRATION_COMPLETED':
+        reg = Registration.objects.filter(customer__email=email_log.recipient_email, status='COMPLETED', event__tenant=tenant).order_by('-created_at').first()
+        if reg:
+            try:
+                from apps.notifications.services import BANNER_WEB_URL, get_attendee_qr_web_url
+                from django.template.loader import render_to_string
+                customer = reg.customer
+                event = reg.event
+                order = getattr(reg, 'order', None)
+                pass_code = getattr(reg, 'attendee_pass', None).pass_code if hasattr(reg, 'attendee_pass') and reg.attendee_pass else reg.registration_code
+                attendee = getattr(reg, 'attendee_pass', None)
+                ticket_count = getattr(reg, 'ticket_count', 1) or 1
+                unit_fee = event.registration_fee or 0
+                attendee_list = [{'index': 1, 'name': customer.name.title() + ' (Primary)', 'age': '-', 'gender': '-', 'type': 'Primary Ticket Holder', 'email': customer.email, 'phone': customer.phone or '-', 'amount': unit_fee}]
+                email_context = {'registration': reg, 'customer': customer, 'event': event, 'order': order, 'attendee': attendee, 'pass_code': pass_code, 'banner_src': BANNER_WEB_URL, 'qr_src': get_attendee_qr_web_url(pass_code), 'attendee_list': attendee_list, 'ticket_count': ticket_count, 'unit_fee': unit_fee}
+                fresh_html = render_to_string('emails/registration_confirmed.html', email_context)
+                email_log.body_html = fresh_html
+                email_log.save(update_fields=['body_html'])
+            except Exception:
+                pass
+
     try:
         send_mail(
             subject=email_log.subject,
