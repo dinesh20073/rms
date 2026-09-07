@@ -49,12 +49,6 @@
         opacity: 1;
         transform: translateX(0);
     }
-
-    /* Mobile drawer */
-    #mobile-drawer { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-    #mobile-drawer.open { transform: translateX(0) !important; }
-    #mobile-backdrop { transition: opacity 0.25s ease; }
-    #mobile-backdrop.open { opacity: 1 !important; pointer-events: auto !important; }
 </style>
 
 <div class="flex h-screen overflow-hidden bg-[#f8f9fa] font-sans text-[#202124]">
@@ -143,77 +137,17 @@
         </div>
     </aside>
 
-    <!-- 2. Mobile Drawer Navigation -->
-    <div id="mobile-backdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/40 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity"></div>
-    <div id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white text-[#202124] z-50 lg:hidden -translate-x-full shadow-2xl flex flex-col justify-between p-4 border-r border-[#dadce0]">
-        <div>
-            <!-- Header -->
-            <div class="flex items-center justify-between pb-3 border-b border-[#dadce0]">
-                <div class="flex items-center gap-2.5">
-                    <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-7 h-7 object-contain">
-                    <span class="font-display font-semibold text-base text-[#202124]">Nizhal Console</span>
-                </div>
-                <button onclick="toggleMobileMenu()" class="p-1.5 text-[#5f6368] hover:text-[#202124] rounded-full hover:bg-[#f1f3f4]">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Drawer Links -->
-            <nav class="mt-4 space-y-1 text-sm font-medium">
-                <a href="{% url 'dashboard-overview' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if request.resolver_match.url_name == 'dashboard-overview' %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
-                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                    <span>Overview</span>
-                </a>
-                <a href="{% url 'dashboard-registrations-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
-                    <i data-lucide="receipt" class="w-4 h-4"></i>
-                    <span>Registrations</span>
-                </a>
-                <a href="{% url 'dashboard-events-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if 'event' in request.resolver_match.url_name %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
-                    <i data-lucide="calendar" class="w-4 h-4"></i>
-                    <span>Events</span>
-                </a>
-                <a href="{% url 'dashboard-verification-queue' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if 'verification' in request.resolver_match.url_name %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
-                    <i data-lucide="shield-check" class="w-4 h-4"></i>
-                    <span>Verification Queue</span>
-                    {% if pending_reviews_count > 0 %}
-                    <span class="ml-auto bg-[#fef7e0] text-[#b06000] border border-[#feefc3] font-semibold text-xs px-2 py-0.5 rounded-full">{{ pending_reviews_count }}</span>
-                    {% endif %}
-                </a>
-                <a href="{% url 'dashboard-email-logs' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if 'email' in request.resolver_match.url_name %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
-                    <i data-lucide="mail" class="w-4 h-4"></i>
-                    <span>Email Logs</span>
-                </a>
-            </nav>
-        </div>
-
-        <!-- Footer -->
-        <div class="pt-3 border-t border-[#dadce0] flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-full bg-[#1a73e8] text-white flex items-center justify-center font-medium text-xs">
-                    {{ request.user.username|slice:":1"|upper|default:'N' }}
-                </div>
-                <div>
-                    <span class="font-medium text-xs text-[#202124] block">{{ request.user.username|default:'Nizhal' }}</span>
-                    <span class="text-[11px] text-[#137333] font-medium">Active Admin</span>
-                </div>
-            </div>
-            <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-2 text-[#5f6368] hover:text-[#d93025] rounded-full hover:bg-[#fce8e6] transition" title="Sign Out">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-            </a>
-        </div>
-    </div>
-
     <!-- 3. Main Application Container -->
     <div class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa]">
         
         <!-- Google Console Top Header Bar -->
         <header class="google-topbar h-14 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
-            <!-- Left: Mobile Menu + Header Title + Breadcrumb -->
+            <!-- Left: Header Title + Breadcrumb -->
             <div class="flex items-center gap-3">
-                <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-[#5f6368] hover:text-[#202124] rounded-full hover:bg-[#f1f3f4]">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
-                </button>
                 <div class="flex items-center gap-2.5">
+                    <a href="{% url 'dashboard-overview' %}" class="lg:hidden w-8 h-8 rounded-full flex items-center justify-center p-1" title="Nizhal Console">
+                        <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-6 h-6 object-contain">
+                    </a>
                     <h1 class="font-display font-semibold text-base sm:text-lg text-[#202124] tracking-tight m-0">
                         {% block header_title %}Overview{% endblock %}
                     </h1>
@@ -259,7 +193,7 @@
     </div>
 
     <!-- 4. Mobile Bottom Navigation Bar -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#dadce0] flex items-center justify-around py-2 px-2 text-[11px] font-medium text-[#5f6368] shadow-lg">
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#dadce0] flex items-center justify-around py-2 px-1 text-[11px] font-medium text-[#5f6368] shadow-lg">
         <a href="{% url 'dashboard-overview' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-overview' %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
             <i data-lucide="layout-grid" class="w-5 h-5"></i>
             <span>Overview</span>
@@ -278,6 +212,10 @@
             {% if pending_reviews_count > 0 %}
             <span class="absolute top-0 right-1 w-2 h-2 rounded-full bg-[#f9ab00]"></span>
             {% endif %}
+        </a>
+        <a href="{% url 'dashboard-email-logs' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'email' in request.resolver_match.url_name %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
+            <i data-lucide="mail" class="w-5 h-5"></i>
+            <span>Emails</span>
         </a>
     </nav>
 
@@ -337,15 +275,6 @@
 </div>
 
 <script>
-    function toggleMobileMenu() {
-        const drawer = document.getElementById('mobile-drawer');
-        const backdrop = document.getElementById('mobile-backdrop');
-        if (drawer && backdrop) {
-            drawer.classList.toggle('open');
-            backdrop.classList.toggle('open');
-        }
-    }
-
     function openPassModal(passCode, attendeeName, eventTitle) {
         const modal = document.getElementById('passViewerModal');
         const iframe = document.getElementById('passModalIframe');
