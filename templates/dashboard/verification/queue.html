@@ -9,38 +9,31 @@
     <div class="google-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
+                <div class="w-8 h-8 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
                     <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
                 <div class="flex flex-wrap items-center gap-2.5">
                     <h1 class="text-base sm:text-lg font-semibold font-display text-[#202124] tracking-tight m-0">Verification</h1>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] flex items-center gap-1">
-                        <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-                        <span>Manual Review</span>
-                    </span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#e6f4ea] text-[#137333] border border-[#ceead6] flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e]"></span>
-                        <span>OCR Active</span>
-                    </span>
+                    <span class="text-xs font-medium text-[#5f6368]">• Manual Review</span>
                 </div>
             </div>
-            <p class="text-xs text-[#5f6368] mt-1.5 pl-12">Review payment proofs and approve or reject registrations.</p>
+            <p class="text-xs text-[#5f6368] mt-1">Review payment proofs and approve or reject registrations.</p>
         </div>
         
-        <div class="flex items-center gap-2.5 pl-12 md:pl-0">
+        <div class="flex items-center gap-2.5">
             {% if queue %}
-            <span class="px-3.5 py-1.5 rounded-full bg-[#fef7e0] border border-[#feefc3] text-[#b06000] font-semibold text-xs flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded bg-[#fef7e0] border border-[#feefc3] text-[#b06000] font-semibold text-xs flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-[#f9ab00] animate-ping"></span>
                 <span>{{ queue|length }} Pending</span>
             </span>
             {% else %}
-            <span class="px-3.5 py-1.5 rounded-full bg-[#e6f4ea] border border-[#ceead6] text-[#137333] font-medium text-xs flex items-center gap-2">
-                <i data-lucide="check-circle" class="w-4 h-4 text-[#1e8e3e]"></i>
+            <span class="px-2.5 py-1 rounded bg-[#e6f4ea] border border-[#ceead6] text-[#137333] font-medium text-xs flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-[#1e8e3e]"></i>
                 <span>Queue Clear</span>
             </span>
             {% endif %}
 
-            <a href="{% url 'dashboard-verification-queue' %}" class="google-btn-outlined py-1.5 px-3 text-xs rounded-full flex items-center gap-1.5" title="Refresh Queue">
+            <a href="{% url 'dashboard-verification-queue' %}" class="google-btn-outlined py-1 px-3 text-xs flex items-center gap-1.5" title="Refresh Queue">
                 <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                 <span class="hidden sm:inline">Refresh</span>
             </a>
@@ -121,7 +114,7 @@
             <!-- Order Header Bar -->
             <div class="bg-[#f8f9fa] px-5 py-3 border-b border-[#dadce0] flex flex-wrap items-center justify-between gap-2.5">
                 <div class="flex flex-wrap items-center gap-2.5 text-xs">
-                    <span class="font-mono font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc]">
+                    <span class="font-mono font-medium text-[#1a73e8]">
                         {{ item.order.order_code }}
                     </span>
                     <span class="font-semibold text-[#202124]">
@@ -133,7 +126,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-mono text-[#5f6368]">{{ item.created_at|date:"d M Y, H:i A" }}</span>
-                    <span class="pill-orange">Awaiting Review</span>
+                    <span class="pill-orange text-xs">Awaiting Review</span>
                 </div>
             </div>
 
@@ -147,10 +140,10 @@
                         <span>Payment Screenshot</span>
                     </span>
                     
-                    <div class="bg-[#202124] rounded-2xl border border-[#dadce0] p-3 flex items-center justify-center min-h-[280px] max-h-[420px] overflow-hidden relative group">
+                    <div class="bg-[#202124] rounded border border-[#dadce0] p-3 flex items-center justify-center min-h-[280px] max-h-[420px] overflow-hidden relative group">
                         {% if item.evidence and item.evidence.screenshot %}
-                        <img src="{{ item.evidence.screenshot.url }}" alt="Payment Proof" class="max-h-[400px] w-auto object-contain rounded-lg shadow-md group-hover:scale-102 transition duration-200">
-                        <a href="{{ item.evidence.screenshot.url }}" target="_blank" class="absolute bottom-3 right-3 bg-white text-[#202124] text-xs px-3 py-1.5 rounded-full border border-[#dadce0] font-medium flex items-center gap-1 shadow-md hover:bg-[#f8f9fa] transition" title="Open full resolution in new tab">
+                        <img src="{{ item.evidence.screenshot.url }}" alt="Payment Proof" class="max-h-[400px] w-auto object-contain rounded shadow-sm group-hover:scale-102 transition duration-200">
+                        <a href="{{ item.evidence.screenshot.url }}" target="_blank" class="absolute bottom-3 right-3 bg-white text-[#202124] text-xs px-2.5 py-1 rounded border border-[#dadce0] font-medium flex items-center gap-1 shadow hover:bg-[#f8f9fa] transition" title="Open full resolution in new tab">
                             <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                             <span>View</span>
                         </a>
@@ -174,7 +167,7 @@
 
                         <!-- Reason Alerts -->
                         {% if item.is_duplicate_txn %}
-                        <div class="p-3 rounded-xl bg-[#fce8e6] border border-[#fad2cf] text-[#c5221f] text-xs flex items-start gap-2.5">
+                        <div class="p-3 rounded bg-[#fce8e6] border border-[#fad2cf] text-[#c5221f] text-xs flex items-start gap-2.5">
                             <i data-lucide="alert-octagon" class="w-4 h-4 shrink-0 text-[#d93025] mt-0.5"></i>
                             <div>
                                 <strong class="font-semibold block">Duplicate Transaction ID:</strong>
@@ -184,7 +177,7 @@
                         {% endif %}
 
                         {% if not item.is_amount_matched %}
-                        <div class="p-3 rounded-xl bg-[#fef7e0] border border-[#feefc3] text-[#b06000] text-xs flex items-start gap-2.5">
+                        <div class="p-3 rounded bg-[#fef7e0] border border-[#feefc3] text-[#b06000] text-xs flex items-start gap-2.5">
                             <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-[#f9ab00] mt-0.5"></i>
                             <div>
                                 <strong class="font-semibold block">Amount Mismatch:</strong>
@@ -194,28 +187,28 @@
                         {% endif %}
 
                         <!-- Comparison Grid -->
-                        <div class="grid grid-cols-2 gap-3 bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0] text-xs">
-                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                        <div class="grid grid-cols-2 gap-3 bg-[#f8f9fa] p-3 rounded border border-[#dadce0] text-xs">
+                            <div class="bg-white p-2.5 rounded border border-[#dadce0]">
                                 <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Expected</span>
                                 <span class="font-bold text-[#202124] text-base font-mono">₹{{ item.order.amount|floatformat:2 }}</span>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                            <div class="bg-white p-2.5 rounded border border-[#dadce0]">
                                 <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Receipt Amount</span>
                                 <span class="font-bold text-base font-mono {% if item.is_amount_matched %}text-[#137333]{% else %}text-[#b06000]{% endif %}">
                                     ₹{{ item.ocr_amount|default:"N/A" }}
                                 </span>
                             </div>
 
-                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                            <div class="bg-white p-2.5 rounded border border-[#dadce0]">
                                 <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">UTR / Txn ID</span>
                                 <span class="font-mono font-semibold text-[#202124] text-xs">{{ item.ocr_transaction_id|default:"Not Detected" }}</span>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                            <div class="bg-white p-2.5 rounded border border-[#dadce0]">
                                 <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Payee UPI</span>
                                 <span class="font-medium text-[#202124] text-xs truncate block">{{ item.ocr_payee|default:item.order.registration.event.upi_name }}</span>
                             </div>
 
-                            <div class="col-span-2 bg-white p-3 rounded-xl border border-[#dadce0]">
+                            <div class="col-span-2 bg-white p-2.5 rounded border border-[#dadce0]">
                                 <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Notes</span>
                                 <span class="font-mono text-xs text-[#3c4043]">{{ item.review_notes|default:"Awaiting review." }}</span>
                             </div>
@@ -223,18 +216,18 @@
                     </div>
 
                     <!-- Action Decision Form -->
-                    <form method="POST" action="{% url 'dashboard-verification-action' item.id %}" class="bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0] space-y-3">
+                    <form method="POST" action="{% url 'dashboard-verification-action' item.id %}" class="bg-[#f8f9fa] p-3 rounded border border-[#dadce0] space-y-3">
                         {% csrf_token %}
                         <div>
                             <label class="text-xs font-semibold text-[#202124] block mb-1">Note (Optional)</label>
-                            <input type="text" name="notes" placeholder="e.g. Verified on bank portal" class="google-input text-xs py-2">
+                            <input type="text" name="notes" placeholder="e.g. Verified on bank portal" class="google-input text-xs py-1.5">
                         </div>
-                        <div class="flex items-center justify-end gap-2.5">
-                            <button type="submit" name="action" value="REJECT" onclick="return confirm('Are you sure you want to REJECT this payment proof?');" class="google-btn-danger py-1.5 px-3.5 text-xs rounded-full flex items-center gap-1 cursor-pointer">
+                        <div class="flex items-center justify-end gap-2">
+                            <button type="submit" name="action" value="REJECT" onclick="return confirm('Are you sure you want to REJECT this payment proof?');" class="google-btn-danger text-xs flex items-center gap-1 cursor-pointer">
                                 <i data-lucide="x" class="w-4 h-4"></i>
                                 <span>Reject</span>
                             </button>
-                            <button type="submit" name="action" value="APPROVE" class="google-btn-primary py-1.5 px-4 text-xs rounded-full flex items-center gap-1.5 cursor-pointer">
+                            <button type="submit" name="action" value="APPROVE" class="google-btn-primary text-xs flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="check" class="w-4 h-4"></i>
                                 <span>Approve</span>
                             </button>

@@ -147,7 +147,7 @@
             box-shadow: 0 1px 6px rgba(32,33,36,0.24) !important;
         }
 
-        /* Clean Modern Buttons */
+        /* Clean Flat Buttons (Google Cloud Style) */
         .google-btn-primary, .btn-auth-primary, .survey-btn-submit {
             display: inline-flex;
             align-items: center;
@@ -156,26 +156,24 @@
             background-color: #1a73e8 !important;
             color: #ffffff !important;
             border: 1px solid #1a73e8 !important;
-            border-radius: 8px !important;
-            padding: 7px 16px !important;
+            border-radius: 4px !important;
+            padding: 6px 14px !important;
             font-size: 13px !important;
-            font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
-            font-weight: 600 !important;
+            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 500 !important;
             text-decoration: none !important;
             cursor: pointer;
-            box-shadow: 0 1px 2px rgba(60,64,67,0.15) !important;
-            transition: all 0.15s ease !important;
+            box-shadow: none !important;
+            transition: background-color 0.15s ease !important;
             white-space: nowrap;
             line-height: 1.4 !important;
         }
         .google-btn-primary:hover, .btn-auth-primary:hover, .survey-btn-submit:hover {
             background-color: #1557b0 !important;
             border-color: #1557b0 !important;
-            box-shadow: 0 1px 3px rgba(60,64,67,0.3) !important;
         }
         .google-btn-primary:active, .btn-auth-primary:active {
             background-color: #174ea6 !important;
-            transform: scale(0.98);
         }
 
         .google-btn-outlined {
@@ -186,11 +184,11 @@
             background-color: #ffffff !important;
             color: #1a73e8 !important;
             border: 1px solid #dadce0 !important;
-            border-radius: 8px !important;
-            padding: 6px 14px !important;
+            border-radius: 4px !important;
+            padding: 5px 12px !important;
             font-size: 13px !important;
-            font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
-            font-weight: 600 !important;
+            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 500 !important;
             text-decoration: none !important;
             cursor: pointer;
             transition: all 0.15s ease !important;
@@ -198,12 +196,9 @@
             line-height: 1.4 !important;
         }
         .google-btn-outlined:hover {
-            background-color: #f8f9fa !important;
-            border-color: #1a73e8 !important;
+            background-color: #f1f3f4 !important;
+            border-color: #dadce0 !important;
             color: #1557b0 !important;
-        }
-        .google-btn-outlined:active {
-            transform: scale(0.98);
         }
 
         .google-btn-tonal {
@@ -211,14 +206,14 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
-            background-color: #e8f0fe !important;
-            color: #1a73e8 !important;
-            border: 1px solid #d2e3fc !important;
-            border-radius: 8px !important;
-            padding: 6px 14px !important;
+            background-color: #f1f3f4 !important;
+            color: #202124 !important;
+            border: 1px solid #dadce0 !important;
+            border-radius: 4px !important;
+            padding: 5px 12px !important;
             font-size: 13px !important;
-            font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
-            font-weight: 600 !important;
+            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 500 !important;
             text-decoration: none !important;
             cursor: pointer;
             transition: all 0.15s ease !important;
@@ -226,11 +221,7 @@
             line-height: 1.4 !important;
         }
         .google-btn-tonal:hover {
-            background-color: #d2e3fc !important;
-            color: #1557b0 !important;
-        }
-        .google-btn-tonal:active {
-            transform: scale(0.98);
+            background-color: #e8eaed !important;
         }
 
         .google-btn-danger {
@@ -240,12 +231,12 @@
             gap: 5px;
             background-color: #ffffff !important;
             color: #d93025 !important;
-            border: 1px solid #fad2cf !important;
-            border-radius: 8px !important;
-            padding: 6px 14px !important;
+            border: 1px solid #dadce0 !important;
+            border-radius: 4px !important;
+            padding: 5px 12px !important;
             font-size: 13px !important;
-            font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
-            font-weight: 600 !important;
+            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 500 !important;
             text-decoration: none !important;
             cursor: pointer;
             transition: all 0.15s ease !important;
@@ -254,72 +245,100 @@
         }
         .google-btn-danger:hover {
             background-color: #fce8e6 !important;
-            border-color: #d93025 !important;
-        }
-        .google-btn-danger:active {
-            transform: scale(0.98);
+            border-color: #fad2cf !important;
         }
 
-        /* Google Status Badges (Rounded Pills) */
-        .pill-green {
-            border: 1px solid #ceead6 !important;
+        /* Clean Flat Status Badges (No Curved Capsules) */
+        .pill-green, .badge-green {
             color: #137333 !important;
-            background-color: #e6f4ea !important;
-            font-weight: 600;
-            border-radius: 16px !important;
-            padding: 2px 9px;
-            font-size: 11px;
+            font-weight: 500;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             white-space: nowrap;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
         }
-        .pill-orange {
-            border: 1px solid #feefc3 !important;
-            color: #b06000 !important;
-            background-color: #fef7e0 !important;
-            font-weight: 600;
-            border-radius: 16px !important;
-            padding: 2px 9px;
-            font-size: 11px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .pill-blue {
-            border: 1px solid #d2e3fc !important;
-            color: #1a73e8 !important;
-            background-color: #e8f0fe !important;
-            font-weight: 600;
-            border-radius: 16px !important;
-            padding: 2px 9px;
-            font-size: 11px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .pill-red {
-            border: 1px solid #fad2cf !important;
-            color: #c5221f !important;
-            background-color: #fce8e6 !important;
-            font-weight: 600;
-            border-radius: 16px !important;
-            padding: 2px 9px;
-            font-size: 11px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
+        .pill-green::before, .badge-green::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #1e8e3e;
         }
 
-        /* Google Card Container */
+        .pill-orange, .badge-orange {
+            color: #b06000 !important;
+            font-weight: 500;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        .pill-orange::before, .badge-orange::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #f9ab00;
+        }
+
+        .pill-blue, .badge-blue {
+            color: #1a73e8 !important;
+            font-weight: 500;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        .pill-blue::before, .badge-blue::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #1a73e8;
+        }
+
+        .pill-red, .badge-red {
+            color: #c5221f !important;
+            font-weight: 500;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        .pill-red::before, .badge-red::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #d93025;
+        }
+
+        /* Clean Flat Cards */
         .google-card, .auth-card, .survey-card-container {
             background-color: #ffffff !important;
             border: 1px solid #dadce0 !important;
-            border-radius: 12px !important;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.08);
+            border-radius: 8px !important;
+            box-shadow: none !important;
         }
 
         /* Clean scrollbar */
