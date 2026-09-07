@@ -1,4 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
+
+
+def ai_innovators_register_view(request):
+    """Render the custom AI Innovators Summit registration page.
+    The form posts to the generic submit view which handles creation of
+    Registration and Order objects.
+    """
+    # Ensure the event exists; replace slug with actual event slug.
+    event = get_object_or_404(Event, slug='ai-innovators-2026')
+    return render(request, 'public/ai_innovators_register.html', {'event': event})
 from django.contrib import messages
 from django.http import JsonResponse
 from apps.events.models import Event
@@ -183,6 +193,10 @@ def attendee_badge_view(request, pass_code):
         if not reg:
             order = Order.objects.filter(order_code=pass_code).first()
             if order:
+                # If payment not verified, redirect to payment page
+                if order.status != 'VERIFIED':
+                    messages.info(request, "Your payment is being processed. Please wait for verification.")
+                    return redirect('payment-checkout', order_code=order.order_code)
                 reg = order.registration
         if reg:
             attendee, _ = Attendee.objects.get_or_create(registration=reg)
@@ -192,51 +206,87 @@ def attendee_badge_view(request, pass_code):
 
     registration = attendee.registration
     responses = registration.form_responses or {}
+    customer = registration.customer
+    event = registration.event
 
     # Helper for strict proper case
     def to_proper_case(val):
-        if not val or val == '-':
+        if not val or str(val).strip() in ('-', '', 'None'):
             return '-'
         return str(val).strip().title()
+
+    # Ticket count
+    raw_tc = responses.get('Ticket Count') or responses.get('ticket_count') or 1
+    try:
+        ticket_count = int(raw_tc)
+    except (ValueError, TypeError):
+        ticket_count = 1
+
+    # Single ticket fee
+    if event and event.registration_fee is not None:
+        unit_fee = float(event.registration_fee)
+    elif ticket_count > 0:
+        unit_fee = float(registration.amount) / ticket_count
+    else:
+        unit_fee = float(registration.amount)
 
     # Extract Person list (Person 1 + Person 2 to Person N)
     attendee_list = []
 
     # Person 1 (Primary Attendee)
-    p1_age = responses.get('age') or responses.get('age_category') or responses.get('Age') or '-'
-    p1_gender = to_proper_case(responses.get('gender') or responses.get('Gender') or '-')
-    p1_name = to_proper_case(registration.customer.name)
+    p1_age = responses.get('Age') or responses.get('age') or responses.get('Age Category') or responses.get('age_category') or '-'
+    p1_gender = to_proper_case(responses.get('Gender') or responses.get('gender') or '-')
+    p1_name = f"{to_proper_case(customer.name)} (Primary)"
     attendee_list.append({
         'index': 1,
         'name': p1_name,
         'age': p1_age,
         'gender': p1_gender,
         'type': 'Primary Attendee',
-        'email': registration.customer.email,
-        'phone': registration.customer.phone
+        'email': customer.email,
+        'phone': customer.phone,
+        'amount': unit_fee,
     })
 
-    # Person 2 to N
-    try:
-        raw_ticket_count = responses.get('ticket_count', 1)
-        ticket_count = int(raw_ticket_count)
-    except (ValueError, TypeError):
-        ticket_count = 1
+    # Co-Attendees from structured list or individual fields
+    co_list = (
+        responses.get('Co-Attendees (Person 2 to N)')
+        or responses.get('co_attendees')
+        or responses.get('co_attendee_list')
+        or []
+    )
+    if isinstance(co_list, list):
+        for idx, item in enumerate(co_list, start=2):
+            if isinstance(item, dict):
+                c_name = to_proper_case(item.get('name') or item.get('full_name') or f"Attendee #{idx}")
+                c_age = item.get('age') or item.get('age_category') or item.get('Age') or '-'
+                c_gender = to_proper_case(item.get('gender') or item.get('Gender') or '-')
+                attendee_list.append({
+                    'index': idx,
+                    'name': c_name,
+                    'age': c_age,
+                    'gender': c_gender,
+                    'type': f'Co-Attendee #{idx}',
+                    'email': '-',
+                    'phone': '-',
+                    'amount': unit_fee,
+                })
 
-    for i in range(2, ticket_count + 1):
-        raw_name = responses.get(f'person_{i}_name') or f"Attendee #{i}"
-        name = to_proper_case(raw_name)
-        age = responses.get(f'person_{i}_age') or '-'
-        raw_gender = responses.get(f'person_{i}_gender') or '-'
-        gender = to_proper_case(raw_gender)
+    # If ticket_count > len(attendee_list), fill remaining
+    for idx in range(len(attendee_list) + 1, ticket_count + 1):
+        raw_name = responses.get(f'person_{idx}_name') or f"Attendee #{idx}"
+        c_name = to_proper_case(raw_name)
+        c_age = responses.get(f'person_{idx}_age') or '-'
+        c_gender = to_proper_case(responses.get(f'person_{idx}_gender') or '-')
         attendee_list.append({
-            'index': i,
-            'name': name,
-            'age': age,
-            'gender': gender,
-            'type': f'Co-Attendee #{i}',
+            'index': idx,
+            'name': c_name,
+            'age': c_age,
+            'gender': c_gender,
+            'type': f'Co-Attendee #{idx}',
             'email': '-',
-            'phone': '-'
+            'phone': '-',
+            'amount': unit_fee,
         })
 
     # Generate embedded Base64 QR code
@@ -248,9 +298,46 @@ def attendee_badge_view(request, pass_code):
     return render(request, 'public/attendee_pass.html', {
         'attendee': attendee,
         'registration': registration,
-        'event': registration.event,
-        'customer': registration.customer,
+        'event': event,
+        'customer': customer,
         'attendee_list': attendee_list,
         'ticket_count': max(ticket_count, len(attendee_list)),
+        'unit_fee': unit_fee,
         'qr_base64': qr_base64,
     })
+
+def send_pass_email_view(request, pass_code):
+    from apps.notifications.services import send_registration_success_email
+    from apps.payments.models import Order
+    
+    # Resilient lookup: pass_code -> registration_code -> order_code
+    attendee = Attendee.objects.filter(pass_code=pass_code).first()
+    if not attendee:
+        reg = Registration.objects.filter(registration_code=pass_code).first()
+        if not reg:
+            order = Order.objects.filter(order_code=pass_code).first()
+            if order:
+                reg = order.registration
+        if reg:
+            attendee, _ = Attendee.objects.get_or_create(registration=reg)
+            
+    if not attendee:
+        return JsonResponse({'success': False, 'error': 'Attendee pass not found.'}, status=404)
+        
+    registration = attendee.registration
+    try:
+        email_log = send_registration_success_email(registration)
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('format') == 'json' or request.method == 'POST':
+            return JsonResponse({
+                'success': True,
+                'email': registration.customer.email,
+                'message': f"Official pass sent to {registration.customer.email}"
+            })
+        messages.success(request, f"Official pass sent to {registration.customer.email}!")
+    except Exception as e:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('format') == 'json' or request.method == 'POST':
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        messages.error(request, f"Failed to send email: {str(e)}")
+        
+    return redirect('attendee-badge', pass_code=attendee.pass_code)
+

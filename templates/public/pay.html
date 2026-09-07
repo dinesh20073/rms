@@ -32,7 +32,8 @@
     </div>
 
     <!-- 2. Main Body Section -->
-    <div class="p-6 sm:p-10 space-y-8 bg-white text-[#3F3A3A]">        {% if registration.status == 'COMPLETED' or attendee %}
+    <div class="p-6 sm:p-10 space-y-8 bg-white text-[#3F3A3A]">
+        {% if registration.status == 'COMPLETED' or attendee %}
         <!-- ==================== VERIFIED & COMPLETED PASS STATE ==================== -->
         <div class="space-y-6 text-center">
             <div class="w-14 h-14 bg-emerald-50 border border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto mb-3 shadow-2xs">
@@ -43,10 +44,31 @@
                 Your payment has been verified. Your official entry pass is ready for download and print.
             </p>
 
+            <!-- Embedded QR Pass Box -->
+            <div class="p-4 bg-[#f8fafc] border-2 border-slate-900 max-w-xs mx-auto text-center space-y-2">
+                <div class="p-2 bg-white border border-slate-300 shadow-2xs inline-block">
+                    {% if qr_base64 %}
+                    <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Pass" class="w-32 h-32 object-contain block mx-auto">
+                    {% else %}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ attendee.pass_code|default:registration.registration_code }}" alt="QR Pass" class="w-32 h-32 object-contain block mx-auto">
+                    {% endif %}
+                </div>
+                <div class="font-mono text-sm font-black text-slate-900 tracking-wider">
+                    {{ attendee.pass_code|default:registration.registration_code }}
+                </div>
+                <div class="text-[9px] font-bold text-emerald-700 uppercase tracking-wider font-mono">
+                    ✓ SECURE ENTRANCE QR
+                </div>
+            </div>
+
             <div class="flex items-center justify-center gap-3 pt-2">
                 <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}?print=1" target="_blank" class="google-btn-primary px-5 py-2.5 text-xs font-bold flex items-center gap-2 shadow-md">
                     <span class="material-symbols-outlined text-[18px]">print</span>
                     <span>Print Official Entry Pass (100% A4)</span>
+                </a>
+                <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}" target="_blank" class="google-btn-outlined px-4 py-2.5 text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                    <span>View Pass</span>
                 </a>
             </div>
 
@@ -58,7 +80,7 @@
                 </div>
                 <div class="flex justify-between">
                     <span class="text-[#999A78]">Primary Attendee:</span>
-                    <span class="font-bold text-slate-900">{{ customer.name }}</span>
+                    <span class="font-bold text-slate-900">{{ customer.name|title }}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-[#999A78]">Email:</span>

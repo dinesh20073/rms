@@ -2,64 +2,31 @@
 
 {% block body_content %}
 <style>
-    /* Sharp SaaS Navigation Styling */
-    .google-sidebar {
-        background-color: #0b132b !important;
-        border-right: 1px solid #1e293b !important;
-        border-radius: 0px !important;
-    }
-    .google-topbar {
-        background: linear-gradient(90deg, #1a73e8 0%, #1d4ed8 50%, #1e40af 100%) !important;
-        border-bottom: 1px solid #1e3a8a !important;
-        border-radius: 0px !important;
-    }
-    .sidebar-nav-btn {
-        color: #94a3b8;
-        transition: all 0.15s ease-in-out;
-        position: relative;
-        border-radius: 0px !important;
-    }
-    .sidebar-nav-btn:hover {
-        color: #ffffff !important;
-        background-color: #1e293b !important;
-    }
-    .sidebar-nav-btn.active {
-        background: linear-gradient(135deg, #1a73e8, #2563eb) !important;
-        color: #ffffff !important;
-        box-shadow: 0 0 12px rgba(26, 115, 232, 0.5) !important;
-        font-weight: 700;
-        border-radius: 0px !important;
-    }
-    .sidebar-nav-btn.active i {
-        color: #ffffff !important;
-    }
-    .sidebar-tooltip {
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.15s ease, transform 0.15s ease;
-        transform: translateX(-4px);
-        border-radius: 0px !important;
-    }
-    .sidebar-item-wrap:hover .sidebar-tooltip {
-        visibility: visible;
-        opacity: 1;
-        transform: translateX(0);
-    }
-    
-    /* Mobile Drawer */
-    #mobile-drawer {
-        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: 0px !important;
-    }
-    #mobile-drawer.open {
-        transform: translateX(0) !important;
-    }
-    #mobile-backdrop {
-        transition: opacity 0.2s ease;
-    }
-    #mobile-backdrop.open {
-        opacity: 1 !important;
-        pointer-events: auto !important;
+    /* Core navigation styling */
+    .google-sidebar { background-color: #0b132b !important; border-right: 1px solid #1e293b !important; }
+    .google-topbar { background: linear-gradient(90deg, #1a73e8 0%, #1d4ed8 50%, #1e40af 100%) !important; border-bottom: 1px solid #1e3a8a !important; }
+    .sidebar-nav-btn { color: #94a3b8; transition: all 0.15s ease-in-out; position: relative; border-radius: 0px !important; }
+    .sidebar-nav-btn:hover { color: #ffffff !important; background-color: #1e293b !important; }
+    .sidebar-nav-btn.active { background: linear-gradient(135deg, #1a73e8, #2563eb) !important; color: #ffffff !important; box-shadow: 0 0 12px rgba(26,115,232,0.5) !important; font-weight: 700; }
+    .sidebar-tooltip { visibility: hidden; opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease; transform: translateX(-4px); }
+    .sidebar-item-wrap:hover .sidebar-tooltip { visibility: visible; opacity: 1; transform: translateX(0); }
+    /* Mobile drawer transitions */
+    #mobile-drawer { transition: transform 0.2s cubic-bezier(0.4,0,0.2,1); }
+    #mobile-drawer.open { transform: translateX(0) !important; }
+    #mobile-backdrop { transition: opacity 0.2s ease; }
+    #mobile-backdrop.open { opacity: 1 !important; pointer-events: auto !important; }
+
+    /* ==== Responsive font scaling for mobile ==== */
+    @media (max-width: 640px) {
+        /* Reduce overall base font size */
+        html { font-size: 14px; }
+        .google-topbar .font-display { font-size: 0.9rem; }
+        .sidebar-nav-btn i { font-size: 0.75rem; }
+        .google-topbar h1 { font-size: 1rem; }
+        .google-topbar span { font-size: 0.75rem; }
+        .google-topbar button { font-size: 0.75rem; }
+        /* Adjust button text in dashboard header */
+        .google-topbar .bg-white { font-size: 0.7rem; padding: 0.4rem 0.6rem; }
     }
 </style>
 
@@ -130,43 +97,8 @@
                     </div>
                 </div>
 
-                <!-- Revenue -->
-                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-revenue-analytics' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'revenue' in request.resolver_match.url_name %}active{% endif %}">
-                        <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-                    </a>
-                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
-                        Revenue
-                    </div>
-                </div>
 
-                <!-- Emails -->
-                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-email-logs' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'email' in request.resolver_match.url_name %}active{% endif %}">
-                        <i data-lucide="mail" class="w-5 h-5"></i>
-                    </a>
-                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
-                        Emails
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Bottom Section: Developer API & User Profile -->
-        <div class="flex flex-col items-center gap-2.5 w-full px-2">
-            <!-- API -->
-            <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                <a href="{% url 'dashboard-partner-api' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'partner' in request.resolver_match.url_name %}active{% endif %}">
-                    <i data-lucide="code" class="w-5 h-5"></i>
-                </a>
-                <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
-                    API
-                </div>
-            </div>
-
-            <!-- Profile Avatar -->
-            <div class="w-9 h-9 bg-gradient-to-tr from-blue-600 to-indigo-600 border border-slate-700 text-white flex items-center justify-center text-xs font-bold font-display shadow-sm cursor-pointer" title="Admin">
-                A
             </div>
         </div>
     </aside>
@@ -202,17 +134,9 @@
                     <span class="ml-auto bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5">{{ pending_reviews_count }}</span>
                     {% endif %}
                 </a>
-                <a href="{% url 'dashboard-revenue-analytics' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'revenue' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
-                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-                    <span>Revenue</span>
-                </a>
                 <a href="{% url 'dashboard-email-logs' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'email' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
                     <i data-lucide="mail" class="w-4 h-4"></i>
                     <span>Emails</span>
-                </a>
-                <a href="{% url 'dashboard-partner-api' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'partner' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
-                    <i data-lucide="code" class="w-4 h-4"></i>
-                    <span>API</span>
                 </a>
             </nav>
         </div>
@@ -253,7 +177,7 @@
         </header>
 
         <!-- Main Body Scroll Area -->
-        <main class="flex-1 min-h-0 overflow-y-auto bg-[#f4f7fb] pb-16 lg:pb-4 flex flex-col">
+        <main class="flex-1 min-h-0 overflow-y-auto bg-[#f4f7fb] {% if 'email' in request.resolver_match.url_name %}bg-white pb-0 overflow-hidden{% else %}pb-16 lg:pb-4{% endif %} flex flex-col">
             {% block content %}{% endblock %}
         </main>
 
@@ -280,12 +204,61 @@
             <span class="absolute top-0 right-1 w-2 h-2 bg-amber-400"></span>
             {% endif %}
         </a>
-        <a href="{% url 'dashboard-revenue-analytics' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'revenue' in request.resolver_match.url_name %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
-            <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-            <span>Revenue</span>
-        </a>
     </nav>
 
+</div>
+
+<!-- Global Pass Viewer Modal Popup (Exact PDF / Voucher View) -->
+<div id="passViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-200">
+    <div class="relative w-full max-w-3xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[92vh] max-h-[850px]">
+        
+        <!-- Modal Topbar -->
+        <div class="px-4 py-3 bg-[#1e293b] text-white flex items-center justify-between shrink-0 border-b border-slate-700">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h3 id="passModalTitle" class="text-xs sm:text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                        <span>Attendee Pass</span>
+                        <span id="passModalBadge" class="bg-emerald-400/20 text-emerald-300 font-mono text-[10px] px-2 py-0.2 rounded">PASS-CODE</span>
+                    </h3>
+                    <p id="passModalSubtitle" class="text-[11px] text-slate-400 truncate">Exact Single A4 Voucher & Print View</p>
+                </div>
+            </div>
+
+            <!-- Top Actions -->
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="printPassModalIframe()" class="google-btn-primary py-1 px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center gap-1.5 shadow-sm cursor-pointer">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                    <span>Print PDF</span>
+                </button>
+                <a id="passModalFullLink" href="#" target="_blank" class="google-btn-outlined py-1 px-2 text-xs text-slate-300 hover:text-white hover:border-slate-500 flex items-center gap-1" title="Open full screen in new tab">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                </a>
+                <button type="button" onclick="closePassModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer" title="Close (Esc)">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Iframe Body -->
+        <div class="flex-1 min-h-0 bg-[#edf2f7] relative overflow-hidden">
+            <iframe id="passModalIframe" src="" class="w-full h-full border-0 bg-white" title="Attendee Pass Voucher View"></iframe>
+        </div>
+
+        <!-- Modal Bottom Footer -->
+        <div class="px-4 py-2.5 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 shrink-0">
+            <span class="flex items-center gap-1.5 text-[11px]">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>Official QR Code Verified • Direct Single-Click Print Ready</span>
+            </span>
+            <button type="button" onclick="closePassModal()" class="google-btn-outlined py-1 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-200 cursor-pointer">
+                Close
+            </button>
+        </div>
+
+    </div>
 </div>
 
 <script>
@@ -297,5 +270,53 @@
             backdrop.classList.toggle('open');
         }
     }
+
+    function openPassModal(passCode, attendeeName, eventTitle) {
+        const modal = document.getElementById('passViewerModal');
+        const iframe = document.getElementById('passModalIframe');
+        const title = document.getElementById('passModalTitle');
+        const badge = document.getElementById('passModalBadge');
+        const subtitle = document.getElementById('passModalSubtitle');
+        const fullLink = document.getElementById('passModalFullLink');
+
+        if (!modal || !iframe) return;
+
+        const passUrl = `/pass/${passCode}/`;
+        iframe.src = passUrl;
+        if (badge) badge.innerText = passCode;
+        if (title) title.innerHTML = `<span>Attendee Pass: ${attendeeName || 'Attendee'}</span> <span class="bg-emerald-400/20 text-emerald-300 font-mono text-[10px] px-2 py-0.2 rounded">${passCode}</span>`;
+        if (subtitle) subtitle.innerText = `${eventTitle || 'Event'} • Exact Single A4 Sheet Print / PDF View`;
+        if (fullLink) fullLink.href = passUrl;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function closePassModal() {
+        const modal = document.getElementById('passViewerModal');
+        const iframe = document.getElementById('passModalIframe');
+        if (!modal) return;
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        if (iframe) iframe.src = '';
+        document.body.style.overflow = '';
+    }
+
+    function printPassModalIframe() {
+        const iframe = document.getElementById('passModalIframe');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePassModal();
+        }
+    });
 </script>
 {% endblock %}

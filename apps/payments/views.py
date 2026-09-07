@@ -12,11 +12,24 @@ from apps.verification.engine import VerificationEngine
 from apps.audit.services import log_audit_event
 
 def payment_checkout_view(request, order_code):
+    from apps.registrations.models import Attendee
+    from apps.notifications.services import generate_attendee_qr_base64
+
     order = get_object_or_404(Order, order_code=order_code)
     registration = order.registration
     event = registration.event
     verification = getattr(order, 'verification', None)
     attendee = getattr(registration, 'attendee_pass', None)
+    
+    if not attendee and (registration.status == 'COMPLETED' or order.status == 'SUCCESS'):
+        attendee, _ = Attendee.objects.get_or_create(registration=registration)
+
+    qr_base64 = None
+    if attendee:
+        try:
+            qr_base64 = generate_attendee_qr_base64(attendee.pass_code)
+        except Exception:
+            qr_base64 = None
 
     context = {
         'order': order,
@@ -25,6 +38,7 @@ def payment_checkout_view(request, order_code):
         'customer': registration.customer,
         'verification': verification,
         'attendee': attendee,
+        'qr_base64': qr_base64,
     }
     return render(request, 'public/pay.html', context)
 

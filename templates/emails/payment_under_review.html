@@ -1,57 +1,57 @@
 {% extends 'emails/email_base.html' %}
 
-{% block email_title %}Payment Proof Received: Under Review - {{ event.title }}{% endblock %}
+{% block email_title %}Payment Proof Under Review • {{ customer.name|title }} | {{ event.title }}{% endblock %}
 
 {% block email_content %}
 <div style="text-align: left;">
     
     <!-- Status Header -->
-    <div style="margin-bottom: 24px;">
-        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b06000; background-color: #fef7e0; border: 1px solid #feefc3; padding: 3px 10px; border-radius: 12px; display: inline-block; margin-bottom: 8px;">
-            Payment Under Review
+    <div style="margin-bottom: 20px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #1d4ed8; background-color: #dbeafe; border: 1px solid #bfdbfe; padding: 3px 10px; border-radius: 12px; display: inline-block; margin-bottom: 8px;">
+            ⏳ Payment Proof Received
         </span>
-        <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #202124; line-height: 1.3;">
+        <h1 style="margin: 0 0 6px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3;">
             We've received your payment proof
         </h1>
-        <p style="margin: 8px 0 0 0; font-size: 14px; color: #5f6368; line-height: 1.5;">
-            Hi <strong>{{ customer.name }}</strong>, thank you for uploading your payment screenshot for <strong>{{ event.title }}</strong>. Our team is currently reviewing the transaction details.
+        <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+            Hi <strong>{{ customer.name|title }}</strong>, thank you for uploading your payment screenshot for <strong>{{ event.title }}</strong>. Our team is currently reviewing your transaction.
         </p>
     </div>
 
     <!-- Review Notice Card -->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8f9fa; border: 1px solid #dadce0; border-radius: 12px; margin: 24px 0; padding: 20px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; margin: 18px 0; padding: 16px;">
         <tr>
             <td>
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 13px; color: #3c4043;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 12px; color: #334155;">
                     <tr>
-                        <td style="padding: 6px 0; color: #5f6368;">Registration ID:</td>
-                        <td style="padding: 6px 0; font-weight: 700; color: #1a73e8; font-family: monospace; text-align: right;">{{ registration.registration_code }}</td>
+                        <td style="padding: 5px 0; color: #64748b;">Registration Code:</td>
+                        <td style="padding: 5px 0; font-weight: 700; color: #1976d2; font-family: monospace; text-align: right;">{{ registration.registration_code }}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 6px 0; color: #5f6368;">Expected Amount:</td>
-                        <td style="padding: 6px 0; font-weight: 600; color: #202124; text-align: right;">₹{{ registration.amount|floatformat:2 }}</td>
+                        <td style="padding: 5px 0; color: #64748b;">Expected Amount:</td>
+                        <td style="padding: 5px 0; font-weight: 700; color: #0f172a; font-family: monospace; text-align: right;">₹{{ registration.amount|floatformat:2 }}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 6px 0; color: #5f6368;">Verification Status:</td>
-                        <td style="padding: 6px 0; font-weight: 700; color: #b06000; text-align: right;">Manual Review in Progress</td>
+                        <td style="padding: 5px 0; color: #64748b;">Verification Status:</td>
+                        <td style="padding: 5px 0; font-weight: 700; color: #d97706; text-align: right;">Manual Review in Progress</td>
                     </tr>
                 </table>
             </td>
         </tr>
     </table>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 28px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 22px 0;">
         <tr>
             <td align="center">
-                <a href="http://127.0.0.1:8000/status/{{ registration.registration_code }}/" target="_blank" style="display: inline-block; background-color: #1a73e8; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; padding: 12px 28px; border-radius: 24px; box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3);">
+                <a href="http://127.0.0.1:8000/status/{{ registration.registration_code }}/" target="_blank" style="display: inline-block; background-color: #1976d2; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 12px 28px; border-radius: 24px; box-shadow: 0 3px 8px rgba(25, 118, 210, 0.35);">
                     Track Live Status →
                 </a>
             </td>
         </tr>
     </table>
 
-    <div style="background-color: #f1f3f4; border-radius: 8px; padding: 14px 18px; font-size: 12px; color: #5f6368; line-height: 1.5;">
-        As soon as the verification is finalized, your entry pass badge and QR code will be immediately dispatched to your email address.
+    <div style="background-color: #f1f5f9; border-radius: 6px; padding: 12px 16px; font-size: 11px; color: #475569; line-height: 1.5; border-left: 4px solid #1976d2;">
+        As soon as the verification is completed by our coordinators, your official entry pass badge and Turnstile check-in QR code will be dispatched to your email.
     </div>
 
 </div>

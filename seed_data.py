@@ -26,7 +26,7 @@ def seed():
         admin_user.set_password('admin123')
         admin_user.is_superuser = True
         admin_user.is_staff = True
-        admin_user.email = 'admin@ems-platform.com'
+        admin_user.email = 'nizhal.community@gmail.com'
         admin_user.save()
         print("  [+] Created Admin User (admin / admin123)")
 

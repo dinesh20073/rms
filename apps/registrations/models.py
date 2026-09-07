@@ -50,6 +50,24 @@ class Registration(models.Model):
             self.registration_code = f"REG-{count:06d}"
         super().save(*args, **kwargs)
 
+    @property
+    def latest_email_log(self):
+        from apps.notifications.models import EmailLog
+        return EmailLog.objects.filter(
+            recipient_email=self.customer.email,
+            tenant=self.event.tenant
+        ).order_by('-sent_at').first()
+
+    @property
+    def is_confirmation_email_sent(self):
+        from apps.notifications.models import EmailLog
+        return EmailLog.objects.filter(
+            recipient_email=self.customer.email,
+            tenant=self.event.tenant,
+            event_type='REGISTRATION_COMPLETED',
+            status__in=['SENT', 'SIMULATED']
+        ).exists()
+
 class Attendee(models.Model):
     registration = models.OneToOneField(Registration, on_delete=models.CASCADE, related_name='attendee_pass')
     pass_code = models.CharField(max_length=64, unique=True)

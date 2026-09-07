@@ -40,25 +40,23 @@ class VerificationEngine:
         is_payee_matched = False
         review_notes_list = []
 
-        # 1. Amount Match Check
+        # 1. Amount Match Check (Assistant note for human reviewer)
         if ocr_amount_val is not None:
             try:
                 ocr_dec = Decimal(str(ocr_amount_val))
                 if abs(ocr_dec - order.amount) < Decimal('0.01'):
                     is_amount_matched = True
-                    log_audit_event('AMOUNT_MATCHED', order.order_code, {'expected': str(order.amount), 'extracted': str(ocr_dec)}, tenant=tenant)
+                    review_notes_list.append(f"Amount match confirmed: ₹{ocr_dec}")
                 else:
-                    review_notes_list.append(f"Amount mismatch: Expected ₹{order.amount}, Extracted ₹{ocr_dec}")
+                    review_notes_list.append(f"⚠️ Amount mismatch: Expected ₹{order.amount}, Extracted ₹{ocr_dec}")
             except Exception as e:
                 review_notes_list.append(f"Invalid amount format in OCR: {e}")
         else:
             review_notes_list.append("Could not extract payment amount from receipt")
 
-        # 2. Transaction ID & Duplicate Fraud Protection Check
+        # 2. Transaction ID & Duplicate Fraud Protection Check (Assistant note for human reviewer)
         if is_txn_id_found:
             clean_txn_id = str(ocr_txn_id).strip()
-            log_audit_event('TRANSACTION_ID_MATCHED', order.order_code, {'txn_id': clean_txn_id}, tenant=tenant)
-
             # Check if this transaction ID was previously approved on ANY other order
             existing_payment = Payment.objects.filter(transaction_id=clean_txn_id).exclude(order=order).first()
             existing_verification = Verification.objects.filter(
@@ -70,14 +68,16 @@ class VerificationEngine:
                 is_duplicate_txn = True
                 conflict_order = existing_payment.order.order_code if existing_payment else existing_verification.order.order_code
                 review_notes_list.append(f"⚠️ DUPLICATE TRANSACTION DETECTED: UTR {clean_txn_id} was already used for order {conflict_order}!")
+            else:
+                review_notes_list.append(f"UTR: {clean_txn_id}")
         else:
-            review_notes_list.append("Could not find standard 12-digit UPI UTR / Transaction ID")
+            review_notes_list.append("Standard 12-digit UTR not detected - verify screenshot manually")
 
-        # 3. Payee Match Check (Optional / Soft Rule)
+        # 3. Payee Match Check
         if ocr_payee and (event.upi_name.lower() in ocr_payee.lower() or event.upi_id.lower() in ocr_payee.lower()):
             is_payee_matched = True
 
-        # Make Decision
+        # Save verification record with extracted assistant notes
         verification, _ = Verification.objects.get_or_create(order=order)
         verification.evidence = evidence
         verification.is_amount_matched = is_amount_matched
@@ -89,45 +89,21 @@ class VerificationEngine:
         verification.ocr_payee = ocr_payee or ''
         verification.ocr_timestamp_str = ocr_timestamp_str
 
-        # Decision threshold:
-        # Pass requires: Amount Matched + Txn ID Found + NOT Duplicate
-        if is_amount_matched and is_txn_id_found and not is_duplicate_txn:
-            verification.decision = 'AUTO_VERIFIED'
-            verification.review_notes = "Automatically verified via OCR and rule engine checks."
-            verification.save()
+        # STRICT HUMAN VERIFICATION ONLY: All uploaded proofs are queued for manual human decision
+        verification.decision = 'MANUAL_REVIEW'
+        verification.review_notes = " | ".join(review_notes_list) if review_notes_list else "Awaiting human admin review."
+        verification.save()
 
-            # Transition Order & Registration
-            order.status = 'VERIFIED'
-            order.save()
+        order.status = 'MANUAL_REVIEW'
+        order.save()
+        registration.status = 'MANUAL_REVIEW'
+        registration.save()
 
-            Payment.objects.get_or_create(
-                order=order,
-                transaction_id=str(ocr_txn_id).strip(),
-                defaults={
-                    'amount': order.amount,
-                    'currency': order.currency,
-                    'payee_upi': event.upi_id,
-                    'payer_name': registration.customer.name,
-                    'status': 'SUCCESS'
-                }
-            )
-
-            log_audit_event('PAYMENT_AUTO_VERIFIED', order.order_code, {'txn_id': ocr_txn_id, 'amount': str(order.amount)}, tenant=tenant)
-            
-            # Complete registration pipeline
-            cls.complete_registration(registration, tenant=tenant)
-
-        else:
-            verification.decision = 'MANUAL_REVIEW'
-            verification.review_notes = " | ".join(review_notes_list)
-            verification.save()
-
-            order.status = 'MANUAL_REVIEW'
-            order.save()
-            registration.status = 'MANUAL_REVIEW'
-            registration.save()
-
-            log_audit_event('PAYMENT_MANUAL_REVIEW', order.order_code, {'reasons': review_notes_list}, tenant=tenant)
+        log_audit_event('PAYMENT_QUEUED_FOR_HUMAN_REVIEW', order.order_code, {
+            'reasons': review_notes_list,
+            'amount_matched': is_amount_matched,
+            'txn_id': ocr_txn_id
+        }, tenant=tenant)
 
         return verification
 

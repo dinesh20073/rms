@@ -404,18 +404,28 @@ def form_builder_view(request, event_id):
 
 def manual_verification_queue_view(request):
     tenant = get_current_tenant(request)
-    queue = Verification.objects.filter(
-        order__registration__event__tenant=tenant,
+    verifications_qs = Verification.objects.filter(order__registration__event__tenant=tenant)
+    
+    queue = verifications_qs.filter(
         decision='MANUAL_REVIEW'
     ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence').order_by('-created_at')
 
-    all_verifications = Verification.objects.filter(
-        order__registration__event__tenant=tenant
-    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence').order_by('-created_at')[:30]
+    manual_approved_count = verifications_qs.filter(decision='MANUAL_APPROVED').count()
+    rejected_count = verifications_qs.filter(decision='REJECTED').count()
+    total_processed = manual_approved_count + rejected_count
+    approval_rate = round((manual_approved_count / max(total_processed, 1)) * 100, 1) if total_processed > 0 else 100.0
+
+    recent_history = verifications_qs.exclude(
+        decision='MANUAL_REVIEW'
+    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence', 'reviewed_by').order_by('-reviewed_at', '-created_at')[:25]
 
     return render(request, 'dashboard/verification/queue.html', {
         'queue': queue,
-        'all_verifications': all_verifications,
+        'recent_history': recent_history,
+        'manual_approved_count': manual_approved_count,
+        'rejected_count': rejected_count,
+        'total_processed': total_processed,
+        'approval_rate': approval_rate,
         'tenant': tenant
     })
 
@@ -597,11 +607,44 @@ def send_registration_email_view(request, registration_code):
     registration = get_object_or_404(Registration, registration_code=registration_code, event__tenant=tenant)
     from apps.notifications.services import send_registration_success_email, send_payment_reminder_email
     
+    email_type = request.GET.get('type', 'auto')
+    
     if registration.status == 'COMPLETED':
         send_registration_success_email(registration)
-        messages.success(request, f"Confirmation & pass email sent to {registration.customer.email}!")
-    else:
+        messages.success(request, f"Official Confirmation & Attendee Pass email dispatched to {registration.customer.email}!")
+    elif registration.status in ['PENDING', 'FAILED'] or email_type == 'reminder':
         send_payment_reminder_email(registration)
-        messages.success(request, f"Payment reminder email sent to {registration.customer.email}!")
+        messages.success(request, f"Payment reminder & UPI retry instructions dispatched to {registration.customer.email}!")
+    elif registration.status == 'MANUAL_REVIEW':
+        messages.warning(request, "Registration is currently under manual review. Official pass email will be dispatched automatically once approved in the verification queue.")
+    else:
+        messages.info(request, "No email action available for this registration status.")
         
     return redirect(request.META.get('HTTP_REFERER', 'dashboard-overview'))
+
+def resend_email_log_view(request, email_id):
+    tenant = get_current_tenant(request)
+    email_log = get_object_or_404(EmailLog, id=email_id, tenant=tenant)
+    from django.core.mail import send_mail
+    from django.conf import settings
+    
+    try:
+        send_mail(
+            subject=email_log.subject,
+            message="Please find your official Nizhal Community pass attached.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email_log.recipient_email],
+            html_message=email_log.body_html,
+            fail_silently=False
+        )
+        email_log.status = 'SENT'
+        email_log.error_message = ''
+        email_log.save()
+        messages.success(request, f"Real email dispatched successfully to {email_log.recipient_email}!")
+    except Exception as e:
+        email_log.status = 'FAILED'
+        email_log.error_message = str(e)
+        email_log.save()
+        messages.error(request, f"Email delivery failed: {str(e)}")
+        
+    return redirect(f"/dashboard/emails/?id={email_id}")

@@ -13,8 +13,7 @@ urlpatterns = [
     path('verification-queue/<int:verification_id>/action/', views.verification_action_view, name='dashboard-verification-action'),
     path('registrations/', views.registrations_list_view, name='dashboard-registrations-list'),
     path('registrations/<str:registration_code>/send-email/', views.send_registration_email_view, name='dashboard-registration-send-email'),
-    path('revenue/', views.revenue_analytics_view, name='dashboard-revenue-analytics'),
     path('emails/', views.email_logs_view, name='dashboard-email-logs'),
+    path('emails/<int:email_id>/resend/', views.resend_email_log_view, name='dashboard-email-resend'),
     path('audit/', views.audit_logs_view, name='dashboard-audit-logs'),
-    path('partner-api/', views.partner_api_view, name='dashboard-partner-api'),
 ]

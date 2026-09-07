@@ -32,6 +32,9 @@
          {% endif %}>
         
         {% include 'public/partials/status_card.html' %}
+            {% if registration.status != 'COMPLETED' %}
+                <div class="text-center text-sm text-rose-600 mt-2">Emails will be sent only after your registration is confirmed.</div>
+            {% endif %}
 
     </div>
 

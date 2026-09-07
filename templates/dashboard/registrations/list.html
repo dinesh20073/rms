@@ -1,52 +1,51 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Registration Logs Directory{% endblock %}
+{% block header_title %}Registration Logs{% endblock %}
 
 {% block content %}
-<div class="p-2.5 sm:p-4 max-w-[1600px] w-full mx-auto min-h-full lg:h-full flex flex-col space-y-3 overflow-y-auto lg:overflow-hidden">
+<div class="p-2 sm:p-3 max-w-[1600px] w-full mx-auto min-h-full lg:h-full flex flex-col space-y-2.5 overflow-y-auto lg:overflow-hidden">
 
-    <!-- Top Multi-Column Filter & Search Bar (Google Style - Fixed Top) -->
-    <div class="google-card p-4 flex flex-col gap-3 shrink-0">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-            <div>
-                <h2 class="text-base sm:text-lg font-bold font-display text-[#202124] flex items-center gap-2">
-                    <span>All Registration Logs</span>
-                    <span class="bg-[#e8f0fe] text-[#1a73e8] text-xs font-semibold px-2.5 py-0.5 rounded-full">{{ registrations|length }} Records</span>
-                </h2>
-                <p class="text-xs text-[#5f6368] mt-0.5">Filter by Date, Status, Reg Code, Customer, Event, Amount, and Pass Badges.</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="document.getElementById('listColumnFilterGrid').classList.toggle('hidden')" class="google-btn-outlined py-1.5 px-3 flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100">
-                    <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
-                    <span>Column Filters</span>
-                    {% if active_filters_count > 0 %}
-                    <span class="bg-[#1a73e8] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">{{ active_filters_count }}</span>
-                    {% endif %}
-                </button>
-                {% if active_filters_count > 0 %}
-                <a href="{% url 'dashboard-registrations-list' %}" class="google-btn-outlined py-1.5 px-2.5 text-xs text-rose-600 hover:text-rose-700 hover:border-rose-300 flex items-center gap-1">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                    <span>Reset All</span>
-                </a>
-                {% endif %}
-            </div>
-        </div>
-
-        <form method="GET" action="{% url 'dashboard-registrations-list' %}" class="space-y-3">
-            <!-- Global Search Row -->
-            <div class="flex flex-wrap items-center gap-2.5">
-                <div class="relative flex-1 min-w-[240px]">
-                    <i data-lucide="search" class="w-4 h-4 text-[#5f6368] absolute left-3 top-3 pointer-events-none"></i>
-                    <input type="text" name="q" value="{{ filter_params.q }}" placeholder="Quick search name, email, booking code, order code, pass..." class="google-search-pill">
+    <!-- Compact Sleek Toolbar & Instant Real-Time Search -->
+    <div class="google-card p-2.5 bg-white border border-[#e2e8f0] shrink-0 space-y-2">
+        <form method="GET" action="{% url 'dashboard-registrations-list' %}" id="regFilterForm" class="space-y-2">
+            
+            <!-- Compact Single-Row Toolbar -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                
+                <!-- Search Input with Live Real-time Filtering -->
+                <div class="flex-1 min-w-[220px] max-w-md relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none"></i>
+                    <input type="text" id="realtimeSearchInput" name="q" value="{{ filter_params.q }}" placeholder="Search name, email, booking code, pass..." autocomplete="off" class="w-full pl-8 pr-7 py-1.5 text-xs bg-slate-50 hover:bg-white focus:bg-white border border-slate-300 focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] rounded-full outline-hidden transition shadow-2xs font-medium text-slate-800 placeholder:text-slate-400">
+                    <button type="button" id="clearSearchBtn" onclick="clearLiveSearch()" class="{% if not filter_params.q %}hidden{% endif %} absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 cursor-pointer" title="Clear search">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
                 </div>
-                <button type="submit" class="google-btn-primary py-1.5 px-4 flex items-center gap-1.5">
-                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
-                    <span>Search</span>
-                </button>
+
+                <!-- Action Controls -->
+                <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="document.getElementById('listColumnFilterGrid').classList.toggle('hidden')" class="google-btn-outlined py-1 px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-1 shadow-2xs cursor-pointer">
+                        <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                        <span>Filters</span>
+                        {% if active_filters_count > 0 %}
+                        <span class="bg-[#1a73e8] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">{{ active_filters_count }}</span>
+                        {% endif %}
+                    </button>
+
+                    {% if active_filters_count > 0 %}
+                    <a href="{% url 'dashboard-registrations-list' %}" class="google-btn-outlined py-1 px-2 text-xs text-rose-600 hover:text-rose-700 hover:border-rose-300 flex items-center gap-1" title="Reset All Filters">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        <span>Reset</span>
+                    </a>
+                    {% endif %}
+
+                    <span id="recordCountBadge" class="bg-[#e8f0fe] text-[#1a73e8] font-bold text-xs px-2.5 py-1 rounded-full border border-blue-100">
+                        {{ registrations|length }} logs
+                    </span>
+                </div>
             </div>
 
-            <!-- Column Filters Grid -->
-            <div id="listColumnFilterGrid" class="{% if active_filters_count == 0 or active_filters_count == 1 and filter_params.q %}hidden{% endif %} pt-2 pb-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5 bg-[#f8fafc] p-3 border border-slate-200">
+            <!-- Collapsible Compact Column Filters Grid -->
+            <div id="listColumnFilterGrid" class="{% if active_filters_count == 0 or active_filters_count == 1 and filter_params.q %}hidden{% endif %} pt-2 pb-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 bg-[#f8fafc] p-2.5 border border-slate-200 rounded-lg">
                 
                 <!-- 1. Date / Time Filter -->
                 <div class="space-y-1">
@@ -54,7 +53,7 @@
                         <i data-lucide="calendar" class="w-3 h-3 text-[#1a73e8]"></i>
                         <span>Date / Time</span>
                     </label>
-                    <select name="date_preset" onchange="toggleDateCustom(this.value, 'list')" class="google-select text-xs py-1.5 px-2 h-8">
+                    <select name="date_preset" onchange="toggleDateCustom(this.value, 'list')" class="google-select text-xs py-1 px-2 h-7.5">
                         <option value="">All Dates</option>
                         <option value="today" {% if filter_params.date_preset == 'today' %}selected{% endif %}>Today</option>
                         <option value="7days" {% if filter_params.date_preset == '7days' %}selected{% endif %}>Last 7 Days</option>
@@ -62,9 +61,9 @@
                         <option value="custom" {% if filter_params.date_preset == 'custom' or filter_params.date_from or filter_params.date_to %}selected{% endif %}>Custom Range</option>
                     </select>
                     <div id="list_date_custom" class="{% if filter_params.date_preset != 'custom' and not filter_params.date_from and not filter_params.date_to %}hidden{% endif %} flex items-center gap-1 pt-1">
-                        <input type="date" name="date_from" value="{{ filter_params.date_from }}" class="google-input text-[10px] py-1 px-1 h-7 flex-1" title="From Date">
+                        <input type="date" name="date_from" value="{{ filter_params.date_from }}" class="google-input text-[10px] py-0.5 px-1 h-6.5 flex-1" title="From Date">
                         <span class="text-slate-400 text-[10px]">-</span>
-                        <input type="date" name="date_to" value="{{ filter_params.date_to }}" class="google-input text-[10px] py-1 px-1 h-7 flex-1" title="To Date">
+                        <input type="date" name="date_to" value="{{ filter_params.date_to }}" class="google-input text-[10px] py-0.5 px-1 h-6.5 flex-1" title="To Date">
                     </div>
                 </div>
 
@@ -74,7 +73,7 @@
                         <i data-lucide="check-circle-2" class="w-3 h-3 text-[#1e8e3e]"></i>
                         <span>Status</span>
                     </label>
-                    <select name="status" class="google-select text-xs py-1.5 px-2 h-8">
+                    <select name="status" class="google-select text-xs py-1 px-2 h-7.5">
                         <option value="">All Statuses</option>
                         <option value="COMPLETED" {% if filter_params.status == 'COMPLETED' %}selected{% endif %}>Verified & Active</option>
                         <option value="PENDING" {% if filter_params.status == 'PENDING' %}selected{% endif %}>Payment Required</option>
@@ -89,7 +88,7 @@
                         <i data-lucide="hash" class="w-3 h-3 text-indigo-600"></i>
                         <span>Reg Code</span>
                     </label>
-                    <input type="text" name="reg_code" value="{{ filter_params.reg_code }}" placeholder="e.g. REG-000001" class="google-input text-xs py-1.5 px-2 font-mono h-8">
+                    <input type="text" name="reg_code" value="{{ filter_params.reg_code }}" placeholder="e.g. REG-000001" class="google-input text-xs py-1 px-2 font-mono h-7.5">
                 </div>
 
                 <!-- 4. Customer Filter -->
@@ -98,7 +97,7 @@
                         <i data-lucide="user" class="w-3 h-3 text-cyan-600"></i>
                         <span>Customer</span>
                     </label>
-                    <input type="text" name="customer" value="{{ filter_params.customer }}" placeholder="Name or email..." class="google-input text-xs py-1.5 px-2 h-8">
+                    <input type="text" name="customer" value="{{ filter_params.customer }}" placeholder="Name, email, phone..." class="google-input text-xs py-1 px-2 h-7.5">
                 </div>
 
                 <!-- 5. Event Filter -->
@@ -107,7 +106,7 @@
                         <i data-lucide="calendar-days" class="w-3 h-3 text-purple-600"></i>
                         <span>Event</span>
                     </label>
-                    <select name="event_id" class="google-select text-xs py-1.5 px-2 h-8">
+                    <select name="event_id" class="google-select text-xs py-1 px-2 h-7.5">
                         <option value="">All Events</option>
                         {% for ev in events %}
                         <option value="{{ ev.id }}" {% if filter_params.event_id == ev.id|stringformat:"s" %}selected{% endif %}>{{ ev.title|truncatechars:18 }}</option>
@@ -121,7 +120,7 @@
                         <i data-lucide="indian-rupee" class="w-3 h-3 text-emerald-600"></i>
                         <span>Amount</span>
                     </label>
-                    <select name="amount_type" class="google-select text-xs py-1.5 px-2 h-8">
+                    <select name="amount_type" class="google-select text-xs py-1 px-2 h-7.5">
                         <option value="">All Amounts</option>
                         <option value="free" {% if filter_params.amount_type == 'free' %}selected{% endif %}>Free Entry (₹0)</option>
                         <option value="paid" {% if filter_params.amount_type == 'paid' %}selected{% endif %}>Paid Entry (> ₹0)</option>
@@ -135,12 +134,12 @@
                         <span>Pass Badge</span>
                     </label>
                     <div class="flex items-center gap-1">
-                        <select name="pass_filter" class="google-select text-xs py-1.5 px-2 h-8 flex-1">
+                        <select name="pass_filter" class="google-select text-xs py-1 px-2 h-7.5 flex-1">
                             <option value="">All Passes</option>
                             <option value="with_pass" {% if filter_params.pass_filter == 'with_pass' %}selected{% endif %}>Pass Issued</option>
                             <option value="without_pass" {% if filter_params.pass_filter == 'without_pass' %}selected{% endif %}>No Pass</option>
                         </select>
-                        <button type="submit" class="google-btn-primary h-8 px-2.5 text-xs shrink-0" title="Apply Column Filters">
+                        <button type="submit" class="google-btn-primary h-7.5 px-2.5 text-xs shrink-0 cursor-pointer" title="Apply Column Filters">
                             <span>Apply</span>
                         </button>
                     </div>
@@ -207,36 +206,42 @@
         </form>
     </div>
 
-    <!-- Google Table Container (Sticky Header & Freeze Columns up to Event - Bottom Scroll Alone) -->
-    <div class="google-card flex-1 min-h-[420px] lg:min-h-0 flex flex-col overflow-hidden">
+    <!-- Google Table Container (Sticky Header & Freeze Columns up to Event) -->
+    <div class="google-card flex-1 min-h-[420px] lg:min-h-0 flex flex-col overflow-hidden bg-white border border-[#e2e8f0]">
         <div class="table-scroll-container flex-1 min-h-0 overflow-auto">
-            <table class="w-full text-left text-xs border-collapse min-w-[1050px]">
+            <table class="w-full text-left text-xs border-collapse min-w-[1000px]">
                 <thead class="bg-[#f8f9fa] border-b border-[#dadce0] text-[#5f6368] font-medium text-[11px] uppercase tracking-wider">
                     <tr>
-                        <th class="py-3 px-4 text-center table-freeze-col-1">
+                        <th class="py-3 px-3.5 text-center table-freeze-col-1">
                             <input type="checkbox" class="rounded border-[#dadce0] text-[#1a73e8] focus:ring-0 cursor-pointer">
                         </th>
-                        <th class="py-3.5 px-4 table-freeze-col-2">Date / Time</th>
-                        <th class="py-3.5 px-4 table-freeze-col-3">Status</th>
-                        <th class="py-3.5 px-4 table-freeze-col-4">Reg Code</th>
-                        <th class="py-3.5 px-4 table-freeze-col-5">Customer</th>
-                        <th class="py-3.5 px-4 table-freeze-col-6">Event</th>
-                        <th class="py-3.5 px-4 min-w-[100px]">Amount</th>
-                        <th class="py-3.5 px-4 text-center min-w-[120px]">Pass Badge</th>
-                        <th class="py-3.5 px-4 text-right min-w-[140px]">Actions</th>
+                        <th class="py-3 px-3.5 table-freeze-col-2">Date / Time</th>
+                        <th class="py-3 px-3.5 table-freeze-col-3">Status</th>
+                        <th class="py-3 px-3.5 table-freeze-col-4">Reg Code</th>
+                        <th class="py-3 px-3.5 table-freeze-col-5">Customer</th>
+                        <th class="py-3 px-3.5 table-freeze-col-6">Event</th>
+                        <th class="py-3 px-3.5 min-w-[90px]">Amount</th>
+                        <th class="py-3 px-3.5 text-center min-w-[130px]">Pass Badge</th>
+                        <th class="py-3 px-3.5 text-right min-w-[150px]">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#dadce0] text-[#202124]">
                     {% for reg in registrations %}
-                    <tr class="{% if reg.status == 'COMPLETED' %}row-verified{% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}row-review{% elif reg.status == 'FAILED' %}row-failed{% else %}row-pending{% endif %} transition duration-100 group">
-                        <td class="py-3 px-4 text-center table-freeze-col-1">
+                    <tr data-searchable="{{ reg.registration_code|lower }} {{ reg.customer.name|lower }} {{ reg.customer.email|lower }} {{ reg.customer.phone|lower }} {{ reg.event.title|lower }} {{ reg.attendee_pass.pass_code|default:''|lower }} {{ reg.status|lower }} {{ reg.amount }}" class="{% if reg.status == 'COMPLETED' %}row-verified{% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}row-review{% elif reg.status == 'FAILED' %}row-failed{% else %}row-pending{% endif %} transition duration-100 group">
+                        
+                        <!-- Checkbox -->
+                        <td class="py-2.5 px-3.5 text-center table-freeze-col-1">
                             <input type="checkbox" class="rounded border-[#dadce0] text-[#1a73e8] focus:ring-0 cursor-pointer">
                         </td>
-                        <td class="py-3 px-4 whitespace-nowrap table-freeze-col-2">
+
+                        <!-- Date / Time -->
+                        <td class="py-2.5 px-3.5 whitespace-nowrap table-freeze-col-2">
                             <div class="font-medium text-[#202124]">{{ reg.created_at|date:"d M Y" }}</div>
                             <div class="text-[11px] text-[#5f6368] font-mono mt-0.5">{{ reg.created_at|time:"H:i A" }}</div>
                         </td>
-                        <td class="py-3 px-4 whitespace-nowrap table-freeze-col-3">
+
+                        <!-- Status Pill -->
+                        <td class="py-2.5 px-3.5 whitespace-nowrap table-freeze-col-3">
                             {% if reg.status == 'COMPLETED' %}
                             <span class="pill-green">Verified & Active</span>
                             {% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}
@@ -247,66 +252,100 @@
                             <span class="pill-blue">Payment Required</span>
                             {% endif %}
                         </td>
-                        <td class="py-3 px-4 font-mono font-medium text-[#1a73e8] whitespace-nowrap table-freeze-col-4">
-                            <button onclick="copyToClipboard('{{ reg.registration_code }}', this)" class="hover:underline flex items-center gap-1" title="Copy code">
+
+                        <!-- Reg Code -->
+                        <td class="py-2.5 px-3.5 font-mono font-medium text-[#1a73e8] whitespace-nowrap table-freeze-col-4">
+                            <button onclick="navigator.clipboard.writeText('{{ reg.registration_code }}')" class="hover:underline flex items-center gap-1" title="Copy code">
                                 <span>{{ reg.registration_code }}</span>
                                 <i data-lucide="copy" class="w-3 h-3 opacity-40 group-hover:opacity-100 transition"></i>
                             </button>
                         </td>
-                        <td class="py-3 px-4 table-freeze-col-5">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-7 h-7 rounded-full bg-[#e8f0fe] text-[#1a73e8] font-bold text-xs flex items-center justify-center font-display shrink-0">
+
+                        <!-- Customer -->
+                        <td class="py-2.5 px-3.5 table-freeze-col-5">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6.5 h-6.5 rounded-full bg-[#e8f0fe] text-[#1a73e8] font-bold text-xs flex items-center justify-center font-display shrink-0">
                                     {{ reg.customer.name|slice:":1" }}
                                 </div>
-                                <div class="truncate max-w-[140px]">
+                                <div class="truncate max-w-[135px]">
                                     <div class="font-medium text-[#202124] truncate">{{ reg.customer.name }}</div>
                                     <div class="text-[11px] text-[#5f6368] truncate">{{ reg.customer.email }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-3 px-4 font-medium text-[#3c4043] table-freeze-col-6">
-                            <a href="{% url 'dashboard-event-detail' reg.event.id %}" class="hover:text-[#1a73e8] hover:underline block truncate max-w-[170px]" title="{{ reg.event.title }}">
+
+                        <!-- Event -->
+                        <td class="py-2.5 px-3.5 font-medium text-[#3c4043] table-freeze-col-6">
+                            <a href="{% url 'dashboard-event-detail' reg.event.id %}" class="hover:text-[#1a73e8] hover:underline block truncate max-w-[160px]" title="{{ reg.event.title }}">
                                 {{ reg.event.title }}
                             </a>
                         </td>
-                        <td class="py-3 px-4 font-mono font-bold text-[#202124] whitespace-nowrap">
+
+                        <!-- Amount -->
+                        <td class="py-2.5 px-3.5 font-mono font-bold text-[#202124] whitespace-nowrap">
                             ₹{{ reg.amount|floatformat:2 }}
                         </td>
-                        <td class="py-3 px-4 text-center whitespace-nowrap">
-                            {% if reg.attendee_pass %}
-                            <a href="{% url 'attendee-badge' reg.attendee_pass.pass_code %}" target="_blank" class="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-emerald-800 bg-emerald-100/70 hover:bg-emerald-200 border border-emerald-300 px-2 py-0.5 rounded transition shadow-2xs" title="Open Attendee Badge">
-                                <i data-lucide="qr-code" class="w-3 h-3 text-emerald-700"></i>
+
+                        <!-- Pass Badge (Combines Pass Code + Print Modal) -->
+                        <td class="py-2.5 px-3.5 text-center whitespace-nowrap">
+                            {% if reg.status == 'COMPLETED' and reg.attendee_pass %}
+                            <button type="button" onclick="openPassModal('{{ reg.attendee_pass.pass_code }}', '{{ reg.customer.name|escapejs }}', '{{ reg.event.title|escapejs }}')" class="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-emerald-800 bg-emerald-100/80 hover:bg-emerald-200 border border-emerald-300 px-2.5 py-1 rounded transition shadow-2xs cursor-pointer group" title="Click to view & print pass">
+                                <i data-lucide="qr-code" class="w-3.5 h-3.5 text-emerald-700"></i>
                                 <span>{{ reg.attendee_pass.pass_code }}</span>
-                            </a>
+                                <i data-lucide="printer" class="w-3 h-3 text-emerald-600 opacity-60 group-hover:opacity-100 transition ml-0.5"></i>
+                            </button>
                             {% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}
                             <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-100/70 border border-amber-300 px-2 py-0.5">
                                 <i data-lucide="clock" class="w-3 h-3 text-amber-600"></i>
                                 <span>Under Review</span>
                             </span>
                             {% else %}
-                            <span class="text-[#80868b] text-xs font-mono">-</span>
+                            <span class="text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold">No Pass</span>
                             {% endif %}
                         </td>
-                        <td class="py-3 px-4 text-right whitespace-nowrap">
+
+                        <!-- Actions -->
+                        <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-1.5">
-                                <a href="{% url 'attendee-badge' reg.attendee_pass.pass_code|default:reg.registration_code %}?print=1" target="_blank" class="google-btn-outlined text-xs py-1 px-2.5 hover:border-[#1e8e3e] hover:text-[#137333] flex items-center gap-1 shadow-2xs font-bold text-emerald-800 bg-emerald-50/70 border-emerald-300" title="Print Official Attendee Pass Badge (A4 Sheet)">
-                                    <i data-lucide="printer" class="w-3.5 h-3.5 text-emerald-700"></i>
-                                    <span>Print</span>
-                                </a>
-                                <a href="{% url 'dashboard-registration-send-email' reg.registration_code %}" class="google-btn-outlined text-xs py-1 px-2.5 hover:border-[#1a73e8] hover:text-[#1a73e8] flex items-center gap-1 shadow-2xs" title="Send Official Confirmation & Pass Email">
-                                    <i data-lucide="mail" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
-                                    <span>Send Email</span>
-                                </a>
-                                <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="google-btn-primary text-xs py-1 px-3.5">
-                                    <span>Track</span>
-                                    <i data-lucide="external-link" class="w-3 h-3"></i>
-                                </a>
+                                {% if reg.status == 'COMPLETED' %}
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5" title="Confirmation & Pass Email Dispatched">
+                                        <i data-lucide="mail-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                        <span>Mail Sent</span>
+                                    </span>
+                                    <a href="{% url 'dashboard-registration-send-email' reg.registration_code %}" class="google-btn-outlined text-xs py-1 px-2 hover:border-[#1a73e8] hover:text-[#1a73e8] flex items-center gap-1 shadow-2xs text-slate-700" title="Resend Official Confirmation & Pass Email">
+                                        <i data-lucide="refresh-cw" class="w-3 h-3 text-[#1a73e8]"></i>
+                                        <span>Resend</span>
+                                    </a>
+                                    <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="google-btn-primary text-xs py-1 px-2.5">
+                                        <span>Track</span>
+                                        <i data-lucide="external-link" class="w-3 h-3"></i>
+                                    </a>
+                                {% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}
+                                    <a href="{% url 'dashboard-verification-queue' %}" class="google-btn-outlined text-xs py-1 px-2.5 hover:border-amber-500 hover:text-amber-900 flex items-center gap-1 shadow-2xs font-bold text-amber-900 bg-amber-50 border-amber-300" title="Review payment proof in Queue (Pass mail sends upon acceptance)">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-600"></i>
+                                        <span>Review Queue</span>
+                                    </a>
+                                    <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="google-btn-outlined text-xs py-1 px-2.5">
+                                        <span>Track</span>
+                                        <i data-lucide="external-link" class="w-3 h-3"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'dashboard-registration-send-email' reg.registration_code %}?type=reminder" class="google-btn-outlined text-xs py-1 px-2.5 hover:border-amber-600 hover:text-amber-800 flex items-center gap-1 shadow-2xs font-bold text-amber-800 bg-amber-50 border-amber-300" title="Send Payment Reminder & Retry Payment Email">
+                                        <i data-lucide="send" class="w-3.5 h-3.5 text-amber-700"></i>
+                                        <span>Retry Payment Email</span>
+                                    </a>
+                                    <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="google-btn-primary text-xs py-1 px-2.5">
+                                        <span>Pay Page</span>
+                                        <i data-lucide="external-link" class="w-3 h-3"></i>
+                                    </a>
+                                {% endif %}
                             </div>
                         </td>
+
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="9" class="py-14 text-center text-[#5f6368]">
+                    <tr id="noRecordsRow">
+                        <td colspan="9" class="py-12 text-center text-[#5f6368]">
                             <div class="flex flex-col items-center justify-center gap-2">
                                 <i data-lucide="inbox" class="w-8 h-8 text-[#80868b]"></i>
                                 <span class="font-medium text-[#202124] text-sm">No registrations match your search filter</span>
@@ -314,10 +353,97 @@
                         </td>
                     </tr>
                     {% endfor %}
+                    
+                    <tr id="noRealtimeResultsRow" class="hidden">
+                        <td colspan="9" class="py-12 text-center text-[#5f6368]">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i data-lucide="search-x" class="w-8 h-8 text-slate-400"></i>
+                                <span class="font-medium text-slate-800 text-sm">No matching registrations found for your search</span>
+                                <button type="button" onclick="clearLiveSearch()" class="text-xs font-bold text-[#1a73e8] hover:underline cursor-pointer">Clear search</button>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
 </div>
+
+<!-- Real-time Instant Search & Filter Script -->
+<script>
+    const searchInput = document.getElementById('realtimeSearchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const searchableRows = document.querySelectorAll('table tbody tr[data-searchable]');
+    const noResultsRow = document.getElementById('noRealtimeResultsRow');
+    const countBadge = document.getElementById('recordCountBadge');
+    const totalCount = {{ registrations|length }};
+
+    function filterTableRealtime() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        
+        if (clearBtn) {
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        let visibleCount = 0;
+        searchableRows.forEach(row => {
+            const searchText = row.getAttribute('data-searchable') || '';
+            if (!query || searchText.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (noResultsRow) {
+            if (visibleCount === 0 && searchableRows.length > 0) {
+                noResultsRow.classList.remove('hidden');
+            } else {
+                noResultsRow.classList.add('hidden');
+            }
+        }
+
+        if (countBadge) {
+            if (query) {
+                countBadge.innerText = `${visibleCount} of ${totalCount} logs`;
+            } else {
+                countBadge.innerText = `${totalCount} logs`;
+            }
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterTableRealtime);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Escape') {
+                clearLiveSearch();
+            }
+        });
+    }
+
+    function clearLiveSearch() {
+        if (searchInput) {
+            searchInput.value = '';
+            filterTableRealtime();
+            searchInput.focus();
+        }
+    }
+
+    function toggleDateCustom(preset, prefix) {
+        const wrap = document.getElementById(prefix + '_date_custom');
+        if (wrap) {
+            if (preset === 'custom') {
+                wrap.classList.remove('hidden');
+            } else {
+                wrap.classList.add('hidden');
+            }
+        }
+    }
+</script>
 {% endblock %}
