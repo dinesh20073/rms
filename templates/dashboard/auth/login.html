@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sign in - Nizhal Community Portal{% endblock %}
+{% block title %}Sign in - Nizhal Community{% endblock %}
 
 {% block extra_head %}
 <style>
-    /* Professional Google-like Layout with Custom Indigo-Slate Palette (Not Google Colors) */
+    /* Professional Clean Layout with Custom Royal Indigo-Slate Palette (Not Google Colors) */
     body {
         background-color: #f0f4f9 !important;
         color: #1e293b !important;
@@ -14,10 +14,9 @@
     .auth-card {
         background: #ffffff;
         border: 1px solid #d8e2ed;
-        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+        box-shadow: 0 4px 24px -2px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
 
-    /* Outlined Floating Field Effect */
     .field-group {
         position: relative;
     }
@@ -27,7 +26,7 @@
         background-color: transparent !important;
         border: 1px solid #94a3b8 !important;
         border-radius: 4px !important;
-        padding: 14px 14px 14px 14px !important;
+        padding: 13px 14px !important;
         font-size: 15px !important;
         font-family: 'Roboto', sans-serif !important;
         color: #0f172a !important;
@@ -48,7 +47,7 @@
         color: #94a3b8 !important;
     }
 
-    /* Primary CTA Button (Refined Royal Indigo Palette) */
+    /* Primary CTA Button (Royal Indigo) */
     .btn-auth-primary {
         background: #3b5bf5 !important;
         color: #ffffff !important;
@@ -71,7 +70,6 @@
         background: #1f3bbd !important;
     }
 
-    /* Checkbox & Text */
     .custom-checkbox {
         accent-color: #3b5bf5;
     }
@@ -79,38 +77,35 @@
 {% endblock %}
 
 {% block body_content %}
-<div class="min-h-screen flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen flex flex-col justify-between py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
 
-    <!-- Top Spacer / Minimal Brand Header -->
-    <div class="w-full max-w-[448px] mx-auto pt-4 sm:pt-8 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-            <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-8 h-8 object-contain" onerror="this.style.display='none';">
-            <span class="font-display font-extrabold text-slate-800 text-lg tracking-tight">Nizhal Community</span>
-        </div>
-        <div class="flex items-center gap-1.5 text-xs text-slate-500">
-            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
-            <span class="font-medium">Secure Portal</span>
-        </div>
-    </div>
+    <!-- Top Space -->
+    <div class="w-full max-w-[448px] mx-auto"></div>
 
-    <!-- Main Google-Style Clean Sign-in Card -->
-    <main class="w-full max-w-[448px] mx-auto my-auto py-6">
+    <!-- Main Centered Sign-in Card -->
+    <main class="w-full max-w-[448px] mx-auto my-auto py-4">
         
         <div class="auth-card p-8 sm:p-10">
 
-            <!-- Header Section -->
-            <div class="text-left mb-7">
-                <h1 class="font-display font-bold text-2xl sm:text-[26px] text-slate-900 tracking-tight leading-snug">
+            <!-- Center Logo & Name Section -->
+            <div class="flex flex-col items-center text-center mb-7">
+                <div class="w-14 h-14 mb-3 flex items-center justify-center">
+                    <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal Community" class="w-full h-full object-contain">
+                </div>
+                <h2 class="font-display font-black text-lg text-slate-800 tracking-tight">
+                    Nizhal Community
+                </h2>
+                <h1 class="font-display font-bold text-2xl sm:text-[26px] text-slate-900 tracking-tight leading-snug mt-2">
                     Sign in
                 </h1>
-                <p class="text-sm text-slate-600 mt-1.5 font-normal">
-                    to access Nizhal Management Console
+                <p class="text-xs sm:text-sm text-slate-600 mt-1 font-normal">
+                    to access Management Console
                 </p>
             </div>
 
             <!-- Lockout or Error Banner -->
             {% if error_message %}
-            <div class="mb-6 p-3.5 bg-rose-50 border-l-4 border-rose-600 text-rose-900 text-xs flex items-start gap-3">
+            <div class="mb-5 p-3.5 bg-rose-50 border-l-4 border-rose-600 text-rose-900 text-xs flex items-start gap-3">
                 <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0 mt-0.5"></i>
                 <div class="flex-1">
                     <span class="font-semibold block text-rose-950">{{ error_message }}</span>
@@ -127,7 +122,7 @@
             <!-- Django Info / Logout Messages -->
             {% if messages %}
                 {% for message in messages %}
-                <div class="mb-6 p-3 bg-slate-100 border-l-4 border-slate-600 text-slate-800 text-xs flex items-center gap-2.5">
+                <div class="mb-5 p-3 bg-slate-100 border-l-4 border-slate-600 text-slate-800 text-xs flex items-center gap-2.5">
                     <i data-lucide="info" class="w-4 h-4 text-slate-600 shrink-0"></i>
                     <span>{{ message }}</span>
                 </div>
@@ -141,11 +136,11 @@
             </div>
 
             <!-- Clean Login Form -->
-            <form method="POST" action="{% url 'login' %}" id="loginForm" class="space-y-5" onsubmit="handleFormSubmit(event)">
+            <form method="POST" action="{% url 'login' %}" id="loginForm" class="space-y-4" onsubmit="handleFormSubmit(event)">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ next }}">
 
-                <!-- Username / Email Input -->
+                <!-- Username Input -->
                 <div class="field-group">
                     <input 
                         type="text" 
@@ -185,7 +180,7 @@
                     </button>
                 </div>
 
-                <!-- Show Password / Stay signed in row -->
+                <!-- Show Password / Stay signed in options -->
                 <div class="flex items-center justify-between pt-1">
                     <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer select-none">
                         <input type="checkbox" id="showPasswordCheckbox" onchange="syncPasswordVisibility(this.checked)" class="custom-checkbox w-3.5 h-3.5">
@@ -199,15 +194,11 @@
                 </div>
 
                 <!-- Action Button Row -->
-                <div class="pt-5 flex items-center justify-between">
-                    <span class="text-xs text-slate-500">
-                        Protected session
-                    </span>
-
+                <div class="pt-5 flex items-center justify-end">
                     <button 
                         type="submit" 
                         id="submitBtn" 
-                        class="btn-auth-primary flex items-center justify-center gap-2 {% if is_locked %}opacity-50 cursor-not-allowed{% endif %}"
+                        class="btn-auth-primary flex items-center justify-center gap-2 w-full sm:w-auto {% if is_locked %}opacity-50 cursor-not-allowed{% endif %}"
                         {% if is_locked %}disabled{% endif %}
                     >
                         <span id="submitText">Next</span>
@@ -221,14 +212,10 @@
 
     </main>
 
-    <!-- Bottom Footer (Google-style minimal layout) -->
-    <footer class="w-full max-w-[448px] mx-auto flex items-center justify-between text-xs text-slate-500 py-4">
-        <span>Nizhal Community</span>
-        <div class="flex items-center gap-4 text-xs text-slate-500">
-            <span class="hover:text-slate-700 cursor-default">Help</span>
-            <span class="hover:text-slate-700 cursor-default">Privacy</span>
-            <span class="hover:text-slate-700 cursor-default">Terms</span>
-        </div>
+    <!-- Bottom Footer: Centered Copyright with Nizhal Community Logo -->
+    <footer class="w-full max-w-[448px] mx-auto flex items-center justify-center gap-2 text-xs text-slate-500 py-4 select-none">
+        <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal Logo" class="w-4 h-4 object-contain opacity-80">
+        <span>&copy; 2026 Nizhal Community. All rights reserved.</span>
     </footer>
 
 </div>
