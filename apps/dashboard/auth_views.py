@@ -131,9 +131,6 @@ def login_view(request):
             else:
                 # Login Success!
                 login(request, user)
-                
-                # Session fixation protection: cycle session key
-                request.session.cycle_key()
 
                 # Handle remember me session duration
                 if remember_me:
@@ -226,4 +223,17 @@ def session_ping_view(request):
             'authenticated': False,
             'redirect': '/login/'
         }, status=401)
+
+@never_cache
+def csrf_failure_view(request, reason=""):
+    """
+    Custom CSRF Failure View.
+    Prevents ugly raw 403 debug pages and seamlessly recovers by rendering
+    the login form with a fresh CSRF token and a helpful message.
+    """
+    return render(request, 'dashboard/auth/login.html', {
+        'info_message': 'Your security session was updated. Please enter your credentials to sign in.',
+        'next': request.POST.get('next') or request.GET.get('next') or 'dashboard-overview'
+    }, status=200)
+
 

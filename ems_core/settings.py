@@ -124,14 +124,13 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard-overview'
 LOGOUT_REDIRECT_URL = 'login'
 
-SESSION_COOKIE_NAME = 'nizhal_session_id'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_AGE = 1800  # 30 minutes rolling window
 SESSION_SAVE_EVERY_REQUEST = True  # Resets activity timestamp on every request
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-CSRF_COOKIE_NAME = 'nizhal_csrftoken'
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_FAILURE_VIEW = 'apps.dashboard.auth_views.csrf_failure_view'
 
