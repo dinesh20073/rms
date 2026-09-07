@@ -201,7 +201,7 @@ def overview_dashboard_view(request):
     table_qs, filter_params, active_filters_count = filter_registrations_queryset(table_qs, request)
     recent_registrations = table_qs[:100]
 
-    all_events = events_qs.all()
+    all_events = events_qs.annotate(registrations_count=Count('registrations')).order_by('-created_at')
 
     context = {
         'tenant': tenant,
