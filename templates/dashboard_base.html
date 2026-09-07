@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block body_content %}
 <style>
     /* Core navigation styling */
-    .google-sidebar { background-color: #0b132b !important; border-right: 1px solid #1e293b !important; }
-    .google-topbar { background: linear-gradient(90deg, #1a73e8 0%, #1d4ed8 50%, #1e40af 100%) !important; border-bottom: 1px solid #1e3a8a !important; }
+    .google-sidebar { background-color: #070d1e !important; border-right: 1px solid #1e293b !important; }
+    .google-topbar { background: linear-gradient(90deg, #3b5bf5 0%, #2b49e0 50%, #1f3bbd 100%) !important; border-bottom: 1px solid #2b49e0 !important; }
     .sidebar-nav-btn { color: #94a3b8; transition: all 0.15s ease-in-out; position: relative; border-radius: 0px !important; }
     .sidebar-nav-btn:hover { color: #ffffff !important; background-color: #1e293b !important; }
-    .sidebar-nav-btn.active { background: linear-gradient(135deg, #1a73e8, #2563eb) !important; color: #ffffff !important; box-shadow: 0 0 12px rgba(26,115,232,0.5) !important; font-weight: 700; }
+    .sidebar-nav-btn.active { background: linear-gradient(135deg, #3b5bf5, #2b49e0) !important; color: #ffffff !important; box-shadow: 0 0 14px rgba(59,91,245,0.6) !important; font-weight: 700; }
     .sidebar-tooltip { visibility: hidden; opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease; transform: translateX(-4px); }
     .sidebar-item-wrap:hover .sidebar-tooltip { visibility: visible; opacity: 1; transform: translateX(0); }
     /* Mobile drawer transitions */
@@ -18,19 +19,17 @@
 
     /* ==== Responsive font scaling for mobile ==== */
     @media (max-width: 640px) {
-        /* Reduce overall base font size */
         html { font-size: 14px; }
         .google-topbar .font-display { font-size: 0.9rem; }
         .sidebar-nav-btn i { font-size: 0.75rem; }
         .google-topbar h1 { font-size: 1rem; }
         .google-topbar span { font-size: 0.75rem; }
         .google-topbar button { font-size: 0.75rem; }
-        /* Adjust button text in dashboard header */
         .google-topbar .bg-white { font-size: 0.7rem; padding: 0.4rem 0.6rem; }
     }
 </style>
 
-<div class="flex h-screen overflow-hidden bg-[#f4f7fb] font-sans">
+<div class="flex h-screen overflow-hidden bg-[#f0f4f9] font-sans">
 
     <!-- 1. Left Slim Navigation Dock (Desktop lg+) -->
     <aside class="google-sidebar hidden lg:flex w-16 flex-col items-center justify-between py-3.5 shrink-0 z-30 select-none">
@@ -38,15 +37,8 @@
         <!-- Top Section: Brand Logo & Navigation Icons -->
         <div class="flex flex-col items-center gap-3 w-full">
             <!-- Brand Logo -->
-            <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 bg-white border border-slate-700 shadow-md flex items-center justify-center p-1.5 transition hover:scale-105" title="EMS Console">
-                <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                    <path d="M18 4C10.268 4 4 10.268 4 18H18V4Z" fill="#4285F4"/>
-                    <path d="M32 18C32 10.268 25.732 4 18 4V18H32Z" fill="#EA4335"/>
-                    <path d="M18 32C25.732 32 32 25.732 32 18H18V32Z" fill="#FBBC05"/>
-                    <path d="M4 18C4 25.732 10.268 32 18 32V18H4Z" fill="#34A853"/>
-                    <circle cx="18" cy="18" r="7.5" fill="#FFFFFF"/>
-                    <path d="M14.5 16H21.5M14.5 18.5H19.5M14.5 21H21.5" stroke="#1A73E8" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
+            <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 bg-slate-900 border border-slate-700 shadow-md flex items-center justify-center p-1.5 transition hover:scale-105" title="Nizhal EMS Console">
+                <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-7 h-7 object-contain">
             </a>
 
             <div class="w-8 h-[1px] bg-slate-800 my-0.5"></div>
@@ -203,15 +195,15 @@
 
             <!-- Right: Actions & User Menu -->
             <div class="flex items-center gap-3 text-xs">
-                <a href="{% url 'dashboard-event-create' %}" class="bg-white hover:bg-blue-50 text-[#1a73e8] font-bold px-3.5 py-1.5 transition shadow-sm flex items-center gap-1.5">
-                    <i data-lucide="plus" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                <a href="{% url 'dashboard-event-create' %}" class="bg-white hover:bg-slate-50 text-[#3b5bf5] font-bold px-3.5 py-1.5 transition shadow-sm flex items-center gap-1.5">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 text-[#3b5bf5]"></i>
                     <span>New Event</span>
                 </a>
 
                 <!-- User Pill & Sign Out -->
                 <div class="hidden sm:flex items-center gap-2 pl-2 border-l border-blue-400/30">
                     <div class="flex items-center gap-2 px-2.5 py-1 bg-white/10 border border-white/20">
-                        <div class="w-5 h-5 bg-white text-[#1a73e8] flex items-center justify-center font-bold text-[10px]">
+                        <div class="w-5 h-5 bg-white text-[#3b5bf5] flex items-center justify-center font-bold text-[10px]">
                             {{ request.user.username|slice:":1"|upper|default:'N' }}
                         </div>
                         <div class="flex flex-col leading-tight text-left">
@@ -220,7 +212,7 @@
                         <span class="ml-1 px-1.5 py-0.2 bg-emerald-400/30 text-emerald-200 border border-emerald-300/40 text-[9px] font-mono font-bold">ADMIN</span>
                     </div>
 
-                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-600 text-white font-semibold border border-red-400/30 transition flex items-center gap-1" title="Sign Out">
+                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-600 text-white font-semibold border border-red-400/30 transition flex items-center gap-1 cursor-pointer" title="Sign Out">
                         <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                         <span class="hidden md:inline text-[11px]">Sign Out</span>
                     </a>
@@ -245,20 +237,20 @@
     </div>
 
     <!-- 4. Mobile Bottom Navigation Bar -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#dbeafe] flex items-center justify-around py-1.5 px-2 text-[10px] font-semibold text-slate-500 shadow-xl">
-        <a href="{% url 'dashboard-overview' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-overview' %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#d8e2ed] flex items-center justify-around py-1.5 px-2 text-[10px] font-semibold text-slate-500 shadow-xl">
+        <a href="{% url 'dashboard-overview' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-overview' %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
             <i data-lucide="layout-grid" class="w-5 h-5"></i>
             <span>Overview</span>
         </a>
-        <a href="{% url 'dashboard-registrations-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+        <a href="{% url 'dashboard-registrations-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
             <i data-lucide="receipt" class="w-5 h-5"></i>
             <span>Logs</span>
         </a>
-        <a href="{% url 'dashboard-events-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'event' in request.resolver_match.url_name %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+        <a href="{% url 'dashboard-events-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'event' in request.resolver_match.url_name %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
             <i data-lucide="calendar" class="w-5 h-5"></i>
             <span>Events</span>
         </a>
-        <a href="{% url 'dashboard-verification-queue' %}" class="flex flex-col items-center gap-0.5 p-1 relative {% if 'verification' in request.resolver_match.url_name %}text-[#1a73e8] font-bold{% else %}hover:text-slate-900{% endif %}">
+        <a href="{% url 'dashboard-verification-queue' %}" class="flex flex-col items-center gap-0.5 p-1 relative {% if 'verification' in request.resolver_match.url_name %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>Queue</span>
             {% if pending_reviews_count > 0 %}

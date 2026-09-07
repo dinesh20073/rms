@@ -5,27 +5,27 @@
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
 
-    <!-- Header info (Google Analytics Style) -->
-    <div class="google-card p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-white to-[#f0fdf4]/50">
+    <!-- Header info -->
+    <div class="google-card p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-[#d8e2ed]">
         <div>
-            <h2 class="text-xl font-bold font-display text-[#202124] flex items-center gap-2">
-                <i data-lucide="line-chart" class="w-5 h-5 text-[#1e8e3e]"></i>
+            <h2 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-5 h-5 text-emerald-600"></i>
                 <span>Revenue & Financial Analytics</span>
             </h2>
-            <p class="text-xs text-[#5f6368] mt-1">Real-time collections breakdown across verified UPI transactions.</p>
+            <p class="text-xs text-slate-500 mt-1">Real-time collections breakdown across verified UPI transactions.</p>
         </div>
         <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 bg-[#e6f4ea] border border-[#ceead6] text-[#137333] rounded-full text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs">
-                <span class="w-2 h-2 rounded-full bg-[#1e8e3e] animate-pulse"></span>
+            <span class="px-3 py-1.5 bg-[#eef2ff] border border-[#dbeafe] text-[#3b5bf5] rounded-full text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xs">
+                <span class="w-2 h-2 rounded-full bg-[#3b5bf5] animate-pulse"></span>
                 <span>Currency: INR (₹)</span>
             </span>
         </div>
     </div>
 
-    <!-- Vibrant Multi-Color Revenue KPIs Grid -->
+    <!-- Revenue KPIs Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <!-- Today Card (Vibrant Green) -->
+        <!-- Today Card (Green) -->
         <div class="bg-white p-5 rounded-2xl border border-[#ceead6] shadow-xs hover:shadow-md transition bg-gradient-to-b from-[#f0fdf4]/80 to-white">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-[#15803d]">Today's Revenue</span>
@@ -40,19 +40,19 @@
             </div>
         </div>
 
-        <!-- This Week (Vibrant Blue) -->
-        <div class="bg-white p-5 rounded-2xl border border-[#d2e3fc] shadow-xs hover:shadow-md transition bg-gradient-to-b from-[#eff6ff]/80 to-white">
+        <!-- This Week (Royal Indigo) -->
+        <div class="bg-white p-5 rounded-2xl border border-[#dbeafe] shadow-xs hover:shadow-md transition bg-gradient-to-b from-[#eef2ff]/80 to-white">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-[#1a73e8]">This Week</span>
-                <div class="w-8 h-8 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
-                    <i data-lucide="calendar" class="w-4 h-4 text-[#1a73e8]"></i>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#3b5bf5]">This Week</span>
+                <div class="w-8 h-8 rounded-full bg-[#eef2ff] text-[#3b5bf5] flex items-center justify-center">
+                    <i data-lucide="calendar" class="w-4 h-4 text-[#3b5bf5]"></i>
                 </div>
             </div>
-            <div class="text-3xl font-extrabold font-display text-[#185abc] mt-2 font-mono">₹{{ week_rev|floatformat:2 }}</div>
-            <div class="text-[11px] text-[#1a73e8] mt-2 font-semibold">Current 7-day rolling period</div>
+            <div class="text-3xl font-extrabold font-display text-[#1f3bbd] mt-2 font-mono">₹{{ week_rev|floatformat:2 }}</div>
+            <div class="text-[11px] text-[#3b5bf5] mt-2 font-semibold">Current 7-day rolling period</div>
         </div>
 
-        <!-- This Month (Vibrant Amber/Yellow) -->
+        <!-- This Month (Amber/Warm) -->
         <div class="bg-white p-5 rounded-2xl border border-[#feefc3] shadow-xs hover:shadow-md transition bg-gradient-to-b from-[#fffbeb]/80 to-white">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-[#b06000]">This Month</span>
@@ -64,16 +64,16 @@
             <div class="text-[11px] text-[#b06000] mt-2 font-semibold">Current month-to-date total</div>
         </div>
 
-        <!-- Lifetime Total Revenue (Deep Google Royal Blue Gradient) -->
-        <div class="bg-gradient-to-tr from-[#1a73e8] via-[#1557b0] to-[#174ea6] text-white p-5 rounded-2xl border border-[#1a73e8] shadow-md hover:shadow-lg transition">
+        <!-- Lifetime Total Revenue (Royal Indigo Gradient) -->
+        <div class="bg-gradient-to-tr from-[#3b5bf5] via-[#2b49e0] to-[#1f3bbd] text-white p-5 rounded-2xl border border-[#3b5bf5] shadow-md hover:shadow-lg transition">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-[#d2e3fc]">Total Lifetime Collections</span>
+                <span class="text-xs font-bold uppercase tracking-wider text-[#eef2ff]">Total Lifetime Collections</span>
                 <div class="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center">
                     <i data-lucide="banknote" class="w-4 h-4 text-white"></i>
                 </div>
             </div>
             <div class="text-3xl font-extrabold font-display text-white mt-2 font-mono">₹{{ total_rev|floatformat:2 }}</div>
-            <div class="text-[11px] text-[#d2e3fc] mt-2 font-bold flex items-center gap-1">
+            <div class="text-[11px] text-[#eef2ff] mt-2 font-bold flex items-center gap-1">
                 <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-300"></i>
                 <span>100% Verified UPI settlements</span>
             </div>
@@ -81,15 +81,15 @@
     </div>
 
     <!-- Revenue Breakdown by Event Table -->
-    <div class="google-card p-5 sm:p-6 overflow-hidden">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-[#202124] mb-4 flex items-center gap-2">
-            <i data-lucide="layers" class="w-4 h-4 text-[#1a73e8]"></i>
+    <div class="google-card p-5 sm:p-6 overflow-hidden bg-white border border-[#d8e2ed]">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-[#3b5bf5]"></i>
             <span>Event-wise Collections Breakdown</span>
         </h3>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse min-w-[600px]">
-                <thead class="bg-[#f8f9fa] border-b border-[#dadce0] text-[#5f6368] font-bold text-[11px] uppercase tracking-wider">
+                <thead class="bg-[#f8f9fa] border-b border-[#d8e2ed] text-slate-600 font-bold text-[11px] uppercase tracking-wider">
                     <tr>
                         <th class="py-3 px-4">Event Code</th>
                         <th class="py-3 px-4">Event Title</th>
@@ -98,15 +98,15 @@
                         <th class="py-3 px-4 text-right">Total Collected</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-[#dadce0] bg-white text-[#202124]">
+                <tbody class="divide-y divide-[#d8e2ed] bg-white text-slate-900">
                     {% for ev in events_breakdown %}
                     <tr class="hover:bg-[#f8f9fa] transition">
-                        <td class="py-3.5 px-4 font-mono font-bold text-[#1a73e8]">
-                            <span class="bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc]">{{ ev.event_code }}</span>
+                        <td class="py-3.5 px-4 font-mono font-bold text-[#3b5bf5]">
+                            <span class="bg-[#eef2ff] px-2.5 py-0.5 rounded-full border border-[#dbeafe]">{{ ev.event_code }}</span>
                         </td>
-                        <td class="py-3.5 px-4 font-bold text-[#202124]">
-                            <a href="{% url 'dashboard-event-detail' ev.id %}" class="hover:text-[#1a73e8] hover:underline flex items-center gap-1.5">
-                                <i data-lucide="ticket" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                        <td class="py-3.5 px-4 font-bold text-slate-900">
+                            <a href="{% url 'dashboard-event-detail' ev.id %}" class="hover:text-[#3b5bf5] hover:underline flex items-center gap-1.5">
+                                <i data-lucide="ticket" class="w-3.5 h-3.5 text-[#3b5bf5]"></i>
                                 <span>{{ ev.title }}</span>
                             </a>
                         </td>
@@ -123,7 +123,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="py-8 text-center text-[#5f6368]">No events found.</td>
+                        <td colspan="5" class="py-8 text-center text-slate-500">No events found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

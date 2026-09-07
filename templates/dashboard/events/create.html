@@ -7,11 +7,11 @@
 
     <div class="flex items-center justify-between">
         <div>
-            <h2 class="text-xl font-bold font-display text-[#202124] flex items-center gap-2">
-                <i data-lucide="calendar-plus" class="w-5 h-5 text-[#1a73e8]"></i>
+            <h2 class="text-xl font-bold font-display text-slate-900 flex items-center gap-2">
+                <i data-lucide="calendar-plus" class="w-5 h-5 text-[#3b5bf5]"></i>
                 <span>Create New Event</span>
             </h2>
-            <p class="text-xs text-[#5f6368] mt-0.5">Configure event schedule, pricing (INR only), and upload the master UPI QR code.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Configure event schedule, pricing (INR only), and upload the master UPI QR code.</p>
         </div>
         <a href="{% url 'dashboard-events-list' %}" class="google-btn-outlined text-xs">
             <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -19,88 +19,88 @@
         </a>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" class="google-card p-6 sm:p-8 space-y-6">
+    <form method="POST" enctype="multipart/form-data" class="google-card p-6 sm:p-8 space-y-6 bg-white border border-[#d8e2ed]">
         {% csrf_token %}
 
         <!-- Basic Details -->
         <div class="space-y-4">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-[#1a73e8] flex items-center gap-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#3b5bf5] flex items-center gap-2">
                 <i data-lucide="info" class="w-4 h-4"></i>
                 <span>Event Information</span>
             </h3>
 
             <div>
-                <label class="text-xs font-medium text-[#202124] block mb-1.5">Event Name *</label>
+                <label class="text-xs font-medium text-slate-900 block mb-1.5">Event Name *</label>
                 <input type="text" name="title" required placeholder="e.g. Annual Tech Symposium 2026" class="google-input">
             </div>
 
             <div>
-                <label class="text-xs font-medium text-[#202124] block mb-1.5">Description</label>
+                <label class="text-xs font-medium text-slate-900 block mb-1.5">Description</label>
                 <textarea name="description" rows="3" placeholder="Detailed event description, agenda, guidelines, and highlights." class="google-input"></textarea>
             </div>
 
             <div>
-                <label class="text-xs font-medium text-[#202124] block mb-1.5">Venue / Platform</label>
+                <label class="text-xs font-medium text-slate-900 block mb-1.5">Venue / Platform</label>
                 <input type="text" name="venue" value="Campus Auditorium & Online Broadcast" class="google-input">
             </div>
         </div>
 
         <!-- Payment & UPI Master QR Config -->
-        <div class="pt-6 border-t border-[#f1f3f4] space-y-4">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-[#1a73e8] flex items-center gap-2">
-                <i data-lucide="banknote" class="w-4 h-4 text-[#1e8e3e]"></i>
+        <div class="pt-6 border-t border-slate-100 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#3b5bf5] flex items-center gap-2">
+                <i data-lucide="banknote" class="w-4 h-4 text-emerald-600"></i>
                 <span>Pricing (Fixed INR ₹) & Master UPI QR</span>
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-xs font-medium text-[#202124] block mb-1.5">Ticket Fee (₹ INR) *</label>
+                    <label class="text-xs font-medium text-slate-900 block mb-1.5">Ticket Fee (₹ INR) *</label>
                     <div class="relative">
-                        <span class="absolute left-3.5 top-2.5 font-mono font-bold text-[#137333]">₹</span>
-                        <input type="number" step="0.01" name="registration_fee" value="500.00" required class="google-input pl-8 font-mono font-bold text-[#137333]">
+                        <span class="absolute left-3.5 top-2.5 font-mono font-bold text-emerald-700">₹</span>
+                        <input type="number" step="0.01" name="registration_fee" value="500.00" required class="google-input pl-8 font-mono font-bold text-emerald-700">
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-xs font-medium text-[#202124] block mb-1.5">Currency System</label>
-                    <input type="text" value="Indian Rupee (INR ₹)" readonly class="google-input font-mono bg-[#f1f3f4] text-[#5f6368] cursor-not-allowed">
+                    <label class="text-xs font-medium text-slate-900 block mb-1.5">Currency System</label>
+                    <input type="text" value="Indian Rupee (INR ₹)" readonly class="google-input font-mono bg-slate-100 text-slate-500 cursor-not-allowed">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-xs font-medium text-[#202124] block mb-1.5">Payee UPI ID *</label>
+                    <label class="text-xs font-medium text-slate-900 block mb-1.5">Payee UPI ID *</label>
                     <input type="text" name="upi_id" value="dinesh.b@superyes" required placeholder="yourname@okaxis / phonepe" class="google-input font-mono">
                 </div>
 
                 <div>
-                    <label class="text-xs font-medium text-[#202124] block mb-1.5">Payee Display Name *</label>
+                    <label class="text-xs font-medium text-slate-900 block mb-1.5">Payee Display Name *</label>
                     <input type="text" name="upi_name" value="Dinesh" required placeholder="e.g. Dinesh Kumar" class="google-input">
                 </div>
             </div>
 
             <!-- Upload Master UPI QR Code Image -->
-            <div class="bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0] space-y-2">
-                <label class="text-xs font-bold text-[#202124] flex items-center gap-2">
-                    <i data-lucide="qr-code" class="w-4 h-4 text-[#1a73e8]"></i>
+            <div class="bg-[#f8fafc] p-4 rounded-xl border border-[#d8e2ed] space-y-2">
+                <label class="text-xs font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-[#3b5bf5]"></i>
                     <span>Upload Master Event UPI QR Code Image (Optional)</span>
                 </label>
-                <p class="text-[11px] text-[#5f6368] leading-normal">
+                <p class="text-[11px] text-slate-500 leading-normal">
                     Upload your merchant or personal UPI QR code screenshot (PhonePe, Google Pay, Paytm). All attendees registering for this event will scan this exact QR code. If left blank, a standard UPI QR will be automatically generated.
                 </p>
-                <input type="file" name="upi_qr_code" accept="image/*" class="google-input file:mr-4 file:py-1 file:px-3.5 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-[#1a73e8] file:text-white hover:file:bg-[#1557b0] cursor-pointer">
+                <input type="file" name="upi_qr_code" accept="image/*" class="google-input file:mr-4 file:py-1 file:px-3.5 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-[#3b5bf5] file:text-white hover:file:bg-[#2b49e0] cursor-pointer">
             </div>
         </div>
 
         <!-- Availability -->
-        <div class="pt-6 border-t border-[#f1f3f4] space-y-4">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-[#1a73e8] flex items-center gap-2">
+        <div class="pt-6 border-t border-slate-100 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#3b5bf5] flex items-center gap-2">
                 <i data-lucide="globe" class="w-4 h-4"></i>
                 <span>Publishing Status</span>
             </h3>
 
             <div>
-                <label class="text-xs font-medium text-[#202124] block mb-1.5">Event Status</label>
+                <label class="text-xs font-medium text-slate-900 block mb-1.5">Event Status</label>
                 <select name="status" class="google-select w-full">
                     <option value="OPEN" selected>OPEN (Live & Accepting Registrations)</option>
                     <option value="DRAFT">DRAFT (Admin Only)</option>
@@ -110,7 +110,7 @@
         </div>
 
         <!-- Submit Button -->
-        <div class="pt-6 border-t border-[#f1f3f4] flex items-center justify-end gap-3">
+        <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
             <a href="{% url 'dashboard-events-list' %}" class="google-btn-outlined">Cancel</a>
             <button type="submit" class="google-btn-primary">
                 <i data-lucide="check" class="w-4 h-4"></i>
