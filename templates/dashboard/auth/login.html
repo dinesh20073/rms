@@ -97,19 +97,11 @@
                 </h2>
             </div>
 
-            <!-- Lockout or Error Banner -->
+            <!-- Error Banner -->
             {% if error_message %}
-            <div class="mb-5 p-3.5 bg-rose-50 border-l-4 border-rose-600 text-rose-900 text-xs flex items-start gap-3">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0 mt-0.5"></i>
-                <div class="flex-1">
-                    <span class="font-semibold block text-rose-950">{{ error_message }}</span>
-                    {% if is_locked and lockout_secs %}
-                    <div class="mt-1.5 font-mono text-[11px] text-rose-800 flex items-center gap-1.5">
-                        <i data-lucide="timer" class="w-3.5 h-3.5"></i>
-                        <span>Lockout active. Try again in <strong id="countdown">{{ lockout_secs }}</strong>s</span>
-                    </div>
-                    {% endif %}
-                </div>
+            <div class="mb-5 p-3.5 bg-rose-50 border-l-4 border-rose-600 text-rose-900 text-xs flex items-center gap-2.5">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i>
+                <span class="font-medium text-rose-950">{{ error_message }}</span>
             </div>
             {% endif %}
 

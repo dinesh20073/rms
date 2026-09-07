@@ -95,27 +95,7 @@ def login_view(request):
         password = request.POST.get('password', '').strip()
         remember_me = request.POST.get('remember_me') == 'on'
 
-        # 1. Check Rate Limiting / Lockout Status
-        is_locked, lockout_secs = is_rate_limited(client_ip, username)
-        if is_locked:
-            minutes = (lockout_secs // 60) + 1
-            error_message = f"Too many failed login attempts. For security, access is temporarily locked. Please try again in {minutes} minute(s)."
-            log_audit_event(
-                action='AUTH_LOGIN_BLOCKED_RATE_LIMIT',
-                reference_id=username,
-                details={'ip': client_ip, 'lockout_seconds': lockout_secs, 'user_agent': request.META.get('HTTP_USER_AGENT', '')},
-                actor=username or 'Anonymous',
-                ip_address=client_ip
-            )
-            return render(request, 'dashboard/auth/login.html', {
-                'error_message': error_message,
-                'is_locked': True,
-                'lockout_secs': lockout_secs,
-                'next': redirect_to,
-                'username': username
-            }, status=429)
-
-        # 2. Authenticate User (Mitigates timing attacks internally in Django auth backend)
+        # Authenticate User
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
@@ -138,9 +118,6 @@ def login_view(request):
                 else:
                     request.session.set_expiry(0)  # Expires on browser close
 
-                # Clear failed attempts
-                clear_login_attempts(client_ip, username)
-
                 # Log audit record
                 log_audit_event(
                     action='AUTH_LOGIN_SUCCESS',
@@ -154,30 +131,18 @@ def login_view(request):
                 return redirect(redirect_to)
         else:
             # Authentication failed
-            is_now_locked, attempts_left_or_lock_time = record_failed_login(client_ip, username)
-            
+            error_message = "Invalid username or password."
             log_audit_event(
                 action='AUTH_LOGIN_FAILED',
                 reference_id=username,
-                details={'ip': client_ip, 'is_locked': is_now_locked, 'user_agent': request.META.get('HTTP_USER_AGENT', '')},
+                details={'ip': client_ip, 'user_agent': request.META.get('HTTP_USER_AGENT', '')},
                 actor=username or 'Anonymous',
                 ip_address=client_ip
             )
 
-            if is_now_locked:
-                minutes = (attempts_left_or_lock_time // 60) + 1
-                error_message = f"Too many failed login attempts. For security, your access is locked for {minutes} minutes."
-                lockout_remaining_seconds = attempts_left_or_lock_time
-            else:
-                remaining_attempts = attempts_left_or_lock_time
-                error_message = f"Invalid username or password. {remaining_attempts} attempt(s) remaining before security lockout."
-
     return render(request, 'dashboard/auth/login.html', {
         'error_message': error_message,
         'info_message': info_message,
-        'remaining_attempts': remaining_attempts,
-        'lockout_secs': lockout_remaining_seconds,
-        'is_locked': lockout_remaining_seconds > 0,
         'next': redirect_to,
         'username': request.POST.get('username', '')
     })
