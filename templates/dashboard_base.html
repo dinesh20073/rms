@@ -224,23 +224,18 @@
                 </div>
             </div>
 
-            <!-- Right: Action Button & Profile -->
+            <!-- Right: Profile & Actions -->
             <div class="flex items-center gap-3">
-                <a href="{% url 'dashboard-event-create' %}" class="google-btn-primary py-1.5 px-3.5 text-xs rounded-full flex items-center gap-1.5 shadow-none hover:shadow-sm">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    <span>New Event</span>
-                </a>
-
                 <!-- Google Account Avatar -->
-                <div class="flex items-center gap-2 pl-2 border-l border-[#dadce0]">
-                    <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#f1f3f4] border border-[#dadce0]">
-                        <div class="w-6 h-6 rounded-full bg-[#1a73e8] text-white flex items-center justify-center font-medium text-xs">
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-[#f1f3f4] border border-[#dadce0]">
+                        <div class="w-6 h-6 rounded bg-[#1a73e8] text-white flex items-center justify-center font-medium text-xs">
                             {{ request.user.username|slice:":1"|upper|default:'N' }}
                         </div>
                         <span class="hidden sm:inline font-medium text-xs text-[#202124]">{{ request.user.username|default:'Nizhal' }}</span>
                     </div>
 
-                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-1.5 text-[#5f6368] hover:text-[#d93025] rounded-full hover:bg-[#fce8e6] transition" title="Sign Out">
+                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-1.5 text-[#5f6368] hover:text-[#d93025] rounded hover:bg-[#fce8e6] transition" title="Sign Out">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                     </a>
                 </div>
