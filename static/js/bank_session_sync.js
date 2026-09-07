@@ -12,9 +12,9 @@
 
 (function () {
     const CHANNEL_NAME = 'nizhal_bank_auth_sync';
-    const IDLE_TIMEOUT_MS = 15 * 60 * 1000;      // 15 minutes
+    const IDLE_TIMEOUT_MS = 30 * 60 * 1000;      // 30 minutes
     const WARNING_TIME_MS = 60 * 1000;           // Show warning 60 seconds before
-    const PING_INTERVAL_MS = 45 * 1000;          // Heartbeat ping every 45s
+    const PING_INTERVAL_MS = 60 * 1000;          // Heartbeat ping every 60s
 
     let broadcastChannel = null;
     if (typeof BroadcastChannel !== 'undefined') {
@@ -133,6 +133,17 @@
 
     ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
         window.addEventListener(evt, onUserInteraction, { passive: true });
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            recordActivity();
+            pingServer();
+        }
+    });
+
+    window.addEventListener('focus', () => {
+        recordActivity();
     });
 
     // Create Bank-Grade Inactivity Warning Modal

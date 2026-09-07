@@ -426,48 +426,55 @@
             background-color: #fce8e6 !important;
         }
 
-        /* Google Material Snackbar Styles */
+        /* Google Material Compact Pill Snackbar Styles */
         .google-snackbar {
-            background-color: #323232;
+            background-color: #202124;
             color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12);
-            font-family: 'Roboto', sans-serif;
-            font-size: 14px;
-            display: flex;
+            border-radius: 9999px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            font-size: 12px;
+            display: inline-flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 12px 16px;
-            min-height: 48px;
-            max-width: 420px;
-            width: 100%;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 8px;
+            padding: 6px 12px;
+            max-width: 92vw;
+            width: auto;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        @media (min-width: 640px) {
+            .google-snackbar {
+                border-radius: 8px;
+                font-size: 13px;
+                padding: 8px 14px;
+                max-width: 400px;
+            }
         }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-full flex flex-col bg-[#f8f9fa] text-[#202124] antialiased selection:bg-[#e8f0fe] selection:text-[#1a73e8]">
 
-    <!-- Google Material Floating Snackbars Container (Top-Right Above Everything) -->
-    <div id="google-snackbar-container" class="fixed top-4 right-4 sm:top-5 sm:right-5 z-50 flex flex-col gap-2.5 max-w-sm w-[calc(100vw-2rem)] sm:w-96 pointer-events-none">
+    <!-- Google Material Floating Compact Snackbars Container -->
+    <div id="google-snackbar-container" class="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-1.5 max-w-[94vw] sm:max-w-md w-auto pointer-events-none select-none">
         {% if messages %}
             {% for message in messages %}
-            <div class="google-snackbar toast-item pointer-events-auto transition-all duration-300 transform translate-x-0 opacity-100" role="alert">
-                <div class="flex items-center gap-3 min-w-0">
+            <div onclick="dismissSnackbar(this)" class="google-snackbar toast-item pointer-events-auto transition-all duration-200 transform translate-y-0 opacity-100" role="alert" title="Tap to dismiss">
+                <div class="flex items-center gap-2 min-w-0">
                     {% if message.tags == 'success' %}
-                    <i data-lucide="check-circle" class="w-5 h-5 text-[#81c995] shrink-0"></i>
+                    <i data-lucide="check-circle" class="w-4 h-4 text-[#81c995] shrink-0"></i>
                     {% elif message.tags == 'error' %}
-                    <i data-lucide="alert-circle" class="w-5 h-5 text-[#f28b82] shrink-0"></i>
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-[#f28b82] shrink-0"></i>
                     {% elif message.tags == 'warning' %}
-                    <i data-lucide="alert-triangle" class="w-5 h-5 text-[#fdd663] shrink-0"></i>
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-[#fdd663] shrink-0"></i>
                     {% else %}
-                    <i data-lucide="info" class="w-5 h-5 text-[#8ab4f8] shrink-0"></i>
+                    <i data-lucide="info" class="w-4 h-4 text-[#8ab4f8] shrink-0"></i>
                     {% endif %}
-                    <span class="text-xs sm:text-sm text-white font-medium break-words">{{ message }}</span>
+                    <span class="text-xs text-white font-medium truncate max-w-[240px] sm:max-w-xs">{{ message }}</span>
                 </div>
-                <button type="button" onclick="dismissSnackbar(this.closest('.google-snackbar'))" class="text-[#8ab4f8] hover:text-white font-medium text-xs sm:text-sm ml-2 shrink-0 cursor-pointer uppercase tracking-wider">
-                    Dismiss
+                <button type="button" onclick="event.stopPropagation(); dismissSnackbar(this.closest('.google-snackbar'))" class="text-[#8ab4f8] hover:text-white p-0.5 ml-1 shrink-0 cursor-pointer">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
             {% endfor %}
@@ -480,20 +487,20 @@
     <script>
         function dismissSnackbar(el) {
             if (!el) return;
-            el.style.transform = 'translateY(-10px)';
+            el.style.transform = 'translateY(-8px) scale(0.95)';
             el.style.opacity = '0';
             setTimeout(() => {
                 el.remove();
-            }, 250);
+            }, 200);
         }
 
-        // Auto-dismiss snackbars after 4.5 seconds
+        // Auto-dismiss snackbars after 2.5 seconds
         document.addEventListener('DOMContentLoaded', function() {
             const snackbars = document.querySelectorAll('.google-snackbar');
             snackbars.forEach((sb, idx) => {
                 setTimeout(() => {
                     dismissSnackbar(sb);
-                }, 4500 + (idx * 500));
+                }, 2500 + (idx * 300));
             });
         });
 
