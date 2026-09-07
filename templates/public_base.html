@@ -1,105 +1,133 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block body_content %}
 <style>
-    /* Modern Clean Form Design System */
+    /* Ultra-Modern Design System for Registration & Checkout */
     :root {
-        --form-bg: #f8f9fa;
+        --form-bg: #f8fafc;
         --form-card: #ffffff;
-        --form-primary: #1a73e8;
-        --form-primary-hover: #1557b0;
-        --form-heading: #202124;
-        --form-text: #3c4043;
-        --form-border: #dadce0;
-        --form-focus: #1a73e8;
-        --form-required: #d93025;
+        --form-primary: #2563eb;
+        --form-primary-hover: #1d4ed8;
+        --form-heading: #0f172a;
+        --form-text: #334155;
+        --form-muted: #64748b;
+        --form-border: #e2e8f0;
+        --form-border-focus: #3b82f6;
     }
 
-    .survey-bg-canvas {
-        background-color: #f8f9fa;
-        background-image: radial-gradient(#e8eaed 1px, transparent 1px);
-        background-size: 24px 24px;
+    .public-canvas {
+        background-color: #f8fafc;
+        background-image: radial-gradient(#cbd5e1 0.8px, transparent 0.8px);
+        background-size: 20px 20px;
         min-height: 100vh;
-        position: relative;
     }
 
-    /* Modern Rounded Form Card */
-    .survey-card-container {
-        position: relative;
-        z-index: 10;
-        background-color: #ffffff;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-        border-radius: 16px;
-        border: 1px solid #dadce0;
+    .public-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
         overflow: hidden;
+        transition: box-shadow 0.2s ease;
     }
 
-    .survey-header-banner {
-        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-        color: #ffffff;
-        padding: 24px 32px;
+    .public-input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
     }
 
-    /* Polished Modern Inputs */
-    .survey-input {
+    .public-input-icon {
+        position: absolute;
+        left: 14px;
+        color: #94a3b8;
+        pointer-events: none;
+        transition: color 0.15s ease;
+    }
+
+    .public-input {
         width: 100%;
         background-color: #ffffff !important;
-        color: #202124 !important;
-        border: 1px solid #dadce0 !important;
-        border-radius: 8px !important;
-        padding: 10px 14px !important;
+        color: #0f172a !important;
+        border: 1.5px solid #e2e8f0 !important;
+        border-radius: 10px !important;
+        padding: 11px 14px !important;
         font-size: 14px !important;
+        line-height: 1.4 !important;
         outline: none !important;
-        transition: all 0.15s ease-in-out !important;
-    }
-    .survey-input:hover {
-        border-color: #bdc1c6 !important;
-    }
-    .survey-input:focus {
-        border-color: #1a73e8 !important;
-        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15) !important;
-    }
-    .survey-input::placeholder {
-        color: #9aa0a6 !important;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* Modern Primary Action Button */
-    .survey-btn-submit {
-        background-color: #1a73e8 !important;
-        background-image: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%) !important;
+    .public-input.with-icon {
+        padding-left: 42px !important;
+    }
+
+    .public-input:hover {
+        border-color: #cbd5e1 !important;
+    }
+
+    .public-input:focus {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.12) !important;
+    }
+
+    .public-input-group:focus-within .public-input-icon {
+        color: #2563eb !important;
+    }
+
+    .public-input::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    .public-btn-primary {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
         color: #ffffff !important;
         font-weight: 600 !important;
         font-size: 14px !important;
-        padding: 12px 28px !important;
-        border-radius: 8px !important;
+        padding: 13px 24px !important;
+        border-radius: 10px !important;
         border: none !important;
         cursor: pointer;
-        transition: all 0.15s ease-in-out !important;
-        box-shadow: 0 2px 6px rgba(26, 115, 232, 0.25) !important;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        width: 100%;
+        box-shadow: 0 4px 14px -1px rgba(37, 99, 235, 0.35) !important;
+        transition: all 0.15s ease !important;
         text-decoration: none !important;
     }
-    .survey-btn-submit:hover {
-        background-color: #1557b0 !important;
-        background-image: linear-gradient(135deg, #1557b0 0%, #0d47a1 100%) !important;
-        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35) !important;
+
+    .public-btn-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+        box-shadow: 0 6px 20px -2px rgba(37, 99, 235, 0.45) !important;
         transform: translateY(-1px);
     }
-    .survey-btn-submit:active {
+
+    .public-btn-primary:active {
         transform: translateY(0);
+    }
+
+    .chip-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
     }
 </style>
 
-<div class="survey-bg-canvas flex flex-col justify-start items-center py-6 sm:py-10 px-3 sm:px-6 relative min-h-screen">
+<div class="public-canvas flex flex-col justify-start items-center py-6 sm:py-10 px-3 sm:px-6 relative min-h-screen">
     
-    <!-- Top Brand Logo -->
-    <div class="mb-5 flex items-center gap-2 select-none">
-        <span class="font-display font-bold text-base text-[#202124] tracking-tight">Nizhal Community</span>
-    </div>
+    <!-- Top Brand Header -->
+    <header class="mb-5 flex items-center gap-2.5 select-none">
+        <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+            N
+        </div>
+        <span class="font-display font-bold text-base text-slate-800 tracking-tight">Nizhal Events</span>
+    </header>
 
     <!-- Main Content Container -->
     <main class="relative z-10 w-full max-w-2xl">
@@ -107,9 +135,9 @@
     </main>
 
     <!-- Footer note -->
-    <div class="mt-8 text-center text-xs text-[#5f6368] select-none">
-        <span>Powered by Nizhal Registration Management System</span>
-    </div>
+    <footer class="mt-8 text-center text-xs text-slate-400 select-none pb-6">
+        <span>Powered by Nizhal Registration Platform • Secure &amp; Verified</span>
+    </footer>
 
 </div>
 {% endblock %}

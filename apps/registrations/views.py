@@ -1,14 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-
-
-def ai_innovators_register_view(request):
-    """Render the custom AI Innovators Summit registration page.
-    The form posts to the generic submit view which handles creation of
-    Registration and Order objects.
-    """
-    # Ensure the event exists; replace slug with actual event slug.
-    event = get_object_or_404(Event, slug='ai-innovators-2026')
-    return render(request, 'public/ai_innovators_register.html', {'event': event})
 from django.contrib import messages
 from django.http import JsonResponse
 from apps.events.models import Event
@@ -16,6 +6,14 @@ from apps.forms_builder.models import Form, FormField
 from apps.registrations.models import Customer, Registration, Attendee
 from apps.payments.models import Order
 from apps.audit.services import log_audit_event
+
+def ai_innovators_register_view(request):
+    """Render the AI Innovators Summit registration page using the modern public registration view."""
+    event = Event.objects.filter(slug__icontains='ai-innovators').first() or Event.objects.first()
+    slug = event.slug if event else 'ai-innovators-summit-2026'
+    return public_registration_view(request, slug=slug)
+
+
 
 def public_registration_view(request, slug):
     event = get_object_or_404(Event, slug=slug)

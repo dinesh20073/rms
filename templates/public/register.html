@@ -1,13 +1,13 @@
 {% extends 'public_base.html' %}
 {% load static %}
 
-{% block title %}{{ event.title }} | Registration{% endblock %}
+{% block title %}{{ event.title }} | Register Online{% endblock %}
 
 {% block main_content %}
-<div class="w-full survey-card-container bg-white shadow-xl">
+<div class="w-full public-card">
 
-    <!-- 1. Header Banner -->
-    <div class="w-full overflow-hidden bg-slate-900 border-b border-[#dadce0]">
+    <!-- 1. Header Hero Banner -->
+    <div class="w-full overflow-hidden bg-slate-900 border-b border-slate-200">
         <picture class="w-full block">
             <source media="(max-width: 639px)" srcset="{% static 'images/banners/form_header_mobile.png' %}">
             <source media="(min-width: 640px)" srcset="{% static 'images/banners/form_header_pc.png' %}">
@@ -15,41 +15,45 @@
         </picture>
     </div>
 
-    <!-- 2. Event Details Card -->
-    <div class="p-5 sm:p-7 bg-white border-b border-[#dadce0] space-y-3.5">
+    <!-- 2. Event Overview Card -->
+    <div class="p-6 sm:p-8 bg-white border-b border-slate-100 space-y-4">
         <div>
-            <h1 class="text-xl sm:text-2xl font-bold font-display text-[#202124] tracking-tight">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 mb-2">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>Official Registration</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tracking-tight leading-tight">
                 {{ event.title }}
             </h1>
-            <p class="text-xs sm:text-sm text-[#5f6368] mt-1.5 leading-relaxed">
-                {{ event.description|default:"Please fill in the registration details below to complete your booking and receive your official entry pass." }}
+            <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                {{ event.description|default:"Fill in your details below to register and secure your official digital entrance pass." }}
             </p>
         </div>
 
         <!-- Event Key Details Chips -->
-        <div class="pt-3 border-t border-[#dadce0] flex flex-wrap items-center justify-between gap-2.5 text-xs text-[#3c4043]">
+        <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
             
-            <div class="flex flex-wrap items-center gap-2 sm:gap-4">
-                <!-- Location -->
-                <div class="flex items-center gap-1.5 font-medium">
-                    <i data-lucide="map-pin" class="w-4 h-4 text-[#1a73e8] shrink-0"></i>
-                    <span>{{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC)" }}</span>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <!-- Location Chip -->
+                <div class="chip-badge bg-slate-50 text-slate-700 border border-slate-200/80">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                    <span class="font-medium">{{ event.venue|default:"BIEC, Bengaluru & Online" }}</span>
                 </div>
                 
-                <!-- Date & Time -->
-                <div class="flex items-center gap-1.5 font-medium">
-                    <i data-lucide="calendar" class="w-4 h-4 text-[#1a73e8] shrink-0"></i>
-                    <span>{{ event.start_time|date:"d M Y"|default:"28 Aug 2026" }} • {{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</span>
+                <!-- Date & Time Chip -->
+                <div class="chip-badge bg-slate-50 text-slate-700 border border-slate-200/80">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                    <span class="font-medium">{{ event.start_time|date:"d M Y"|default:"28 Aug 2026" }} • {{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</span>
                 </div>
             </div>
 
             <!-- Fee Badge -->
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {% if event.registration_fee == 0 %}bg-[#e6f4ea] text-[#137333] border border-[#ceead6]{% else %}bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]{% endif %}">
+            <div class="chip-badge {% if event.registration_fee == 0 %}bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold{% else %}bg-blue-50 text-blue-700 border border-blue-200 font-bold{% endif %}">
                 <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
                 {% if event.registration_fee == 0 %}
-                <span>Free Entry</span>
+                <span>Free Registration</span>
                 {% else %}
-                <span>₹{{ event.registration_fee|floatformat:0 }} / person</span>
+                <span>₹{{ event.registration_fee|floatformat:0 }} INR / person</span>
                 {% endif %}
             </div>
 
@@ -57,74 +61,150 @@
     </div>
 
     <!-- 3. Form Body -->
-    <div class="p-5 sm:p-7 space-y-6 bg-white">
+    <div class="p-6 sm:p-8 space-y-6 bg-white">
         
-        <div class="flex items-center justify-between text-xs text-[#5f6368]">
-            <span class="font-medium text-[#202124]">Primary Attendee Details</span>
-            <span class="text-[#d93025] font-semibold">* Required fields</span>
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Primary Attendee</h2>
+            </div>
+            <span class="text-xs text-rose-500 font-medium">* Required fields</span>
         </div>
 
         <form method="POST" action="{% url 'public-register-submit' event.slug %}" class="space-y-5" id="publicRegForm">
             {% csrf_token %}
 
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 gap-4">
                 {% for field in fields %}
                 <div class="space-y-1.5">
-                    <label class="block text-xs sm:text-sm font-medium text-[#202124]">
+                    <label class="block text-xs font-semibold text-slate-700">
                         {{ field.label }}
-                        {% if field.is_required %}<span class="text-[#d93025] font-bold">*</span>{% endif %}
+                        {% if field.is_required %}<span class="text-rose-500">*</span>{% endif %}
                     </label>
 
                     {% if field.help_text %}
-                    <p class="text-[11px] text-[#5f6368]">{{ field.help_text }}</p>
+                    <p class="text-[11px] text-slate-500">{{ field.help_text }}</p>
                     {% endif %}
 
                     {% if field.field_type == 'textarea' %}
-                    <textarea name="{{ field.field_key }}" rows="3" placeholder="{{ field.placeholder|default:'Your answer' }}" {% if field.is_required %}required{% endif %} class="survey-input"></textarea>
+                    <textarea name="{{ field.field_key }}" rows="3" placeholder="{{ field.placeholder|default:'Enter your response...' }}" {% if field.is_required %}required{% endif %} class="public-input"></textarea>
 
                     {% elif field.field_type == 'dropdown' %}
-                    <select name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="survey-input cursor-pointer">
-                        <option value="">Select an option...</option>
-                        {% for opt in field.options %}
-                        <option value="{{ opt }}">{{ opt }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="public-input-group">
+                        <i data-lucide="chevron-down" class="public-input-icon !left-auto !right-3.5 w-4 h-4"></i>
+                        <select name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="public-input cursor-pointer appearance-none pr-10">
+                            <option value="">Select an option...</option>
+                            {% for opt in field.options %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                     {% elif field.field_key == 'age' or field.label|lower == 'age' %}
-                    <input type="number" name="{{ field.field_key }}" min="1" max="120" placeholder="Enter age" {% if field.is_required %}required{% endif %} class="survey-input font-mono">
+                    <div class="public-input-group">
+                        <i data-lucide="calendar" class="public-input-icon w-4 h-4"></i>
+                        <input type="number" name="{{ field.field_key }}" min="1" max="120" placeholder="e.g. 28" {% if field.is_required %}required{% endif %} class="public-input with-icon font-mono">
+                    </div>
 
                     {% elif field.field_type == 'number' or field.field_key == 'ticket_count' or field.field_key == 'tickets' or field.label|lower == 'ticket count' %}
-                    <div class="flex items-center gap-2">
-                        <input type="number" id="ticket-count-input" name="{{ field.field_key }}" value="1" min="1" max="10" placeholder="1" {% if field.is_required %}required{% endif %} class="survey-input font-mono font-semibold max-w-[120px]" oninput="handleTicketCountChange(this.value)">
-                        <span class="text-xs text-[#5f6368]">(Max 10 passes per registration)</span>
+                    <!-- Interactive Pass Quantity Stepper -->
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-3">
+                            <div class="inline-flex items-center border border-slate-300 rounded-xl bg-slate-50 p-1">
+                                <button type="button" onclick="adjustTickets(-1)" class="w-8 h-8 rounded-lg bg-white shadow-xs hover:bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-base transition-colors select-none">
+                                    −
+                                </button>
+                                <input type="number" id="ticket-count-input" name="{{ field.field_key }}" value="1" min="1" max="10" class="w-14 text-center bg-transparent border-none font-bold text-slate-900 font-mono text-base focus:outline-none" oninput="handleTicketCountChange(this.value)">
+                                <button type="button" onclick="adjustTickets(1)" class="w-8 h-8 rounded-lg bg-white shadow-xs hover:bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-base transition-colors select-none">
+                                    +
+                                </button>
+                            </div>
+                            <span class="text-xs text-slate-500">(Max 10 passes per registration)</span>
+                        </div>
+
+                        <!-- Quick Chips -->
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-[11px] text-slate-400 mr-1">Quick Select:</span>
+                            <button type="button" onclick="setTickets(1)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">1 Pass</button>
+                            <button type="button" onclick="setTickets(2)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">2 Passes</button>
+                            <button type="button" onclick="setTickets(3)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">3 Passes</button>
+                            <button type="button" onclick="setTickets(5)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">5 Passes</button>
+                        </div>
                     </div>
 
                     {% elif field.field_type == 'checkbox' %}
-                    <div class="flex items-center gap-2 pt-1">
-                        <input type="checkbox" id="chk_{{ field.field_key }}" name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="w-4 h-4 rounded text-[#1a73e8] border-[#dadce0] focus:ring-[#1a73e8] cursor-pointer">
-                        <label for="chk_{{ field.field_key }}" class="text-xs sm:text-sm text-[#3c4043] cursor-pointer select-none">
+                    <div class="flex items-center gap-2.5 pt-1">
+                        <input type="checkbox" id="chk_{{ field.field_key }}" name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+                        <label for="chk_{{ field.field_key }}" class="text-xs font-medium text-slate-700 cursor-pointer select-none">
                             {{ field.placeholder|default:field.label }}
                         </label>
                     </div>
 
+                    {% elif field.field_key == 'full_name' or field.label|lower == 'full name' or field.label|lower == 'name' %}
+                    <div class="public-input-group">
+                        <i data-lucide="user" class="public-input-icon w-4 h-4"></i>
+                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'e.g. Alex Johnson' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif field.field_key == 'email_address' or field.field_type == 'email' or field.label|lower == 'email' or 'email' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="mail" class="public-input-icon w-4 h-4"></i>
+                        <input type="email" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'alex@company.com' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif field.field_key == 'phone_number' or field.field_type == 'tel' or 'phone' in field.label|lower or 'mobile' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="phone" class="public-input-icon w-4 h-4"></i>
+                        <input type="tel" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'+91 98765 43210' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif 'company' in field.label|lower or 'organization' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="building-2" class="public-input-icon w-4 h-4"></i>
+                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'Company or University' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif 'designation' in field.label|lower or 'role' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="briefcase" class="public-input-icon w-4 h-4"></i>
+                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'e.g. Lead Engineer' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
                     {% else %}
-                    <input type="{{ field.field_type }}" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'Your answer' }}" {% if field.is_required %}required{% endif %} class="survey-input">
+                    <input type="{{ field.field_type }}" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'Your answer' }}" {% if field.is_required %}required{% endif %} class="public-input">
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
 
             <!-- Dynamic Additional Attendees Container (Person 2 to N) -->
-            <div id="additional-attendees-container" class="space-y-4 pt-2 hidden">
-                <!-- Injected via JavaScript -->
+            <div id="additional-attendees-container" class="space-y-4 pt-3 hidden">
+                <!-- Injected dynamically via JavaScript -->
             </div>
 
-            <!-- Submit Button & Price Banner -->
-            <div class="pt-5 border-t border-[#dadce0]">
-                <button type="submit" class="survey-btn-submit text-sm py-3 px-6">
-                    <span id="submit-btn-label">{% if event.registration_fee == 0 %}Confirm Free Registration{% else %}Continue to Payment • ₹{{ event.registration_fee|floatformat:0 }}{% endif %}</span>
+            <!-- Order Live Summary Box -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/90 space-y-2 text-xs">
+                <div class="flex items-center justify-between text-slate-600">
+                    <span>Ticket Breakdown (<span id="summary-pass-count">1</span> × ₹{{ event.registration_fee|floatformat:0 }})</span>
+                    <span id="summary-subtotal" class="font-mono font-semibold text-slate-800">₹{{ event.registration_fee|floatformat:0 }} INR</span>
+                </div>
+                <div class="flex items-center justify-between pt-2 border-t border-slate-200 font-bold text-slate-900 text-sm">
+                    <span>Total Payable</span>
+                    <span id="summary-total" class="font-mono text-blue-600 text-base">₹{{ event.registration_fee|floatformat:0 }} INR</span>
+                </div>
+            </div>
+
+            <!-- Submit Button Area -->
+            <div class="pt-2 space-y-3">
+                <button type="submit" class="public-btn-primary w-full text-sm py-3.5">
+                    <span id="submit-btn-label">{% if event.registration_fee == 0 %}Confirm Free Registration (1 Pass){% else %}Continue to Payment • ₹{{ event.registration_fee|floatformat:0 }}{% endif %}</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
+
+                <div class="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 text-center select-none">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                    <span>256-Bit Encrypted Checkout • Instant Pass Confirmation</span>
+                </div>
             </div>
         </form>
 
@@ -136,6 +216,23 @@
     const unitPrice = parseFloat("{{ event.registration_fee|default:'0' }}") || 0;
     const genderOptions = ['Male', 'Female', 'Other / Prefer not to say'];
 
+    function setTickets(val) {
+        const input = document.getElementById('ticket-count-input');
+        if (input) {
+            input.value = val;
+            handleTicketCountChange(val);
+        }
+    }
+
+    function adjustTickets(delta) {
+        const input = document.getElementById('ticket-count-input');
+        if (!input) return;
+        let val = parseInt(input.value, 10) || 1;
+        val = Math.max(1, Math.min(10, val + delta));
+        input.value = val;
+        handleTicketCountChange(val);
+    }
+
     function handleTicketCountChange(qty) {
         let count = parseInt(qty, 10);
         if (isNaN(count) || count < 1) count = 1;
@@ -145,14 +242,25 @@
             if (inputEl) inputEl.value = 10;
         }
 
-        // 1. Update Price Label
+        // 1. Update Breakdown & Price Labels
+        const total = count * unitPrice;
+        const formattedTotal = total.toLocaleString('en-IN');
+
+        const summaryCount = document.getElementById('summary-pass-count');
+        if (summaryCount) summaryCount.innerText = count;
+
+        const summarySubtotal = document.getElementById('summary-subtotal');
+        if (summarySubtotal) summarySubtotal.innerText = `₹${formattedTotal} INR`;
+
+        const summaryTotal = document.getElementById('summary-total');
+        if (summaryTotal) summaryTotal.innerText = `₹${formattedTotal} INR`;
+
         const btnLabel = document.getElementById('submit-btn-label');
         if (btnLabel) {
             if (unitPrice === 0) {
                 btnLabel.innerText = `Confirm Free Registration (${count} Pass${count > 1 ? 'es' : ''})`;
             } else {
-                const total = (count * unitPrice).toLocaleString('en-IN');
-                btnLabel.innerText = `Continue to Payment • ₹${total} (${count} Pass${count > 1 ? 'es' : ''})`;
+                btnLabel.innerText = `Continue to Payment • ₹${formattedTotal} (${count} Pass${count > 1 ? 'es' : ''})`;
             }
         }
 
@@ -168,36 +276,42 @@
 
         container.classList.remove('hidden');
         let html = `
-            <div class="pt-3 border-t border-[#dadce0]">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[#1a73e8] flex items-center gap-1.5">
-                    <i data-lucide="users" class="w-4 h-4"></i>
-                    <span>Co-Attendee Details</span>
-                </h3>
+            <div class="pt-3 border-t border-slate-200">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-2 h-2 rounded-full bg-blue-600"></div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                        <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
+                        <span>Co-Attendee Passes (${count - 1} Additional)</span>
+                    </h3>
+                </div>
             </div>
         `;
 
         for (let i = 2; i <= count; i++) {
             html += `
-                <div class="p-3.5 bg-[#f8f9fa] border border-[#dadce0] rounded-lg space-y-3">
-                    <div class="font-semibold text-xs text-[#202124] flex items-center justify-between">
-                        <span>Person ${i}</span>
-                        <span class="text-[10px] text-[#5f6368] font-mono bg-white px-2 py-0.5 rounded border border-[#dadce0]">Pass #${i}</span>
+                <div class="p-4 bg-slate-50 border border-slate-200/90 rounded-xl space-y-3">
+                    <div class="font-bold text-xs text-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">${i}</span>
+                            <span>Attendee #${i}</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono bg-white px-2 py-0.5 rounded-md border border-slate-200">Pass ${i} of ${count}</span>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="space-y-1">
-                            <label class="block text-xs font-medium text-[#3c4043]">Full Name *</label>
-                            <input type="text" name="person_${i}_name" required placeholder="Full Name" class="survey-input text-xs py-1.5">
+                            <label class="block text-[11px] font-semibold text-slate-600">Full Name *</label>
+                            <input type="text" name="person_${i}_name" required placeholder="Full Name" class="public-input text-xs py-2">
                         </div>
 
                         <div class="space-y-1">
-                            <label class="block text-xs font-medium text-[#3c4043]">Age *</label>
-                            <input type="number" name="person_${i}_age" min="1" max="120" required placeholder="Age" class="survey-input text-xs py-1.5 font-mono">
+                            <label class="block text-[11px] font-semibold text-slate-600">Age *</label>
+                            <input type="number" name="person_${i}_age" min="1" max="120" required placeholder="Age" class="public-input text-xs py-2 font-mono">
                         </div>
 
                         <div class="space-y-1">
-                            <label class="block text-xs font-medium text-[#3c4043]">Gender *</label>
-                            <select name="person_${i}_gender" required class="survey-input text-xs py-1.5 cursor-pointer">
+                            <label class="block text-[11px] font-semibold text-slate-600">Gender *</label>
+                            <select name="person_${i}_gender" required class="public-input text-xs py-2 cursor-pointer">
                                 <option value="">Select...</option>
                                 ${genderOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
                             </select>
