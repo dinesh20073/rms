@@ -2,107 +2,80 @@
 
 {% block body_content %}
 <style>
-    /* Nizhal Palette Canvas (Sharp Edges) */
+    /* Modern Clean Form Design System */
     :root {
-        --nizhal-bg: #FFF7F5;
-        --nizhal-card: #FFFFFF;
-        --nizhal-primary: #B85C68;
-        --nizhal-primary-hover: #9F4C58;
-        --nizhal-heading: #8F414B;
-        --nizhal-text: #3F3A3A;
-        --nizhal-border: #E8C7C7;
-        --nizhal-focus: #C96D77;
-        --nizhal-required: #C45A64;
-        --nizhal-olive: #999A78;
-        --nizhal-peach: #F5A477;
+        --form-bg: #f8f9fa;
+        --form-card: #ffffff;
+        --form-primary: #1a73e8;
+        --form-primary-hover: #1557b0;
+        --form-heading: #202124;
+        --form-text: #3c4043;
+        --form-border: #dadce0;
+        --form-focus: #1a73e8;
+        --form-required: #d93025;
     }
 
     .survey-bg-canvas {
-        background: linear-gradient(180deg, #FFF7F5 0%, #FDF2F0 50%, #FAF0EE 100%);
+        background-color: #f8f9fa;
+        background-image: radial-gradient(#e8eaed 1px, transparent 1px);
+        background-size: 24px 24px;
         min-height: 100vh;
         position: relative;
-        overflow-x: hidden;
-    }
-    
-    /* Decorative Ambient Glow Spheres */
-    .ambient-sphere-1 {
-        position: fixed;
-        width: 380px;
-        height: 380px;
-        border-radius: 50% !important;
-        background: radial-gradient(circle, rgba(245, 164, 119, 0.2) 0%, rgba(184, 92, 104, 0.05) 70%, transparent 100%);
-        top: 5%;
-        right: 5%;
-        pointer-events: none;
-        filter: blur(50px);
-        z-index: 1;
-    }
-    .ambient-sphere-2 {
-        position: fixed;
-        width: 450px;
-        height: 450px;
-        border-radius: 50% !important;
-        background: radial-gradient(circle, rgba(184, 92, 104, 0.12) 0%, rgba(153, 154, 120, 0.05) 70%, transparent 100%);
-        bottom: 5%;
-        left: 5%;
-        pointer-events: none;
-        filter: blur(60px);
-        z-index: 1;
     }
 
-    /* Strict Sharp Form Card */
+    /* Modern Rounded Form Card */
     .survey-card-container {
         position: relative;
         z-index: 10;
-        background-color: #FFFFFF;
-        box-shadow: 0 10px 30px rgba(143, 65, 75, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
-        border-radius: 0px !important;
-        border: 1px solid #E8C7C7;
+        background-color: #ffffff;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+        border-radius: 16px;
+        border: 1px solid #dadce0;
+        overflow: hidden;
     }
 
     .survey-header-banner {
-        background: linear-gradient(135deg, #B85C68 0%, #8F414B 100%);
+        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
         color: #ffffff;
-        padding: 28px 36px;
-        border-radius: 0px !important;
+        padding: 24px 32px;
     }
 
-    /* Sharp Inputs */
+    /* Polished Modern Inputs */
     .survey-input {
         width: 100%;
-        background-color: #FFFFFF !important;
-        color: #3F3A3A !important;
-        border: 1px solid #E8C7C7 !important;
-        border-radius: 0px !important;
-        padding: 11px 14px !important;
+        background-color: #ffffff !important;
+        color: #202124 !important;
+        border: 1px solid #dadce0 !important;
+        border-radius: 8px !important;
+        padding: 10px 14px !important;
         font-size: 14px !important;
         outline: none !important;
         transition: all 0.15s ease-in-out !important;
     }
     .survey-input:hover {
-        border-color: #C96D77 !important;
+        border-color: #bdc1c6 !important;
     }
     .survey-input:focus {
-        border-color: #C96D77 !important;
-        box-shadow: 0 0 0 3px rgba(201, 109, 119, 0.2) !important;
+        border-color: #1a73e8 !important;
+        box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15) !important;
     }
     .survey-input::placeholder {
-        color: #a8a29e !important;
+        color: #9aa0a6 !important;
     }
 
-    /* Exact Website Palette Submit Button (Nizhal Rose - No Blue) */
+    /* Modern Primary Action Button */
     .survey-btn-submit {
-        background-color: #B85C68 !important;
-        background-image: linear-gradient(135deg, #B85C68 0%, #A34E5A 100%) !important;
+        background-color: #1a73e8 !important;
+        background-image: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%) !important;
         color: #ffffff !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         font-size: 14px !important;
-        padding: 14px 32px !important;
-        border-radius: 0px !important;
-        border: 1px solid #8F414B !important;
+        padding: 12px 28px !important;
+        border-radius: 8px !important;
+        border: none !important;
         cursor: pointer;
         transition: all 0.15s ease-in-out !important;
-        box-shadow: 0 4px 14px rgba(184, 92, 104, 0.3) !important;
+        box-shadow: 0 2px 6px rgba(26, 115, 232, 0.25) !important;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -111,26 +84,32 @@
         text-decoration: none !important;
     }
     .survey-btn-submit:hover {
-        background-color: #9F4C58 !important;
-        background-image: linear-gradient(135deg, #9F4C58 0%, #8F414B 100%) !important;
-        box-shadow: 0 6px 18px rgba(159, 76, 88, 0.4) !important;
+        background-color: #1557b0 !important;
+        background-image: linear-gradient(135deg, #1557b0 0%, #0d47a1 100%) !important;
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35) !important;
+        transform: translateY(-1px);
     }
-    .survey-btn-submit i, .survey-btn-submit svg {
-        color: #ffffff !important;
-        stroke: #ffffff !important;
+    .survey-btn-submit:active {
+        transform: translateY(0);
     }
 </style>
 
-<div class="survey-bg-canvas flex flex-col justify-center items-center py-10 px-4 sm:px-6 relative min-h-screen">
+<div class="survey-bg-canvas flex flex-col justify-start items-center py-6 sm:py-10 px-3 sm:px-6 relative min-h-screen">
     
-    <!-- Ambient Soft Glow Spheres -->
-    <div class="ambient-sphere-1"></div>
-    <div class="ambient-sphere-2"></div>
+    <!-- Top Brand Logo -->
+    <div class="mb-5 flex items-center gap-2 select-none">
+        <span class="font-display font-bold text-base text-[#202124] tracking-tight">Nizhal Community</span>
+    </div>
 
     <!-- Main Content Container -->
-    <main class="relative z-10 w-full max-w-3xl my-auto">
+    <main class="relative z-10 w-full max-w-2xl">
         {% block main_content %}{% endblock %}
     </main>
+
+    <!-- Footer note -->
+    <div class="mt-8 text-center text-xs text-[#5f6368] select-none">
+        <span>Powered by Nizhal Registration Management System</span>
+    </div>
 
 </div>
 {% endblock %}
