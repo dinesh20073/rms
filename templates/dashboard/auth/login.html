@@ -113,6 +113,14 @@
             </div>
             {% endif %}
 
+            <!-- Info / Cross-Tab / Timeout Banner -->
+            {% if info_message %}
+            <div class="mb-5 p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-900 text-xs flex items-center gap-2.5">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                <span class="font-medium">{{ info_message }}</span>
+            </div>
+            {% endif %}
+
             <!-- Django Info / Logout Messages -->
             {% if messages %}
                 {% for message in messages %}

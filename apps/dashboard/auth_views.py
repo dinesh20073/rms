@@ -1,5 +1,6 @@
 import time
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -79,9 +80,15 @@ def login_view(request):
         redirect_to = 'dashboard-overview'
 
     error_message = None
+    info_message = None
     remaining_attempts = None
     lockout_remaining_seconds = 0
     client_ip = get_client_ip(request)
+
+    if request.GET.get('timeout') == '1':
+        info_message = "Your session expired after 15 minutes of inactivity. Please sign in again."
+    elif request.GET.get('reason') == 'cross_tab_logout':
+        info_message = "You were securely signed out from another browser tab."
 
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
@@ -170,6 +177,7 @@ def login_view(request):
 
     return render(request, 'dashboard/auth/login.html', {
         'error_message': error_message,
+        'info_message': info_message,
         'remaining_attempts': remaining_attempts,
         'lockout_secs': lockout_remaining_seconds,
         'is_locked': lockout_remaining_seconds > 0,
@@ -199,3 +207,23 @@ def logout_view(request):
     request.session.flush()
     messages.info(request, "You have been securely logged out.")
     return redirect('login')
+
+@never_cache
+def session_ping_view(request):
+    """
+    Heartbeat and Multi-Tab Session Synchronization Endpoint.
+    Refreshes session activity timer and informs open browser tabs of session validity.
+    """
+    if request.user.is_authenticated:
+        request.session['last_activity'] = int(time.time())
+        return JsonResponse({
+            'authenticated': True,
+            'username': request.user.username,
+            'idle_timeout': 900
+        })
+    else:
+        return JsonResponse({
+            'authenticated': False,
+            'redirect': '/login/'
+        }, status=401)
+

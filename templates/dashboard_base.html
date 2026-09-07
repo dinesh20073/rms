@@ -113,7 +113,7 @@
         <!-- Sidebar Bottom: User & Logout -->
         <div class="flex flex-col items-center gap-2 w-full px-2 pt-2 border-t border-slate-800">
             <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                <a href="{% url 'logout' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-950/40" title="Sign Out">
+                <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-950/40" title="Sign Out">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </a>
                 <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-red-950 text-red-200 text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-red-800">
@@ -174,7 +174,7 @@
                     <span class="text-[10px] text-emerald-400">Authenticated</span>
                 </div>
             </div>
-            <a href="{% url 'logout' %}" class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 transition" title="Sign Out">
+            <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 transition" title="Sign Out">
                 <i data-lucide="log-out" class="w-4 h-4"></i>
             </a>
         </div>
@@ -220,13 +220,22 @@
                         <span class="ml-1 px-1.5 py-0.2 bg-emerald-400/30 text-emerald-200 border border-emerald-300/40 text-[9px] font-mono font-bold">ADMIN</span>
                     </div>
 
-                    <a href="{% url 'logout' %}" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-600 text-white font-semibold border border-red-400/30 transition flex items-center gap-1" title="Sign Out">
+                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-600 text-white font-semibold border border-red-400/30 transition flex items-center gap-1" title="Sign Out">
                         <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                         <span class="hidden md:inline text-[11px]">Sign Out</span>
                     </a>
                 </div>
             </div>
         </header>
+
+        <script>
+            // Notify other open browser tabs of active authenticated session
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.NizhalAuthSync && typeof window.NizhalAuthSync.notifyLogin === 'function') {
+                    window.NizhalAuthSync.notifyLogin("{{ request.user.username|default:'Nizhal' }}");
+                }
+            });
+        </script>
 
         <!-- Main Body Scroll Area -->
         <main class="flex-1 min-h-0 overflow-y-auto bg-[#f4f7fb] {% if 'email' in request.resolver_match.url_name %}bg-white pb-0 overflow-hidden{% else %}pb-16 lg:pb-4{% endif %} flex flex-col">

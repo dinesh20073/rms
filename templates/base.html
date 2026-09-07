@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-[#f4f7fb] text-[#1e293b] antialiased">
 <head>
@@ -471,6 +472,7 @@
             lucide.createIcons();
         });
     </script>
+    <script src="{% static 'js/bank_session_sync.js' %}"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
