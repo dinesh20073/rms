@@ -670,5 +670,52 @@ def resend_email_log_view(request, email_id):
 def email_preview_view(request, email_id):
     tenant = get_current_tenant(request)
     email_log = get_object_or_404(EmailLog, id=email_id, tenant=tenant)
-    return HttpResponse(email_log.body_html, content_type='text/html; charset=utf-8')
+    html = email_log.body_html or ''
+    
+    # Inject constraint styles so that the email pass ends strictly where the image ends (600px)
+    bounds_css = """
+    <style id="nizhal-email-bounds-fix">
+        html, body {
+            background-color: #f8f9fa !important;
+            margin: 0 !important;
+            padding: 20px 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            min-height: 100vh !important;
+            box-sizing: border-box !important;
+        }
+        table.ticket-card, table.email-card, .ticket-card, .email-card {
+            width: 600px !important;
+            max-width: 600px !important;
+            min-width: 0 !important;
+            margin: 0 auto !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12) !important;
+            border-radius: 0px !important;
+            overflow: hidden !important;
+        }
+        table[role="presentation"] {
+            max-width: 600px !important;
+            margin: 0 auto !important;
+        }
+        td[width="600"], td[width="564"] {
+            max-width: 600px !important;
+        }
+        img {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+    """
+    if '</head>' in html:
+        html = html.replace('</head>', bounds_css + '</head>')
+    elif '<body>' in html:
+        html = html.replace('<body>', '<head>' + bounds_css + '</head><body>')
+    else:
+        html = '<!DOCTYPE html><html><head>' + bounds_css + '</head><body>' + html + '</body></html>'
+        
+    return HttpResponse(html, content_type='text/html; charset=utf-8')
+
 
