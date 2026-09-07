@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Email Delivery Tracker{% endblock %}
+{% block header_title %}Emails{% endblock %}
 
 {% block content %}
 <!-- Full-Bleed Gmail 2-Pane Split View -->
@@ -13,10 +13,10 @@
         <div class="px-4 py-3 bg-[#f8f9fa] border-b border-[#dadce0] flex items-center justify-between text-xs font-semibold text-[#5f6368] shrink-0">
             <div class="flex items-center gap-2">
                 <i data-lucide="inbox" class="w-4 h-4 text-[#1a73e8]"></i>
-                <span class="font-semibold text-[#202124] text-xs sm:text-sm">Outbound Messages</span>
+                <span class="font-semibold text-[#202124] text-xs sm:text-sm">Messages</span>
                 <span class="bg-[#e8f0fe] text-[#1a73e8] text-xs font-semibold px-2.5 py-0.5 rounded-full font-mono border border-[#d2e3fc]">{{ email_logs|length }}</span>
             </div>
-            <span class="text-xs text-[#5f6368] font-normal">Sorted by Date</span>
+            <span class="text-xs text-[#5f6368] font-normal">By Date</span>
         </div>
 
         <!-- Email Scrollable Items List -->

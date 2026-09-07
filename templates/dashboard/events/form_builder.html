@@ -12,7 +12,7 @@
                 <span class="font-mono text-xs font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc]">{{ event.event_code }}</span>
                 <h2 class="text-lg font-semibold font-display text-[#202124]">{{ event.title }}</h2>
             </div>
-            <p class="text-xs text-[#5f6368] mt-1">Customize attendee registration form fields, requirements, and questions.</p>
+            <p class="text-xs text-[#5f6368] mt-1">Configure registration form fields and questions.</p>
         </div>
         <div class="flex items-center gap-2.5">
             <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-outlined text-xs rounded-full">
@@ -20,7 +20,7 @@
                 <span>Live Form</span>
             </a>
             <a href="{% url 'dashboard-event-detail' event.id %}" class="google-btn-tonal text-xs rounded-full">
-                <span>Back to Event</span>
+                <span>Back</span>
             </a>
         </div>
     </div>
@@ -34,7 +34,7 @@
             <!-- Existing Fields List -->
             <div class="google-card p-5 sm:p-6 space-y-4">
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-[#5f6368] flex items-center justify-between">
-                    <span>Configured Form Questions ({{ fields.count }})</span>
+                    <span>Form Questions ({{ fields.count }})</span>
                     <span class="text-xs text-[#5f6368] font-normal">Order top-to-bottom</span>
                 </h3>
 
@@ -83,7 +83,7 @@
             <div class="google-card p-5 sm:p-6">
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-[#1a73e8] mb-4 flex items-center gap-2">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    <span>Add Custom Question / Field</span>
+                    <span>Add Question</span>
                 </h3>
 
                 <form method="POST" class="space-y-4">

@@ -1,42 +1,42 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Human Payment Verification Console{% endblock %}
+{% block header_title %}Verification{% endblock %}
 
 {% block content %}
 <div class="p-4 sm:p-6 max-w-[1600px] w-full mx-auto space-y-5 pb-12">
 
-    <!-- 1. Header Bar: Google Console Style -->
+    <!-- 1. Header Bar -->
     <div class="google-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
-                    <i data-lucide="user-check" class="w-5 h-5"></i>
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
                 <div class="flex flex-wrap items-center gap-2.5">
-                    <h1 class="text-base sm:text-lg font-semibold font-display text-[#202124] tracking-tight m-0">Human Payment Verification Console</h1>
+                    <h1 class="text-base sm:text-lg font-semibold font-display text-[#202124] tracking-tight m-0">Verification</h1>
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] flex items-center gap-1">
                         <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-                        <span>100% Human Review</span>
+                        <span>Manual Review</span>
                     </span>
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#e6f4ea] text-[#137333] border border-[#ceead6] flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e]"></span>
-                        <span>OCR Assist Active</span>
+                        <span>OCR Active</span>
                     </span>
                 </div>
             </div>
-            <p class="text-xs text-[#5f6368] mt-1.5 pl-12">Review submitted payment receipts, verify UTR and amounts against bank collections, and manually approve or reject attendee passes.</p>
+            <p class="text-xs text-[#5f6368] mt-1.5 pl-12">Review payment proofs and approve or reject registrations.</p>
         </div>
         
         <div class="flex items-center gap-2.5 pl-12 md:pl-0">
             {% if queue %}
             <span class="px-3.5 py-1.5 rounded-full bg-[#fef7e0] border border-[#feefc3] text-[#b06000] font-semibold text-xs flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-[#f9ab00] animate-ping"></span>
-                <span>{{ queue|length }} Awaiting Human Approval</span>
+                <span>{{ queue|length }} Pending</span>
             </span>
             {% else %}
             <span class="px-3.5 py-1.5 rounded-full bg-[#e6f4ea] border border-[#ceead6] text-[#137333] font-medium text-xs flex items-center gap-2">
                 <i data-lucide="check-circle" class="w-4 h-4 text-[#1e8e3e]"></i>
-                <span>0 Pending Review</span>
+                <span>Queue Clear</span>
             </span>
             {% endif %}
 
@@ -47,66 +47,66 @@
         </div>
     </div>
 
-    <!-- 2. Human Verification Performance KPIs Grid -->
+    <!-- 2. Verification KPIs Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Metric 1: Pending Queue -->
         <div class="google-card p-4 flex flex-col justify-between {% if queue %}border-[#feefc3] bg-gradient-to-b from-[#fefbf0] to-white{% endif %}">
             <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider mb-2 {% if queue %}text-[#b06000]{% else %}text-[#5f6368]{% endif %}">
-                <span>Pending Review</span>
+                <span>Pending</span>
                 <i data-lucide="inbox" class="w-4 h-4 {% if queue %}text-[#b06000]{% else %}text-[#5f6368]{% endif %}"></i>
             </div>
             <div class="text-2xl font-bold font-display {% if queue %}text-[#b06000]{% else %}text-[#202124]{% endif %}">
                 {{ queue|length }}
             </div>
             <div class="mt-2 text-xs pt-2 border-t border-[#dadce0] flex items-center justify-between text-[#5f6368]">
-                <span>{% if queue %}Admin action required{% else %}Queue is clean{% endif %}</span>
+                <span>{% if queue %}Needs Action{% else %}Clear{% endif %}</span>
                 <span class="font-mono text-xs">Active</span>
             </div>
         </div>
 
-        <!-- Metric 2: Manual Approvals -->
+        <!-- Metric 2: Approvals -->
         <div class="google-card p-4 flex flex-col justify-between border-[#ceead6] bg-gradient-to-b from-[#f6fbf7] to-white">
             <div class="flex items-center justify-between text-[#137333] text-xs font-semibold uppercase tracking-wider mb-2">
-                <span>Passes Approved</span>
+                <span>Approved</span>
                 <i data-lucide="user-check" class="w-4 h-4 text-[#1e8e3e]"></i>
             </div>
             <div class="text-2xl font-bold font-display text-[#137333] font-mono">
                 {{ manual_approved_count }}
             </div>
             <div class="mt-2 text-xs pt-2 border-t border-[#ceead6] flex items-center justify-between text-[#137333] font-medium">
-                <span>Human Approved</span>
-                <span class="text-xs font-mono">{{ approval_rate }}% Rate</span>
+                <span>Confirmed</span>
+                <span class="text-xs font-mono">{{ approval_rate }}%</span>
             </div>
         </div>
 
         <!-- Metric 3: Rejected Transactions -->
         <div class="google-card p-4 flex flex-col justify-between border-[#fad2cf] bg-gradient-to-b from-[#fdf7f7] to-white">
             <div class="flex items-center justify-between text-[#c5221f] text-xs font-semibold uppercase tracking-wider mb-2">
-                <span>Rejections</span>
+                <span>Rejected</span>
                 <i data-lucide="x-circle" class="w-4 h-4 text-[#d93025]"></i>
             </div>
             <div class="text-2xl font-bold font-display text-[#c5221f]">
                 {{ rejected_count }}
             </div>
             <div class="mt-2 text-xs pt-2 border-t border-[#fad2cf] flex items-center justify-between text-[#c5221f]">
-                <span>Invalid Receipts</span>
-                <span class="text-xs">Declined</span>
+                <span>Declined</span>
+                <span class="text-xs">Invalid</span>
             </div>
         </div>
 
-        <!-- Metric 4: Total Reconciled -->
+        <!-- Metric 4: Total Processed -->
         <div class="google-card p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between text-[#5f6368] text-xs font-semibold uppercase tracking-wider mb-2">
-                <span>Total Reconciled</span>
+                <span>Total Processed</span>
                 <i data-lucide="check-circle" class="w-4 h-4 text-[#1e8e3e]"></i>
             </div>
             <div class="text-2xl font-bold font-display text-[#202124] font-mono">
                 {{ total_processed }}
             </div>
             <div class="mt-2 text-xs pt-2 border-t border-[#dadce0] flex items-center justify-between text-[#5f6368]">
-                <span>Manual Decisions</span>
-                <span class="text-[#137333] font-medium text-xs">100% Audited</span>
+                <span>Decisions</span>
+                <span class="text-[#137333] font-medium text-xs">Audited</span>
             </div>
         </div>
 
@@ -133,18 +133,18 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-mono text-[#5f6368]">{{ item.created_at|date:"d M Y, H:i A" }}</span>
-                    <span class="pill-orange">AWAITING HUMAN APPROVAL</span>
+                    <span class="pill-orange">Awaiting Review</span>
                 </div>
             </div>
 
             <!-- Split Screen Review Workspace -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-5">
                 
-                <!-- Left: Uploaded Receipt Screenshot (5 cols) -->
+                <!-- Left: Uploaded Receipt Screenshot -->
                 <div class="lg:col-span-5 flex flex-col space-y-2">
                     <span class="text-xs font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1.5">
                         <i data-lucide="image" class="w-4 h-4 text-[#1a73e8]"></i>
-                        <span>Uploaded Payment Screenshot</span>
+                        <span>Payment Screenshot</span>
                     </span>
                     
                     <div class="bg-[#202124] rounded-2xl border border-[#dadce0] p-3 flex items-center justify-center min-h-[280px] max-h-[420px] overflow-hidden relative group">
@@ -152,24 +152,24 @@
                         <img src="{{ item.evidence.screenshot.url }}" alt="Payment Proof" class="max-h-[400px] w-auto object-contain rounded-lg shadow-md group-hover:scale-102 transition duration-200">
                         <a href="{{ item.evidence.screenshot.url }}" target="_blank" class="absolute bottom-3 right-3 bg-white text-[#202124] text-xs px-3 py-1.5 rounded-full border border-[#dadce0] font-medium flex items-center gap-1 shadow-md hover:bg-[#f8f9fa] transition" title="Open full resolution in new tab">
                             <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
-                            <span>Full Image</span>
+                            <span>View</span>
                         </a>
                         {% else %}
                         <div class="text-xs text-white/70 flex flex-col items-center gap-2">
                             <i data-lucide="file-question" class="w-8 h-8 text-white/50"></i>
-                            <span>No visual receipt file attached</span>
+                            <span>No file attached</span>
                         </div>
                         {% endif %}
                     </div>
                 </div>
 
-                <!-- Right: OCR Extracted Metadata & Human Decision Form (7 cols) -->
+                <!-- Right: OCR Extracted Metadata & Human Decision Form -->
                 <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
                     
                     <div class="space-y-3">
                         <span class="text-xs font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1.5">
                             <i data-lucide="file-text" class="w-4 h-4 text-[#1a73e8]"></i>
-                            <span>Extracted Details vs Expected Order Amount</span>
+                            <span>Details</span>
                         </span>
 
                         <!-- Reason Alerts -->
@@ -177,8 +177,8 @@
                         <div class="p-3 rounded-xl bg-[#fce8e6] border border-[#fad2cf] text-[#c5221f] text-xs flex items-start gap-2.5">
                             <i data-lucide="alert-octagon" class="w-4 h-4 shrink-0 text-[#d93025] mt-0.5"></i>
                             <div>
-                                <strong class="font-semibold block">DUPLICATE TRANSACTION ID DETECTED:</strong>
-                                <span>This transaction ID has already been utilized for another order. Check bank records carefully.</span>
+                                <strong class="font-semibold block">Duplicate Transaction ID:</strong>
+                                <span>This transaction ID was already used for another order.</span>
                             </div>
                         </div>
                         {% endif %}
@@ -187,8 +187,8 @@
                         <div class="p-3 rounded-xl bg-[#fef7e0] border border-[#feefc3] text-[#b06000] text-xs flex items-start gap-2.5">
                             <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-[#f9ab00] mt-0.5"></i>
                             <div>
-                                <strong class="font-semibold block">AMOUNT CHECK NOTICE:</strong>
-                                <span>Order expects <strong>₹{{ item.order.amount }}</strong> but OCR extracted <strong>₹{{ item.ocr_amount|default:"Unknown" }}</strong>.</span>
+                                <strong class="font-semibold block">Amount Mismatch:</strong>
+                                <span>Expected <strong>₹{{ item.order.amount }}</strong>, receipt shows <strong>₹{{ item.ocr_amount|default:"Unknown" }}</strong>.</span>
                             </div>
                         </div>
                         {% endif %}
@@ -196,47 +196,47 @@
                         <!-- Comparison Grid -->
                         <div class="grid grid-cols-2 gap-3 bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0] text-xs">
                             <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
-                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Expected Payable Amount</span>
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Expected</span>
                                 <span class="font-bold text-[#202124] text-base font-mono">₹{{ item.order.amount|floatformat:2 }}</span>
                             </div>
                             <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
-                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Receipt Detected Amount</span>
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Receipt Amount</span>
                                 <span class="font-bold text-base font-mono {% if item.is_amount_matched %}text-[#137333]{% else %}text-[#b06000]{% endif %}">
                                     ₹{{ item.ocr_amount|default:"N/A" }}
                                 </span>
                             </div>
 
                             <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
-                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Extracted UTR / Txn ID</span>
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">UTR / Txn ID</span>
                                 <span class="font-mono font-semibold text-[#202124] text-xs">{{ item.ocr_transaction_id|default:"Not Detected" }}</span>
                             </div>
                             <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
-                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Payee UPI on Receipt</span>
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Payee UPI</span>
                                 <span class="font-medium text-[#202124] text-xs truncate block">{{ item.ocr_payee|default:item.order.registration.event.upi_name }}</span>
                             </div>
 
                             <div class="col-span-2 bg-white p-3 rounded-xl border border-[#dadce0]">
-                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">System Notes</span>
-                                <span class="font-mono text-xs text-[#3c4043]">{{ item.review_notes|default:"Awaiting human admin review and approval." }}</span>
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Notes</span>
+                                <span class="font-mono text-xs text-[#3c4043]">{{ item.review_notes|default:"Awaiting review." }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Human Action Decision Form -->
+                    <!-- Action Decision Form -->
                     <form method="POST" action="{% url 'dashboard-verification-action' item.id %}" class="bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0] space-y-3">
                         {% csrf_token %}
                         <div>
-                            <label class="text-xs font-semibold text-[#202124] block mb-1">Admin Reviewer Note (Optional)</label>
-                            <input type="text" name="notes" placeholder="e.g. Verified transaction on bank merchant dashboard" class="google-input text-xs py-2">
+                            <label class="text-xs font-semibold text-[#202124] block mb-1">Note (Optional)</label>
+                            <input type="text" name="notes" placeholder="e.g. Verified on bank portal" class="google-input text-xs py-2">
                         </div>
                         <div class="flex items-center justify-end gap-2.5">
                             <button type="submit" name="action" value="REJECT" onclick="return confirm('Are you sure you want to REJECT this payment proof?');" class="google-btn-danger py-1.5 px-3.5 text-xs rounded-full flex items-center gap-1 cursor-pointer">
                                 <i data-lucide="x" class="w-4 h-4"></i>
-                                <span>Reject Payment</span>
+                                <span>Reject</span>
                             </button>
                             <button type="submit" name="action" value="APPROVE" class="google-btn-primary py-1.5 px-4 text-xs rounded-full flex items-center gap-1.5 cursor-pointer">
                                 <i data-lucide="check" class="w-4 h-4"></i>
-                                <span>Approve & Issue Pass</span>
+                                <span>Approve</span>
                             </button>
                         </div>
                     </form>
@@ -254,23 +254,23 @@
         <div class="w-14 h-14 rounded-full bg-[#e6f4ea] text-[#137333] flex items-center justify-center mx-auto">
             <i data-lucide="check" class="w-7 h-7 text-[#1e8e3e]"></i>
         </div>
-        <h2 class="text-lg sm:text-xl font-semibold font-display text-[#202124] tracking-tight">Verification Queue is Completely Clear</h2>
+        <h2 class="text-lg sm:text-xl font-semibold font-display text-[#202124] tracking-tight">Queue is Clear</h2>
         <p class="text-xs text-[#5f6368] max-w-md mx-auto leading-relaxed">
-            All submitted payment receipts have been reviewed and approved or rejected by administrators.
+            All submitted payment receipts have been reviewed.
         </p>
         <div class="pt-2 flex flex-wrap items-center justify-center gap-2.5">
             <a href="{% url 'dashboard-registrations-list' %}" class="google-btn-primary text-xs py-1.5 px-4 rounded-full flex items-center gap-1.5">
                 <i data-lucide="database" class="w-4 h-4"></i>
-                <span>View Registration Logs</span>
+                <span>Registrations</span>
             </a>
             <a href="{% url 'dashboard-overview' %}" class="google-btn-outlined text-xs py-1.5 px-4 rounded-full">
-                <span>Dashboard Overview</span>
+                <span>Overview</span>
             </a>
         </div>
     </div>
     {% endif %}
 
-    <!-- 5. Recent Verification & Reconciliation Audit History Log -->
+    <!-- 5. Recent Verification History Log -->
     {% if recent_history %}
     <div class="google-card overflow-hidden">
         <div class="px-5 py-3.5 border-b border-[#dadce0] bg-[#f8f9fa] flex items-center justify-between">
@@ -278,9 +278,9 @@
                 <div class="w-7 h-7 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
                     <i data-lucide="history" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-sm font-semibold text-[#202124]">Recent Verification & Resolution History</h3>
+                <h3 class="text-sm font-semibold text-[#202124]">Recent History</h3>
             </div>
-            <span class="text-xs text-[#5f6368] font-mono">{{ recent_history|length }} resolved items</span>
+            <span class="text-xs text-[#5f6368] font-mono">{{ recent_history|length }} resolved</span>
         </div>
 
         <div class="overflow-x-auto">
@@ -291,9 +291,9 @@
                         <th class="py-3 px-4">Customer</th>
                         <th class="py-3 px-4">Decision</th>
                         <th class="py-3 px-4">Amount</th>
-                        <th class="py-3 px-4">Extracted UTR</th>
+                        <th class="py-3 px-4">UTR</th>
                         <th class="py-3 px-4">Reviewer</th>
-                        <th class="py-3 px-4 text-right">Resolved Time</th>
+                        <th class="py-3 px-4 text-right">Time</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#dadce0] text-[#202124]">
@@ -344,4 +344,3 @@
 
 </div>
 {% endblock %}
-

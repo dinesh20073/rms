@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}System Audit Trail{% endblock %}
+{% block header_title %}Audit Logs{% endblock %}
 
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -10,9 +10,9 @@
         <div>
             <h2 class="text-xl font-semibold font-display text-[#202124] flex items-center gap-2.5">
                 <i data-lucide="shield-alert" class="w-5 h-5 text-[#1a73e8]"></i>
-                <span>Security & Lifecycle Audit Trail</span>
+                <span>Audit Logs</span>
             </h2>
-            <p class="text-xs text-[#5f6368] mt-1">Chronological activity log: registration creation, UPI generation, OCR extraction, auto-verification, and manual reviews.</p>
+            <p class="text-xs text-[#5f6368] mt-1">Chronological activity log of all system events and verifications.</p>
         </div>
 
         <form method="GET" class="flex items-center gap-3">

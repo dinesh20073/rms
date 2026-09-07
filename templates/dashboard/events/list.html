@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Events Directory{% endblock %}
+{% block header_title %}Events{% endblock %}
 
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -10,14 +10,14 @@
         <div>
             <h2 class="text-xl font-semibold font-display text-[#202124] flex items-center gap-2.5">
                 <i data-lucide="calendar" class="w-5 h-5 text-[#1a73e8]"></i>
-                <span>Active & Scheduled Events</span>
+                <span>Events</span>
                 <span class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] text-xs font-semibold px-2.5 py-0.5 rounded-full">{{ events|length }} Active</span>
             </h2>
-            <p class="text-xs text-[#5f6368] mt-1">Manage registration forms, UPI payment gates, attendee quotas, and live passes.</p>
+            <p class="text-xs text-[#5f6368] mt-1">Manage registration forms, UPI payment gates, and live passes.</p>
         </div>
         <a href="{% url 'dashboard-event-create' %}" class="google-btn-primary w-full sm:w-fit justify-center rounded-full">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>Create New Event</span>
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>New Event</span>
         </a>
     </div>
 

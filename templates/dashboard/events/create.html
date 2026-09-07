@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Create New Event{% endblock %}
+{% block header_title %}New Event{% endblock %}
 
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto space-y-6">
@@ -9,9 +9,9 @@
         <div>
             <h2 class="text-xl font-semibold font-display text-[#202124] flex items-center gap-2.5">
                 <i data-lucide="calendar-plus" class="w-5 h-5 text-[#1a73e8]"></i>
-                <span>Create New Event</span>
+                <span>New Event</span>
             </h2>
-            <p class="text-xs text-[#5f6368] mt-1">Configure event schedule, pricing (INR only), and upload the master UPI QR code.</p>
+            <p class="text-xs text-[#5f6368] mt-1">Configure event schedule, pricing, and master UPI QR code.</p>
         </div>
         <a href="{% url 'dashboard-events-list' %}" class="google-btn-outlined text-xs rounded-full">
             <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -26,7 +26,7 @@
         <div class="space-y-4">
             <h3 class="text-xs font-semibold uppercase tracking-wider text-[#1a73e8] flex items-center gap-2">
                 <i data-lucide="info" class="w-4 h-4"></i>
-                <span>Event Information</span>
+                <span>Event Details</span>
             </h3>
 
             <div>
@@ -49,7 +49,7 @@
         <div class="pt-6 border-t border-[#dadce0] space-y-4">
             <h3 class="text-xs font-semibold uppercase tracking-wider text-[#1a73e8] flex items-center gap-2">
                 <i data-lucide="banknote" class="w-4 h-4 text-[#137333]"></i>
-                <span>Pricing (Fixed INR ₹) & Master UPI QR</span>
+                <span>Pricing & UPI QR</span>
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -114,7 +114,7 @@
             <a href="{% url 'dashboard-events-list' %}" class="google-btn-outlined rounded-full">Cancel</a>
             <button type="submit" class="google-btn-primary rounded-full">
                 <i data-lucide="check" class="w-4 h-4"></i>
-                <span>Publish Event & Launch Form</span>
+                <span>Create Event</span>
             </button>
         </div>
 

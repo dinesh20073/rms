@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Partner REST API & Integrations{% endblock %}
+{% block header_title %}API & Integrations{% endblock %}
 
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -11,20 +11,20 @@
             <div class="flex items-center gap-2.5">
                 <h2 class="text-xl font-semibold font-display text-[#202124] flex items-center gap-2">
                     <i data-lucide="code-2" class="w-5 h-5 text-[#1a73e8]"></i>
-                    <span>Partner REST API & Webhooks</span>
+                    <span>API & Integrations</span>
                 </h2>
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono">
-                    v1.0 Stable
+                    v1.0
                 </span>
             </div>
-            <p class="text-xs text-[#5f6368] mt-1">Integrate external websites, mobile applications, and payment gateways with your EMS backend.</p>
+            <p class="text-xs text-[#5f6368] mt-1">Integrate external websites and apps with the platform.</p>
         </div>
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="generate_key" value="1">
             <button type="submit" class="google-btn-primary cursor-pointer rounded-full">
                 <i data-lucide="key" class="w-4 h-4"></i>
-                <span>Generate API Key</span>
+                <span>Generate Key</span>
             </button>
         </form>
     </div>

@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Event Overview • {{ event.title }}{% endblock %}
+{% block header_title %}{{ event.title }}{% endblock %}
 
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -75,7 +75,7 @@
             <div class="flex items-center justify-between border-b border-[#dadce0] pb-3">
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
                     <i data-lucide="users" class="w-4 h-4 text-[#1a73e8]"></i>
-                    <span>Gender Demographics Breakdown</span>
+                    <span>Gender Demographics</span>
                 </h3>
                 <span class="text-xs font-medium text-[#5f6368]">{{ total_reg }} Registered</span>
             </div>
@@ -118,9 +118,9 @@
             <div class="flex items-center justify-between border-b border-[#dadce0] pb-3">
                 <h3 class="text-xs font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
                     <i data-lucide="bar-chart" class="w-4 h-4 text-[#137333]"></i>
-                    <span>Age Category Distribution</span>
+                    <span>Age Distribution</span>
                 </h3>
-                <span class="text-xs font-medium text-[#5f6368]">Attendee Age Groups</span>
+                <span class="text-xs font-medium text-[#5f6368]">Attendee Groups</span>
             </div>
 
             <div class="space-y-3 pt-1 text-xs">
@@ -145,11 +145,11 @@
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-sm font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
                 <i data-lucide="users" class="w-4 h-4 text-[#1a73e8]"></i>
-                <span>Registered Attendees ({{ registrations.count }})</span>
+                <span>Attendees ({{ registrations.count }})</span>
             </h3>
             <a href="{% url 'dashboard-event-export-csv' event.id %}" class="google-btn-outlined text-xs py-1 px-3 rounded-full">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                <span>Download Roster CSV</span>
+                <span>Export CSV</span>
             </a>
         </div>
 
