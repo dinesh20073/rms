@@ -1,246 +1,243 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Emails{% endblock %}
+{% block header_title %}Email Logs{% endblock %}
 
 {% block content %}
-<!-- Full-Bleed Gmail 2-Pane Split View -->
-<div class="w-full h-full flex-1 flex flex-col lg:flex-row overflow-hidden bg-white m-0 p-0 border-t border-[#dadce0]">
-    
-    <!-- LEFT PANE: Email Logs List (Gmail Inbox List Style) -->
-    <div id="emailListPane" class="w-full lg:w-[380px] xl:w-[430px] border-b lg:border-b-0 lg:border-r border-[#dadce0] flex flex-col shrink-0 bg-white h-full overflow-hidden">
+<div class="p-3 sm:p-5 max-w-[1600px] w-full mx-auto flex-1 flex flex-col space-y-3.5 pb-20 lg:pb-6">
+
+    <!-- Top Toolbar & Search -->
+    <div class="google-card p-3.5 sm:p-4 space-y-3 shrink-0">
         
-        <!-- List Header Toolbar -->
-        <div class="px-4 py-3 bg-[#f8f9fa] border-b border-[#dadce0] flex items-center justify-between text-xs font-semibold text-[#5f6368] shrink-0">
-            <div class="flex items-center gap-2">
-                <i data-lucide="inbox" class="w-4 h-4 text-[#1a73e8]"></i>
-                <span class="font-semibold text-[#202124] text-xs sm:text-sm">Messages</span>
-                <span class="bg-[#e8f0fe] text-[#1a73e8] text-xs font-semibold px-2.5 py-0.5 rounded-full font-mono border border-[#d2e3fc]">{{ email_logs|length }}</span>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h2 class="text-base sm:text-lg font-semibold font-display text-[#202124] flex items-center gap-2">
+                    <i data-lucide="mail" class="w-5 h-5 text-[#1a73e8]"></i>
+                    <span>Email Logs</span>
+                </h2>
+                <p class="text-xs text-[#5f6368] mt-0.5">Showing all email dispatches by recipient name and email address.</p>
             </div>
-            <span class="text-xs text-[#5f6368] font-normal">By Date</span>
+
+            <!-- Summary KPI Chips -->
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{% url 'dashboard-email-logs' %}" class="px-2.5 py-1 text-xs rounded border {% if not status_filter %}bg-[#e8f0fe] border-[#1a73e8] text-[#1a73e8] font-semibold{% else %}border-[#dadce0] text-[#5f6368] hover:bg-[#f8f9fa]{% endif %}">
+                    All: <span class="font-mono">{{ total_count }}</span>
+                </a>
+                <a href="{% url 'dashboard-email-logs' %}?status=SENT" class="px-2.5 py-1 text-xs rounded border {% if status_filter == 'SENT' %}bg-[#e6f4ea] border-[#137333] text-[#137333] font-semibold{% else %}border-[#dadce0] text-[#5f6368] hover:bg-[#f8f9fa]{% endif %}">
+                    Delivered: <span class="font-mono">{{ sent_count }}</span>
+                </a>
+                <a href="{% url 'dashboard-email-logs' %}?status=SIMULATED" class="px-2.5 py-1 text-xs rounded border {% if status_filter == 'SIMULATED' %}bg-[#e8f0fe] border-[#1a73e8] text-[#1a73e8] font-semibold{% else %}border-[#dadce0] text-[#5f6368] hover:bg-[#f8f9fa]{% endif %}">
+                    Simulated: <span class="font-mono">{{ simulated_count }}</span>
+                </a>
+                {% if failed_count > 0 %}
+                <a href="{% url 'dashboard-email-logs' %}?status=FAILED" class="px-2.5 py-1 text-xs rounded border {% if status_filter == 'FAILED' %}bg-[#fce8e6] border-[#d93025] text-[#d93025] font-semibold{% else %}border-[#dadce0] text-[#5f6368] hover:bg-[#f8f9fa]{% endif %}">
+                    Failed: <span class="font-mono">{{ failed_count }}</span>
+                </a>
+                {% endif %}
+            </div>
         </div>
 
-        <!-- Email Scrollable Items List -->
-        <div class="flex-1 overflow-y-auto divide-y divide-[#dadce0]" id="emailListContainer">
-            {% for email in email_logs %}
-            <div onclick="selectEmailRecord({{ email.id }})" id="email-item-{{ email.id }}" class="email-row-item px-4 py-3 cursor-pointer transition flex items-start gap-3 hover:bg-[#f8f9fa] {% if selected_email and selected_email.id == email.id %}bg-[#e8f0fe] border-l-4 border-[#1a73e8]{% else %}border-l-4 border-transparent{% endif %}" data-email-id="{{ email.id }}">
-                
-                <!-- Avatar with Initial -->
-                <div class="w-8 h-8 rounded-full {% if email.status == 'SENT' %}bg-[#1e8e3e]{% elif email.status == 'FAILED' %}bg-[#d93025]{% else %}bg-[#1a73e8]{% endif %} text-white font-medium text-xs flex items-center justify-center shrink-0 font-display mt-0.5">
-                    {{ email.recipient_name|default:email.recipient_email|slice:":1"|upper }}
-                </div>
-
-                <!-- Email Content Summary -->
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="font-semibold text-[#202124] text-xs truncate max-w-[170px]">
-                            {{ email.recipient_name|default:email.recipient_email }}
-                        </span>
-                        <span class="text-[11px] font-mono text-[#5f6368] whitespace-nowrap">
-                            {{ email.sent_at|date:"d M H:i" }}
-                        </span>
-                    </div>
-
-                    <div class="text-xs font-medium text-[#202124] truncate mt-0.5">
-                        {{ email.subject }}
-                    </div>
-
-                    <div class="text-[11px] text-[#5f6368] font-mono truncate mt-0.5">
-                        To: {{ email.recipient_email }}
-                    </div>
-
-                    <!-- Status Badge & Trigger -->
-                    <div class="flex items-center gap-1.5 mt-1.5">
-                        {% if email.status == 'SENT' %}
-                        <span class="pill-green">
-                            <i data-lucide="check-check" class="w-3 h-3 text-[#137333]"></i>
-                            <span>Delivered</span>
-                        </span>
-                        {% elif email.status == 'SIMULATED' %}
-                        <span class="pill-blue">
-                            <i data-lucide="send" class="w-3 h-3 text-[#1a73e8]"></i>
-                            <span>Simulated</span>
-                        </span>
-                        {% else %}
-                        <span class="pill-red">
-                            <i data-lucide="alert-circle" class="w-3 h-3 text-[#d93025]"></i>
-                            <span>Failed</span>
-                        </span>
-                        {% endif %}
-
-                        <span class="text-[11px] text-[#5f6368] truncate">
-                            {{ email.get_event_type_display|default:email.event_type }}
-                        </span>
-                    </div>
-                </div>
-
+        <!-- Filter & Search Bar -->
+        <form method="GET" action="{% url 'dashboard-email-logs' %}" class="flex flex-wrap items-center gap-2 pt-1">
+            <div class="flex-1 min-w-[240px] max-w-md relative">
+                <i data-lucide="search" class="w-4 h-4 text-[#5f6368] absolute left-3 top-2.5 pointer-events-none"></i>
+                <input type="text" id="emailSearchInput" name="q" value="{{ search_query }}" placeholder="Search by recipient name, email or subject..." class="google-search-pill text-xs w-full pl-9">
             </div>
-            {% empty %}
-            <div class="py-16 text-center text-[#5f6368] p-4">
-                <i data-lucide="mail-x" class="w-8 h-8 text-[#5f6368] mx-auto mb-2"></i>
-                <span class="font-semibold text-[#202124] text-xs block">No emails available</span>
-            </div>
-            {% endfor %}
-        </div>
 
+            <select name="status" onchange="this.form.submit()" class="google-select text-xs py-1.5 px-3 h-8">
+                <option value="">All Statuses</option>
+                <option value="SENT" {% if status_filter == 'SENT' %}selected{% endif %}>Delivered (Sent)</option>
+                <option value="SIMULATED" {% if status_filter == 'SIMULATED' %}selected{% endif %}>Simulated</option>
+                <option value="FAILED" {% if status_filter == 'FAILED' %}selected{% endif %}>Failed</option>
+            </select>
+
+            <button type="submit" class="google-btn-primary text-xs py-1.5 px-3.5 rounded-full">
+                Filter
+            </button>
+            {% if search_query or status_filter %}
+            <a href="{% url 'dashboard-email-logs' %}" class="google-btn-outlined text-xs py-1.5 px-3 rounded-full">
+                Reset
+            </a>
+            {% endif %}
+        </form>
     </div>
 
-    <!-- RIGHT PANE: Clean Gmail Reading Surface -->
-    <div id="emailDetailPane" class="flex-1 flex flex-col bg-white h-full overflow-hidden {% if not selected_email %}hidden lg:flex{% endif %}">
-        
-        {% if selected_email %}
-        <!-- Email Header Bar -->
-        <div class="px-6 py-4 bg-white border-b border-[#dadce0] flex flex-col gap-3 shrink-0">
-            
-            <!-- Mobile Back Button -->
-            <div class="lg:hidden flex items-center pb-2 border-b border-[#dadce0]">
-                <button type="button" onclick="showEmailListMobile()" class="text-xs font-semibold text-[#202124] flex items-center gap-1 hover:text-[#1a73e8]">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span>Back to Messages</span>
-                </button>
-            </div>
+    <!-- Email Logs Table -->
+    <div class="google-card overflow-hidden p-0">
+        <div class="overflow-x-auto">
+            <table class="google-table w-full text-left border-collapse" id="emailLogsTable">
+                <thead>
+                    <tr class="bg-[#f8f9fa] border-b border-[#dadce0] text-[11px] font-semibold uppercase tracking-wider text-[#5f6368]">
+                        <th class="py-2.5 px-4">Recipient Name</th>
+                        <th class="py-2.5 px-4">Recipient Email</th>
+                        <th class="py-2.5 px-4">Subject</th>
+                        <th class="py-2.5 px-4">Status</th>
+                        <th class="py-2.5 px-4">Sent Time</th>
+                        <th class="py-2.5 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#dadce0] text-xs">
+                    {% for email in email_logs %}
+                    <tr class="hover:bg-[#f8f9fa] transition email-row" data-search="{{ email.recipient_name|lower }} {{ email.recipient_email|lower }} {{ email.subject|lower }}">
+                        
+                        <!-- Name -->
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-full {% if email.status == 'SENT' %}bg-[#1e8e3e]{% elif email.status == 'FAILED' %}bg-[#d93025]{% else %}bg-[#1a73e8]{% endif %} text-white font-medium text-xs flex items-center justify-center shrink-0">
+                                    {{ email.recipient_name|default:email.recipient_email|slice:":1"|upper }}
+                                </div>
+                                <span class="font-semibold text-[#202124] text-xs">
+                                    {{ email.recipient_name|default:"—" }}
+                                </span>
+                            </div>
+                        </td>
 
-            <!-- Subject Line -->
-            <div class="flex items-start justify-between gap-3">
-                <h1 class="text-lg sm:text-xl font-semibold font-display text-[#202124] leading-tight" id="detailSubject">
-                    {{ selected_email.subject }}
-                </h1>
-                <span class="text-xs font-mono px-2.5 py-0.5 bg-[#f1f3f4] text-[#202124] rounded-full border border-[#dadce0] shrink-0" id="detailEventType">
-                    {{ selected_email.get_event_type_display|default:selected_email.event_type }}
-                </span>
-            </div>
+                        <!-- Email -->
+                        <td class="py-3 px-4 font-mono text-xs text-[#202124]">
+                            <a href="mailto:{{ email.recipient_email }}" class="text-[#1a73e8] hover:underline flex items-center gap-1">
+                                <i data-lucide="mail" class="w-3.5 h-3.5 text-[#5f6368]"></i>
+                                <span>{{ email.recipient_email }}</span>
+                            </a>
+                        </td>
 
-            <!-- Sender Metadata Strip -->
-            <div class="flex items-center justify-between gap-3 pt-1">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-[#1a73e8] text-white flex items-center justify-center font-semibold text-sm shrink-0">
-                        N
-                    </div>
-                    <div>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-xs sm:text-sm font-semibold text-[#202124]" id="detailFrom">Nizhal Community</span>
-                            <span class="text-xs text-[#5f6368] font-mono hidden sm:inline">&lt;nizhalcommunity@gmail.com&gt;</span>
-                        </div>
-                        <div class="text-xs text-[#5f6368] flex items-center gap-1.5">
-                            <span>to <strong class="text-[#202124] font-medium" id="detailToName">{{ selected_email.recipient_name }}</strong></span>
-                            <span class="text-[#5f6368] font-mono text-[11px]" id="detailToEmail">&lt;{{ selected_email.recipient_email }}&gt;</span>
-                        </div>
-                    </div>
-                </div>
+                        <!-- Subject -->
+                        <td class="py-3 px-4 max-w-xs">
+                            <div class="text-[#202124] font-medium truncate" title="{{ email.subject }}">
+                                {{ email.subject }}
+                            </div>
+                            <span class="text-[10px] font-mono text-[#5f6368]">
+                                {{ email.get_event_type_display|default:email.event_type }}
+                            </span>
+                        </td>
 
-                <div class="flex items-center gap-2 shrink-0">
-                    <div class="text-right hidden sm:block">
-                        <div class="text-xs font-medium text-[#5f6368]" id="detailDate">
-                            {{ selected_email.sent_at|date:"d M Y, h:i A" }}
-                        </div>
-                        <div class="text-[11px] font-mono text-[#5f6368]" id="detailMessageId">
-                            MSG-{{ selected_email.id|stringformat:"06d" }}
-                        </div>
-                    </div>
-                    <a id="btnOpenNewTab" href="{% url 'dashboard-email-preview' selected_email.id %}" target="_blank" class="px-3 py-1.5 text-xs font-medium rounded-md border border-[#dadce0] bg-white text-[#3c4043] hover:bg-[#f8f9fa] flex items-center gap-1.5 transition" title="Open full email in new tab">
-                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-[#5f6368]"></i>
-                        <span>Open Full</span>
-                    </a>
-                    <a id="btnResendEmail" href="{% url 'dashboard-email-resend' selected_email.id %}" class="google-btn-primary text-xs py-1.5 px-3.5 rounded-full flex items-center gap-1.5 shadow-none hover:shadow-sm" title="Send this real email via Gmail SMTP right now">
-                        <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                        <span>Send Real Email</span>
-                    </a>
-                </div>
-            </div>
+                        <!-- Status -->
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            {% if email.status == 'SENT' %}
+                            <span class="pill-green">
+                                <i data-lucide="check-check" class="w-3 h-3 text-[#137333]"></i>
+                                <span>Delivered</span>
+                            </span>
+                            {% elif email.status == 'SIMULATED' %}
+                            <span class="pill-blue">
+                                <i data-lucide="send" class="w-3 h-3 text-[#1a73e8]"></i>
+                                <span>Simulated</span>
+                            </span>
+                            {% else %}
+                            <span class="pill-red" title="{{ email.error_message }}">
+                                <i data-lucide="alert-circle" class="w-3 h-3 text-[#d93025]"></i>
+                                <span>Failed</span>
+                            </span>
+                            {% endif %}
+                        </td>
 
+                        <!-- Date -->
+                        <td class="py-3 px-4 font-mono text-xs text-[#5f6368] whitespace-nowrap">
+                            {{ email.sent_at|date:"d M Y, H:i" }}
+                        </td>
+
+                        <!-- Actions -->
+                        <td class="py-3 px-4 text-right whitespace-nowrap">
+                            <div class="inline-flex items-center gap-1.5 justify-end">
+                                <button type="button" onclick="previewEmailModal({{ email.id }}, '{{ email.recipient_name|escapejs }}', '{{ email.recipient_email|escapejs }}')" class="google-btn-outlined text-[11px] py-1 px-2.5 rounded cursor-pointer" title="Preview complete email pass">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                                    <span>View</span>
+                                </button>
+                                <a href="{% url 'dashboard-email-resend' email.id %}" class="google-btn-primary text-[11px] py-1 px-2.5 rounded flex items-center gap-1 shadow-none" title="Send live email via SMTP">
+                                    <i data-lucide="send" class="w-3 h-3"></i>
+                                    <span>Send Real</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-[#5f6368]">
+                            <i data-lucide="mail-x" class="w-8 h-8 text-[#5f6368] mx-auto mb-2"></i>
+                            <div class="font-semibold text-xs text-[#202124]">No email logs found</div>
+                            <div class="text-[11px] text-[#5f6368] mt-0.5">Logs will automatically appear here whenever passes or confirmations are dispatched.</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-
-        <!-- Pure Flush Email Body Viewport -->
-        <div class="flex-1 min-h-0 bg-white overflow-hidden p-0 m-0 relative">
-            <iframe id="emailPreviewIframe" src="{% url 'dashboard-email-preview' selected_email.id %}" class="w-full h-full border-0 block m-0 p-0 absolute inset-0"></iframe>
-        </div>
-        {% else %}
-        <!-- Empty Placeholder -->
-        <div class="flex-1 flex flex-col items-center justify-center p-8 text-center text-[#5f6368]">
-            <i data-lucide="mail-open" class="w-12 h-12 text-[#5f6368] mb-3"></i>
-            <h3 class="font-semibold text-[#202124] text-sm">Select an email to view</h3>
-            <p class="text-xs text-[#5f6368] mt-1 max-w-sm">Click on any message on the left to read its complete visual pass confirmation.</p>
-        </div>
-        {% endif %}
-
     </div>
 
 </div>
 
-<!-- Email Data Store in JS for Instant Interactive Switching -->
+<!-- EMAIL PREVIEW MODAL POPUP -->
+<div id="emailPreviewModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6" onclick="if(event.target === this) closeEmailModal()">
+    <div class="bg-white rounded-lg shadow-2xl border border-[#dadce0] w-full max-w-3xl h-[85vh] max-h-[800px] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        
+        <!-- Modal Top Bar -->
+        <div class="px-4 py-3 bg-[#f8f9fa] border-b border-[#dadce0] flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-2 min-w-0">
+                <i data-lucide="mail" class="w-4 h-4 text-[#1a73e8] shrink-0"></i>
+                <div class="truncate">
+                    <span class="text-xs font-semibold text-[#202124]" id="modalRecipientTitle">Email Preview</span>
+                    <span class="text-[11px] font-mono text-[#5f6368] ml-2" id="modalRecipientEmail"></span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <a id="modalOpenFullBtn" href="#" target="_blank" class="text-xs font-medium text-[#1a73e8] hover:underline flex items-center gap-1">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    <span>Full Tab</span>
+                </a>
+                <button type="button" onclick="closeEmailModal()" class="text-[#5f6368] hover:text-[#202124] p-1 rounded hover:bg-[#dadce0]/50 transition cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Iframe Body -->
+        <div class="flex-1 bg-white relative overflow-hidden">
+            <iframe id="modalEmailIframe" src="" class="w-full h-full border-0 absolute inset-0"></iframe>
+        </div>
+
+    </div>
+</div>
+
 <script>
-const emailDatabase = {
-    {% for email in email_logs %}
-    "{{ email.id }}": {
-        "id": "{{ email.id }}",
-        "subject": "{{ email.subject|escapejs }}",
-        "recipient_name": "{{ email.recipient_name|escapejs }}",
-        "recipient_email": "{{ email.recipient_email|escapejs }}",
-        "event_type": "{{ email.get_event_type_display|default:email.event_type|escapejs }}",
-        "status": "{{ email.status|escapejs }}",
-        "sent_at": "{{ email.sent_at|date:'d M Y, h:i A' }}"
-    },
-    {% endfor %}
-};
+function previewEmailModal(emailId, recipientName, recipientEmail) {
+    const modal = document.getElementById('emailPreviewModal');
+    const iframe = document.getElementById('modalEmailIframe');
+    const titleEl = document.getElementById('modalRecipientTitle');
+    const emailEl = document.getElementById('modalRecipientEmail');
+    const openBtn = document.getElementById('modalOpenFullBtn');
 
-function selectEmailRecord(emailId) {
-    const data = emailDatabase[emailId];
-    if (!data) return;
-
-    // 1. Highlight active left item
-    document.querySelectorAll('.email-row-item').forEach(el => {
-        el.classList.remove('bg-[#e8f0fe]', 'border-[#1a73e8]');
-        el.classList.add('border-transparent');
-    });
-    const activeEl = document.getElementById('email-item-' + emailId);
-    if (activeEl) {
-        activeEl.classList.remove('border-transparent');
-        activeEl.classList.add('bg-[#e8f0fe]', 'border-[#1a73e8]');
-    }
-
-    // 2. Update Right Pane Details
-    const subjectEl = document.getElementById('detailSubject');
-    if (subjectEl) subjectEl.innerText = data.subject;
-
-    const toNameEl = document.getElementById('detailToName');
-    if (toNameEl) toNameEl.innerText = data.recipient_name;
-
-    const toEmailEl = document.getElementById('detailToEmail');
-    if (toEmailEl) toEmailEl.innerText = `<${data.recipient_email}>`;
-
-    const eventTypeEl = document.getElementById('detailEventType');
-    if (eventTypeEl) eventTypeEl.innerText = data.event_type;
-
-    const dateEl = document.getElementById('detailDate');
-    if (dateEl) dateEl.innerText = data.sent_at;
-
-    const msgIdEl = document.getElementById('detailMessageId');
-    if (msgIdEl) msgIdEl.innerText = `MSG-${String(data.id).padStart(6, '0')}`;
-
-    const resendBtn = document.getElementById('btnResendEmail');
-    if (resendBtn) resendBtn.href = `/dashboard/emails/${emailId}/resend/`;
-
-    const openNewTabBtn = document.getElementById('btnOpenNewTab');
-    if (openNewTabBtn) openNewTabBtn.href = `/dashboard/emails/${emailId}/preview/`;
-
-    // 3. Update iFrame preview directly via URL to avoid quote truncation
-    const iframe = document.getElementById('emailPreviewIframe');
-    if (iframe) {
+    if (modal && iframe) {
+        titleEl.innerText = recipientName || 'Email Preview';
+        emailEl.innerText = recipientEmail ? `<${recipientEmail}>` : '';
         iframe.src = `/dashboard/emails/${emailId}/preview/`;
+        openBtn.href = `/dashboard/emails/${emailId}/preview/`;
+        modal.classList.remove('hidden');
     }
-
-    // 4. Mobile screen transition
-    if (window.innerWidth < 1024) {
-        document.getElementById('emailListPane').classList.add('hidden');
-        document.getElementById('emailDetailPane').classList.remove('hidden');
-    }
-    
-    lucide.createIcons();
 }
 
-function showEmailListMobile() {
-    document.getElementById('emailListPane').classList.remove('hidden');
-    document.getElementById('emailDetailPane').classList.add('hidden');
+function closeEmailModal() {
+    const modal = document.getElementById('emailPreviewModal');
+    const iframe = document.getElementById('modalEmailIframe');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    if (iframe) {
+        iframe.src = '';
+    }
 }
+
+// Client-side quick filter
+document.getElementById('emailSearchInput')?.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.email-row');
+    rows.forEach(row => {
+        const text = row.getAttribute('data-search') || '';
+        if (text.includes(term)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof lucide !== 'undefined') {
