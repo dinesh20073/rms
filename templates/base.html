@@ -440,9 +440,71 @@
 </head>
 <body class="min-h-full flex flex-col bg-[#f4f7fb] text-[#0f172a] antialiased selection:bg-[#dbeafe] selection:text-[#1d4ed8]">
 
+    <!-- Global Floating Top-Right Toast Notifications Container -->
+    <div id="global-toast-container" class="fixed top-4 right-4 sm:top-5 sm:right-5 z-50 flex flex-col gap-2.5 max-w-sm w-[calc(100vw-2rem)] sm:w-96 pointer-events-none">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="toast-item pointer-events-auto bg-white border border-[#d8e2ed] {% if message.tags == 'success' %}border-l-4 border-l-emerald-600{% elif message.tags == 'error' %}border-l-4 border-l-rose-600{% elif message.tags == 'warning' %}border-l-4 border-l-amber-500{% else %}border-l-4 border-l-[#3b5bf5]{% endif %} shadow-xl p-3.5 flex items-start justify-between gap-3 transition-all duration-300 transform translate-x-0 opacity-100" role="alert">
+                <div class="flex items-start gap-2.5 min-w-0">
+                    <div class="shrink-0 mt-0.5">
+                        {% if message.tags == 'success' %}
+                        <div class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                        </div>
+                        {% elif message.tags == 'error' %}
+                        <div class="w-6 h-6 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
+                            <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i>
+                        </div>
+                        {% elif message.tags == 'warning' %}
+                        <div class="w-6 h-6 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
+                        </div>
+                        {% else %}
+                        <div class="w-6 h-6 rounded-full bg-[#eef2ff] text-[#3b5bf5] flex items-center justify-center">
+                            <i data-lucide="info" class="w-4 h-4 text-[#3b5bf5]"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 leading-snug">
+                            {% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Alert{% elif message.tags == 'warning' %}Notice{% else %}Information{% endif %}
+                        </p>
+                        <p class="text-xs text-slate-600 mt-0.5 leading-relaxed break-words font-medium">
+                            {{ message }}
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="text-slate-400 hover:text-slate-700 p-1 shrink-0 transition cursor-pointer" title="Dismiss">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% block extra_toasts %}{% endblock %}
+    </div>
+
     {% block body_content %}{% endblock %}
 
     <script>
+        function dismissToast(el) {
+            if (!el) return;
+            el.style.transform = 'translateX(100%)';
+            el.style.opacity = '0';
+            setTimeout(() => {
+                el.remove();
+            }, 300);
+        }
+
+        // Auto-dismiss toasts after 6 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const toasts = document.querySelectorAll('.toast-item');
+            toasts.forEach((toast, idx) => {
+                setTimeout(() => {
+                    dismissToast(toast);
+                }, 5000 + (idx * 500));
+            });
+        });
+
         function toggleDateCustom(val, prefix) {
             var el = document.getElementById(prefix + '_date_custom');
             if (el) {
