@@ -195,15 +195,15 @@
                     </label>
                 </div>
 
-                <!-- Action Button Row -->
-                <div class="pt-5 flex items-center justify-end">
+                <!-- Action Button Row (Centered Sign In Button) -->
+                <div class="pt-4 flex items-center justify-center">
                     <button 
                         type="submit" 
                         id="submitBtn" 
-                        class="btn-auth-primary flex items-center justify-center gap-2 w-full sm:w-auto {% if is_locked %}opacity-50 cursor-not-allowed{% endif %}"
+                        class="btn-auth-primary flex items-center justify-center gap-2 w-full py-2.5 text-sm font-semibold tracking-wide {% if is_locked %}opacity-50 cursor-not-allowed{% endif %}"
                         {% if is_locked %}disabled{% endif %}
                     >
-                        <span id="submitText">Next</span>
+                        <span id="submitText">Sign In</span>
                         <div id="submitSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div>
                     </button>
                 </div>
