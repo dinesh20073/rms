@@ -122,52 +122,52 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead class="bg-[#f8f9fa] text-[#5f6368] font-semibold text-xs uppercase tracking-wider border-b border-[#dadce0]">
+                    <table class="w-full text-left text-xs border-collapse min-w-[500px] sm:min-w-full">
+                        <thead class="bg-[#f8f9fa] text-[#5f6368] font-semibold text-[10px] sm:text-xs uppercase tracking-wider border-b border-[#dadce0]">
                             <tr>
-                                <th class="py-3 px-3">Event</th>
-                                <th class="py-3 px-3">Ticket</th>
-                                <th class="py-3 px-3">Registrations</th>
-                                <th class="py-3 px-3">Status</th>
-                                <th class="py-3 px-3 text-right">Actions</th>
+                                <th class="py-2.5 px-2.5 sm:px-3">Event</th>
+                                <th class="py-2.5 px-2.5 sm:px-3">Ticket</th>
+                                <th class="py-2.5 px-2.5 sm:px-3">Registrations</th>
+                                <th class="py-2.5 px-2.5 sm:px-3">Status</th>
+                                <th class="py-2.5 px-2.5 sm:px-3 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#dadce0] text-[#202124]">
                             {% for ev in events %}
                             <tr class="hover:bg-[#f8f9fa] transition">
-                                <td class="py-3 px-3">
-                                    <div class="font-semibold text-[#202124]">
+                                <td class="py-2 px-2.5 sm:px-3">
+                                    <div class="font-semibold text-[#202124] text-[11px] sm:text-xs">
                                         <a href="{% url 'dashboard-event-detail' ev.id %}" class="hover:text-[#1a73e8] hover:underline">
                                             {{ ev.title }}
                                         </a>
                                     </div>
-                                    <div class="text-[11px] text-[#5f6368] font-mono mt-0.5">{{ ev.event_code }} • {{ ev.venue|truncatechars:24 }}</div>
+                                    <div class="text-[10px] sm:text-[11px] text-[#5f6368] font-mono mt-0.5">{{ ev.event_code }} • {{ ev.venue|truncatechars:20 }}</div>
                                 </td>
-                                <td class="py-3 px-3 font-mono font-semibold">
+                                <td class="py-2 px-2.5 sm:px-3 font-mono font-semibold text-[11px] sm:text-xs">
                                     {% if ev.registration_fee == 0 %}
-                                    <span class="pill-green">FREE</span>
+                                    <span class="pill-green text-[10px] sm:text-xs">FREE</span>
                                     {% else %}
-                                    ₹{{ ev.registration_fee|floatformat:2 }}
+                                    ₹{{ ev.registration_fee|floatformat:0 }}
                                     {% endif %}
                                 </td>
-                                <td class="py-3 px-3 font-medium text-[#3c4043]">
+                                <td class="py-2 px-2.5 sm:px-3 font-medium text-[#3c4043] text-[11px] sm:text-xs">
                                     {{ ev.registrations.count }}
                                 </td>
-                                <td class="py-3 px-3">
+                                <td class="py-2 px-2.5 sm:px-3">
                                     {% if ev.status == 'OPEN' %}
-                                    <span class="pill-green">Open</span>
+                                    <span class="pill-green text-[10px] sm:text-xs">Open</span>
                                     {% elif ev.status == 'CLOSED' %}
-                                    <span class="pill-red">Closed</span>
+                                    <span class="pill-red text-[10px] sm:text-xs">Closed</span>
                                     {% else %}
-                                    <span class="pill-orange">{{ ev.status }}</span>
+                                    <span class="pill-orange text-[10px] sm:text-xs">{{ ev.status }}</span>
                                     {% endif %}
                                 </td>
-                                <td class="py-3 px-3 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a href="{% url 'dashboard-event-detail' ev.id %}" class="google-btn-outlined py-1 px-2.5 text-xs rounded-full" title="Manage">
+                                <td class="py-2 px-2.5 sm:px-3 text-right">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <a href="{% url 'dashboard-event-detail' ev.id %}" class="google-btn-outlined py-0.5 px-2 text-[10px] sm:text-xs rounded-full" title="Manage">
                                             <span>Manage</span>
                                         </a>
-                                        <a href="{% url 'public-register' ev.slug %}" target="_blank" class="google-btn-primary py-1 px-2.5 text-xs rounded-full flex items-center gap-1 shadow-none" title="Public Form">
+                                        <a href="{% url 'public-register' ev.slug %}" target="_blank" class="google-btn-primary py-0.5 px-2 text-[10px] sm:text-xs rounded-full flex items-center gap-1 shadow-none" title="Public Form">
                                             <span>Form</span>
                                             <i data-lucide="external-link" class="w-3 h-3"></i>
                                         </a>

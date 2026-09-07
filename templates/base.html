@@ -331,7 +331,7 @@
             border-bottom: 1px solid #dadce0;
         }
         
-        /* Freeze Columns on Desktop Screens (lg: >= 1024px) */
+        /* Freeze Columns on Large Desktop Screens (lg: >= 1024px) */
         @media (min-width: 1024px) {
             .table-freeze-col-1 { position: sticky; left: 0px; z-index: 10; width: 44px; min-width: 44px; max-width: 44px; }
             .table-freeze-col-2 { position: sticky; left: 44px; z-index: 10; min-width: 110px; }
@@ -348,6 +348,57 @@
             thead th.table-freeze-col-6 {
                 z-index: 30 !important;
                 background-color: #f8f9fa !important;
+            }
+        }
+
+        /* Mobile Responsive Full-View Tables (<= 768px) */
+        @media (max-width: 768px) {
+            .table-scroll-container table,
+            .google-card table {
+                font-size: 11px !important;
+            }
+            .table-scroll-container th,
+            .google-card table th {
+                padding: 6px 8px !important;
+                font-size: 10px !important;
+                letter-spacing: 0.02em !important;
+                white-space: nowrap !important;
+            }
+            .table-scroll-container td,
+            .google-card table td {
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+                line-height: 1.25 !important;
+            }
+            .table-scroll-container .pill-green,
+            .table-scroll-container .pill-orange,
+            .table-scroll-container .pill-blue,
+            .table-scroll-container .pill-red,
+            .google-card table .pill-green,
+            .google-card table .pill-orange,
+            .google-card table .pill-blue,
+            .google-card table .pill-red {
+                padding: 1px 6px !important;
+                font-size: 9.5px !important;
+                gap: 3px !important;
+            }
+            .table-scroll-container .google-btn-primary,
+            .table-scroll-container .google-btn-outlined,
+            .table-scroll-container .google-btn-tonal,
+            .table-scroll-container .google-btn-danger,
+            .google-card table .google-btn-primary,
+            .google-card table .google-btn-outlined,
+            .google-card table .google-btn-tonal,
+            .google-card table .google-btn-danger {
+                padding: 2px 7px !important;
+                font-size: 10px !important;
+                gap: 3px !important;
+                border-radius: 6px !important;
+            }
+            .table-scroll-container svg,
+            .google-card table svg {
+                width: 12px !important;
+                height: 12px !important;
             }
         }
 
