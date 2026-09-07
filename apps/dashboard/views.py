@@ -665,3 +665,10 @@ def resend_email_log_view(request, email_id):
         messages.error(request, f"Email delivery failed: {str(e)}")
         
     return redirect(f"/dashboard/emails/?id={email_id}")
+
+@login_required(login_url='login')
+def email_preview_view(request, email_id):
+    tenant = get_current_tenant(request)
+    email_log = get_object_or_404(EmailLog, id=email_id, tenant=tenant)
+    return HttpResponse(email_log.body_html, content_type='text/html; charset=utf-8')
+

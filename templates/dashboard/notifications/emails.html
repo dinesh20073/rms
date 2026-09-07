@@ -127,8 +127,8 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 shrink-0">
-                    <div class="text-right">
+                <div class="flex items-center gap-2 shrink-0">
+                    <div class="text-right hidden sm:block">
                         <div class="text-xs font-medium text-[#5f6368]" id="detailDate">
                             {{ selected_email.sent_at|date:"d M Y, h:i A" }}
                         </div>
@@ -136,6 +136,10 @@
                             MSG-{{ selected_email.id|stringformat:"06d" }}
                         </div>
                     </div>
+                    <a id="btnOpenNewTab" href="{% url 'dashboard-email-preview' selected_email.id %}" target="_blank" class="px-3 py-1.5 text-xs font-medium rounded-md border border-[#dadce0] bg-white text-[#3c4043] hover:bg-[#f8f9fa] flex items-center gap-1.5 transition" title="Open full email in new tab">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-[#5f6368]"></i>
+                        <span>Open Full</span>
+                    </a>
                     <a id="btnResendEmail" href="{% url 'dashboard-email-resend' selected_email.id %}" class="google-btn-primary text-xs py-1.5 px-3.5 rounded-full flex items-center gap-1.5 shadow-none hover:shadow-sm" title="Send this real email via Gmail SMTP right now">
                         <i data-lucide="send" class="w-3.5 h-3.5"></i>
                         <span>Send Real Email</span>
@@ -146,8 +150,8 @@
         </div>
 
         <!-- Pure Flush Email Body Viewport -->
-        <div class="flex-1 min-h-0 bg-white overflow-y-auto p-0 m-0">
-            <iframe id="emailPreviewIframe" srcdoc="{{ selected_email.body_html }}" class="w-full h-full border-0 block m-0 p-0 min-h-[600px]"></iframe>
+        <div class="flex-1 min-h-0 bg-white overflow-hidden p-0 m-0 relative">
+            <iframe id="emailPreviewIframe" src="{% url 'dashboard-email-preview' selected_email.id %}" class="w-full h-full border-0 block m-0 p-0 absolute inset-0"></iframe>
         </div>
         {% else %}
         <!-- Empty Placeholder -->
@@ -173,8 +177,7 @@ const emailDatabase = {
         "recipient_email": "{{ email.recipient_email|escapejs }}",
         "event_type": "{{ email.get_event_type_display|default:email.event_type|escapejs }}",
         "status": "{{ email.status|escapejs }}",
-        "sent_at": "{{ email.sent_at|date:'d M Y, h:i A' }}",
-        "raw_html": `{{ email.body_html|escapejs }}`
+        "sent_at": "{{ email.sent_at|date:'d M Y, h:i A' }}"
     },
     {% endfor %}
 };
@@ -216,10 +219,13 @@ function selectEmailRecord(emailId) {
     const resendBtn = document.getElementById('btnResendEmail');
     if (resendBtn) resendBtn.href = `/dashboard/emails/${emailId}/resend/`;
 
-    // 3. Update iFrame preview directly
+    const openNewTabBtn = document.getElementById('btnOpenNewTab');
+    if (openNewTabBtn) openNewTabBtn.href = `/dashboard/emails/${emailId}/preview/`;
+
+    // 3. Update iFrame preview directly via URL to avoid quote truncation
     const iframe = document.getElementById('emailPreviewIframe');
     if (iframe) {
-        iframe.srcdoc = data.raw_html;
+        iframe.src = `/dashboard/emails/${emailId}/preview/`;
     }
 
     // 4. Mobile screen transition

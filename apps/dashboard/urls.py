@@ -18,6 +18,7 @@ urlpatterns = [
     path('registrations/', views.registrations_list_view, name='dashboard-registrations-list'),
     path('registrations/<str:registration_code>/send-email/', views.send_registration_email_view, name='dashboard-registration-send-email'),
     path('emails/', views.email_logs_view, name='dashboard-email-logs'),
+    path('emails/<int:email_id>/preview/', views.email_preview_view, name='dashboard-email-preview'),
     path('emails/<int:email_id>/resend/', views.resend_email_log_view, name='dashboard-email-resend'),
     path('audit/', views.audit_logs_view, name='dashboard-audit-logs'),
 ]
