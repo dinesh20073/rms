@@ -15,6 +15,32 @@
         overflow: hidden;
     }
 
+    {% if request.GET.embed %}
+    html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .a4-print-wrapper {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-height: 100% !important;
+    }
+    .voucher-container {
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    .embed-hidden {
+        display: none !important;
+    }
+    {% endif %}
+
     /* Strict Single A4 Sheet Print / PDF Styling */
     @media print {
         @page {
@@ -322,8 +348,8 @@
 
     </div>
 
-    <!-- Action Toolbar (Positioned cleanly below the pass, hidden in print/PDF) -->
-    <div class="w-full max-w-[590px] mt-4 flex flex-wrap items-center justify-between gap-2 bg-white p-3 border border-slate-300 shadow-sm rounded-lg no-print">
+    <!-- Action Toolbar (Positioned cleanly below the pass, hidden in print/PDF and modal embed) -->
+    <div class="w-full max-w-[590px] mt-4 flex flex-wrap items-center justify-between gap-2 bg-white p-3 border border-slate-300 shadow-sm rounded-lg no-print embed-hidden">
         {% csrf_token %}
         <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>

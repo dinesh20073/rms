@@ -217,52 +217,41 @@
 
 <!-- Global Pass Viewer Modal Popup (Google Material Dialog) -->
 <div id="passViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-xs transition-opacity duration-200">
-    <div class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-[#dadce0] overflow-hidden flex flex-col h-[92vh] max-h-[850px]">
+    <div class="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-[#dadce0] overflow-hidden flex flex-col h-[92vh] max-h-[850px]">
         
         <!-- Modal Topbar -->
-        <div class="px-5 py-3.5 bg-white text-[#202124] flex items-center justify-between shrink-0 border-b border-[#dadce0]">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-[#e6f4ea] text-[#137333] flex items-center justify-center">
-                    <i data-lucide="badge-check" class="w-5 h-5"></i>
+        <div class="px-4 py-2.5 sm:px-5 sm:py-3 bg-white text-[#202124] flex items-center justify-between shrink-0 border-b border-[#dadce0]">
+            <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <div class="w-8 h-8 rounded bg-[#e6f4ea] text-[#137333] flex items-center justify-center shrink-0">
+                    <i data-lucide="badge-check" class="w-4 h-4"></i>
                 </div>
-                <div>
-                    <h3 id="passModalTitle" class="text-sm font-semibold text-[#202124] tracking-tight flex items-center gap-2">
+                <div class="min-w-0">
+                    <h3 id="passModalTitle" class="text-xs sm:text-sm font-semibold text-[#202124] tracking-tight flex items-center gap-2 truncate">
                         <span>Attendee Pass</span>
-                        <span id="passModalBadge" class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded-full">PASS-CODE</span>
+                        <span id="passModalBadge" class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded">PASS-CODE</span>
                     </h3>
-                    <p id="passModalSubtitle" class="text-xs text-[#5f6368] truncate">Single A4 Voucher & Print View</p>
+                    <p id="passModalSubtitle" class="text-[11px] text-[#5f6368] truncate hidden sm:block">Official Voucher & QR Pass</p>
                 </div>
             </div>
 
             <!-- Top Actions -->
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="printPassModalIframe()" class="google-btn-primary py-1.5 px-3.5 text-xs rounded-full flex items-center gap-1.5 cursor-pointer">
-                    <i data-lucide="printer" class="w-4 h-4"></i>
-                    <span>Print PDF</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="printPassModalIframe()" class="google-btn-primary py-1 px-3 text-xs flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                    <span>Print</span>
                 </button>
-                <a id="passModalFullLink" href="#" target="_blank" class="google-btn-outlined py-1.5 px-2.5 text-xs rounded-full flex items-center gap-1" title="Open full screen in new tab">
-                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                <a id="passModalFullLink" href="#" target="_blank" class="google-btn-outlined py-1 px-2.5 text-xs flex items-center gap-1" title="Open full screen in new tab">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                 </a>
-                <button type="button" onclick="closePassModal()" class="p-2 text-[#5f6368] hover:text-[#202124] rounded-full hover:bg-[#f1f3f4] transition cursor-pointer" title="Close (Esc)">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                <button type="button" onclick="closePassModal()" class="p-1.5 text-[#5f6368] hover:text-[#202124] rounded hover:bg-[#f1f3f4] transition cursor-pointer" title="Close (Esc)">
+                    <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
 
         <!-- Modal Iframe Body -->
-        <div class="flex-1 min-h-0 bg-[#f8f9fa] relative overflow-hidden">
+        <div class="flex-1 min-h-0 bg-white relative overflow-hidden">
             <iframe id="passModalIframe" src="" class="w-full h-full border-0 bg-white" title="Attendee Pass Voucher View"></iframe>
-        </div>
-
-        <!-- Modal Bottom Footer -->
-        <div class="px-5 py-3 bg-[#f8f9fa] border-t border-[#dadce0] flex items-center justify-between text-xs text-[#5f6368] shrink-0">
-            <span class="flex items-center gap-1.5 text-xs">
-                <i data-lucide="shield-check" class="w-4 h-4 text-[#1e8e3e]"></i>
-                <span>Official QR Code Verified • Direct Print Ready</span>
-            </span>
-            <button type="button" onclick="closePassModal()" class="google-btn-outlined py-1 px-3.5 text-xs font-medium text-[#3c4043] rounded-full hover:bg-[#e8eaed] cursor-pointer">
-                Close
-            </button>
         </div>
 
     </div>
@@ -279,12 +268,12 @@
 
         if (!modal || !iframe) return;
 
-        const passUrl = `/pass/${passCode}/`;
+        const passUrl = `/pass/${passCode}/?embed=1`;
         iframe.src = passUrl;
         if (badge) badge.innerText = passCode;
-        if (title) title.innerHTML = `<span>Attendee Pass: ${attendeeName || 'Attendee'}</span> <span class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded-full">${passCode}</span>`;
-        if (subtitle) subtitle.innerText = `${eventTitle || 'Event'} • Official Voucher View`;
-        if (fullLink) fullLink.href = passUrl;
+        if (title) title.innerHTML = `<span class="truncate">${attendeeName || 'Attendee'}</span> <span class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded">${passCode}</span>`;
+        if (subtitle) subtitle.innerText = `${eventTitle || 'Event'} • Official Voucher`;
+        if (fullLink) fullLink.href = `/pass/${passCode}/`;
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
