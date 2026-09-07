@@ -3,71 +3,71 @@
 {% block header_title %}Email Delivery Tracker{% endblock %}
 
 {% block content %}
-<!-- Full-Bleed Gmail 2-Pane Split View (Edge-to-Edge, Zero Boxed Padding) -->
-<div class="w-full h-full flex-1 flex flex-col lg:flex-row overflow-hidden bg-white m-0 p-0 border-t border-slate-200">
+<!-- Full-Bleed Gmail 2-Pane Split View -->
+<div class="w-full h-full flex-1 flex flex-col lg:flex-row overflow-hidden bg-white m-0 p-0 border-t border-[#dadce0]">
     
-    <!-- LEFT PANE: Email Logs List (Inbox List Style) -->
-    <div id="emailListPane" class="w-full lg:w-[380px] xl:w-[430px] border-b lg:border-b-0 lg:border-r border-[#d8e2ed] flex flex-col shrink-0 bg-white h-full overflow-hidden">
+    <!-- LEFT PANE: Email Logs List (Gmail Inbox List Style) -->
+    <div id="emailListPane" class="w-full lg:w-[380px] xl:w-[430px] border-b lg:border-b-0 lg:border-r border-[#dadce0] flex flex-col shrink-0 bg-white h-full overflow-hidden">
         
         <!-- List Header Toolbar -->
-        <div class="px-4 py-3 bg-[#f8fafc] border-b border-[#d8e2ed] flex items-center justify-between text-xs font-semibold text-slate-700 shrink-0">
+        <div class="px-4 py-3 bg-[#f8f9fa] border-b border-[#dadce0] flex items-center justify-between text-xs font-semibold text-[#5f6368] shrink-0">
             <div class="flex items-center gap-2">
-                <i data-lucide="inbox" class="w-4 h-4 text-[#3b5bf5]"></i>
-                <span class="font-bold text-slate-800 text-sm">Outbound Messages</span>
-                <span class="bg-[#eef2ff] text-[#3b5bf5] text-[11px] font-bold px-2 py-0.5 rounded-full font-mono border border-[#dbeafe]">{{ email_logs|length }}</span>
+                <i data-lucide="inbox" class="w-4 h-4 text-[#1a73e8]"></i>
+                <span class="font-semibold text-[#202124] text-xs sm:text-sm">Outbound Messages</span>
+                <span class="bg-[#e8f0fe] text-[#1a73e8] text-xs font-semibold px-2.5 py-0.5 rounded-full font-mono border border-[#d2e3fc]">{{ email_logs|length }}</span>
             </div>
-            <span class="text-[11px] text-slate-400 font-medium">Sorted by Date</span>
+            <span class="text-xs text-[#5f6368] font-normal">Sorted by Date</span>
         </div>
 
         <!-- Email Scrollable Items List -->
-        <div class="flex-1 overflow-y-auto divide-y divide-[#d8e2ed]/50" id="emailListContainer">
+        <div class="flex-1 overflow-y-auto divide-y divide-[#dadce0]" id="emailListContainer">
             {% for email in email_logs %}
-            <div onclick="selectEmailRecord({{ email.id }})" id="email-item-{{ email.id }}" class="email-row-item px-4 py-3 cursor-pointer transition flex items-start gap-3 hover:bg-slate-50 {% if selected_email and selected_email.id == email.id %}bg-[#eef2ff] border-l-4 border-[#3b5bf5]{% else %}border-l-4 border-transparent{% endif %}" data-email-id="{{ email.id }}">
+            <div onclick="selectEmailRecord({{ email.id }})" id="email-item-{{ email.id }}" class="email-row-item px-4 py-3 cursor-pointer transition flex items-start gap-3 hover:bg-[#f8f9fa] {% if selected_email and selected_email.id == email.id %}bg-[#e8f0fe] border-l-4 border-[#1a73e8]{% else %}border-l-4 border-transparent{% endif %}" data-email-id="{{ email.id }}">
                 
                 <!-- Avatar with Initial -->
-                <div class="w-8 h-8 rounded-full {% if email.status == 'SENT' %}bg-emerald-600{% elif email.status == 'FAILED' %}bg-rose-600{% else %}bg-[#3b5bf5]{% endif %} text-white font-bold text-xs flex items-center justify-center shrink-0 font-display mt-0.5 shadow-2xs">
+                <div class="w-8 h-8 rounded-full {% if email.status == 'SENT' %}bg-[#1e8e3e]{% elif email.status == 'FAILED' %}bg-[#d93025]{% else %}bg-[#1a73e8]{% endif %} text-white font-medium text-xs flex items-center justify-center shrink-0 font-display mt-0.5">
                     {{ email.recipient_name|default:email.recipient_email|slice:":1"|upper }}
                 </div>
 
                 <!-- Email Content Summary -->
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between gap-1">
-                        <span class="font-bold text-slate-900 text-xs truncate max-w-[170px]">
+                        <span class="font-semibold text-[#202124] text-xs truncate max-w-[170px]">
                             {{ email.recipient_name|default:email.recipient_email }}
                         </span>
-                        <span class="text-[10px] font-mono text-slate-400 whitespace-nowrap">
+                        <span class="text-[11px] font-mono text-[#5f6368] whitespace-nowrap">
                             {{ email.sent_at|date:"d M H:i" }}
                         </span>
                     </div>
 
-                    <div class="text-[11px] font-medium text-slate-800 truncate mt-0.5">
+                    <div class="text-xs font-medium text-[#202124] truncate mt-0.5">
                         {{ email.subject }}
                     </div>
 
-                    <div class="text-[10px] text-slate-500 font-mono truncate mt-0.5">
+                    <div class="text-[11px] text-[#5f6368] font-mono truncate mt-0.5">
                         To: {{ email.recipient_email }}
                     </div>
 
                     <!-- Status Badge & Trigger -->
                     <div class="flex items-center gap-1.5 mt-1.5">
                         {% if email.status == 'SENT' %}
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100/80 px-1.5 py-0.2 rounded-sm border border-emerald-200">
-                            <i data-lucide="check-check" class="w-3 h-3 text-emerald-600"></i>
+                        <span class="pill-green">
+                            <i data-lucide="check-check" class="w-3 h-3 text-[#137333]"></i>
                             <span>Delivered</span>
                         </span>
                         {% elif email.status == 'SIMULATED' %}
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-[#3b5bf5] bg-[#eef2ff] px-1.5 py-0.2 rounded-sm border border-[#dbeafe]">
-                            <i data-lucide="send" class="w-3 h-3 text-[#3b5bf5]"></i>
+                        <span class="pill-blue">
+                            <i data-lucide="send" class="w-3 h-3 text-[#1a73e8]"></i>
                             <span>Simulated</span>
                         </span>
                         {% else %}
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-800 bg-rose-100/80 px-1.5 py-0.2 rounded-sm border border-rose-200">
-                            <i data-lucide="alert-circle" class="w-3 h-3 text-rose-600"></i>
+                        <span class="pill-red">
+                            <i data-lucide="alert-circle" class="w-3 h-3 text-[#d93025]"></i>
                             <span>Failed</span>
                         </span>
                         {% endif %}
 
-                        <span class="text-[10px] text-slate-400 truncate">
+                        <span class="text-[11px] text-[#5f6368] truncate">
                             {{ email.get_event_type_display|default:email.event_type }}
                         </span>
                     </div>
@@ -75,25 +75,25 @@
 
             </div>
             {% empty %}
-            <div class="py-16 text-center text-slate-400 p-4">
-                <i data-lucide="mail-x" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
-                <span class="font-bold text-slate-700 text-xs block">No emails available</span>
+            <div class="py-16 text-center text-[#5f6368] p-4">
+                <i data-lucide="mail-x" class="w-8 h-8 text-[#5f6368] mx-auto mb-2"></i>
+                <span class="font-semibold text-[#202124] text-xs block">No emails available</span>
             </div>
             {% endfor %}
         </div>
 
     </div>
 
-    <!-- RIGHT PANE: Clean Reading Surface -->
+    <!-- RIGHT PANE: Clean Gmail Reading Surface -->
     <div id="emailDetailPane" class="flex-1 flex flex-col bg-white h-full overflow-hidden {% if not selected_email %}hidden lg:flex{% endif %}">
         
         {% if selected_email %}
         <!-- Email Header Bar -->
-        <div class="px-6 py-4 bg-white border-b border-[#d8e2ed] flex flex-col gap-3 shrink-0">
+        <div class="px-6 py-4 bg-white border-b border-[#dadce0] flex flex-col gap-3 shrink-0">
             
             <!-- Mobile Back Button -->
-            <div class="lg:hidden flex items-center pb-2 border-b border-slate-100">
-                <button type="button" onclick="showEmailListMobile()" class="text-xs font-bold text-slate-700 flex items-center gap-1 hover:text-[#3b5bf5]">
+            <div class="lg:hidden flex items-center pb-2 border-b border-[#dadce0]">
+                <button type="button" onclick="showEmailListMobile()" class="text-xs font-semibold text-[#202124] flex items-center gap-1 hover:text-[#1a73e8]">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     <span>Back to Messages</span>
                 </button>
@@ -101,10 +101,10 @@
 
             <!-- Subject Line -->
             <div class="flex items-start justify-between gap-3">
-                <h1 class="text-lg sm:text-xl font-bold font-display text-slate-900 leading-tight" id="detailSubject">
+                <h1 class="text-lg sm:text-xl font-semibold font-display text-[#202124] leading-tight" id="detailSubject">
                     {{ selected_email.subject }}
                 </h1>
-                <span class="text-[11px] font-mono px-2.5 py-0.5 bg-slate-100 text-slate-700 rounded border border-[#d8e2ed] shrink-0" id="detailEventType">
+                <span class="text-xs font-mono px-2.5 py-0.5 bg-[#f1f3f4] text-[#202124] rounded-full border border-[#dadce0] shrink-0" id="detailEventType">
                     {{ selected_email.get_event_type_display|default:selected_email.event_type }}
                 </span>
             </div>
@@ -112,31 +112,31 @@
             <!-- Sender Metadata Strip -->
             <div class="flex items-center justify-between gap-3 pt-1">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-[#3b5bf5] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-2xs">
+                    <div class="w-9 h-9 rounded-full bg-[#1a73e8] text-white flex items-center justify-center font-semibold text-sm shrink-0">
                         N
                     </div>
                     <div>
                         <div class="flex items-baseline gap-2">
-                            <span class="text-xs sm:text-sm font-bold text-slate-900" id="detailFrom">Nizhal Community</span>
-                            <span class="text-[11px] text-slate-400 font-mono hidden sm:inline">&lt;nizhalcommunity@gmail.com&gt;</span>
+                            <span class="text-xs sm:text-sm font-semibold text-[#202124]" id="detailFrom">Nizhal Community</span>
+                            <span class="text-xs text-[#5f6368] font-mono hidden sm:inline">&lt;nizhalcommunity@gmail.com&gt;</span>
                         </div>
-                        <div class="text-[11px] text-slate-500 flex items-center gap-1.5">
-                            <span>to <strong class="text-slate-800 font-medium" id="detailToName">{{ selected_email.recipient_name }}</strong></span>
-                            <span class="text-slate-400 font-mono text-[10px]" id="detailToEmail">&lt;{{ selected_email.recipient_email }}&gt;</span>
+                        <div class="text-xs text-[#5f6368] flex items-center gap-1.5">
+                            <span>to <strong class="text-[#202124] font-medium" id="detailToName">{{ selected_email.recipient_name }}</strong></span>
+                            <span class="text-[#5f6368] font-mono text-[11px]" id="detailToEmail">&lt;{{ selected_email.recipient_email }}&gt;</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 shrink-0">
                     <div class="text-right">
-                        <div class="text-xs font-medium text-slate-500" id="detailDate">
+                        <div class="text-xs font-medium text-[#5f6368]" id="detailDate">
                             {{ selected_email.sent_at|date:"d M Y, h:i A" }}
                         </div>
-                        <div class="text-[10px] font-mono text-slate-400" id="detailMessageId">
+                        <div class="text-[11px] font-mono text-[#5f6368]" id="detailMessageId">
                             MSG-{{ selected_email.id|stringformat:"06d" }}
                         </div>
                     </div>
-                    <a id="btnResendEmail" href="{% url 'dashboard-email-resend' selected_email.id %}" class="bg-[#3b5bf5] hover:bg-[#2b49e0] text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1.5 shadow-sm transition" title="Send this real email via Gmail SMTP right now">
+                    <a id="btnResendEmail" href="{% url 'dashboard-email-resend' selected_email.id %}" class="google-btn-primary text-xs py-1.5 px-3.5 rounded-full flex items-center gap-1.5 shadow-none hover:shadow-sm" title="Send this real email via Gmail SMTP right now">
                         <i data-lucide="send" class="w-3.5 h-3.5"></i>
                         <span>Send Real Email</span>
                     </a>
@@ -145,16 +145,16 @@
 
         </div>
 
-        <!-- Pure Flush Email Body Viewport (Zero Frame, Full Clean Background) -->
+        <!-- Pure Flush Email Body Viewport -->
         <div class="flex-1 min-h-0 bg-white overflow-y-auto p-0 m-0">
             <iframe id="emailPreviewIframe" srcdoc="{{ selected_email.body_html }}" class="w-full h-full border-0 block m-0 p-0 min-h-[600px]"></iframe>
         </div>
         {% else %}
         <!-- Empty Placeholder -->
-        <div class="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
-            <i data-lucide="mail-open" class="w-12 h-12 text-slate-300 mb-3"></i>
-            <h3 class="font-bold text-slate-700 text-sm">Select an email to view</h3>
-            <p class="text-xs text-slate-500 mt-1 max-w-sm">Click on any message on the left to read its complete visual pass confirmation.</p>
+        <div class="flex-1 flex flex-col items-center justify-center p-8 text-center text-[#5f6368]">
+            <i data-lucide="mail-open" class="w-12 h-12 text-[#5f6368] mb-3"></i>
+            <h3 class="font-semibold text-[#202124] text-sm">Select an email to view</h3>
+            <p class="text-xs text-[#5f6368] mt-1 max-w-sm">Click on any message on the left to read its complete visual pass confirmation.</p>
         </div>
         {% endif %}
 
@@ -185,13 +185,13 @@ function selectEmailRecord(emailId) {
 
     // 1. Highlight active left item
     document.querySelectorAll('.email-row-item').forEach(el => {
-        el.classList.remove('bg-[#eef2ff]', 'border-[#3b5bf5]');
+        el.classList.remove('bg-[#e8f0fe]', 'border-[#1a73e8]');
         el.classList.add('border-transparent');
     });
     const activeEl = document.getElementById('email-item-' + emailId);
     if (activeEl) {
         activeEl.classList.remove('border-transparent');
-        activeEl.classList.add('bg-[#eef2ff]', 'border-[#3b5bf5]');
+        activeEl.classList.add('bg-[#e8f0fe]', 'border-[#1a73e8]');
     }
 
     // 2. Update Right Pane Details

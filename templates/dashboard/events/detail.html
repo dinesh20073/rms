@@ -6,37 +6,37 @@
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
 
     <!-- Top Card & Actions -->
-    <div class="google-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white border border-[#d8e2ed]">
+    <div class="google-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
             <div class="flex items-center gap-2.5 mb-2">
-                <span class="font-mono text-xs font-bold text-[#3b5bf5] bg-[#eef2ff] px-2.5 py-0.5 border border-[#dbeafe] rounded-md">{{ event.event_code }}</span>
+                <span class="font-mono text-xs font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 border border-[#d2e3fc] rounded-full">{{ event.event_code }}</span>
                 <span class="pill-green">{{ event.status }}</span>
-                <span class="text-xs text-slate-500 font-mono font-bold">₹{{ event.registration_fee|floatformat:0 }} INR</span>
+                <span class="text-xs text-[#5f6368] font-mono font-semibold">₹{{ event.registration_fee|floatformat:0 }} INR</span>
             </div>
-            <h2 class="text-2xl font-bold font-display text-slate-900">{{ event.title }}</h2>
-            <p class="text-xs text-slate-500 mt-1.5 max-w-2xl leading-relaxed">{{ event.description|default:"No event description specified." }}</p>
-            <div class="flex items-center gap-4 mt-3 text-xs text-slate-600 font-medium">
+            <h2 class="text-2xl font-semibold font-display text-[#202124]">{{ event.title }}</h2>
+            <p class="text-xs text-[#5f6368] mt-1.5 max-w-2xl leading-relaxed">{{ event.description|default:"No event description specified." }}</p>
+            <div class="flex items-center gap-4 mt-3 text-xs text-[#5f6368]">
                 <div class="flex items-center gap-1.5">
-                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#5f6368]"></i>
                     <span>{{ event.venue|default:"Online / Virtual" }}</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <i data-lucide="smartphone" class="w-3.5 h-3.5 text-slate-400"></i>
-                    <span>Payee: <strong class="font-mono text-slate-900">{{ event.upi_id }}</strong></span>
+                    <i data-lucide="smartphone" class="w-3.5 h-3.5 text-[#5f6368]"></i>
+                    <span>Payee: <strong class="font-mono text-[#202124]">{{ event.upi_id }}</strong></span>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
-            <a href="{% url 'dashboard-event-form' event.id %}" class="google-btn-outlined text-xs">
+            <a href="{% url 'dashboard-event-form' event.id %}" class="google-btn-outlined text-xs rounded-full">
                 <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
                 <span>Form Builder</span>
             </a>
-            <a href="{% url 'dashboard-event-export-csv' event.id %}" class="google-btn-outlined text-xs">
+            <a href="{% url 'dashboard-event-export-csv' event.id %}" class="google-btn-outlined text-xs rounded-full">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
                 <span>Export CSV</span>
             </a>
-            <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-primary text-xs">
+            <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-primary text-xs rounded-full shadow-none">
                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                 <span>Public Form</span>
             </a>
@@ -45,25 +45,25 @@
 
     <!-- Quick Stats Grid (KPIs) -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div class="google-card p-4 bg-white border border-[#d8e2ed]">
-            <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wider block">Total Bookings</span>
-            <span class="text-2xl font-extrabold font-display text-slate-900 mt-1 block">{{ total_reg }}</span>
+        <div class="google-card p-4">
+            <span class="text-[11px] text-[#5f6368] font-semibold uppercase tracking-wider block">Total Bookings</span>
+            <span class="text-2xl font-bold font-display text-[#202124] mt-1 block">{{ total_reg }}</span>
         </div>
-        <div class="google-card p-4 border-[#bbf7d0] bg-gradient-to-b from-[#f0fdf4] to-white">
-            <span class="text-[11px] text-[#15803d] font-bold uppercase tracking-wider block">Ticket Count</span>
-            <span class="text-2xl font-extrabold font-display text-[#15803d] mt-1 block">{{ total_tickets }} <span class="text-xs text-slate-400 font-normal">/ {{ event.max_capacity }} max</span></span>
+        <div class="google-card p-4 border-[#ceead6] bg-gradient-to-b from-[#f6fbf7] to-white">
+            <span class="text-[11px] text-[#137333] font-semibold uppercase tracking-wider block">Ticket Count</span>
+            <span class="text-2xl font-bold font-display text-[#137333] mt-1 block">{{ total_tickets }} <span class="text-xs text-[#5f6368] font-normal">/ {{ event.max_capacity }} max</span></span>
         </div>
-        <div class="google-card p-4 border-[#dbeafe] bg-gradient-to-b from-[#eef2ff] to-white">
-            <span class="text-[11px] text-[#3b5bf5] font-bold uppercase tracking-wider block">Issued Passes</span>
-            <span class="text-2xl font-extrabold font-display text-[#3b5bf5] mt-1 block">{{ completed_reg }}</span>
+        <div class="google-card p-4 border-[#d2e3fc] bg-gradient-to-b from-[#f8fafd] to-white">
+            <span class="text-[11px] text-[#1a73e8] font-semibold uppercase tracking-wider block">Issued Passes</span>
+            <span class="text-2xl font-bold font-display text-[#1a73e8] mt-1 block">{{ completed_reg }}</span>
         </div>
-        <div class="google-card p-4 border-[#fed7aa] bg-gradient-to-b from-[#fff7ed] to-white">
-            <span class="text-[11px] text-[#c2410c] font-bold uppercase tracking-wider block">Manual Review</span>
-            <span class="text-2xl font-extrabold font-display text-[#c2410c] mt-1 block">{{ review_reg }}</span>
+        <div class="google-card p-4 border-[#feefc3] bg-gradient-to-b from-[#fefbf0] to-white">
+            <span class="text-[11px] text-[#b06000] font-semibold uppercase tracking-wider block">Manual Review</span>
+            <span class="text-2xl font-bold font-display text-[#b06000] mt-1 block">{{ review_reg }}</span>
         </div>
-        <div class="google-card p-4 border-[#3b5bf5] bg-gradient-to-tr from-[#3b5bf5] via-[#2b49e0] to-[#1f3bbd] text-white">
-            <span class="text-[11px] text-[#eef2ff] font-bold uppercase tracking-wider block">Total Revenue</span>
-            <span class="text-2xl font-black font-display text-white mt-1 block font-mono">₹{{ revenue|floatformat:0 }}</span>
+        <div class="google-card p-4 border-[#d2e3fc] bg-[#e8f0fe] text-[#1a73e8]">
+            <span class="text-[11px] text-[#1a73e8] font-semibold uppercase tracking-wider block">Total Revenue</span>
+            <span class="text-2xl font-bold font-display text-[#1a73e8] mt-1 block font-mono">₹{{ revenue|floatformat:0 }}</span>
         </div>
     </div>
 
@@ -71,67 +71,67 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         
         <!-- 1. Gender Demographics Breakdown (Male vs Female Count) -->
-        <div class="google-card p-5 space-y-4 bg-white border border-[#d8e2ed]">
-            <div class="flex items-center justify-between border-b border-[#d8e2ed] pb-3">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                    <i data-lucide="users" class="w-4 h-4 text-[#3b5bf5]"></i>
+        <div class="google-card p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-[#dadce0] pb-3">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-[#1a73e8]"></i>
                     <span>Gender Demographics Breakdown</span>
                 </h3>
-                <span class="text-xs font-bold text-slate-500">{{ total_reg }} Registered</span>
+                <span class="text-xs font-medium text-[#5f6368]">{{ total_reg }} Registered</span>
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-1">
                 <!-- Male Count Card -->
-                <div class="bg-[#eef2ff] border border-[#dbeafe] p-3.5 rounded-lg">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-[#3b5bf5] block flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 bg-[#3b5bf5] rounded-full"></span>
+                <div class="bg-[#e8f0fe] border border-[#d2e3fc] p-3.5 rounded-xl">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-[#1a73e8] block flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 bg-[#1a73e8] rounded-full"></span>
                         <span>Male Count</span>
                     </span>
-                    <div class="text-2xl font-black font-display text-[#1f3bbd] mt-1">{{ male_count }}</div>
-                    <div class="text-[11px] text-[#3b5bf5] mt-1 font-semibold">
+                    <div class="text-2xl font-bold font-display text-[#1a73e8] mt-1">{{ male_count }}</div>
+                    <div class="text-xs text-[#1a73e8] mt-1 font-medium">
                         {% widthratio male_count total_reg 100 %}% of attendees
                     </div>
                 </div>
 
                 <!-- Female Count Card -->
-                <div class="bg-purple-50/60 border border-purple-200 p-3.5 rounded-lg">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-purple-800 block flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 bg-purple-600 rounded-full"></span>
+                <div class="bg-[#fef7e0] border border-[#feefc3] p-3.5 rounded-xl">
+                    <span class="text-[11px] font-semibold uppercase tracking-wider text-[#b06000] block flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 bg-[#f9ab00] rounded-full"></span>
                         <span>Female Count</span>
                     </span>
-                    <div class="text-2xl font-black font-display text-purple-950 mt-1">{{ female_count }}</div>
-                    <div class="text-[11px] text-purple-700 mt-1 font-semibold">
+                    <div class="text-2xl font-bold font-display text-[#b06000] mt-1">{{ female_count }}</div>
+                    <div class="text-xs text-[#b06000] mt-1 font-medium">
                         {% widthratio female_count total_reg 100 %}% of attendees
                     </div>
                 </div>
             </div>
 
             <!-- Progress distribution bar -->
-            <div class="w-full bg-slate-100 rounded-full h-2.5 flex overflow-hidden">
-                <div style="width: {% widthratio male_count total_reg 100 %}%;" class="bg-[#3b5bf5] h-full"></div>
-                <div style="width: {% widthratio female_count total_reg 100 %}%;" class="bg-purple-600 h-full"></div>
+            <div class="w-full bg-[#f1f3f4] rounded-full h-2.5 flex overflow-hidden">
+                <div style="width: {% widthratio male_count total_reg 100 %}%;" class="bg-[#1a73e8] h-full"></div>
+                <div style="width: {% widthratio female_count total_reg 100 %}%;" class="bg-[#f9ab00] h-full"></div>
             </div>
         </div>
 
         <!-- 2. Age Category Distribution -->
-        <div class="google-card p-5 space-y-3.5 bg-white border border-[#d8e2ed]">
-            <div class="flex items-center justify-between border-b border-[#d8e2ed] pb-3">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                    <i data-lucide="bar-chart" class="w-4 h-4 text-emerald-600"></i>
+        <div class="google-card p-5 space-y-3.5">
+            <div class="flex items-center justify-between border-b border-[#dadce0] pb-3">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
+                    <i data-lucide="bar-chart" class="w-4 h-4 text-[#137333]"></i>
                     <span>Age Category Distribution</span>
                 </h3>
-                <span class="text-xs font-bold text-slate-500">Attendee Age Groups</span>
+                <span class="text-xs font-medium text-[#5f6368]">Attendee Age Groups</span>
             </div>
 
-            <div class="space-y-2.5 pt-1 text-xs">
+            <div class="space-y-3 pt-1 text-xs">
                 {% for group, count in age_distribution.items %}
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <span class="font-bold text-slate-700">{{ group }}</span>
-                        <span class="font-mono font-bold text-slate-900">{{ count }} attendees</span>
+                        <span class="font-medium text-[#202124]">{{ group }}</span>
+                        <span class="font-mono font-semibold text-[#202124]">{{ count }} attendees</span>
                     </div>
-                    <div class="w-full bg-slate-100 border border-slate-200 h-2 rounded-full overflow-hidden flex">
-                        <div style="width: {% widthratio count total_reg 100 %}%;" class="bg-emerald-600 h-full"></div>
+                    <div class="w-full bg-[#f1f3f4] border border-[#dadce0] h-2 rounded-full overflow-hidden flex">
+                        <div style="width: {% widthratio count total_reg 100 %}%;" class="bg-[#1e8e3e] h-full rounded-full"></div>
                     </div>
                 </div>
                 {% endfor %}
@@ -141,13 +141,13 @@
     </div>
 
     <!-- Registrations & Attendees Table -->
-    <div class="google-card p-5 sm:p-6 overflow-hidden bg-white border border-[#d8e2ed]">
+    <div class="google-card p-5 sm:p-6 overflow-hidden">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                <i data-lucide="users" class="w-4 h-4 text-[#3b5bf5]"></i>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-[#1a73e8]"></i>
                 <span>Registered Attendees ({{ registrations.count }})</span>
             </h3>
-            <a href="{% url 'dashboard-event-export-csv' event.id %}" class="google-btn-outlined text-xs py-1 px-3">
+            <a href="{% url 'dashboard-event-export-csv' event.id %}" class="google-btn-outlined text-xs py-1 px-3 rounded-full">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
                 <span>Download Roster CSV</span>
             </a>
@@ -155,7 +155,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse min-w-[700px]">
-                <thead class="bg-[#f8fafc] border-b border-[#d8e2ed] text-slate-600 font-bold text-[11px] uppercase tracking-wider">
+                <thead class="bg-[#f8f9fa] border-b border-[#dadce0] text-[#5f6368] font-semibold text-[11px] uppercase tracking-wider">
                     <tr>
                         <th class="py-3 px-3">Order Ref</th>
                         <th class="py-3 px-3">Attendee</th>
@@ -166,31 +166,31 @@
                         <th class="py-3 px-3 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-[#d8e2ed]/60 bg-white text-slate-800">
+                <tbody class="divide-y divide-[#dadce0] text-[#202124]">
                     {% for reg in registrations %}
-                    <tr class="hover:bg-[#eef2ff]/30 transition">
-                        <td class="py-3.5 px-3 font-mono font-bold text-[#3b5bf5]">
+                    <tr class="hover:bg-[#f8f9fa] transition">
+                        <td class="py-3 px-3 font-mono font-semibold text-[#1a73e8]">
                             {{ reg.order.order_code|default:reg.registration_code }}
                         </td>
-                        <td class="py-3.5 px-3">
-                            <div class="font-bold text-slate-900">{{ reg.customer.name }}</div>
-                            <div class="text-[11px] text-slate-500 font-medium">{{ reg.customer.company|default:reg.customer.designation }}</div>
+                        <td class="py-3 px-3">
+                            <div class="font-semibold text-[#202124]">{{ reg.customer.name }}</div>
+                            <div class="text-[11px] text-[#5f6368]">{{ reg.customer.company|default:reg.customer.designation }}</div>
                         </td>
-                        <td class="py-3.5 px-3">
-                            <div class="text-slate-900 font-medium">{{ reg.customer.email }}</div>
-                            <div class="text-[11px] text-slate-500 font-mono">{{ reg.customer.phone|default:"-" }}</div>
+                        <td class="py-3 px-3">
+                            <div class="text-[#202124]">{{ reg.customer.email }}</div>
+                            <div class="text-[11px] text-[#5f6368] font-mono">{{ reg.customer.phone|default:"-" }}</div>
                         </td>
-                        <td class="py-3.5 px-3 text-center">
+                        <td class="py-3 px-3 text-center">
                             {% if reg.attendee_pass %}
-                            <a href="{% url 'attendee-badge' reg.attendee_pass.pass_code %}" target="_blank" class="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 border border-emerald-300 hover:bg-emerald-100 transition shadow-2xs rounded" title="Open QR Badge">
-                                <i data-lucide="qr-code" class="w-3 h-3 text-emerald-600"></i>
+                            <a href="{% url 'attendee-badge' reg.attendee_pass.pass_code %}" target="_blank" class="pill-green" title="Open QR Badge">
+                                <i data-lucide="qr-code" class="w-3.5 h-3.5 text-[#137333]"></i>
                                 <span>{{ reg.attendee_pass.pass_code }}</span>
                             </a>
                             {% else %}
-                            <span class="text-slate-400 text-xs font-mono">-</span>
+                            <span class="text-[#5f6368] text-xs font-mono">-</span>
                             {% endif %}
                         </td>
-                        <td class="py-3.5 px-3">
+                        <td class="py-3 px-3">
                             {% if reg.order.status == 'VERIFIED' %}
                             <span class="pill-green">₹{{ reg.amount|floatformat:0 }} Verified</span>
                             {% elif reg.order.status == 'MANUAL_REVIEW' %}
@@ -199,21 +199,21 @@
                             <span class="pill-blue">Pending</span>
                             {% endif %}
                         </td>
-                        <td class="py-3.5 px-3">
+                        <td class="py-3 px-3">
                             {% if reg.status == 'COMPLETED' %}
-                            <span class="text-[#15803d] font-bold">Confirmed</span>
+                            <span class="text-[#137333] font-semibold">Confirmed</span>
                             {% elif reg.status == 'MANUAL_REVIEW' %}
-                            <span class="text-[#c2410c] font-bold">Needs Review</span>
+                            <span class="text-[#b06000] font-semibold">Needs Review</span>
                             {% else %}
-                            <span class="text-slate-500 font-medium">Pending</span>
+                            <span class="text-[#5f6368]">Pending</span>
                             {% endif %}
                         </td>
-                        <td class="py-3.5 px-3 text-right space-x-1 whitespace-nowrap">
-                            <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="google-btn-outlined text-xs py-0.5 px-2.5">
+                        <td class="py-3 px-3 text-right space-x-1 whitespace-nowrap">
+                            <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="google-btn-outlined text-xs py-0.5 px-2.5 rounded-full">
                                 Tracker
                             </a>
                             {% if reg.order and reg.status != 'COMPLETED' %}
-                            <a href="{% url 'payment-checkout' reg.order.order_code %}" target="_blank" class="google-btn-primary text-xs py-0.5 px-2.5">
+                            <a href="{% url 'payment-checkout' reg.order.order_code %}" target="_blank" class="google-btn-primary text-xs py-0.5 px-2.5 rounded-full shadow-none">
                                 Pay
                             </a>
                             {% endif %}
@@ -221,7 +221,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="py-12 text-center text-slate-500">
+                        <td colspan="7" class="py-12 text-center text-[#5f6368]">
                             No attendees have registered for this event yet.
                         </td>
                     </tr>

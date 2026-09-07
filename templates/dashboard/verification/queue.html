@@ -3,110 +3,110 @@
 {% block header_title %}Human Payment Verification Console{% endblock %}
 
 {% block content %}
-<div class="p-3 sm:p-5 max-w-[1600px] w-full mx-auto space-y-4 pb-12">
+<div class="p-4 sm:p-6 max-w-[1600px] w-full mx-auto space-y-5 pb-12">
 
     <!-- 1. Header Bar: Google Console Style -->
-    <div class="google-card p-4 sm:p-5 bg-white border border-[#d8e2ed] flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
+    <div class="google-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-[#eef2ff] text-[#3b5bf5] flex items-center justify-center">
-                    <i data-lucide="user-check" class="w-4.5 h-4.5 text-[#3b5bf5]"></i>
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
+                    <i data-lucide="user-check" class="w-5 h-5"></i>
                 </div>
-                <div class="flex flex-wrap items-center gap-2">
-                    <h1 class="text-base sm:text-lg font-bold font-display text-slate-900 tracking-tight">Human Payment Verification Console</h1>
-                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#eef2ff] text-[#3b5bf5] border border-[#dbeafe] font-mono flex items-center gap-1">
-                        <i data-lucide="shield" class="w-3 h-3 text-[#3b5bf5]"></i>
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <h1 class="text-base sm:text-lg font-semibold font-display text-[#202124] tracking-tight m-0">Human Payment Verification Console</h1>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] flex items-center gap-1">
+                        <i data-lucide="shield" class="w-3.5 h-3.5"></i>
                         <span>100% Human Review</span>
                     </span>
-                    <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#e6f4ea] text-[#137333] border border-[#ceead6] flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e]"></span>
                         <span>OCR Assist Active</span>
                     </span>
                 </div>
             </div>
-            <p class="text-xs text-slate-500 mt-1 pl-10">Review submitted payment receipts, verify UTR and amounts against bank collections, and manually approve or reject attendee passes.</p>
+            <p class="text-xs text-[#5f6368] mt-1.5 pl-12">Review submitted payment receipts, verify UTR and amounts against bank collections, and manually approve or reject attendee passes.</p>
         </div>
         
-        <div class="flex items-center gap-2.5 pl-10 md:pl-0">
+        <div class="flex items-center gap-2.5 pl-12 md:pl-0">
             {% if queue %}
-            <span class="px-3.5 py-1.5 rounded-full bg-[#fef3c7] border border-amber-300 text-amber-900 font-extrabold text-xs flex items-center gap-2 shadow-2xs">
-                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+            <span class="px-3.5 py-1.5 rounded-full bg-[#fef7e0] border border-[#feefc3] text-[#b06000] font-semibold text-xs flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#f9ab00] animate-ping"></span>
                 <span>{{ queue|length }} Awaiting Human Approval</span>
             </span>
             {% else %}
-            <span class="px-3.5 py-1.5 rounded-full bg-[#dcfce7] border border-emerald-300 text-emerald-800 font-bold text-xs flex items-center gap-2 shadow-2xs">
-                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span class="px-3.5 py-1.5 rounded-full bg-[#e6f4ea] border border-[#ceead6] text-[#137333] font-medium text-xs flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-[#1e8e3e]"></i>
                 <span>0 Pending Review</span>
             </span>
             {% endif %}
 
-            <a href="{% url 'dashboard-verification-queue' %}" class="google-btn-outlined py-1.5 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 shadow-2xs" title="Refresh Queue">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#3b5bf5]"></i>
+            <a href="{% url 'dashboard-verification-queue' %}" class="google-btn-outlined py-1.5 px-3 text-xs rounded-full flex items-center gap-1.5" title="Refresh Queue">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                 <span class="hidden sm:inline">Refresh</span>
             </a>
         </div>
     </div>
 
     <!-- 2. Human Verification Performance KPIs Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- Metric 1: Pending Queue -->
-        <div class="bg-white rounded-xl p-3.5 border {% if queue %}border-amber-300 bg-gradient-to-b from-amber-50/40 to-white{% else %}border-[#d8e2ed]{% endif %} shadow-2xs">
-            <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-1 {% if queue %}text-amber-800{% else %}text-slate-600{% endif %}">
+        <div class="google-card p-4 flex flex-col justify-between {% if queue %}border-[#feefc3] bg-gradient-to-b from-[#fefbf0] to-white{% endif %}">
+            <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider mb-2 {% if queue %}text-[#b06000]{% else %}text-[#5f6368]{% endif %}">
                 <span>Pending Review</span>
-                <i data-lucide="inbox" class="w-4 h-4 {% if queue %}text-amber-600{% else %}text-slate-400{% endif %}"></i>
+                <i data-lucide="inbox" class="w-4 h-4 {% if queue %}text-[#b06000]{% else %}text-[#5f6368]{% endif %}"></i>
             </div>
-            <div class="text-2xl font-black font-display {% if queue %}text-amber-900{% else %}text-slate-900{% endif %}">
+            <div class="text-2xl font-bold font-display {% if queue %}text-[#b06000]{% else %}text-[#202124]{% endif %}">
                 {{ queue|length }}
             </div>
-            <div class="mt-2 text-xs pt-1.5 border-t border-slate-100 flex items-center justify-between text-slate-500 font-medium">
+            <div class="mt-2 text-xs pt-2 border-t border-[#dadce0] flex items-center justify-between text-[#5f6368]">
                 <span>{% if queue %}Admin action required{% else %}Queue is clean{% endif %}</span>
-                <span class="font-mono text-[11px]">Active</span>
+                <span class="font-mono text-xs">Active</span>
             </div>
         </div>
 
         <!-- Metric 2: Manual Approvals -->
-        <div class="bg-white rounded-xl p-3.5 border border-[#ceead6] bg-gradient-to-b from-[#f0fdf4] to-white shadow-2xs">
-            <div class="flex items-center justify-between text-[#15803d] text-xs font-bold uppercase tracking-wider mb-1">
+        <div class="google-card p-4 flex flex-col justify-between border-[#ceead6] bg-gradient-to-b from-[#f6fbf7] to-white">
+            <div class="flex items-center justify-between text-[#137333] text-xs font-semibold uppercase tracking-wider mb-2">
                 <span>Passes Approved</span>
-                <i data-lucide="user-check" class="w-4 h-4 text-[#16a34a]"></i>
+                <i data-lucide="user-check" class="w-4 h-4 text-[#1e8e3e]"></i>
             </div>
-            <div class="text-2xl font-black font-display text-[#0f5132] font-mono">
+            <div class="text-2xl font-bold font-display text-[#137333] font-mono">
                 {{ manual_approved_count }}
             </div>
-            <div class="mt-2 text-xs pt-1.5 border-t border-[#ceead6] flex items-center justify-between text-[#15803d] font-bold">
+            <div class="mt-2 text-xs pt-2 border-t border-[#ceead6] flex items-center justify-between text-[#137333] font-medium">
                 <span>Human Approved</span>
-                <span class="text-[11px] font-mono">{{ approval_rate }}% Rate</span>
+                <span class="text-xs font-mono">{{ approval_rate }}% Rate</span>
             </div>
         </div>
 
         <!-- Metric 3: Rejected Transactions -->
-        <div class="bg-white rounded-xl p-3.5 border border-[#fed7aa] bg-gradient-to-b from-[#fff7ed] to-white shadow-2xs">
-            <div class="flex items-center justify-between text-[#c2410c] text-xs font-bold uppercase tracking-wider mb-1">
+        <div class="google-card p-4 flex flex-col justify-between border-[#fad2cf] bg-gradient-to-b from-[#fdf7f7] to-white">
+            <div class="flex items-center justify-between text-[#c5221f] text-xs font-semibold uppercase tracking-wider mb-2">
                 <span>Rejections</span>
-                <i data-lucide="x-circle" class="w-4 h-4 text-[#ea580c]"></i>
+                <i data-lucide="x-circle" class="w-4 h-4 text-[#d93025]"></i>
             </div>
-            <div class="text-2xl font-black font-display text-[#9a3412]">
+            <div class="text-2xl font-bold font-display text-[#c5221f]">
                 {{ rejected_count }}
             </div>
-            <div class="mt-2 text-xs pt-1.5 border-t border-[#fed7aa] flex items-center justify-between text-[#c2410c] font-semibold">
+            <div class="mt-2 text-xs pt-2 border-t border-[#fad2cf] flex items-center justify-between text-[#c5221f]">
                 <span>Invalid Receipts</span>
-                <span class="text-[11px]">Declined</span>
+                <span class="text-xs">Declined</span>
             </div>
         </div>
 
         <!-- Metric 4: Total Reconciled -->
-        <div class="bg-white rounded-xl p-3.5 border border-[#d8e2ed] shadow-2xs">
-            <div class="flex items-center justify-between text-slate-600 text-xs font-bold uppercase tracking-wider mb-1">
+        <div class="google-card p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-[#5f6368] text-xs font-semibold uppercase tracking-wider mb-2">
                 <span>Total Reconciled</span>
-                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                <i data-lucide="check-circle" class="w-4 h-4 text-[#1e8e3e]"></i>
             </div>
-            <div class="text-2xl font-black font-display text-slate-900 font-mono">
+            <div class="text-2xl font-bold font-display text-[#202124] font-mono">
                 {{ total_processed }}
             </div>
-            <div class="mt-2 text-xs pt-1.5 border-t border-slate-100 flex items-center justify-between text-slate-500 font-medium">
+            <div class="mt-2 text-xs pt-2 border-t border-[#dadce0] flex items-center justify-between text-[#5f6368]">
                 <span>Manual Decisions</span>
-                <span class="text-emerald-700 font-bold text-[11px]">100% Human Audited</span>
+                <span class="text-[#137333] font-medium text-xs">100% Audited</span>
             </div>
         </div>
 
@@ -116,47 +116,47 @@
     {% if queue %}
     <div class="space-y-4">
         {% for item in queue %}
-        <div class="google-card bg-white border border-[#d8e2ed] overflow-hidden shadow-sm">
+        <div class="google-card overflow-hidden">
             
             <!-- Order Header Bar -->
-            <div class="bg-[#f8fafc] px-4 sm:px-6 py-3 border-b border-[#d8e2ed] flex flex-wrap items-center justify-between gap-2.5">
+            <div class="bg-[#f8f9fa] px-5 py-3 border-b border-[#dadce0] flex flex-wrap items-center justify-between gap-2.5">
                 <div class="flex flex-wrap items-center gap-2.5 text-xs">
-                    <span class="font-mono font-bold text-[#3b5bf5] bg-[#eef2ff] px-2.5 py-0.5 border border-[#dbeafe]">
+                    <span class="font-mono font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc]">
                         {{ item.order.order_code }}
                     </span>
-                    <span class="font-bold text-slate-900">
+                    <span class="font-semibold text-[#202124]">
                         {{ item.order.registration.event.title }}
                     </span>
-                    <span class="text-slate-500 font-medium">
+                    <span class="text-[#5f6368]">
                         • {{ item.order.registration.customer.name }} ({{ item.order.registration.customer.email }})
                     </span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="text-[11px] font-mono text-slate-500">{{ item.created_at|date:"d M Y, H:i A" }}</span>
+                    <span class="text-xs font-mono text-[#5f6368]">{{ item.created_at|date:"d M Y, H:i A" }}</span>
                     <span class="pill-orange">AWAITING HUMAN APPROVAL</span>
                 </div>
             </div>
 
             <!-- Split Screen Review Workspace -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 p-4 sm:p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 p-5">
                 
                 <!-- Left: Uploaded Receipt Screenshot (5 cols) -->
                 <div class="lg:col-span-5 flex flex-col space-y-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                        <i data-lucide="image" class="w-4 h-4 text-[#3b5bf5]"></i>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1.5">
+                        <i data-lucide="image" class="w-4 h-4 text-[#1a73e8]"></i>
                         <span>Uploaded Payment Screenshot</span>
                     </span>
                     
-                    <div class="bg-[#0f172a] rounded-xl border border-slate-300 p-2.5 flex items-center justify-center min-h-[280px] max-h-[420px] overflow-hidden relative group">
+                    <div class="bg-[#202124] rounded-2xl border border-[#dadce0] p-3 flex items-center justify-center min-h-[280px] max-h-[420px] overflow-hidden relative group">
                         {% if item.evidence and item.evidence.screenshot %}
-                        <img src="{{ item.evidence.screenshot.url }}" alt="Payment Proof" class="max-h-[400px] w-auto object-contain rounded shadow-lg group-hover:scale-102 transition duration-200">
-                        <a href="{{ item.evidence.screenshot.url }}" target="_blank" class="absolute bottom-3 right-3 bg-white text-slate-900 text-xs px-3 py-1.5 rounded-full border border-slate-300 font-bold flex items-center gap-1 shadow-md hover:bg-slate-50 transition" title="Open full resolution in new tab">
-                            <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[#3b5bf5]"></i>
+                        <img src="{{ item.evidence.screenshot.url }}" alt="Payment Proof" class="max-h-[400px] w-auto object-contain rounded-lg shadow-md group-hover:scale-102 transition duration-200">
+                        <a href="{{ item.evidence.screenshot.url }}" target="_blank" class="absolute bottom-3 right-3 bg-white text-[#202124] text-xs px-3 py-1.5 rounded-full border border-[#dadce0] font-medium flex items-center gap-1 shadow-md hover:bg-[#f8f9fa] transition" title="Open full resolution in new tab">
+                            <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                             <span>Full Image</span>
                         </a>
                         {% else %}
-                        <div class="text-xs text-slate-400 flex flex-col items-center gap-2">
-                            <i data-lucide="file-question" class="w-8 h-8 text-slate-500"></i>
+                        <div class="text-xs text-white/70 flex flex-col items-center gap-2">
+                            <i data-lucide="file-question" class="w-8 h-8 text-white/50"></i>
                             <span>No visual receipt file attached</span>
                         </div>
                         {% endif %}
@@ -167,75 +167,75 @@
                 <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
                     
                     <div class="space-y-3">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                            <i data-lucide="file-text" class="w-4 h-4 text-[#3b5bf5]"></i>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1.5">
+                            <i data-lucide="file-text" class="w-4 h-4 text-[#1a73e8]"></i>
                             <span>Extracted Details vs Expected Order Amount</span>
                         </span>
 
                         <!-- Reason Alerts -->
                         {% if item.is_duplicate_txn %}
-                        <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
-                            <i data-lucide="alert-octagon" class="w-4 h-4 shrink-0 text-rose-600 mt-0.5"></i>
+                        <div class="p-3 rounded-xl bg-[#fce8e6] border border-[#fad2cf] text-[#c5221f] text-xs flex items-start gap-2.5">
+                            <i data-lucide="alert-octagon" class="w-4 h-4 shrink-0 text-[#d93025] mt-0.5"></i>
                             <div>
-                                <strong class="font-bold block">DUPLICATE TRANSACTION ID DETECTED:</strong>
+                                <strong class="font-semibold block">DUPLICATE TRANSACTION ID DETECTED:</strong>
                                 <span>This transaction ID has already been utilized for another order. Check bank records carefully.</span>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if not item.is_amount_matched %}
-                        <div class="p-3 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2.5">
-                            <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-amber-600 mt-0.5"></i>
+                        <div class="p-3 rounded-xl bg-[#fef7e0] border border-[#feefc3] text-[#b06000] text-xs flex items-start gap-2.5">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 text-[#f9ab00] mt-0.5"></i>
                             <div>
-                                <strong class="font-bold block">AMOUNT CHECK NOTICE:</strong>
+                                <strong class="font-semibold block">AMOUNT CHECK NOTICE:</strong>
                                 <span>Order expects <strong>₹{{ item.order.amount }}</strong> but OCR extracted <strong>₹{{ item.ocr_amount|default:"Unknown" }}</strong>.</span>
                             </div>
                         </div>
                         {% endif %}
 
                         <!-- Comparison Grid -->
-                        <div class="grid grid-cols-2 gap-2.5 bg-[#f8fafc] p-3.5 rounded-xl border border-[#d8e2ed] text-xs">
-                            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
-                                <span class="text-slate-500 block text-[10px] font-bold uppercase">Expected Payable Amount</span>
-                                <span class="font-bold text-slate-900 text-base font-mono">₹{{ item.order.amount|floatformat:2 }}</span>
+                        <div class="grid grid-cols-2 gap-3 bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0] text-xs">
+                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Expected Payable Amount</span>
+                                <span class="font-bold text-[#202124] text-base font-mono">₹{{ item.order.amount|floatformat:2 }}</span>
                             </div>
-                            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
-                                <span class="text-slate-500 block text-[10px] font-bold uppercase">Receipt Detected Amount</span>
-                                <span class="font-bold text-base font-mono {% if item.is_amount_matched %}text-emerald-700{% else %}text-amber-800{% endif %}">
+                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Receipt Detected Amount</span>
+                                <span class="font-bold text-base font-mono {% if item.is_amount_matched %}text-[#137333]{% else %}text-[#b06000]{% endif %}">
                                     ₹{{ item.ocr_amount|default:"N/A" }}
                                 </span>
                             </div>
 
-                            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
-                                <span class="text-slate-500 block text-[10px] font-bold uppercase">Extracted UTR / Txn ID</span>
-                                <span class="font-mono font-bold text-slate-900 text-xs">{{ item.ocr_transaction_id|default:"Not Detected" }}</span>
+                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Extracted UTR / Txn ID</span>
+                                <span class="font-mono font-semibold text-[#202124] text-xs">{{ item.ocr_transaction_id|default:"Not Detected" }}</span>
                             </div>
-                            <div class="bg-white p-2.5 rounded-lg border border-slate-200">
-                                <span class="text-slate-500 block text-[10px] font-bold uppercase">Payee UPI on Receipt</span>
-                                <span class="font-medium text-slate-900 text-xs truncate block">{{ item.ocr_payee|default:item.order.registration.event.upi_name }}</span>
+                            <div class="bg-white p-3 rounded-xl border border-[#dadce0]">
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">Payee UPI on Receipt</span>
+                                <span class="font-medium text-[#202124] text-xs truncate block">{{ item.ocr_payee|default:item.order.registration.event.upi_name }}</span>
                             </div>
 
-                            <div class="col-span-2 bg-white p-2.5 rounded-lg border border-slate-200">
-                                <span class="text-slate-500 block text-[10px] font-bold uppercase">System Notes</span>
-                                <span class="font-mono text-[11px] text-slate-800 font-medium">{{ item.review_notes|default:"Awaiting human admin review and approval." }}</span>
+                            <div class="col-span-2 bg-white p-3 rounded-xl border border-[#dadce0]">
+                                <span class="text-[#5f6368] block text-[11px] font-semibold uppercase">System Notes</span>
+                                <span class="font-mono text-xs text-[#3c4043]">{{ item.review_notes|default:"Awaiting human admin review and approval." }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Human Action Decision Form -->
-                    <form method="POST" action="{% url 'dashboard-verification-action' item.id %}" class="bg-[#f8fafc] p-3.5 rounded-xl border border-[#d8e2ed] space-y-2.5">
+                    <form method="POST" action="{% url 'dashboard-verification-action' item.id %}" class="bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0] space-y-3">
                         {% csrf_token %}
                         <div>
-                            <label class="text-[11px] font-bold text-slate-700 block mb-1">Admin Reviewer Note (Optional)</label>
-                            <input type="text" name="notes" placeholder="e.g. Verified transaction on bank merchant dashboard" class="google-input text-xs py-1.5">
+                            <label class="text-xs font-semibold text-[#202124] block mb-1">Admin Reviewer Note (Optional)</label>
+                            <input type="text" name="notes" placeholder="e.g. Verified transaction on bank merchant dashboard" class="google-input text-xs py-2">
                         </div>
-                        <div class="flex items-center justify-end gap-2">
-                            <button type="submit" name="action" value="REJECT" onclick="return confirm('Are you sure you want to REJECT this payment proof?');" class="google-btn-danger py-1.5 px-3 text-xs flex items-center gap-1 cursor-pointer">
-                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        <div class="flex items-center justify-end gap-2.5">
+                            <button type="submit" name="action" value="REJECT" onclick="return confirm('Are you sure you want to REJECT this payment proof?');" class="google-btn-danger py-1.5 px-3.5 text-xs rounded-full flex items-center gap-1 cursor-pointer">
+                                <i data-lucide="x" class="w-4 h-4"></i>
                                 <span>Reject Payment</span>
                             </button>
-                            <button type="submit" name="action" value="APPROVE" class="google-btn-primary py-1.5 px-3.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center gap-1 cursor-pointer">
-                                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                            <button type="submit" name="action" value="APPROVE" class="google-btn-primary py-1.5 px-4 text-xs rounded-full flex items-center gap-1.5 cursor-pointer">
+                                <i data-lucide="check" class="w-4 h-4"></i>
                                 <span>Approve & Issue Pass</span>
                             </button>
                         </div>
@@ -250,20 +250,20 @@
 
     <!-- 4. Empty Queue State -->
     {% else %}
-    <div class="google-card p-10 sm:p-14 bg-white border border-[#d8e2ed] text-center space-y-3 shadow-sm">
-        <div class="w-14 h-14 rounded-full bg-[#dcfce7] text-[#15803d] border border-emerald-300 flex items-center justify-center mx-auto shadow-sm">
-            <i data-lucide="check" class="w-7 h-7 text-emerald-600"></i>
+    <div class="google-card p-12 sm:p-16 text-center space-y-3.5">
+        <div class="w-14 h-14 rounded-full bg-[#e6f4ea] text-[#137333] flex items-center justify-center mx-auto">
+            <i data-lucide="check" class="w-7 h-7 text-[#1e8e3e]"></i>
         </div>
-        <h2 class="text-lg sm:text-xl font-bold font-display text-slate-900 tracking-tight">Verification Queue is Completely Clear</h2>
-        <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+        <h2 class="text-lg sm:text-xl font-semibold font-display text-[#202124] tracking-tight">Verification Queue is Completely Clear</h2>
+        <p class="text-xs text-[#5f6368] max-w-md mx-auto leading-relaxed">
             All submitted payment receipts have been reviewed and approved or rejected by administrators.
         </p>
-        <div class="pt-2 flex flex-wrap items-center justify-center gap-2">
-            <a href="{% url 'dashboard-registrations-list' %}" class="google-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1 shadow-2xs">
-                <i data-lucide="database" class="w-3.5 h-3.5"></i>
+        <div class="pt-2 flex flex-wrap items-center justify-center gap-2.5">
+            <a href="{% url 'dashboard-registrations-list' %}" class="google-btn-primary text-xs py-1.5 px-4 rounded-full flex items-center gap-1.5">
+                <i data-lucide="database" class="w-4 h-4"></i>
                 <span>View Registration Logs</span>
             </a>
-            <a href="{% url 'dashboard-overview' %}" class="google-btn-outlined text-xs py-1.5 px-3.5">
+            <a href="{% url 'dashboard-overview' %}" class="google-btn-outlined text-xs py-1.5 px-4 rounded-full">
                 <span>Dashboard Overview</span>
             </a>
         </div>
@@ -272,44 +272,44 @@
 
     <!-- 5. Recent Verification & Reconciliation Audit History Log -->
     {% if recent_history %}
-    <div class="google-card bg-white border border-[#d8e2ed] overflow-hidden shadow-2xs">
-        <div class="px-4 sm:px-6 py-3 border-b border-slate-200 bg-[#f8fafc] flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded bg-[#eef2ff] text-[#3b5bf5] flex items-center justify-center">
-                    <i data-lucide="history" class="w-3.5 h-3.5 text-[#3b5bf5]"></i>
+    <div class="google-card overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-[#dadce0] bg-[#f8f9fa] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
+                    <i data-lucide="history" class="w-4 h-4"></i>
                 </div>
-                <h3 class="text-xs sm:text-sm font-bold text-slate-900">Recent Verification & Resolution History</h3>
+                <h3 class="text-sm font-semibold text-[#202124]">Recent Verification & Resolution History</h3>
             </div>
-            <span class="text-xs text-slate-500 font-medium font-mono">{{ recent_history|length }} resolved items</span>
+            <span class="text-xs text-[#5f6368] font-mono">{{ recent_history|length }} resolved items</span>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse min-w-[750px]">
-                <thead class="bg-[#f8fafc] text-slate-600 font-bold text-[11px] uppercase tracking-wider border-b border-slate-200">
+                <thead class="bg-[#f8f9fa] text-[#5f6368] font-semibold text-[11px] uppercase tracking-wider border-b border-[#dadce0]">
                     <tr>
-                        <th class="py-2.5 px-4">Order Code</th>
-                        <th class="py-2.5 px-4">Customer</th>
-                        <th class="py-2.5 px-4">Decision</th>
-                        <th class="py-2.5 px-4">Amount</th>
-                        <th class="py-2.5 px-4">Extracted UTR</th>
-                        <th class="py-2.5 px-4">Reviewer</th>
-                        <th class="py-2.5 px-4 text-right">Resolved Time</th>
+                        <th class="py-3 px-4">Order Code</th>
+                        <th class="py-3 px-4">Customer</th>
+                        <th class="py-3 px-4">Decision</th>
+                        <th class="py-3 px-4">Amount</th>
+                        <th class="py-3 px-4">Extracted UTR</th>
+                        <th class="py-3 px-4">Reviewer</th>
+                        <th class="py-3 px-4 text-right">Resolved Time</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-slate-800">
+                <tbody class="divide-y divide-[#dadce0] text-[#202124]">
                     {% for h in recent_history %}
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="py-2.5 px-4 font-mono font-bold text-[#3b5bf5]">
+                    <tr class="hover:bg-[#f8f9fa] transition">
+                        <td class="py-3 px-4 font-mono font-semibold text-[#1a73e8]">
                             {{ h.order.order_code }}
                         </td>
-                        <td class="py-2.5 px-4">
-                            <div class="font-bold text-slate-900">{{ h.order.registration.customer.name }}</div>
-                            <div class="text-[11px] text-slate-500">{{ h.order.registration.event.title|truncatechars:20 }}</div>
+                        <td class="py-3 px-4">
+                            <div class="font-semibold text-[#202124]">{{ h.order.registration.customer.name }}</div>
+                            <div class="text-[11px] text-[#5f6368]">{{ h.order.registration.event.title|truncatechars:20 }}</div>
                         </td>
-                        <td class="py-2.5 px-4">
+                        <td class="py-3 px-4">
                             {% if h.decision == 'MANUAL_APPROVED' or h.decision == 'AUTO_VERIFIED' %}
-                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                                <i data-lucide="check-circle" class="w-3 h-3 text-emerald-600"></i>
+                            <span class="pill-green">
+                                <i data-lucide="check-circle" class="w-3 h-3 text-[#137333]"></i>
                                 <span>Approved</span>
                             </span>
                             {% elif h.decision == 'REJECTED' %}
@@ -318,20 +318,20 @@
                             <span class="pill-orange">{{ h.decision }}</span>
                             {% endif %}
                         </td>
-                        <td class="py-2.5 px-4 font-mono font-bold">
+                        <td class="py-3 px-4 font-mono font-semibold">
                             ₹{{ h.order.amount|floatformat:2 }}
                         </td>
-                        <td class="py-2.5 px-4 font-mono text-[11px] text-slate-700">
+                        <td class="py-3 px-4 font-mono text-[11px] text-[#5f6368]">
                             {{ h.ocr_transaction_id|default:"-" }}
                         </td>
-                        <td class="py-2.5 px-4 text-slate-600">
+                        <td class="py-3 px-4 text-[#5f6368]">
                             {% if h.reviewed_by %}
-                            <span class="font-semibold">{{ h.reviewed_by.username }}</span>
+                            <span class="font-medium text-[#202124]">{{ h.reviewed_by.username }}</span>
                             {% else %}
-                            <span class="font-semibold text-slate-700">Admin</span>
+                            <span class="font-medium text-[#202124]">Admin</span>
                             {% endif %}
                         </td>
-                        <td class="py-2.5 px-4 text-right font-mono text-slate-500 text-[11px] whitespace-nowrap">
+                        <td class="py-3 px-4 text-right font-mono text-[#5f6368] text-[11px] whitespace-nowrap">
                             {{ h.reviewed_at|default:h.created_at|date:"d M Y, H:i" }}
                         </td>
                     </tr>
@@ -344,3 +344,4 @@
 
 </div>
 {% endblock %}
+

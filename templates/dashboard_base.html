@@ -3,218 +3,245 @@
 
 {% block body_content %}
 <style>
-    /* Core navigation styling */
-    .google-sidebar { background-color: #070d1e !important; border-right: 1px solid #1e293b !important; }
-    .google-topbar { background: linear-gradient(90deg, #3b5bf5 0%, #2b49e0 50%, #1f3bbd 100%) !important; border-bottom: 1px solid #2b49e0 !important; }
-    .sidebar-nav-btn { color: #94a3b8; transition: all 0.15s ease-in-out; position: relative; border-radius: 0px !important; }
-    .sidebar-nav-btn:hover { color: #ffffff !important; background-color: #1e293b !important; }
-    .sidebar-nav-btn.active { background: linear-gradient(135deg, #3b5bf5, #2b49e0) !important; color: #ffffff !important; box-shadow: 0 0 14px rgba(59,91,245,0.6) !important; font-weight: 700; }
-    .sidebar-tooltip { visibility: hidden; opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease; transform: translateX(-4px); }
-    .sidebar-item-wrap:hover .sidebar-tooltip { visibility: visible; opacity: 1; transform: translateX(0); }
-    /* Mobile drawer transitions */
-    #mobile-drawer { transition: transform 0.2s cubic-bezier(0.4,0,0.2,1); }
-    #mobile-drawer.open { transform: translateX(0) !important; }
-    #mobile-backdrop { transition: opacity 0.2s ease; }
-    #mobile-backdrop.open { opacity: 1 !important; pointer-events: auto !important; }
-
-    /* ==== Responsive font scaling for mobile ==== */
-    @media (max-width: 640px) {
-        html { font-size: 14px; }
-        .google-topbar .font-display { font-size: 0.9rem; }
-        .sidebar-nav-btn i { font-size: 0.75rem; }
-        .google-topbar h1 { font-size: 1rem; }
-        .google-topbar span { font-size: 0.75rem; }
-        .google-topbar button { font-size: 0.75rem; }
-        .google-topbar .bg-white { font-size: 0.7rem; padding: 0.4rem 0.6rem; }
+    /* Google Console Topbar & Sidebar Styles */
+    .google-topbar {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #dadce0 !important;
     }
+    .google-sidebar {
+        background-color: #ffffff !important;
+        border-right: 1px solid #dadce0 !important;
+    }
+    .google-nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 50% !important;
+        color: #5f6368;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+    }
+    .google-nav-item:hover {
+        background-color: #f1f3f4 !important;
+        color: #202124 !important;
+    }
+    .google-nav-item.active {
+        background-color: #e8f0fe !important;
+        color: #1a73e8 !important;
+    }
+    .google-nav-item.active i {
+        stroke-width: 2.2px;
+        color: #1a73e8 !important;
+    }
+    
+    /* Google Floating Tooltip */
+    .google-tooltip {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        transform: translateX(-4px);
+        box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+    }
+    .sidebar-item-wrap:hover .google-tooltip {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Mobile drawer */
+    #mobile-drawer { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    #mobile-drawer.open { transform: translateX(0) !important; }
+    #mobile-backdrop { transition: opacity 0.25s ease; }
+    #mobile-backdrop.open { opacity: 1 !important; pointer-events: auto !important; }
 </style>
 
-<div class="flex h-screen overflow-hidden bg-[#f0f4f9] font-sans">
+<div class="flex h-screen overflow-hidden bg-[#f8f9fa] font-sans text-[#202124]">
 
-    <!-- 1. Left Slim Navigation Dock (Desktop lg+) -->
-    <aside class="google-sidebar hidden lg:flex w-16 flex-col items-center justify-between py-3.5 shrink-0 z-30 select-none">
+    <!-- 1. Left Google Slim Navigation Rail (Desktop lg+) -->
+    <aside class="google-sidebar hidden lg:flex w-16 flex-col items-center justify-between py-3 shrink-0 z-30 select-none">
         
-        <!-- Top Section: Brand Logo & Navigation Icons -->
+        <!-- Top: Logo & Nav items -->
         <div class="flex flex-col items-center gap-3 w-full">
-            <!-- Brand Logo -->
-            <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 bg-slate-900 border border-slate-700 shadow-md flex items-center justify-center p-1.5 transition hover:scale-105" title="Nizhal EMS Console">
+            <!-- Nizhal Logo Link -->
+            <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 rounded-full flex items-center justify-center transition hover:bg-[#f1f3f4] p-1.5" title="Nizhal Console">
                 <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-7 h-7 object-contain">
             </a>
 
-            <div class="w-8 h-[1px] bg-slate-800 my-0.5"></div>
+            <div class="w-8 h-[1px] bg-[#dadce0] my-1"></div>
 
-            <!-- Sharp Nav Icons List -->
+            <!-- Navigation Rail Icons -->
             <div class="flex flex-col items-center gap-2 w-full px-2">
                 
                 <!-- Overview -->
                 <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-overview' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if request.resolver_match.url_name == 'dashboard-overview' %}active{% endif %}">
+                    <a href="{% url 'dashboard-overview' %}" class="google-nav-item {% if request.resolver_match.url_name == 'dashboard-overview' %}active{% endif %}">
                         <i data-lucide="layout-grid" class="w-5 h-5"></i>
                     </a>
-                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
                         Overview
                     </div>
                 </div>
 
-                <!-- Logs -->
+                <!-- Registrations / Logs -->
                 <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-registrations-list' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}active{% endif %}">
+                    <a href="{% url 'dashboard-registrations-list' %}" class="google-nav-item {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}active{% endif %}">
                         <i data-lucide="receipt" class="w-5 h-5"></i>
                     </a>
-                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
-                        Logs
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Registrations
                     </div>
                 </div>
 
                 <!-- Events -->
                 <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-events-list' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'event' in request.resolver_match.url_name %}active{% endif %}">
+                    <a href="{% url 'dashboard-events-list' %}" class="google-nav-item {% if 'event' in request.resolver_match.url_name %}active{% endif %}">
                         <i data-lucide="calendar" class="w-5 h-5"></i>
                     </a>
-                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
                         Events
                     </div>
                 </div>
 
-                <!-- Queue -->
+                <!-- Verification Queue -->
                 <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-verification-queue' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center relative {% if 'verification' in request.resolver_match.url_name %}active{% endif %}">
+                    <a href="{% url 'dashboard-verification-queue' %}" class="google-nav-item relative {% if 'verification' in request.resolver_match.url_name %}active{% endif %}">
                         <i data-lucide="shield-check" class="w-5 h-5"></i>
                         {% if pending_reviews_count > 0 %}
-                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400"></span>
+                        <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#f9ab00]"></span>
                         {% endif %}
                     </a>
-                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
-                        Queue {% if pending_reviews_count > 0 %}({{ pending_reviews_count }}){% endif %}
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Verification Queue {% if pending_reviews_count > 0 %}({{ pending_reviews_count }}){% endif %}
                     </div>
                 </div>
 
-                <!-- Emails -->
+                <!-- Email Logs -->
                 <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-email-logs' %}" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center {% if 'email' in request.resolver_match.url_name %}active{% endif %}">
+                    <a href="{% url 'dashboard-email-logs' %}" class="google-nav-item {% if 'email' in request.resolver_match.url_name %}active{% endif %}">
                         <i data-lucide="mail" class="w-5 h-5"></i>
                     </a>
-                    <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-slate-900 text-white text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-slate-700">
-                        Emails
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Email Logs
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- Sidebar Bottom: User & Logout -->
-        <div class="flex flex-col items-center gap-2 w-full px-2 pt-2 border-t border-slate-800">
+        <!-- Rail Bottom: User Profile & Sign Out -->
+        <div class="flex flex-col items-center gap-2 w-full px-2 pt-2 border-t border-[#dadce0]">
             <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="sidebar-nav-btn w-11 h-11 flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-950/40" title="Sign Out">
+                <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="google-nav-item hover:text-[#d93025] hover:bg-[#fce8e6]" title="Sign Out">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                 </a>
-                <div class="sidebar-tooltip absolute left-14 px-2.5 py-1 bg-red-950 text-red-200 text-xs font-semibold shadow-lg whitespace-nowrap z-50 pointer-events-none border border-red-800">
+                <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
                     Sign Out ({{ request.user.username|default:'Nizhal' }})
                 </div>
             </div>
         </div>
     </aside>
 
-    <!-- 2. Mobile Slide-Over Drawer Navigation -->
-    <div id="mobile-backdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-950/60 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity duration-200"></div>
-    <div id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-72 bg-slate-900 text-white z-50 lg:hidden -translate-x-full shadow-2xl flex flex-col justify-between p-5 border-r border-slate-800">
+    <!-- 2. Mobile Drawer Navigation -->
+    <div id="mobile-backdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/40 z-40 lg:hidden opacity-0 pointer-events-none transition-opacity"></div>
+    <div id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white text-[#202124] z-50 lg:hidden -translate-x-full shadow-2xl flex flex-col justify-between p-4 border-r border-[#dadce0]">
         <div>
-            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 bg-blue-600 flex items-center justify-center font-black text-white text-xs">N</div>
-                    <span class="font-display font-bold text-sm text-white">Nizhal Console</span>
+            <!-- Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-[#dadce0]">
+                <div class="flex items-center gap-2.5">
+                    <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-7 h-7 object-contain">
+                    <span class="font-display font-semibold text-base text-[#202124]">Nizhal Console</span>
                 </div>
-                <button onclick="toggleMobileMenu()" class="p-1.5 text-slate-400 hover:text-white">
+                <button onclick="toggleMobileMenu()" class="p-1.5 text-[#5f6368] hover:text-[#202124] rounded-full hover:bg-[#f1f3f4]">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <nav class="mt-4 space-y-1 text-xs font-semibold">
-                <a href="{% url 'dashboard-overview' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if request.resolver_match.url_name == 'dashboard-overview' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+            <!-- Drawer Links -->
+            <nav class="mt-4 space-y-1 text-sm font-medium">
+                <a href="{% url 'dashboard-overview' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if request.resolver_match.url_name == 'dashboard-overview' %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
                     <i data-lucide="layout-grid" class="w-4 h-4"></i>
                     <span>Overview</span>
                 </a>
-                <a href="{% url 'dashboard-registrations-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                <a href="{% url 'dashboard-registrations-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
                     <i data-lucide="receipt" class="w-4 h-4"></i>
-                    <span>Logs</span>
+                    <span>Registrations</span>
                 </a>
-                <a href="{% url 'dashboard-events-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'event' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                <a href="{% url 'dashboard-events-list' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if 'event' in request.resolver_match.url_name %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
                     <i data-lucide="calendar" class="w-4 h-4"></i>
                     <span>Events</span>
                 </a>
-                <a href="{% url 'dashboard-verification-queue' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'verification' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                <a href="{% url 'dashboard-verification-queue' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if 'verification' in request.resolver_match.url_name %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
                     <i data-lucide="shield-check" class="w-4 h-4"></i>
-                    <span>Queue</span>
+                    <span>Verification Queue</span>
                     {% if pending_reviews_count > 0 %}
-                    <span class="ml-auto bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5">{{ pending_reviews_count }}</span>
+                    <span class="ml-auto bg-[#fef7e0] text-[#b06000] border border-[#feefc3] font-semibold text-xs px-2 py-0.5 rounded-full">{{ pending_reviews_count }}</span>
                     {% endif %}
                 </a>
-                <a href="{% url 'dashboard-email-logs' %}" class="flex items-center gap-3 px-3.5 py-2.5 {% if 'email' in request.resolver_match.url_name %}bg-blue-600 text-white font-bold{% else %}text-slate-300 hover:bg-slate-800{% endif %} transition">
+                <a href="{% url 'dashboard-email-logs' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-full {% if 'email' in request.resolver_match.url_name %}bg-[#e8f0fe] text-[#1a73e8] font-semibold{% else %}text-[#3c4043] hover:bg-[#f1f3f4]{% endif %} transition">
                     <i data-lucide="mail" class="w-4 h-4"></i>
-                    <span>Emails</span>
+                    <span>Email Logs</span>
                 </a>
             </nav>
         </div>
 
-        <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600/30 border border-blue-500/50 flex items-center justify-center font-bold text-xs text-blue-300">
+        <!-- Footer -->
+        <div class="pt-3 border-t border-[#dadce0] flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-[#1a73e8] text-white flex items-center justify-center font-medium text-xs">
                     {{ request.user.username|slice:":1"|upper|default:'N' }}
                 </div>
                 <div>
-                    <span class="font-bold text-xs text-white block">{{ request.user.username|default:'Nizhal' }}</span>
-                    <span class="text-[10px] text-emerald-400">Authenticated</span>
+                    <span class="font-medium text-xs text-[#202124] block">{{ request.user.username|default:'Nizhal' }}</span>
+                    <span class="text-[11px] text-[#137333] font-medium">Active Admin</span>
                 </div>
             </div>
-            <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 transition" title="Sign Out">
+            <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-2 text-[#5f6368] hover:text-[#d93025] rounded-full hover:bg-[#fce8e6] transition" title="Sign Out">
                 <i data-lucide="log-out" class="w-4 h-4"></i>
             </a>
         </div>
     </div>
 
     <!-- 3. Main Application Container -->
-    <div class="flex-1 flex flex-col overflow-hidden bg-[#f4f7fb]">
+    <div class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa]">
         
-        <!-- Top Header Bar -->
-        <header class="google-topbar h-14 px-4 sm:px-6 flex items-center justify-between text-white shrink-0 z-20 shadow-sm">
-            <!-- Left: Mobile Menu + Header Title -->
+        <!-- Google Console Top Header Bar -->
+        <header class="google-topbar h-14 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
+            <!-- Left: Mobile Menu + Header Title + Breadcrumb -->
             <div class="flex items-center gap-3">
-                <button onclick="toggleMobileMenu()" class="lg:hidden p-1.5 text-blue-100 hover:text-white">
+                <button onclick="toggleMobileMenu()" class="lg:hidden p-2 text-[#5f6368] hover:text-[#202124] rounded-full hover:bg-[#f1f3f4]">
                     <i data-lucide="menu" class="w-5 h-5"></i>
                 </button>
-                <div class="flex items-center gap-3">
-                    <span class="font-display font-extrabold text-base tracking-tight text-white">
+                <div class="flex items-center gap-2.5">
+                    <h1 class="font-display font-semibold text-base sm:text-lg text-[#202124] tracking-tight m-0">
                         {% block header_title %}Overview{% endblock %}
-                    </span>
-                    <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold bg-emerald-500/20 text-emerald-100 border border-emerald-400/40">
-                        <span class="w-1.5 h-1.5 bg-emerald-300"></span>
+                    </h1>
+                    <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e]"></span>
                         <span>UPI Engine Online</span>
                     </span>
                 </div>
             </div>
 
-            <!-- Right: Actions & User Menu -->
-            <div class="flex items-center gap-3 text-xs">
-                <a href="{% url 'dashboard-event-create' %}" class="bg-white hover:bg-slate-50 text-[#3b5bf5] font-bold px-3.5 py-1.5 transition shadow-sm flex items-center gap-1.5">
-                    <i data-lucide="plus" class="w-3.5 h-3.5 text-[#3b5bf5]"></i>
+            <!-- Right: Action Button & Profile -->
+            <div class="flex items-center gap-3">
+                <a href="{% url 'dashboard-event-create' %}" class="google-btn-primary py-1.5 px-3.5 text-xs rounded-full flex items-center gap-1.5 shadow-none hover:shadow-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
                     <span>New Event</span>
                 </a>
 
-                <!-- User Pill & Sign Out -->
-                <div class="hidden sm:flex items-center gap-2 pl-2 border-l border-blue-400/30">
-                    <div class="flex items-center gap-2 px-2.5 py-1 bg-white/10 border border-white/20">
-                        <div class="w-5 h-5 bg-white text-[#3b5bf5] flex items-center justify-center font-bold text-[10px]">
+                <!-- Google Account Avatar -->
+                <div class="flex items-center gap-2 pl-2 border-l border-[#dadce0]">
+                    <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#f1f3f4] border border-[#dadce0]">
+                        <div class="w-6 h-6 rounded-full bg-[#1a73e8] text-white flex items-center justify-center font-medium text-xs">
                             {{ request.user.username|slice:":1"|upper|default:'N' }}
                         </div>
-                        <div class="flex flex-col leading-tight text-left">
-                            <span class="font-bold text-white text-[11px]">{{ request.user.username|default:'Nizhal' }}</span>
-                        </div>
-                        <span class="ml-1 px-1.5 py-0.2 bg-emerald-400/30 text-emerald-200 border border-emerald-300/40 text-[9px] font-mono font-bold">ADMIN</span>
+                        <span class="hidden sm:inline font-medium text-xs text-[#202124]">{{ request.user.username|default:'Nizhal' }}</span>
                     </div>
 
-                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-600 text-white font-semibold border border-red-400/30 transition flex items-center gap-1 cursor-pointer" title="Sign Out">
-                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                        <span class="hidden md:inline text-[11px]">Sign Out</span>
+                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-1.5 text-[#5f6368] hover:text-[#d93025] rounded-full hover:bg-[#fce8e6] transition" title="Sign Out">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
                     </a>
                 </div>
             </div>
@@ -230,83 +257,83 @@
         </script>
 
         <!-- Main Body Scroll Area -->
-        <main class="flex-1 min-h-0 overflow-y-auto bg-[#f4f7fb] {% if 'email' in request.resolver_match.url_name %}bg-white pb-0 overflow-hidden{% else %}pb-16 lg:pb-4{% endif %} flex flex-col">
+        <main class="flex-1 min-h-0 overflow-y-auto bg-[#f8f9fa] {% if 'email' in request.resolver_match.url_name %}bg-white pb-0 overflow-hidden{% else %}pb-16 lg:pb-4{% endif %} flex flex-col">
             {% block content %}{% endblock %}
         </main>
 
     </div>
 
     <!-- 4. Mobile Bottom Navigation Bar -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#d8e2ed] flex items-center justify-around py-1.5 px-2 text-[10px] font-semibold text-slate-500 shadow-xl">
-        <a href="{% url 'dashboard-overview' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-overview' %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#dadce0] flex items-center justify-around py-2 px-2 text-[11px] font-medium text-[#5f6368] shadow-lg">
+        <a href="{% url 'dashboard-overview' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-overview' %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
             <i data-lucide="layout-grid" class="w-5 h-5"></i>
             <span>Overview</span>
         </a>
-        <a href="{% url 'dashboard-registrations-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
+        <a href="{% url 'dashboard-registrations-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
             <i data-lucide="receipt" class="w-5 h-5"></i>
             <span>Logs</span>
         </a>
-        <a href="{% url 'dashboard-events-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'event' in request.resolver_match.url_name %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
+        <a href="{% url 'dashboard-events-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'event' in request.resolver_match.url_name %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
             <i data-lucide="calendar" class="w-5 h-5"></i>
             <span>Events</span>
         </a>
-        <a href="{% url 'dashboard-verification-queue' %}" class="flex flex-col items-center gap-0.5 p-1 relative {% if 'verification' in request.resolver_match.url_name %}text-[#3b5bf5] font-bold{% else %}hover:text-slate-900{% endif %}">
+        <a href="{% url 'dashboard-verification-queue' %}" class="flex flex-col items-center gap-0.5 p-1 relative {% if 'verification' in request.resolver_match.url_name %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>Queue</span>
             {% if pending_reviews_count > 0 %}
-            <span class="absolute top-0 right-1 w-2 h-2 bg-amber-400"></span>
+            <span class="absolute top-0 right-1 w-2 h-2 rounded-full bg-[#f9ab00]"></span>
             {% endif %}
         </a>
     </nav>
 
 </div>
 
-<!-- Global Pass Viewer Modal Popup (Exact PDF / Voucher View) -->
-<div id="passViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-200">
-    <div class="relative w-full max-w-3xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[92vh] max-h-[850px]">
+<!-- Global Pass Viewer Modal Popup (Google Material Dialog) -->
+<div id="passViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-xs transition-opacity duration-200">
+    <div class="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-[#dadce0] overflow-hidden flex flex-col h-[92vh] max-h-[850px]">
         
         <!-- Modal Topbar -->
-        <div class="px-4 py-3 bg-[#1e293b] text-white flex items-center justify-between shrink-0 border-b border-slate-700">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
-                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+        <div class="px-5 py-3.5 bg-white text-[#202124] flex items-center justify-between shrink-0 border-b border-[#dadce0]">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-[#e6f4ea] text-[#137333] flex items-center justify-center">
+                    <i data-lucide="badge-check" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h3 id="passModalTitle" class="text-xs sm:text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                    <h3 id="passModalTitle" class="text-sm font-semibold text-[#202124] tracking-tight flex items-center gap-2">
                         <span>Attendee Pass</span>
-                        <span id="passModalBadge" class="bg-emerald-400/20 text-emerald-300 font-mono text-[10px] px-2 py-0.2 rounded">PASS-CODE</span>
+                        <span id="passModalBadge" class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded-full">PASS-CODE</span>
                     </h3>
-                    <p id="passModalSubtitle" class="text-[11px] text-slate-400 truncate">Exact Single A4 Voucher & Print View</p>
+                    <p id="passModalSubtitle" class="text-xs text-[#5f6368] truncate">Single A4 Voucher & Print View</p>
                 </div>
             </div>
 
             <!-- Top Actions -->
             <div class="flex items-center gap-2">
-                <button type="button" onclick="printPassModalIframe()" class="google-btn-primary py-1 px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center gap-1.5 shadow-sm cursor-pointer">
-                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                <button type="button" onclick="printPassModalIframe()" class="google-btn-primary py-1.5 px-3.5 text-xs rounded-full flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
                     <span>Print PDF</span>
                 </button>
-                <a id="passModalFullLink" href="#" target="_blank" class="google-btn-outlined py-1 px-2 text-xs text-slate-300 hover:text-white hover:border-slate-500 flex items-center gap-1" title="Open full screen in new tab">
-                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <a id="passModalFullLink" href="#" target="_blank" class="google-btn-outlined py-1.5 px-2.5 text-xs rounded-full flex items-center gap-1" title="Open full screen in new tab">
+                    <i data-lucide="external-link" class="w-4 h-4"></i>
                 </a>
-                <button type="button" onclick="closePassModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer" title="Close (Esc)">
+                <button type="button" onclick="closePassModal()" class="p-2 text-[#5f6368] hover:text-[#202124] rounded-full hover:bg-[#f1f3f4] transition cursor-pointer" title="Close (Esc)">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
 
         <!-- Modal Iframe Body -->
-        <div class="flex-1 min-h-0 bg-[#edf2f7] relative overflow-hidden">
+        <div class="flex-1 min-h-0 bg-[#f8f9fa] relative overflow-hidden">
             <iframe id="passModalIframe" src="" class="w-full h-full border-0 bg-white" title="Attendee Pass Voucher View"></iframe>
         </div>
 
         <!-- Modal Bottom Footer -->
-        <div class="px-4 py-2.5 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 shrink-0">
-            <span class="flex items-center gap-1.5 text-[11px]">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
-                <span>Official QR Code Verified • Direct Single-Click Print Ready</span>
+        <div class="px-5 py-3 bg-[#f8f9fa] border-t border-[#dadce0] flex items-center justify-between text-xs text-[#5f6368] shrink-0">
+            <span class="flex items-center gap-1.5 text-xs">
+                <i data-lucide="shield-check" class="w-4 h-4 text-[#1e8e3e]"></i>
+                <span>Official QR Code Verified • Direct Print Ready</span>
             </span>
-            <button type="button" onclick="closePassModal()" class="google-btn-outlined py-1 px-3 text-xs font-semibold text-slate-700 hover:bg-slate-200 cursor-pointer">
+            <button type="button" onclick="closePassModal()" class="google-btn-outlined py-1 px-3.5 text-xs font-medium text-[#3c4043] rounded-full hover:bg-[#e8eaed] cursor-pointer">
                 Close
             </button>
         </div>
@@ -337,8 +364,8 @@
         const passUrl = `/pass/${passCode}/`;
         iframe.src = passUrl;
         if (badge) badge.innerText = passCode;
-        if (title) title.innerHTML = `<span>Attendee Pass: ${attendeeName || 'Attendee'}</span> <span class="bg-emerald-400/20 text-emerald-300 font-mono text-[10px] px-2 py-0.2 rounded">${passCode}</span>`;
-        if (subtitle) subtitle.innerText = `${eventTitle || 'Event'} • Exact Single A4 Sheet Print / PDF View`;
+        if (title) title.innerHTML = `<span>Attendee Pass: ${attendeeName || 'Attendee'}</span> <span class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded-full">${passCode}</span>`;
+        if (subtitle) subtitle.innerText = `${eventTitle || 'Event'} • Official Voucher View`;
         if (fullLink) fullLink.href = passUrl;
 
         modal.classList.remove('hidden');
@@ -373,3 +400,4 @@
     });
 </script>
 {% endblock %}
+
