@@ -147,101 +147,117 @@
             box-shadow: 0 1px 6px rgba(32,33,36,0.24) !important;
         }
 
-        /* Google Material Standard Buttons */
+        /* Clean Modern Buttons */
         .google-btn-primary, .btn-auth-primary, .survey-btn-submit {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             background-color: #1a73e8 !important;
             color: #ffffff !important;
-            border: none !important;
+            border: 1px solid #1a73e8 !important;
             border-radius: 8px !important;
-            padding: 9px 20px !important;
+            padding: 7px 16px !important;
             font-size: 13px !important;
             font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
             font-weight: 600 !important;
             text-decoration: none !important;
             cursor: pointer;
-            box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15) !important;
-            transition: all 0.2s ease !important;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.15) !important;
+            transition: all 0.15s ease !important;
             white-space: nowrap;
+            line-height: 1.4 !important;
         }
         .google-btn-primary:hover, .btn-auth-primary:hover, .survey-btn-submit:hover {
             background-color: #1557b0 !important;
-            box-shadow: 0 2px 6px 2px rgba(60,64,67,0.35) !important;
+            border-color: #1557b0 !important;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.3) !important;
         }
         .google-btn-primary:active, .btn-auth-primary:active {
             background-color: #174ea6 !important;
+            transform: scale(0.98);
         }
 
         .google-btn-outlined {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             background-color: #ffffff !important;
             color: #1a73e8 !important;
             border: 1px solid #dadce0 !important;
             border-radius: 8px !important;
-            padding: 8px 18px !important;
+            padding: 6px 14px !important;
             font-size: 13px !important;
             font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
             font-weight: 600 !important;
             text-decoration: none !important;
             cursor: pointer;
-            transition: all 0.2s ease !important;
+            transition: all 0.15s ease !important;
             white-space: nowrap;
+            line-height: 1.4 !important;
         }
         .google-btn-outlined:hover {
             background-color: #f8f9fa !important;
             border-color: #1a73e8 !important;
             color: #1557b0 !important;
         }
+        .google-btn-outlined:active {
+            transform: scale(0.98);
+        }
 
         .google-btn-tonal {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             background-color: #e8f0fe !important;
             color: #1a73e8 !important;
             border: 1px solid #d2e3fc !important;
             border-radius: 8px !important;
-            padding: 8px 18px !important;
+            padding: 6px 14px !important;
             font-size: 13px !important;
             font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
             font-weight: 600 !important;
             text-decoration: none !important;
             cursor: pointer;
-            transition: all 0.2s ease !important;
+            transition: all 0.15s ease !important;
             white-space: nowrap;
+            line-height: 1.4 !important;
         }
         .google-btn-tonal:hover {
             background-color: #d2e3fc !important;
+            color: #1557b0 !important;
+        }
+        .google-btn-tonal:active {
+            transform: scale(0.98);
         }
 
         .google-btn-danger {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             background-color: #ffffff !important;
             color: #d93025 !important;
             border: 1px solid #fad2cf !important;
             border-radius: 8px !important;
-            padding: 8px 18px !important;
+            padding: 6px 14px !important;
             font-size: 13px !important;
             font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
             font-weight: 600 !important;
             text-decoration: none !important;
             cursor: pointer;
-            transition: all 0.2s ease !important;
+            transition: all 0.15s ease !important;
             white-space: nowrap;
+            line-height: 1.4 !important;
         }
         .google-btn-danger:hover {
             background-color: #fce8e6 !important;
             border-color: #d93025 !important;
+        }
+        .google-btn-danger:active {
+            transform: scale(0.98);
         }
 
         /* Google Status Badges (Rounded Pills) */
@@ -251,11 +267,11 @@
             background-color: #e6f4ea !important;
             font-weight: 600;
             border-radius: 16px !important;
-            padding: 2px 10px;
+            padding: 2px 9px;
             font-size: 11px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
         }
         .pill-orange {
@@ -264,11 +280,11 @@
             background-color: #fef7e0 !important;
             font-weight: 600;
             border-radius: 16px !important;
-            padding: 2px 10px;
+            padding: 2px 9px;
             font-size: 11px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
         }
         .pill-blue {
@@ -277,11 +293,11 @@
             background-color: #e8f0fe !important;
             font-weight: 600;
             border-radius: 16px !important;
-            padding: 2px 10px;
+            padding: 2px 9px;
             font-size: 11px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
         }
         .pill-red {
@@ -290,11 +306,11 @@
             background-color: #fce8e6 !important;
             font-weight: 600;
             border-radius: 16px !important;
-            padding: 2px 10px;
+            padding: 2px 9px;
             font-size: 11px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
         }
 
@@ -303,102 +319,58 @@
             background-color: #ffffff !important;
             border: 1px solid #dadce0 !important;
             border-radius: 12px !important;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.1), 0 1px 3px 1px rgba(60,64,67,0.05);
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.08);
         }
 
         /* Clean scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f8f9fa; }
-        ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
 
-        /* Sticky & Freeze Table Utilities */
+        /* Clean Table Container */
         .table-scroll-container {
             flex: 1 1 0%;
             height: 100%;
-            overflow: auto;
+            overflow-x: auto;
+            overflow-y: auto;
             position: relative;
             background-color: #ffffff;
-            scrollbar-width: thin;
-            scrollbar-color: #dadce0 #f8f9fa;
             -webkit-overflow-scrolling: touch;
         }
         .table-scroll-container thead th {
             position: sticky;
             top: 0;
-            z-index: 20;
+            z-index: 10;
             background-color: #f8f9fa;
             border-bottom: 1px solid #dadce0;
         }
-        
-        /* Freeze Columns on Large Desktop Screens (lg: >= 1024px) */
-        @media (min-width: 1024px) {
-            .table-freeze-col-1 { position: sticky; left: 0px; z-index: 10; width: 44px; min-width: 44px; max-width: 44px; }
-            .table-freeze-col-2 { position: sticky; left: 44px; z-index: 10; min-width: 110px; }
-            .table-freeze-col-3 { position: sticky; left: 154px; z-index: 10; min-width: 100px; }
-            .table-freeze-col-4 { position: sticky; left: 254px; z-index: 10; min-width: 125px; }
-            .table-freeze-col-5 { position: sticky; left: 379px; z-index: 10; min-width: 190px; }
-            .table-freeze-col-6 { position: sticky; left: 569px; z-index: 10; min-width: 190px; border-right: 1px solid #dadce0 !important; box-shadow: 3px 0 6px -2px rgba(0,0,0,0.08); }
-            
-            thead th.table-freeze-col-1,
-            thead th.table-freeze-col-2,
-            thead th.table-freeze-col-3,
-            thead th.table-freeze-col-4,
-            thead th.table-freeze-col-5,
-            thead th.table-freeze-col-6 {
-                z-index: 30 !important;
-                background-color: #f8f9fa !important;
-            }
-        }
 
-        /* Mobile Responsive Full-View Tables (<= 768px) */
+        /* Responsive Mobile Table Styles */
         @media (max-width: 768px) {
             .table-scroll-container table,
             .google-card table {
-                font-size: 11px !important;
+                font-size: 12px !important;
             }
             .table-scroll-container th,
             .google-card table th {
-                padding: 6px 8px !important;
-                font-size: 10px !important;
-                letter-spacing: 0.02em !important;
+                padding: 8px 10px !important;
+                font-size: 11px !important;
                 white-space: nowrap !important;
             }
             .table-scroll-container td,
             .google-card table td {
-                padding: 6px 8px !important;
-                font-size: 11px !important;
-                line-height: 1.25 !important;
+                padding: 8px 10px !important;
+                font-size: 12px !important;
             }
-            .table-scroll-container .pill-green,
-            .table-scroll-container .pill-orange,
-            .table-scroll-container .pill-blue,
-            .table-scroll-container .pill-red,
-            .google-card table .pill-green,
-            .google-card table .pill-orange,
-            .google-card table .pill-blue,
-            .google-card table .pill-red {
-                padding: 1px 6px !important;
-                font-size: 9.5px !important;
-                gap: 3px !important;
-            }
-            .table-scroll-container .google-btn-primary,
-            .table-scroll-container .google-btn-outlined,
-            .table-scroll-container .google-btn-tonal,
-            .table-scroll-container .google-btn-danger,
-            .google-card table .google-btn-primary,
-            .google-card table .google-btn-outlined,
-            .google-card table .google-btn-tonal,
-            .google-card table .google-btn-danger {
+            .pill-green, .pill-orange, .pill-blue, .pill-red {
                 padding: 2px 7px !important;
-                font-size: 10px !important;
-                gap: 3px !important;
-                border-radius: 6px !important;
+                font-size: 10.5px !important;
             }
-            .table-scroll-container svg,
-            .google-card table svg {
-                width: 12px !important;
-                height: 12px !important;
+            .google-btn-primary, .google-btn-outlined, .google-btn-tonal, .google-btn-danger {
+                padding: 5px 10px !important;
+                font-size: 11.5px !important;
+                gap: 4px !important;
             }
         }
 
