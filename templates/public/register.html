@@ -114,12 +114,12 @@
                                 <button type="button" onclick="adjustTickets(-1)" class="w-8 h-8 rounded-lg bg-white shadow-xs hover:bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-base transition-colors select-none">
                                     −
                                 </button>
-                                <input type="number" id="ticket-count-input" name="{{ field.field_key }}" value="1" min="1" max="10" class="w-14 text-center bg-transparent border-none font-bold text-slate-900 font-mono text-base focus:outline-none" oninput="handleTicketCountChange(this.value)">
+                                <input type="number" id="ticket-count-input" name="{{ field.field_key }}" value="1" min="1" class="w-16 text-center bg-transparent border-none font-bold text-slate-900 font-mono text-base focus:outline-none" oninput="handleTicketCountChange(this.value)">
                                 <button type="button" onclick="adjustTickets(1)" class="w-8 h-8 rounded-lg bg-white shadow-xs hover:bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-base transition-colors select-none">
                                     +
                                 </button>
                             </div>
-                            <span class="text-xs text-slate-500">(Max 10 passes per registration)</span>
+                            <span class="text-xs text-slate-500">Enter or select any number of passes</span>
                         </div>
 
                         <!-- Quick Chips -->
@@ -127,8 +127,9 @@
                             <span class="text-[11px] text-slate-400 mr-1">Quick Select:</span>
                             <button type="button" onclick="setTickets(1)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">1 Pass</button>
                             <button type="button" onclick="setTickets(2)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">2 Passes</button>
-                            <button type="button" onclick="setTickets(3)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">3 Passes</button>
                             <button type="button" onclick="setTickets(5)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">5 Passes</button>
+                            <button type="button" onclick="setTickets(10)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">10 Passes</button>
+                            <button type="button" onclick="setTickets(20)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 transition-colors">20 Passes</button>
                         </div>
                     </div>
 
@@ -228,7 +229,7 @@
         const input = document.getElementById('ticket-count-input');
         if (!input) return;
         let val = parseInt(input.value, 10) || 1;
-        val = Math.max(1, Math.min(10, val + delta));
+        val = Math.max(1, val + delta);
         input.value = val;
         handleTicketCountChange(val);
     }
@@ -236,11 +237,7 @@
     function handleTicketCountChange(qty) {
         let count = parseInt(qty, 10);
         if (isNaN(count) || count < 1) count = 1;
-        if (count > 10) {
-            count = 10;
-            const inputEl = document.getElementById('ticket-count-input');
-            if (inputEl) inputEl.value = 10;
-        }
+
 
         // 1. Update Breakdown & Price Labels
         const total = count * unitPrice;
