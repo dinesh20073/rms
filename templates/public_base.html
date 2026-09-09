@@ -3,33 +3,76 @@
 
 {% block body_content %}
 <style>
-    /* Ultra-Modern Design System for Registration & Checkout */
+    /* Apple Liquid Frosted Clear Glass Design System */
     :root {
-        --form-bg: #f8fafc;
-        --form-card: #ffffff;
-        --form-primary: #2563eb;
-        --form-primary-hover: #1d4ed8;
-        --form-heading: #0f172a;
-        --form-text: #334155;
-        --form-muted: #64748b;
-        --form-border: #e2e8f0;
-        --form-border-focus: #3b82f6;
+        --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.42) 100%);
+        --card-border: rgba(255, 255, 255, 0.72);
+        --input-bg: rgba(255, 255, 255, 0.52);
+        --input-border: rgba(255, 255, 255, 0.78);
+        --input-focus-border: #0071e3;
+        --input-focus-glow: rgba(0, 113, 227, 0.22);
+        --text-primary: #1d1d1f;
+        --text-secondary: #424245;
+        --text-muted: #86868b;
+        --accent-blue: #0071e3;
+        --accent-blue-hover: #0077ed;
+    }
+
+    body {
+        background-color: #0b0f19 !important;
+        color: var(--text-primary) !important;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fixed Clear Full-Color Background Image */
+    .public-canvas-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('{% static "images/backgrounds/form_bg.png" %}'), url('https://lh3.googleusercontent.com/d/1XL210-7zIdMOJf9gR4P1X4QlWXkkxD8P');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        filter: contrast(102%) brightness(0.92);
+        pointer-events: none;
+        z-index: 0;
+        transform: scale(1.01);
+    }
+
+    /* Subtle Atmospheric Vignette Overlay */
+    .public-canvas-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 20%, rgba(15, 23, 42, 0.15) 0%, rgba(11, 15, 25, 0.55) 100%);
+        pointer-events: none;
+        z-index: 1;
     }
 
     .public-canvas {
-        background-color: #f8fafc;
-        background-image: radial-gradient(#cbd5e1 0.8px, transparent 0.8px);
-        background-size: 20px 20px;
         min-height: 100vh;
+        position: relative;
+        z-index: 2;
     }
 
+    /* Apple Clear Glass Card Container */
     .public-card {
-        background: #ffffff;
-        border-radius: 20px;
-        border: 1px solid rgba(226, 232, 240, 0.9);
-        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-        overflow: hidden;
-        transition: box-shadow 0.2s ease;
+        background: var(--card-bg) !important;
+        backdrop-filter: blur(44px) saturate(220%) brightness(106%) !important;
+        -webkit-backdrop-filter: blur(44px) saturate(220%) brightness(106%) !important;
+        border-radius: 28px !important;
+        border: 1px solid var(--card-border) !important;
+        box-shadow: 0 36px 90px -18px rgba(0, 0, 0, 0.65), 
+                    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.9), 
+                    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.25) !important;
+        overflow: hidden !important;
+        -webkit-mask-image: -webkit-radial-gradient(white, black);
+        transform: translateZ(0);
+        transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .public-input-group {
@@ -41,22 +84,27 @@
     .public-input-icon {
         position: absolute;
         left: 14px;
-        color: #94a3b8;
+        color: #6e6e73;
         pointer-events: none;
         transition: color 0.15s ease;
+        z-index: 2;
     }
 
+    /* Apple Clear Glass Input */
     .public-input {
         width: 100%;
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-        border: 1.5px solid #e2e8f0 !important;
-        border-radius: 10px !important;
+        background-color: var(--input-bg) !important;
+        backdrop-filter: blur(24px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+        color: var(--text-primary) !important;
+        border: 1.2px solid var(--input-border) !important;
+        border-radius: 13px !important;
         padding: 11px 14px !important;
         font-size: 14px !important;
-        line-height: 1.4 !important;
+        line-height: 1.45 !important;
         outline: none !important;
-        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .public-input.with-icon {
@@ -64,79 +112,84 @@
     }
 
     .public-input:hover {
-        border-color: #cbd5e1 !important;
+        background-color: rgba(255, 255, 255, 0.72) !important;
+        border-color: rgba(255, 255, 255, 0.95) !important;
     }
 
     .public-input:focus {
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.12) !important;
+        background-color: rgba(255, 255, 255, 0.94) !important;
+        border-color: var(--input-focus-border) !important;
+        box-shadow: 0 0 0 3.5px var(--input-focus-glow), inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
     }
 
     .public-input-group:focus-within .public-input-icon {
-        color: #2563eb !important;
+        color: var(--accent-blue) !important;
     }
 
     .public-input::placeholder {
-        color: #94a3b8 !important;
+        color: #86868b !important;
     }
 
-    .public-btn-primary {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    /* Apple System Blue Glass Button */
+    .public-btn-primary, .public-btn-blue, .survey-btn-submit {
+        background: linear-gradient(180deg, #0077ED 0%, #0066CC 100%) !important;
+        background-color: #0071e3 !important;
         color: #ffffff !important;
         font-weight: 600 !important;
-        font-size: 14px !important;
-        padding: 13px 24px !important;
-        border-radius: 10px !important;
-        border: none !important;
+        font-size: 14.5px !important;
+        padding: 13.5px 24px !important;
+        border-radius: 14px !important;
+        border: 1px solid rgba(255, 255, 255, 0.28) !important;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        box-shadow: 0 4px 14px -1px rgba(37, 99, 235, 0.35) !important;
-        transition: all 0.15s ease !important;
+        box-shadow: 0 6px 20px -2px rgba(0, 113, 227, 0.45), 
+                    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.45) !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
         text-decoration: none !important;
     }
 
-    .public-btn-primary:hover {
-        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-        box-shadow: 0 6px 20px -2px rgba(37, 99, 235, 0.45) !important;
-        transform: translateY(-1px);
+    .public-btn-primary:hover, .public-btn-blue:hover, .survey-btn-submit:hover {
+        background: linear-gradient(180deg, #1482f0 0%, #005bb5 100%) !important;
+        box-shadow: 0 8px 24px -2px rgba(0, 113, 227, 0.55), 
+                    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.55) !important;
+        transform: translateY(-1.5px);
     }
 
-    .public-btn-primary:active {
+    .public-btn-primary:active, .public-btn-blue:active, .survey-btn-submit:active {
         transform: translateY(0);
+        box-shadow: 0 2px 8px -1px rgba(0, 113, 227, 0.4) !important;
     }
 
     .chip-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 4px 10px;
-        border-radius: 8px;
+        padding: 5px 12px;
+        border-radius: 10px;
         font-size: 12px;
         font-weight: 500;
     }
 </style>
 
-<div class="public-canvas flex flex-col justify-start items-center py-6 sm:py-10 px-3 sm:px-6 relative min-h-screen">
-    
-    <!-- Top Brand Header -->
-    <header class="mb-5 flex items-center gap-2.5 select-none">
-        <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-            N
-        </div>
-        <span class="font-display font-bold text-base text-slate-800 tracking-tight">Nizhal Events</span>
-    </header>
+<!-- Fixed Black & White Background Image Layer -->
+<div class="public-canvas-bg"></div>
+<div class="public-canvas-overlay"></div>
 
+<div class="public-canvas flex flex-col justify-start items-center py-6 sm:py-12 px-3 sm:px-6 relative min-h-screen">
+    
     <!-- Main Content Container -->
     <main class="relative z-10 w-full max-w-2xl">
         {% block main_content %}{% endblock %}
     </main>
 
-    <!-- Footer note -->
-    <footer class="mt-8 text-center text-xs text-slate-400 select-none pb-6">
-        <span>Powered by Nizhal Registration Platform • Secure &amp; Verified</span>
+    <!-- Copyright Footer: Nizhal Community -->
+    <footer class="mt-8 text-center text-xs text-slate-300/90 font-medium select-none pb-8 drop-shadow-sm">
+        <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-900/60 backdrop-blur-md border border-white/10 shadow-lg">
+            <span>© 2026 Nizhal Community. All rights reserved.</span>
+        </div>
     </footer>
 
 </div>

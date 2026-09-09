@@ -402,6 +402,49 @@ def form_builder_view(request, event_id):
             messages.info(request, "Field removed from form.")
             return redirect('dashboard-event-form', event_id=event.id)
 
+        elif action == 'update_form_settings':
+            status_val = request.POST.get('status', 'OPEN')
+            event.status = 'OPEN' if status_val == 'OPEN' else 'CLOSED'
+            
+            reg_opens_raw = request.POST.get('registration_opens', '').strip()
+            reg_closes_raw = request.POST.get('registration_closes', '').strip()
+            max_capacity_raw = request.POST.get('max_capacity', '').strip()
+            form_desc = request.POST.get('form_description', '').strip()
+            event_venue = request.POST.get('venue', '').strip()
+
+            if reg_opens_raw:
+                try:
+                    event.registration_opens = timezone.datetime.fromisoformat(reg_opens_raw)
+                    if timezone.is_naive(event.registration_opens):
+                        event.registration_opens = timezone.make_aware(event.registration_opens)
+                except Exception:
+                    pass
+            
+            if reg_closes_raw:
+                try:
+                    event.registration_closes = timezone.datetime.fromisoformat(reg_closes_raw)
+                    if timezone.is_naive(event.registration_closes):
+                        event.registration_closes = timezone.make_aware(event.registration_closes)
+                except Exception:
+                    pass
+            else:
+                event.registration_closes = None
+
+            if max_capacity_raw and str(max_capacity_raw).isdigit():
+                event.max_capacity = int(max_capacity_raw)
+
+            if event_venue:
+                event.venue = event_venue
+
+            event.save()
+
+            if form_desc:
+                form_obj.description = form_desc
+                form_obj.save()
+
+            messages.success(request, "Form response deadline and settings saved successfully.")
+            return redirect('dashboard-event-form', event_id=event.id)
+
     fields = form_obj.fields.all()
     return render(request, 'dashboard/events/form_builder.html', {
         'event': event,
@@ -451,10 +494,76 @@ def verification_action_view(request, verification_id):
 
     if action == 'APPROVE':
         VerificationEngine.manual_approve(verification.order, reviewer_user=user, notes=notes or 'Approved by admin review')
-        messages.success(request, f"Order {verification.order.order_code} has been approved and registration completed!")
+        messages.success(request, f"Order {verification.order.order_code} has been approved and marked as Payment Received!")
     elif action == 'REJECT':
         VerificationEngine.manual_reject(verification.order, reviewer_user=user, notes=notes or 'Rejected by admin review')
-        messages.error(request, f"Order {verification.order.order_code} has been rejected.")
+        messages.warning(request, f"Order {verification.order.order_code} has been marked as Not Received.")
+    elif action == 'DELETE':
+        order_code = verification.order.order_code
+        log_audit_event(
+            action='VERIFICATION_LOG_DELETED',
+            reference_id=order_code,
+            details={'verification_id': verification.id, 'decision': verification.decision},
+            tenant=tenant,
+            actor=user.username if user else 'Admin'
+        )
+        verification.delete()
+        messages.success(request, f"Verification log for order {order_code} has been deleted.")
+
+    return redirect('dashboard-verification-queue')
+
+@login_required(login_url='login')
+def verification_bulk_action_view(request):
+    if request.method != 'POST':
+        return redirect('dashboard-verification-queue')
+
+    tenant = get_current_tenant(request)
+    action = request.POST.get('action')
+    notes = request.POST.get('notes', '')
+    ids_raw = request.POST.getlist('selected_ids') or request.POST.get('selected_ids', '').split(',')
+    
+    verification_ids = []
+    for raw_id in ids_raw:
+        if raw_id and str(raw_id).strip().isdigit():
+            verification_ids.append(int(str(raw_id).strip()))
+
+    if not verification_ids:
+        messages.warning(request, "No verification logs selected.")
+        return redirect('dashboard-verification-queue')
+
+    verifications = list(Verification.objects.filter(
+        id__in=verification_ids,
+        order__registration__event__tenant=tenant
+    ).select_related('order', 'order__registration', 'order__registration__event'))
+
+    user = request.user if request.user.is_authenticated else None
+    count = len(verifications)
+
+    if count == 0:
+        messages.warning(request, "Selected logs were not found.")
+        return redirect('dashboard-verification-queue')
+
+    if action == 'APPROVE':
+        for v in verifications:
+            VerificationEngine.manual_approve(v.order, reviewer_user=user, notes=notes or 'Bulk approved by admin')
+        messages.success(request, f"Successfully marked {count} order(s) as Payment Received.")
+    elif action == 'REJECT':
+        for v in verifications:
+            VerificationEngine.manual_reject(v.order, reviewer_user=user, notes=notes or 'Bulk rejected by admin')
+        messages.warning(request, f"Successfully marked {count} order(s) as Not Received.")
+    elif action == 'DELETE':
+        for v in verifications:
+            log_audit_event(
+                action='VERIFICATION_LOG_DELETED',
+                reference_id=v.order.order_code,
+                details={'verification_id': v.id, 'decision': v.decision},
+                tenant=tenant,
+                actor=user.username if user else 'Admin'
+            )
+            v.delete()
+        messages.success(request, f"Successfully deleted {count} verification log(s).")
+    else:
+        messages.error(request, "Invalid action requested.")
 
     return redirect('dashboard-verification-queue')
 
@@ -694,36 +803,25 @@ def email_preview_view(request, email_id):
     email_log = get_object_or_404(EmailLog, id=email_id, tenant=tenant)
     html = email_log.body_html or ''
     
-    # Inject constraint styles so that the email pass ends strictly where the image ends (600px)
+    # Ensure clean bounds and responsive preview formatting with pure white canvas
     bounds_css = """
     <style id="nizhal-email-bounds-fix">
         html, body {
-            background-color: #f8f9fa !important;
+            background-color: #ffffff !important;
             margin: 0 !important;
-            padding: 20px 0 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
+            padding: 0 !important;
             min-height: 100vh !important;
             box-sizing: border-box !important;
         }
         table.ticket-card, table.email-card, .ticket-card, .email-card {
-            width: 600px !important;
+            width: 100% !important;
             max-width: 600px !important;
-            min-width: 0 !important;
             margin: 0 auto !important;
             background-color: #ffffff !important;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12) !important;
-            border-radius: 0px !important;
+            box-shadow: none !important;
+            border: 1px solid #000000 !important;
+            border-radius: 0 !important;
             overflow: hidden !important;
-        }
-        table[role="presentation"] {
-            max-width: 600px !important;
-            margin: 0 auto !important;
-        }
-        td[width="600"], td[width="564"] {
-            max-width: 600px !important;
         }
         img {
             max-width: 100% !important;

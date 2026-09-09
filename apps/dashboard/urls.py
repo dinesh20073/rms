@@ -14,6 +14,7 @@ urlpatterns = [
     path('events/<int:event_id>/form/', views.form_builder_view, name='dashboard-event-form'),
     path('events/<int:event_id>/export-csv/', views.export_attendees_csv, name='dashboard-event-export-csv'),
     path('verification-queue/', views.manual_verification_queue_view, name='dashboard-verification-queue'),
+    path('verification-queue/bulk-action/', views.verification_bulk_action_view, name='dashboard-verification-bulk-action'),
     path('verification-queue/<int:verification_id>/action/', views.verification_action_view, name='dashboard-verification-action'),
     path('registrations/', views.registrations_list_view, name='dashboard-registrations-list'),
     path('registrations/<str:registration_code>/send-email/', views.send_registration_email_view, name='dashboard-registration-send-email'),

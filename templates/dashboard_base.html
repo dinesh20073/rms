@@ -152,8 +152,14 @@
                 </a>
             </div>
 
-            <!-- Right: Profile & Actions -->
+            <!-- Right: 1-Sec Live Sync Indicator, Profile & Actions -->
             <div class="flex items-center gap-3">
+                <!-- 1s Real-Time Live Sync Status Indicator -->
+                <button type="button" onclick="if(window.triggerGlobalSync) window.triggerGlobalSync();" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[11px] font-medium select-none shadow-2xs cursor-pointer hover:bg-[#ceead6] transition" title="1-Second Background Live Sync Active (Click to sync now)">
+                    <span id="globalLiveSyncDot" class="w-2 h-2 rounded-full bg-[#1e8e3e] animate-pulse"></span>
+                    <span id="globalLiveSyncText" class="font-mono text-[10.5px] uppercase font-bold tracking-wider">Live Sync</span>
+                </button>
+
                 <!-- Google Account Avatar -->
                 <div class="flex items-center gap-2">
                     <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-[#f1f3f4] border border-[#dadce0]">
@@ -305,6 +311,128 @@
             closePassModal();
         }
     });
+
+    // ========================================================
+    // 1-Second Real-Time Live Sync Engine Across All Dashboard Pages
+    // ========================================================
+    (function() {
+        let isGlobalSyncing = false;
+        let globalSyncInterval = null;
+        const SYNC_INTERVAL_MS = 1000; // Exact 1-second interval
+
+        async function executeGlobalLiveSync(force = false) {
+            if (isGlobalSyncing) return;
+            
+            // Skip sync if user is currently typing in an input, an active form is focused, or modal is open
+            const activeEl = document.activeElement;
+            const isUserTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT') && !activeEl.classList.contains('no-sync-lock');
+            const isAnyModalOpen = document.querySelector('.modal:not(.hidden), [id*="Modal"]:not(.hidden), [id*="modal"]:not(.hidden)');
+            const hasCheckedBoxes = document.querySelector('input[type="checkbox"]:checked:not(#selectAllHistoryCheckbox):not(#selectAllCheckbox)');
+
+            if (!force && (isUserTyping || isAnyModalOpen || hasCheckedBoxes)) {
+                return;
+            }
+
+            isGlobalSyncing = true;
+            const liveDot = document.getElementById('globalLiveSyncDot');
+            const liveText = document.getElementById('globalLiveSyncText');
+
+            try {
+                const response = await fetch(window.location.href, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // If custom before hook exists
+                    if (typeof window.onBeforePageLiveSync === 'function') {
+                        window.onBeforePageLiveSync(doc);
+                    }
+
+                    // Key sync selectors
+                    const syncSelectors = [
+                        '#kpiMetricsGrid',
+                        '#overviewMetricsGrid',
+                        '#activeQueueContainer',
+                        '#historyTableBody',
+                        '#registrationsTableBody',
+                        '#emailLogsTableBody',
+                        '#eventsTableBody',
+                        '#recordCountBadge',
+                        '#historyCountBadge',
+                        '#headerQueueBadge'
+                    ];
+
+                    let matchedAny = false;
+                    syncSelectors.forEach(selector => {
+                        const newEl = doc.querySelector(selector);
+                        const currEl = document.querySelector(selector);
+                        if (newEl && currEl) {
+                            if (newEl.innerHTML !== currEl.innerHTML) {
+                                currEl.innerHTML = newEl.innerHTML;
+                            }
+                            matchedAny = true;
+                        }
+                    });
+
+                    // Fallback for tables without specific IDs
+                    if (!matchedAny) {
+                        const newTbody = doc.querySelector('table tbody');
+                        const currTbody = document.querySelector('table tbody');
+                        if (newTbody && currTbody && newTbody.innerHTML !== currTbody.innerHTML) {
+                            currTbody.innerHTML = newTbody.innerHTML;
+                        }
+                    }
+
+                    // If custom after hook exists
+                    if (typeof window.onAfterPageLiveSync === 'function') {
+                        window.onAfterPageLiveSync(doc);
+                    }
+
+                    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                        lucide.createIcons();
+                    }
+
+                    if (liveDot && liveText) {
+                        liveText.innerText = "Synced";
+                        liveDot.className = "w-2 h-2 rounded-full bg-[#1e8e3e]";
+                        setTimeout(() => {
+                            if (liveText) liveText.innerText = "Live Sync";
+                            if (liveDot) liveDot.className = "w-2 h-2 rounded-full bg-[#1e8e3e] animate-pulse";
+                        }, 400);
+                    }
+                }
+            } catch (err) {
+                // Silently retry on next second
+            } finally {
+                isGlobalSyncing = false;
+            }
+        }
+
+        function startGlobalSync() {
+            if (globalSyncInterval) clearInterval(globalSyncInterval);
+            globalSyncInterval = setInterval(() => {
+                if (!document.hidden) {
+                    executeGlobalLiveSync(false);
+                }
+            }, SYNC_INTERVAL_MS);
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                executeGlobalLiveSync(false);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', startGlobalSync);
+        window.triggerGlobalSync = () => executeGlobalLiveSync(true);
+    })();
 </script>
 {% endblock %}
 

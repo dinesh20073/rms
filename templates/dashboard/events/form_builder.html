@@ -11,8 +11,17 @@
             <div class="flex items-center gap-2">
                 <span class="font-mono text-xs font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc]">{{ event.event_code }}</span>
                 <h2 class="text-lg font-semibold font-display text-[#202124]">{{ event.title }}</h2>
+                {% if event.is_registration_open %}
+                <span class="text-[11px] font-semibold text-[#137333] bg-[#e6f4ea] px-2.5 py-0.5 rounded-full border border-[#ceead6] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#137333]"></span> Accepting Responses
+                </span>
+                {% else %}
+                <span class="text-[11px] font-semibold text-[#c5221f] bg-[#fce8e6] px-2.5 py-0.5 rounded-full border border-[#fad2cf] flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#c5221f]"></span> Closed / Not Accepting
+                </span>
+                {% endif %}
             </div>
-            <p class="text-xs text-[#5f6368] mt-1">Configure registration form fields and questions.</p>
+            <p class="text-xs text-[#5f6368] mt-1">Configure registration form questions, response deadlines, and capacity controls.</p>
         </div>
         <div class="flex items-center gap-2.5">
             <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-outlined text-xs rounded-full">
@@ -28,8 +37,82 @@
     <!-- Form Builder Split Grid: Configurator on Left, Live Preview on Right -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left: Fields List & Add Field Form (7 cols) -->
+        <!-- Left: Settings & Fields List (7 cols) -->
         <div class="lg:col-span-7 space-y-6">
+
+            <!-- Google Forms Style: Response & Deadline Settings -->
+            <div class="google-card p-5 sm:p-6 space-y-4 border-t-4 border-t-[#1a73e8]">
+                <div class="flex items-center justify-between border-b border-[#dadce0] pb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#1a73e8] flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-4 h-4"></i>
+                        <span>Responses & Deadline Settings</span>
+                    </h3>
+                    <span class="text-[11px] text-[#5f6368] font-mono">Google Forms Controls</span>
+                </div>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_form_settings">
+
+                    <!-- Accepting Responses Toggle -->
+                    <div class="p-3.5 bg-[#f8f9fa] border border-[#dadce0] rounded-xl flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-xs font-semibold text-[#202124]">Accepting Responses</div>
+                            <div class="text-[11px] text-[#5f6368] mt-0.5">Control whether public users can submit new registrations.</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select name="status" class="google-select text-xs font-medium py-1.5 px-3">
+                                <option value="OPEN" {% if event.status == 'OPEN' %}selected{% endif %}>🟢 Accepting Responses (Open)</option>
+                                <option value="CLOSED" {% if event.status == 'CLOSED' %}selected{% endif %}>🔴 Not Accepting Responses (Closed)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Deadline & Schedule Pickers -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Deadline (Closes At)
+                            </label>
+                            <input type="datetime-local" name="registration_closes" value="{{ event.registration_closes|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
+                            <p class="text-[10px] text-[#5f6368] mt-1">Form automatically stops accepting responses after this timestamp.</p>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">
+                                <i data-lucide="calendar" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Opens At
+                            </label>
+                            <input type="datetime-local" name="registration_opens" value="{{ event.registration_opens|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
+                            <p class="text-[10px] text-[#5f6368] mt-1">When users are allowed to start submitting entries.</p>
+                        </div>
+                    </div>
+
+                    <!-- Capacity & Venue -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">Max Attendee Capacity</label>
+                            <input type="number" name="max_capacity" value="{{ event.max_capacity }}" min="1" class="google-input text-xs">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">Event Venue / Location</label>
+                            <input type="text" name="venue" value="{{ event.venue }}" placeholder="e.g. BIEC, Bengaluru & Online" class="google-input text-xs">
+                        </div>
+                    </div>
+
+                    <!-- Form Description -->
+                    <div>
+                        <label class="text-xs font-medium text-[#202124] block mb-1">Form Description / Notice</label>
+                        <textarea name="form_description" rows="2" class="google-input text-xs" placeholder="Custom instructions or guidance shown on top of the registration form...">{{ form_obj.description }}</textarea>
+                    </div>
+
+                    <div class="pt-1 flex justify-end">
+                        <button type="submit" class="google-btn-primary text-xs py-2 px-5 rounded-full">
+                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                            <span>Save Settings & Deadline</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
             
             <!-- Existing Fields List -->
             <div class="google-card p-5 sm:p-6 space-y-4">

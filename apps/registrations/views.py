@@ -18,6 +18,14 @@ def ai_innovators_register_view(request):
 def public_registration_view(request, slug):
     event = get_object_or_404(Event, slug=slug)
     
+    # Check if registration is open / active
+    if not event.is_registration_open:
+        closed_reason = event.get_registration_closed_reason()
+        return render(request, 'public/registration_closed.html', {
+            'event': event,
+            'closed_reason': closed_reason,
+        })
+
     # Ensure form exists and has default fields
     form_obj, created = Form.objects.get_or_create(event=event)
     if created or not form_obj.fields.exists():
@@ -25,10 +33,16 @@ def public_registration_view(request, slug):
 
     fields = form_obj.fields.all()
 
+    # Extract client IP
+    client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip() or request.META.get('REMOTE_ADDR', '127.0.0.1')
+    if not client_ip:
+        client_ip = '127.0.0.1'
+
     context = {
         'event': event,
         'form_obj': form_obj,
         'fields': fields,
+        'client_ip': client_ip,
     }
     return render(request, 'public/register.html', context)
 
@@ -37,6 +51,12 @@ def submit_registration_view(request, slug):
         return redirect('public-register', slug=slug)
 
     event = get_object_or_404(Event, slug=slug)
+    
+    # Enforce registration deadline / closed check
+    if not event.is_registration_open:
+        messages.error(request, "Registration for this event is now closed.")
+        return redirect('public-register', slug=slug)
+
     form_obj = get_object_or_404(Form, event=event)
     fields = form_obj.fields.all()
 
@@ -47,8 +67,19 @@ def submit_registration_view(request, slug):
     company = request.POST.get('company_organization', '').strip()
     designation = request.POST.get('designation_role', '').strip()
 
+    # Extract client real IP & Device info
+    client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip() or request.META.get('REMOTE_ADDR', '127.0.0.1')
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    client_device_label = request.POST.get('client_device_label', '').strip()
+
     # Collect custom responses
-    form_responses = {}
+    form_responses = {
+        '_client_ip': client_ip,
+        '_client_ua': user_agent,
+    }
+    if client_device_label:
+        form_responses['_client_device'] = client_device_label
+
     for f in fields:
         val = request.POST.get(f.field_key)
         if f.field_type == 'checkbox':

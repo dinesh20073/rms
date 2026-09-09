@@ -280,3 +280,120 @@ def send_payment_under_review_email(registration):
         status=status,
         error_message=error_msg
     )
+
+def send_order_created_email(registration):
+    """
+    Sends order placed / payment pending email immediately after user files the form.
+    Contains order code, payment link, amount, attendee count, and UPI details.
+    """
+    customer = registration.customer
+    event = registration.event
+    order = getattr(registration, 'order', None)
+    
+    order_code = order.order_code if order else registration.registration_code
+    subject = f"Payment Received & Under Review: {event.title} ({order_code})"
+
+    responses = registration.form_responses or {}
+    def to_proper_case(val):
+        if not val or str(val).strip() in ('-', '', 'None'):
+            return '-'
+        return str(val).strip().title()
+
+    raw_tc = responses.get('Ticket Count') or responses.get('ticket_count') or 1
+    try:
+        ticket_count = int(raw_tc)
+    except (ValueError, TypeError):
+        ticket_count = 1
+
+    attendee_list = []
+    p1_age = responses.get('Age') or responses.get('age') or responses.get('Age Category') or responses.get('age_category') or '-'
+    p1_gender = to_proper_case(responses.get('Gender') or responses.get('gender') or '-')
+    p1_name = f"{to_proper_case(customer.name)} (Primary)"
+    attendee_list.append({
+        'index': 1,
+        'name': p1_name,
+        'age': p1_age,
+        'gender': p1_gender,
+        'type': 'Primary Attendee',
+    })
+
+    co_list = (
+        responses.get('Co-Attendees (Person 2 to N)')
+        or responses.get('co_attendees')
+        or responses.get('co_attendee_list')
+        or []
+    )
+    if isinstance(co_list, list):
+        for idx, item in enumerate(co_list, start=2):
+            if isinstance(item, dict):
+                c_name = to_proper_case(item.get('name') or item.get('full_name') or f"Attendee #{idx}")
+                c_age = item.get('age') or item.get('age_category') or item.get('Age') or '-'
+                c_gender = to_proper_case(item.get('gender') or item.get('Gender') or '-')
+                attendee_list.append({
+                    'index': idx,
+                    'name': c_name,
+                    'age': c_age,
+                    'gender': c_gender,
+                    'type': f'Co-Attendee #{idx}',
+                })
+
+    for idx in range(len(attendee_list) + 1, ticket_count + 1):
+        raw_name = responses.get(f'person_{idx}_name') or f"Attendee #{idx}"
+        c_name = to_proper_case(raw_name)
+        c_age = responses.get(f'person_{idx}_age') or '-'
+        c_gender = to_proper_case(responses.get(f'person_{idx}_gender') or '-')
+        attendee_list.append({
+            'index': idx,
+            'name': c_name,
+            'age': c_age,
+            'gender': c_gender,
+            'type': f'Co-Attendee #{idx}',
+        })
+
+    email_context = {
+        'registration': registration,
+        'customer': customer,
+        'event': event,
+        'order': order,
+        'order_code': order_code,
+        'banner_src': BANNER_WEB_URL,
+        'ticket_count': max(ticket_count, len(attendee_list)),
+        'attendee_list': attendee_list,
+    }
+    email_html = render_to_string('emails/order_created.html', email_context)
+
+    status = 'SENT'
+    error_msg = ''
+    try:
+        msg = EmailMultiAlternatives(
+            subject=subject,
+            body=f"Hi {customer.name}, we have received your payment proof for order {order_code} ({event.title}). Our team is reviewing your transaction and your official pass will be delivered upon approval.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[customer.email]
+        )
+        msg.attach_alternative(email_html, "text/html")
+        msg.send(fail_silently=False)
+    except Exception as e:
+        status = 'FAILED'
+        error_msg = str(e)
+
+    email_log = EmailLog.objects.create(
+        tenant=event.tenant,
+        recipient_email=customer.email,
+        recipient_name=customer.name,
+        subject=subject,
+        body_html=email_html,
+        event_type='REGISTRATION_CREATED',
+        status=status,
+        error_message=error_msg
+    )
+
+    log_audit_event(
+        action='EMAIL_SENT',
+        reference_id=order_code,
+        details={'recipient': customer.email, 'subject': subject, 'email_log_id': email_log.id, 'status': status, 'type': 'ORDER_CREATED'},
+        tenant=event.tenant,
+        actor='Nizhal Community'
+    )
+    return email_log
+

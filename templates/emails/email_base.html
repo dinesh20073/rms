@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" style="margin: 0 !important; padding: 0 !important; border: 0 !important;">
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" style="margin: 0 !important; padding: 0 !important; border: 0 !important; background-color: #ffffff !important;">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -30,7 +30,6 @@
         * {
             -ms-text-size-adjust: 100%;
             -webkit-text-size-adjust: 100%;
-            border-radius: 0px !important;
             box-sizing: border-box !important;
         }
         html, body {
@@ -38,11 +37,9 @@
             padding: 0 !important;
             border: 0 !important;
             outline: 0 !important;
-            height: 100% !important;
             width: 100% !important;
             background: #ffffff !important;
             background-color: #ffffff !important;
-            background-image: linear-gradient(#ffffff, #ffffff) !important;
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             color: #1e293b !important;
             -webkit-font-smoothing: antialiased;
@@ -50,7 +47,6 @@
         table, td {
             mso-table-lspace: 0pt !important;
             mso-table-rspace: 0pt !important;
-            border-radius: 0px !important;
             border-collapse: collapse !important;
         }
         img {
@@ -59,7 +55,6 @@
             outline: none !important;
             text-decoration: none;
             display: block;
-            border-radius: 0px !important;
         }
         .font-display {
             font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
@@ -68,7 +63,7 @@
             font-family: 'Roboto Mono', 'SFMono-Regular', Consolas, Menlo, monospace !important;
         }
 
-        /* Mobile Responsiveness */
+        /* Responsive Fluid Layout */
         @media only screen and (max-width: 620px) {
             .email-card, table[class*="email-card"] {
                 width: 100% !important;
@@ -78,9 +73,15 @@
             .outer-wrapper-td {
                 padding: 0 !important;
             }
+            .card-body-padding {
+                padding: 18px 16px !important;
+            }
+            .card-info-padding {
+                padding: 0 16px 16px 16px !important;
+            }
         }
 
-        /* 1. Universal Dark Mode Media Query Lock */
+        /* Universal Light Mode Lock */
         @media (prefers-color-scheme: dark) {
             body, .force-white-bg, .email-card, .email-body {
                 background-color: #ffffff !important;
@@ -106,82 +107,82 @@
         }
     </style>
 </head>
-<body class="body force-white-bg" bgcolor="#f1f5f9" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; background-color: #f1f5f9 !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
+<body class="body force-white-bg" bgcolor="#ffffff" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; background-color: #ffffff !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
 
-    <!-- Outer Centering Table -->
-    <table role="presentation" width="100%" bgcolor="#f1f5f9" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; min-width: 100% !important; margin: 0 auto !important; padding: 0 !important; border: 0 !important; background-color: #f1f5f9 !important;">
+    <!-- Outer Centering Table (Pure White Background) -->
+    <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; padding: 0 !important; border: 0 !important; background-color: #ffffff !important;">
         <tr>
-            <td align="center" valign="top" class="outer-wrapper-td" bgcolor="#f1f5f9" style="padding: 20px 0 !important; margin: 0 !important; border: 0 !important; background-color: #f1f5f9 !important;">
+            <td align="center" valign="top" class="outer-wrapper-td" bgcolor="#ffffff" style="padding: 12px 8px !important; margin: 0 !important; border: 0 !important; background-color: #ffffff !important;">
 
-                <!-- Direct 600px Email Card -->
-                <table role="presentation" class="email-card force-white-bg" align="center" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 600px !important; max-width: 600px !important; min-width: 600px; margin: 0 auto !important; padding: 0 !important; border: 0 !important; border-collapse: collapse !important; background-color: #ffffff !important; box-shadow: 0 1px 4px rgba(0,0,0,0.12);">
+                <!-- 600px Max-Width Fluid Ticket Card with Crisp Black Outer Border -->
+                <table role="presentation" class="email-card force-white-bg" align="center" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; max-width: 600px !important; margin: 0 auto !important; padding: 0 !important; border: 1px solid #000000 !important; border-radius: 0 !important; overflow: hidden !important; background-color: #ffffff !important;">
                     
-                    <!-- 1. Top Event Banner (Fixed 600px Width) -->
+                    <!-- 1. Top Event Banner -->
                     <tr>
                         <td bgcolor="#ffffff" class="force-white-bg" style="padding: 0 !important; margin: 0 !important; line-height: 0 !important; font-size: 0 !important; border: 0 !important; background-color: #ffffff !important;">
-                            <img src="{{ banner_src|default:'https://iili.io/ndZKclf.jpg' }}" alt="Nizhal Event Header" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; border: 0 !important; margin: 0 !important; padding: 0 !important;" />
+                            <img src="{{ banner_src|default:'https://iili.io/ndZzewv.png' }}" alt="Nizhal Event Header" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; border: 0 !important; margin: 0 !important; padding: 0 !important;" />
                         </td>
                     </tr>
 
                     <!-- 2. Email Body Slot -->
                     <tr>
-                        <td bgcolor="#ffffff" class="force-white-bg" style="padding: 24px; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                        <td bgcolor="#ffffff" class="force-white-bg card-body-padding" style="padding: 20px 20px 14px 20px; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
                             {% block email_content %}{% endblock %}
                         </td>
                     </tr>
 
-                    <!-- 3. Important Information & Contacts Box (Sharp 0px Edges) -->
+                    <!-- 3. Important Information & Contacts Box (Clean Rounded Card Inset) -->
                     <tr>
-                        <td bgcolor="#ffffff" class="force-white-bg" style="padding: 0 24px 18px 24px; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #cbd5e1; overflow: hidden; background-color: #ffffff !important; font-family: 'Roboto', sans-serif;">
+                        <td bgcolor="#ffffff" class="force-white-bg card-info-padding" style="padding: 0 20px 24px 20px; background-color: #ffffff !important; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; margin-bottom: 16px;">
                                 <tr>
-                                    <td bgcolor="#f1f5f9" class="font-mono" style="background-color: #f1f5f9 !important; padding: 6px 12px; border-bottom: 1px solid #cbd5e1; font-size: 10px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase;">
+                                    <td bgcolor="#f1f5f9" class="font-mono" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase;">
                                         ℹ️ IMPORTANT INFORMATION
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td bgcolor="#ffffff" style="padding: 12px 14px; font-size: 11px; color: #334155 !important; line-height: 1.5; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                                    <td bgcolor="#ffffff" style="padding: 12px 14px; font-size: 11.5px; color: #334155 !important; line-height: 1.55; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
                                         <ul style="margin: 0; padding-left: 16px;">
-                                            <li style="margin-bottom: 5px;">
+                                            <li style="margin-bottom: 6px;">
                                                 Join our official 
                                                 <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" style="color: #15803d !important; font-weight: 700; text-decoration: underline;">WhatsApp Community</a>
                                                 for real-time event updates and announcements.
                                             </li>
-                                            <li style="margin-bottom: 5px;">
+                                            <li style="margin-bottom: 6px;">
                                                 Follow our official 
-                                                <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #db2777 !important; font-weight: 700; text-decoration: underline;">Instagram Page</a>
+                                                <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Instagram Page</a>
                                                 for event photos, highlights, and updates.
                                             </li>
                                             <li>
-                                                For directions or on-ground coordination, call: 
-                                                <a href="tel:9944488286" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Priyadharshini (9944488286)</a> / 
-                                                <a href="tel:9003429590" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Lakshanya (9003429590)</a> / 
-                                                <a href="tel:9042674924" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline;">Lakshanaa (9042674924)</a>.
+                                                After reaching the location, if you need directions or on-ground coordination, please call:<br>
+                                                <span style="white-space: nowrap; display: inline-block; margin-top: 3px;">
+                                                    <a href="tel:9944488286" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Priyadharshini (9944488286)</a> / 
+                                                    <a href="tel:9003429590" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanya (9003429590)</a> / 
+                                                    <a href="tel:9042674924" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanaa (9042674924)</a>
+                                                </span>
                                             </li>
                                         </ul>
                                     </td>
                                 </tr>
                             </table>
 
-                            <!-- Brand Sign-off & Clean Footer (Sharp 0px Edges) -->
-                            <div style="padding-top: 14px; text-align: center; background-color: #ffffff !important;">
-                                <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 10px auto; border: 0 !important;">
-                                    <tr>
-                                        <td bgcolor="#0f172a" class="font-display" style="background-color: #0f172a !important; color: #ffffff !important; padding: 4px 18px; font-size: 11px; font-weight: 800; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; border: 0 !important;">
-                                            See you there!
-                                        </td>
-                                    </tr>
-                                </table>
+                            <!-- Brand Sign-off & Clean Footer -->
+                            <div style="text-align: center; background-color: #ffffff !important;">
+                                <div style="margin-bottom: 16px; text-align: center;">
+                                    <span class="font-display" style="background-color: #0f172a; color: #ffffff !important; padding: 6px 24px; font-size: 11px; font-weight: 900; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 20px; display: inline-block; white-space: nowrap;">
+                                        SEE YOU THERE!
+                                    </span>
+                                </div>
                                 
-                                <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; border-bottom: 0 !important; border-left: 0 !important; border-right: 0 !important;">
+                                <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; border-bottom: 0 !important; border-left: 0 !important; border-right: 0 !important;">
                                     <tr>
-                                        <td align="left" bgcolor="#ffffff" style="background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                                        <td align="left" bgcolor="#ffffff" style="background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important; padding-top: 8px; white-space: nowrap;">
                                             <a href="http://127.0.0.1:8000/register/{{ event.slug }}/" target="_blank" style="text-decoration: none; color: #0f172a !important;">
                                                 <strong class="font-display" style="font-size: 12px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif;">Nizhal</strong>
                                                 <span style="font-size: 11px; color: #64748b !important;">| The Circle of Warmth</span>
                                             </a>
                                         </td>
-                                        <td align="right" bgcolor="#ffffff" class="font-mono" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important;">
+                                        <td align="right" bgcolor="#ffffff" class="font-mono" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important; padding-top: 8px; white-space: nowrap;">
                                             Booking ID: <strong style="color: #0f172a !important;">{{ order.order_code|default:registration.registration_code }}</strong>
                                         </td>
                                     </tr>

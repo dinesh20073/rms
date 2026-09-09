@@ -45,16 +45,19 @@ class Order(models.Model):
             
         event = self.registration.event
         primary_name = self.registration.customer.name if self.registration and self.registration.customer else "Attendee"
-        # Generate dynamic standard UPI Intent URI with comment: Event Name - Person Name
-        # Format: upi://pay?pa={upi_id}&pn={upi_name}&am={amount}&cu=INR&tn={Event - Name}
+        # Format: upi://pay?pa={upi_id}&pn={upi_name}&tr={order_code}&tn={comment}&comment={comment}&am={amount}&cu=INR
+        clean_title = event.title.replace('&', 'and').strip()
+        clean_comment = f"{self.order_code} - {clean_title}"
         params = {
-            'pa': event.upi_id,
-            'pn': event.upi_name,
+            'pa': event.upi_id.strip(),
+            'pn': event.upi_name.strip(),
+            'tr': self.order_code,
+            'tn': clean_comment,
+            'comment': clean_comment,
             'am': f"{self.amount:.2f}",
             'cu': self.currency,
-            'tn': f"{event.title} - {primary_name}"[:80]
         }
-        self.upi_intent_url = f"upi://pay?{urllib.parse.urlencode(params)}"
+        self.upi_intent_url = f"upi://pay?{urllib.parse.urlencode(params, quote_via=urllib.parse.quote, safe='@')}"
         
         super().save(*args, **kwargs)
 
@@ -81,7 +84,7 @@ class Order(models.Model):
 
     @property
     def gpay_intent(self):
-        return self.upi_intent_url.replace("upi://", "gpay://upi/")
+        return self.upi_intent_url.replace("upi://pay", "tez://upi/pay")
 
     @property
     def phonepe_intent(self):
@@ -90,6 +93,23 @@ class Order(models.Model):
     @property
     def paytm_intent(self):
         return self.upi_intent_url.replace("upi://", "paytmmp://")
+
+    @property
+    def bhim_intent(self):
+        return self.upi_intent_url.replace("upi://", "bhim://")
+
+    @property
+    def payment_comment(self):
+        if not self.registration or not self.registration.event:
+            return f"Order {self.order_code}"
+        event = self.registration.event
+        clean_title = event.title.replace('&', 'and').strip()
+        return f"{self.order_code} - {clean_title}"
+
+    @property
+    def whatsapp_intent(self):
+        return self.upi_intent_url
+
 
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')

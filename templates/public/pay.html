@@ -4,35 +4,36 @@
 {% block title %}Payment Checkout • {{ order.order_code }} | Nizhal{% endblock %}
 
 {% block main_content %}
-<div class="w-full survey-card-container bg-white shadow-xl">
+<div class="w-full public-card shadow-2xl">
 
-    <!-- 1. Header Banner -->
-    <div class="survey-header-banner">
-        <div class="flex items-start justify-between gap-4">
-            <div class="space-y-1.5">
-                <div class="inline-flex items-center gap-2 px-2.5 py-0.5 text-xs font-mono font-semibold bg-white/20 text-white rounded-full">
+    <!-- 1. Header Hero Banner with #F8F4F4 Warm Minimal Tone -->
+    <div class="p-6 sm:p-8 bg-[#F8F4F4] text-slate-900 border-b border-slate-200/80 relative overflow-hidden">
+        <div class="flex items-start justify-between gap-4 relative z-10">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono font-bold bg-white text-blue-700 border border-blue-200/80 rounded-full shadow-2xs">
+                    <i data-lucide="receipt" class="w-3.5 h-3.5 text-blue-600"></i>
                     <span>Order: {{ order.order_code }}</span>
                 </div>
-                <h1 class="text-xl sm:text-2xl font-bold font-display text-white tracking-tight">
+                <h1 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tracking-tight leading-tight">
                     {{ event.title }}
                 </h1>
-                <p class="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                <p class="text-sm text-slate-600 font-medium leading-relaxed max-w-xl">
                     {% if order.status != 'PENDING' %}
                     Your registration payment receipt has been received.
                     {% else %}
-                    Complete your registration payment via UPI to receive your entry pass.
+                    Complete your registration payment via Google Pay or UPI to receive your entry pass.
                     {% endif %}
                 </p>
             </div>
             
-            <div class="hidden sm:flex w-12 h-12 bg-white rounded-lg p-1.5 items-center justify-center shrink-0 shadow-sm">
+            <div class="hidden sm:flex w-14 h-14 bg-white rounded-xl p-2 items-center justify-center shrink-0 shadow-sm border border-slate-200/80">
                 <img src="{% static 'images/logos/upi.png' %}" alt="UPI" class="w-full h-full object-contain">
             </div>
         </div>
     </div>
 
     <!-- 2. Main Body Section -->
-    <div class="p-5 sm:p-7 space-y-6 bg-white text-[#202124]">
+    <div class="p-6 sm:p-8 space-y-6 bg-white text-slate-900">
         {% if registration.status == 'COMPLETED' or attendee %}
         <!-- ==================== VERIFIED & COMPLETED PASS STATE ==================== -->
         <div class="space-y-5 text-center">
@@ -151,9 +152,9 @@
             <div class="border-b border-[#dadce0] pb-2 flex items-center justify-between">
                 <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
                     <span class="w-5 h-5 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-xs font-bold">1</span>
-                    <span>Scan Event QR or Pay with UPI App</span>
+                    <span>Scan Event QR or Pay with Google Pay</span>
                 </h2>
-                <span class="text-[11px] text-[#5f6368]">Official UPI</span>
+                <span class="text-[11px] text-[#5f6368]">Instant UPI</span>
             </div>
 
             <!-- QR Code Card -->
@@ -169,14 +170,26 @@
                 </div>
 
                 <!-- UPI ID Copy Bar -->
-                <div class="flex items-center gap-2 bg-[#f8f9fa] border border-[#dadce0] rounded-full px-3.5 py-1.5">
-                    <span class="text-xs text-[#5f6368]">UPI ID:</span>
-                    <span class="font-mono text-xs font-semibold text-[#202124] select-all">{{ event.upi_id }}</span>
-                    <button type="button" onclick="navigator.clipboard.writeText('{{ event.upi_id }}'); this.innerText='COPIED'; setTimeout(() => this.innerText='COPY', 2000);" class="ml-1 text-[11px] font-semibold text-[#1a73e8] hover:underline cursor-pointer">
-                        COPY
-                    </button>
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <div class="flex items-center gap-2 bg-[#f8f9fa] border border-[#dadce0] rounded-full px-3.5 py-1.5 shadow-2xs">
+                        <span class="text-xs text-[#5f6368]">UPI ID:</span>
+                        <span class="font-mono text-xs font-semibold text-[#202124] select-all">{{ event.upi_id }}</span>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ event.upi_id }}'); this.innerText='COPIED'; setTimeout(() => this.innerText='COPY', 2000);" class="ml-1 text-[11px] font-semibold text-[#1a73e8] hover:underline cursor-pointer">
+                            COPY
+                        </button>
+                    </div>
+
+                    <!-- Payment Note / Remark Copy Bar -->
+                    <div class="flex items-center gap-2 bg-[#f8f9fa] border border-[#dadce0] rounded-full px-3.5 py-1.5 shadow-2xs">
+                        <span class="text-xs text-[#5f6368]">Note / Remark:</span>
+                        <span class="font-mono text-xs font-semibold text-slate-800 select-all max-w-[180px] sm:max-w-[260px] truncate" title="{{ order.payment_comment }}">{{ order.payment_comment }}</span>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ order.payment_comment }}'); this.innerText='COPIED'; setTimeout(() => this.innerText='COPY', 2000);" class="ml-1 text-[11px] font-semibold text-[#1a73e8] hover:underline cursor-pointer">
+                            COPY
+                        </button>
+                    </div>
                 </div>
-                <div class="text-xs text-[#5f6368]">
+
+                <div class="text-xs text-[#5f6368] text-center">
                     Payee Name: <strong class="text-[#202124]">{{ event.upi_name }}</strong>
                 </div>
             </div>
@@ -184,26 +197,16 @@
             <!-- 1-Tap App Action Buttons -->
             <div class="pt-2">
                 <span class="text-xs font-medium text-[#5f6368] block mb-2 text-center">
-                    Or Tap to Open UPI App Directly:
+                    Or Tap to Open Google Pay Directly:
                 </span>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div class="max-w-xs mx-auto">
                     
                     <!-- Google Pay -->
-                    <a href="{{ order.gpay_intent }}" onclick="handleAppClick('Google Pay')" class="flex items-center justify-center gap-2 bg-white hover:bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-2.5 transition text-xs font-medium text-[#202124] shadow-2xs hover:border-[#1a73e8]">
-                        <img src="{% static 'images/logos/gpay.png' %}" alt="Google Pay" class="h-5 w-auto object-contain">
-                        <span>Google Pay</span>
-                    </a>
-
-                    <!-- PhonePe -->
-                    <a href="{{ order.phonepe_intent }}" onclick="handleAppClick('PhonePe')" class="flex items-center justify-center gap-2 bg-white hover:bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-2.5 transition text-xs font-medium text-[#5F259F] shadow-2xs hover:border-[#5F259F]">
-                        <img src="{% static 'images/logos/phonepe.png' %}" alt="PhonePe" class="h-5 w-auto object-contain">
-                        <span>PhonePe</span>
-                    </a>
-
-                    <!-- Other UPI Apps -->
-                    <a href="{{ order.upi_intent_url }}" onclick="handleAppClick('UPI App')" class="flex items-center justify-center gap-2 bg-white hover:bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-2.5 transition text-xs font-medium text-[#202124] shadow-2xs hover:border-[#1a73e8]">
-                        <img src="{% static 'images/logos/upi.png' %}" alt="UPI" class="h-5 w-auto object-contain">
-                        <span>Other UPI Apps</span>
+                    <a href="{{ order.gpay_intent }}" onclick="handleAppClick('Google Pay')" class="h-12 min-h-[48px] px-6 py-2.5 flex items-center justify-center gap-3 bg-white hover:bg-[#f8f9fa] border border-[#dadce0] rounded-xl transition text-sm font-semibold text-[#202124] shadow-2xs hover:border-[#1a73e8] hover:shadow-xs">
+                        <div class="w-6 h-6 flex items-center justify-center shrink-0">
+                            <img src="{% static 'images/logos/gpay.png' %}" alt="Google Pay" class="max-h-5 max-w-full object-contain">
+                        </div>
+                        <span class="truncate">Pay with Google Pay</span>
                     </a>
 
                 </div>
@@ -257,15 +260,17 @@
                     </div>
                 </div>
 
-                <button type="submit" id="verify-submit-btn" class="survey-btn-submit text-sm py-3 px-6">
-                    <i data-lucide="check" class="w-4 h-4"></i>
-                    <span id="verify-btn-text">Verify Payment & Issue Pass (₹{{ order.amount|floatformat:0 }})</span>
-                </button>
+                <div class="flex justify-center pt-2">
+                    <button type="submit" id="verify-submit-btn" class="public-btn-primary mx-auto text-sm py-3.5 px-8 flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span id="verify-btn-text">Verify Payment & Issue Pass (₹{{ order.amount|floatformat:0 }})</span>
+                    </button>
+                </div>
 
                 <!-- Post-Submission Waiting Notice -->
-                <div id="submitting-wait-notice" class="hidden p-3 bg-[#e8f0fe] border border-[#d2e3fc] rounded-lg text-left flex items-start gap-2.5">
-                    <i data-lucide="clock" class="w-4 h-4 text-[#1a73e8] shrink-0 mt-0.5"></i>
-                    <div class="text-xs text-[#1a73e8] leading-relaxed">
+                <div id="submitting-wait-notice" class="hidden p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-left flex items-start gap-2.5 backdrop-blur-md">
+                    <i data-lucide="clock" class="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5"></i>
+                    <div class="text-xs text-[#0071e3] leading-relaxed">
                         <strong>Receipt submitted!</strong> Verification is processing your payment.
                     </div>
                 </div>
@@ -279,9 +284,25 @@
 
 <script>
     function handleAppClick(appName) {
+        const upiId = "{{ event.upi_id }}";
+        const amount = "{{ order.amount|floatformat:2 }}";
+        
+        // Auto-copy UPI ID to clipboard so the user has it ready
+        try {
+            navigator.clipboard.writeText(upiId);
+        } catch (err) {}
+
         const notice = document.getElementById('app-redirect-notice');
         if (notice) {
+            notice.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-[#1a73e8] shrink-0 mt-0.5"></i>
+                    <div class="text-xs text-[#1a73e8] leading-relaxed">
+                        <strong>Opening ${appName}...</strong> Payee UPI ID (<strong>${upiId}</strong>) copied. Complete your payment of <strong>₹${amount}</strong> and upload your screenshot below.
+                    </div>
+                </div>`;
             notice.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
     }
 

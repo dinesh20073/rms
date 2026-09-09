@@ -130,6 +130,9 @@ class PaymentProofUploadAPIView(APIView):
 
         verification = VerificationEngine.process_evidence(order, evidence, ocr_data)
 
+        from apps.notifications.services import send_order_created_email
+        send_order_created_email(order.registration)
+
         return Response({
             "status": "processed",
             "decision": verification.decision,

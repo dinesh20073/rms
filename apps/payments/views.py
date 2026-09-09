@@ -84,6 +84,10 @@ def upload_proof_view(request, order_code):
     # Execute Dual-Tier Verification Rule Engine
     verification = VerificationEngine.process_evidence(order, evidence, ocr_data)
 
+    # Send Order Placed / Payment Submitted Confirmation Email
+    from apps.notifications.services import send_order_created_email
+    send_order_created_email(registration)
+
     return redirect('payment-checkout', order_code=order.order_code)
 
 def simulate_test_proof_view(request, order_code):

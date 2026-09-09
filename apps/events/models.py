@@ -56,7 +56,7 @@ class Event(models.Model):
             params['am'] = f"{self.registration_fee:.2f}"
             params['tn'] = f"{self.title} Entry Fee"[:60]
             
-        upi_url = f"upi://pay?{urllib.parse.urlencode(params)}"
+        upi_url = f"upi://pay?{urllib.parse.urlencode(params, quote_via=urllib.parse.quote, safe='@')}"
         
         qr = qrcode.QRCode(
             version=1,
@@ -105,4 +105,39 @@ class Event(models.Model):
             return False
         if self.registration_closes and now > self.registration_closes:
             return False
+        if self.max_capacity and self.registrations.filter(status='COMPLETED').count() >= self.max_capacity:
+            return False
         return True
+
+    def get_registration_closed_reason(self):
+        now = timezone.now()
+        if self.status != 'OPEN':
+            return {
+                'code': 'CLOSED_MANUAL',
+                'title': 'Registrations Closed',
+                'message': 'The event organizer is currently not accepting new registrations.',
+                'deadline': self.registration_closes,
+            }
+        if self.registration_opens and now < self.registration_opens:
+            return {
+                'code': 'NOT_STARTED',
+                'title': 'Registration Opening Soon',
+                'message': f"Registrations will officially open on {self.registration_opens.strftime('%d %b %Y at %I:%M %p')}.",
+                'deadline': self.registration_opens,
+            }
+        if self.registration_closes and now > self.registration_closes:
+            return {
+                'code': 'DEADLINE_EXPIRED',
+                'title': 'Registration Deadline Passed',
+                'message': f"The deadline for registration ended on {self.registration_closes.strftime('%d %b %Y at %I:%M %p')}.",
+                'deadline': self.registration_closes,
+            }
+        if self.max_capacity and self.registrations.filter(status='COMPLETED').count() >= self.max_capacity:
+            return {
+                'code': 'CAPACITY_REACHED',
+                'title': 'Registration Full',
+                'message': f"This event has reached its maximum attendee capacity ({self.max_capacity} attendees).",
+                'deadline': self.registration_closes,
+            }
+        return None
+

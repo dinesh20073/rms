@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="margin: 0 !important; padding: 0 !important; border: 0 !important; background-color: #f1f5f9 !important;">
+<html lang="en" style="margin: 0 !important; padding: 0 !important; border: 0 !important; background-color: #ffffff !important;">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -38,9 +38,8 @@
             border: 0 !important;
             outline: 0 !important;
             width: 100% !important;
-            min-width: 100% !important;
-            background: #f1f5f9 !important;
-            background-color: #f1f5f9 !important;
+            background: #ffffff !important;
+            background-color: #ffffff !important;
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             color: #1e293b !important;
             -webkit-font-smoothing: antialiased;
@@ -52,16 +51,6 @@
             border-spacing: 0 !important;
             padding: 0 !important;
             margin: 0 !important;
-            border: 0 !important;
-        }
-        table.ticket-card {
-            width: 600px !important;
-            max-width: 600px !important;
-            min-width: 600px !important;
-            margin: 0 auto !important;
-            table-layout: fixed !important;
-            border-collapse: collapse !important;
-            background-color: #ffffff !important;
         }
         td, th {
             mso-table-lspace: 0pt !important;
@@ -75,8 +64,6 @@
             outline: none !important;
             text-decoration: none;
             display: block;
-            margin: 0 !important;
-            padding: 0 !important;
         }
         .font-display {
             font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
@@ -88,7 +75,7 @@
             white-space: nowrap !important;
         }
 
-        /* Mobile Responsiveness for Gmail App & Mobile Browsers */
+        /* Fluid Window Sizing for Mobile & PC */
         @media only screen and (max-width: 620px) {
             .ticket-card, table[class*="ticket-card"] {
                 width: 100% !important;
@@ -100,14 +87,18 @@
                 max-width: 100% !important;
                 height: auto !important;
             }
-            .outer-wrapper-td {
-                padding: 0 !important;
+            .hero-inner-table {
+                width: 100% !important;
+            }
+            .content-side-pad {
+                padding-left: 14px !important;
+                padding-right: 14px !important;
             }
         }
 
-        /* Strict Light Mode Protection */
+        /* Universal Light Mode Lock */
         @media (prefers-color-scheme: dark) {
-            .force-white-bg, .ticket-card, .email-white-box {
+            html, body, .force-white-bg, .ticket-card, .email-white-box {
                 background-color: #ffffff !important;
                 background-image: linear-gradient(#ffffff, #ffffff) !important;
                 background: #ffffff !important;
@@ -133,12 +124,12 @@
         }
     </style>
 </head>
-<body class="body force-white-bg" bgcolor="#f1f5f9" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; width: 100% !important; min-width: 100% !important; background-color: #f1f5f9 !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
+<body class="body force-white-bg" bgcolor="#ffffff" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; width: 100% !important; background-color: #ffffff !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
 
-    <!-- Outer Centering Table (Guarantees Perfect 600px Centering on PC Gmail) -->
-    <table role="presentation" width="100%" bgcolor="#f1f5f9" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; min-width: 100% !important; margin: 0 auto !important; padding: 0 !important; border: 0 !important; background-color: #f1f5f9 !important;">
+    <!-- Outer Canvas Table (Pure White Background, Zero Letterboxing) -->
+    <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; padding: 0 !important; border: 0 !important; background-color: #ffffff !important;">
         <tr>
-            <td align="center" valign="top" class="outer-wrapper-td" bgcolor="#f1f5f9" style="padding: 20px 0 !important; margin: 0 !important; border: 0 !important; background-color: #f1f5f9 !important;">
+            <td align="center" valign="top" bgcolor="#ffffff" style="padding: 12px 8px !important; margin: 0 !important; border: 0 !important; background-color: #ffffff !important;">
                 
                 <!--[if (gte mso 9)|(IE)]>
                 <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
@@ -146,49 +137,49 @@
                 <td align="center" valign="top" width="600">
                 <![endif]-->
 
-                <!-- Standard Fixed-Width (600px) Ticket Canvas -->
-                <table role="presentation" class="ticket-card force-white-bg" width="600" align="center" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 600px !important; max-width: 600px !important; min-width: 600px; margin: 0 auto !important; padding: 0 !important; border: 0 !important; border-collapse: collapse !important; table-layout: fixed !important; background-color: #ffffff !important; box-shadow: 0 1px 4px rgba(0,0,0,0.12);">
+                <!-- Responsive Ticket Card with Crisp Black Outer Border (No Outer Curves) -->
+                <table role="presentation" class="ticket-card force-white-bg" width="600" align="center" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; max-width: 600px !important; margin: 0 auto !important; padding: 0 !important; border: 1px solid #000000 !important; border-radius: 0 !important; overflow: hidden !important; background-color: #ffffff !important;">
 
-                    <!-- 1. Top Visual Header Banner (Flush 600px Full Width) -->
+                    <!-- 1. Top Visual Header Banner (Flush Inside Black Border Box) -->
                     <tr>
-                        <td width="600" align="center" bgcolor="#ffffff" style="width: 600px !important; max-width: 600px !important; padding: 0 !important; margin: 0 !important; line-height: 0 !important; font-size: 0 !important; border: 0 !important; background-color: #ffffff !important;">
-                            <img src="{{ banner_src|default:'https://iili.io/ndZzewv.png' }}" alt="Nizhal Event Header" width="600" border="0" class="fluid-img" style="width: 600px !important; max-width: 600px !important; height: auto !important; display: block !important; border: 0 !important; margin: 0 auto !important; padding: 0 !important; outline: none !important;" />
+                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 0 !important; margin: 0 !important; line-height: 0 !important; font-size: 0 !important; border: 0 !important; background-color: #ffffff !important;">
+                            <img src="{{ banner_src|default:'https://iili.io/ndZzewv.png' }}" alt="Nizhal Event Header" width="600" border="0" class="fluid-img" style="width: 100%; max-width: 600px; height: auto !important; display: block !important; border: 0 !important; margin: 0 auto !important; padding: 0 !important; outline: none !important;" />
                         </td>
                     </tr>
 
                     <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + Mascot + Top Right QR Code) -->
                     <tr>
-                        <td width="600" align="center" bgcolor="#0265d2" style="width: 600px !important; max-width: 600px !important; background-color: #0265d2 !important; background-image: linear-gradient(to right, #0070e0, #0265d2, #0050b8) !important; padding: 16px 18px; color: #ffffff; border: 0 !important;">
-                            <table role="presentation" width="564" bgcolor="#0265d2" cellpadding="0" cellspacing="0" border="0" style="width: 564px !important; max-width: 564px !important; margin: 0 auto !important; background-color: transparent; border: 0 !important; table-layout: fixed !important;">
+                        <td width="100%" align="center" bgcolor="#0265d2" style="background-color: #0265d2 !important; background-image: linear-gradient(to right, #0070e0, #0265d2, #0050b8) !important; padding: 18px 20px; color: #ffffff; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#0265d2" cellpadding="0" cellspacing="0" border="0" class="hero-inner-table" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
                                 <tr>
-                                    <!-- Left Title, Subtitle, and Confirmed Spot Badge (434px) -->
-                                    <td width="434" valign="middle" align="left" style="width: 434px !important; color: #ffffff; padding-right: 12px; border: 0 !important;">
-                                        <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 21px; font-weight: 800; line-height: 1.2; color: #ffffff !important; letter-spacing: -0.3px; margin-bottom: 4px; white-space: nowrap;">
+                                    <!-- Left Title, Subtitle, and Confirmed Spot Badge -->
+                                    <td valign="middle" align="left" style="color: #ffffff; padding-right: 12px; border: 0 !important;">
+                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 21px; font-weight: 800; line-height: 1.2; color: #ffffff !important; letter-spacing: -0.3px; margin-bottom: 5px;">
                                             Booking confirmed!
                                         </div>
-                                        <div style="font-family: 'Roboto', sans-serif; font-size: 11.5px; line-height: 1.4; color: #e1f0ff !important; margin-bottom: 10px;">
+                                        <div style="font-family: 'Roboto', sans-serif; font-size: 12px; line-height: 1.4; color: #e1f0ff !important; margin-bottom: 12px;">
                                             Thank you for joining! Awaiting your presence at <strong>{{ event.title }}</strong>.
                                         </div>
                                         
-                                        <!-- Mascot Badge (Strict Single Line) -->
+                                        <!-- Mascot Badge -->
                                         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border: 0 !important;">
                                             <tr>
-                                                <td bgcolor="#f59e0b" style="background-color: #f59e0b !important; color: #ffffff !important; width: 20px; height: 20px; text-align: center; font-size: 10px; font-weight: 900; line-height: 20px; border: 1.5px solid #ffffff; font-family: 'Roboto', sans-serif;">
+                                                <td bgcolor="#f59e0b" style="background-color: #f59e0b !important; color: #ffffff !important; width: 20px; height: 20px; text-align: center; font-size: 10px; font-weight: 900; line-height: 20px; border-radius: 4px; border: 1.5px solid #ffffff; font-family: 'Roboto', sans-serif;">
                                                     ★
                                                 </td>
-                                                <td class="font-mono nowrap" style="padding-left: 7px; font-size: 10px; font-weight: 700; color: #ffffff !important; letter-spacing: 0.5px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
+                                                <td class="font-mono nowrap" style="padding-left: 7px; font-size: 10.5px; font-weight: 700; color: #ffffff !important; letter-spacing: 0.5px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
                                                     {{ ticket_count|default:1 }} SPOT CONFIRMED
                                                 </td>
                                             </tr>
                                         </table>
                                     </td>
 
-                                    <!-- Right Prominent Square QR Box (130px) -->
-                                    <td width="130" valign="middle" align="right" style="width: 130px !important; text-align: right; border: 0 !important;">
-                                        <table role="presentation" bgcolor="#ffffff" class="email-white-box" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; padding: 4px; border: 1.5px solid #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.15); display: inline-block;">
+                                    <!-- Right Prominent Square QR Box -->
+                                    <td width="115" valign="middle" align="right" style="width: 115px !important; text-align: right; border: 0 !important;">
+                                        <table role="presentation" bgcolor="#ffffff" class="email-white-box" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff !important; padding: 4px; border-radius: 8px; border: 1.5px solid #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.15); display: inline-block;">
                                             <tr>
-                                                <td align="center" bgcolor="#ffffff" style="background-color: #ffffff !important; background-image: linear-gradient(#ffffff, #ffffff) !important; padding: 2px;">
-                                                    <img src="{{ qr_src|default:'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PASS-CONFIRMED&margin=1' }}" alt="QR Ticket" width="94" height="94" style="width: 94px; height: 94px; display: block; margin: 0 auto; background-color: #ffffff !important;" />
+                                                <td align="center" bgcolor="#ffffff" style="background-color: #ffffff !important; padding: 2px;">
+                                                    <img src="{{ qr_src|default:'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PASS-CONFIRMED&margin=1' }}" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto; background-color: #ffffff !important;" />
                                                     <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8.5px; font-weight: 800; color: #0f172a !important; margin-top: 3px; letter-spacing: 0.5px; text-align: center; white-space: nowrap;">
                                                         {{ attendee.pass_code|default:pass_code }}
                                                     </div>
@@ -201,41 +192,53 @@
                         </td>
                     </tr>
 
-                    <!-- 3. Dark Meta Info Strip (Clean Standard Sizing) -->
+                    <!-- 3. Dark Meta Info Strip (Flush Full Width) -->
                     <tr>
-                        <td width="600" align="center" bgcolor="#1a2936" style="width: 600px !important; max-width: 600px !important; background-color: #1a2936 !important; background-image: linear-gradient(#1a2936, #1a2936) !important; color: #e2e8f0; padding: 9px 18px; font-size: 10.5px; font-weight: 500; font-family: 'Roboto', sans-serif; border: 0 !important;">
-                            <table role="presentation" width="564" bgcolor="#1a2936" cellpadding="0" cellspacing="0" border="0" style="width: 564px !important; max-width: 564px !important; margin: 0 auto !important; background-color: transparent; border: 0 !important; table-layout: fixed !important;">
+                        <td width="100%" align="center" bgcolor="#1a2936" style="background-color: #1a2936 !important; background-image: linear-gradient(#1a2936, #1a2936) !important; color: #e2e8f0; padding: 10px 20px; font-size: 11px; font-weight: 500; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#1a2936" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
                                 <tr>
-                                    <td width="270" align="left" valign="middle" style="width: 270px !important; color: #cbd5e1 !important; font-size: 10.5px; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; padding-right: 8px;">
+                                    <td align="left" valign="middle" style="color: #cbd5e1 !important; font-size: 11px; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; padding-right: 8px;">
                                         <div class="nowrap" style="white-space: nowrap;">Date: <strong style="color: #ffffff !important;">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></div>
                                         <div class="nowrap" style="white-space: nowrap;">Time: <strong style="color: #ffffff !important;">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></div>
                                     </td>
-                                    <td width="24" align="center" valign="middle" style="width: 24px !important; color: #475569 !important; font-size: 12px; border: 0; border-right: 1px solid #334155 !important;">&nbsp;</td>
-                                    <td width="270" align="center" valign="middle" style="width: 270px !important; color: #ffffff !important; font-size: 10.5px; font-weight: 700; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; text-align: center;">{{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}</td>
+                                    <td width="16" align="center" valign="middle" style="width: 16px !important; color: #475569 !important; font-size: 12px; border: 0; border-right: 1px solid #334155 !important;">&nbsp;</td>
+                                    <td align="right" valign="middle" style="color: #ffffff !important; font-size: 11px; font-weight: 700; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; text-align: right; padding-left: 8px;">{{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}</td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- 4. Three Colorful Summary KPI Cards (Standard Proportions: 200px / 200px / 200px = 600px) -->
+                    <!-- 4. Delegate Greeting -->
                     <tr>
-                        <td width="600" align="center" bgcolor="#ffffff" style="width: 600px !important; max-width: 600px !important; padding: 0 !important; margin: 0 !important; border: 0 !important;">
-                            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px !important; max-width: 600px !important; margin: 0 auto !important; border: 0 !important; table-layout: fixed !important;">
+                        <td width="100%" align="left" bgcolor="#ffffff" class="content-side-pad" style="padding: 18px 20px 14px 20px; background-color: #ffffff !important; border: 0 !important;">
+                            <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 15px; font-weight: 800; color: #0f172a !important; margin-bottom: 3px; white-space: nowrap;">
+                                Hi {{ customer.name|title }},
+                            </div>
+                            <div style="font-family: 'Roboto', sans-serif; font-size: 12px; color: #475569 !important; line-height: 1.45;">
+                                Welcome to <strong>{{ event.title }}</strong>! Your booking has been <strong style="color: #16a34a !important;">confirmed</strong>. Here are your booking details:
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- 5. Three Colorful Summary KPI Cards (Flush Edge-to-Edge as in Photo) -->
+                    <tr>
+                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 0 0 16px 0 !important; margin: 0 !important; border: 0 !important;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; border: 0 !important; table-layout: fixed !important;">
                                 <tr>
                                     <!-- Card 1: Coral Red (Venue & Get Directions Button) -->
-                                    <td width="200" valign="middle" align="center" bgcolor="#ea384d" style="width: 200px !important; background-color: #ea384d !important; background-image: linear-gradient(to bottom right, #ff4757, #ea384d) !important; padding: 12px 8px; color: #ffffff; text-align: center; border: 0 !important;">
-                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 9.5px; font-weight: 700; line-height: 1.25; min-height: 32px; color: #ffffff !important; text-align: center; margin: 0 auto;">
+                                    <td width="34%" valign="middle" align="center" bgcolor="#ea384d" style="background-color: #ea384d !important; background-image: linear-gradient(to bottom right, #ff4757, #ea384d) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
+                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 10px; font-weight: 700; line-height: 1.25; min-height: 32px; color: #ffffff !important; text-align: center; margin: 0 auto;">
                                             {{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}
                                         </div>
                                         <div style="margin-top: 6px; text-align: center;">
-                                            <a href="https://www.google.com/maps/search/?api=1&query={{ event.venue|default:'BIEC Bangalore'|urlencode }}" target="_blank" class="font-mono nowrap" style="display: inline-block; background-color: #ffffff; color: #ea384d !important; font-size: 8px; font-weight: 900; font-family: 'Roboto Mono', monospace; text-transform: uppercase; padding: 3px 7px; text-decoration: none; white-space: nowrap; margin: 0 auto;">
+                                            <a href="https://www.google.com/maps/search/?api=1&query={{ event.venue|default:'BIEC Bangalore'|urlencode }}" target="_blank" class="font-mono nowrap" style="display: inline-block; background-color: #ffffff; color: #ea384d !important; font-size: 8px; font-weight: 900; font-family: 'Roboto Mono', monospace; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; text-decoration: none; white-space: nowrap; margin: 0 auto;">
                                                 GET DIRECTIONS
                                             </a>
                                         </div>
                                     </td>
 
                                     <!-- Card 2: Sky Blue (Tickets / Persons) -->
-                                    <td width="200" valign="middle" align="center" bgcolor="#0084ff" style="width: 200px !important; background-color: #0084ff !important; background-image: linear-gradient(to bottom right, #1e90ff, #0084ff) !important; padding: 12px 8px; color: #ffffff; text-align: center; border: 0 !important;">
+                                    <td width="33%" valign="middle" align="center" bgcolor="#0084ff" style="background-color: #0084ff !important; background-image: linear-gradient(to bottom right, #1e90ff, #0084ff) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
                                         <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 26px; font-weight: 900; line-height: 1; color: #ffffff !important; text-align: center; margin: 0 auto; white-space: nowrap;">
                                             {{ ticket_count|default:1 }}
                                         </div>
@@ -245,7 +248,7 @@
                                     </td>
 
                                     <!-- Card 3: Amber/Gold (Total Paid) -->
-                                    <td width="200" valign="middle" align="center" bgcolor="#ff9800" style="width: 200px !important; background-color: #ff9800 !important; background-image: linear-gradient(to bottom right, #ffa502, #ff9800) !important; padding: 12px 8px; color: #ffffff; text-align: center; border: 0 !important;">
+                                    <td width="33%" valign="middle" align="center" bgcolor="#ff9800" style="background-color: #ff9800 !important; background-image: linear-gradient(to bottom right, #ffa502, #ff9800) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
                                         <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 26px; font-weight: 900; line-height: 1; color: #ffffff !important; text-align: center; margin: 0 auto; white-space: nowrap;">
                                             {% if registration.amount == 0 %}FREE{% else %}₹{{ registration.amount|floatformat:0 }}{% endif %}
                                         </div>
@@ -258,60 +261,48 @@
                         </td>
                     </tr>
 
-                    <!-- 5. Delegate Greeting (600px Full Flush) -->
+                    <!-- 6. BOOKING DETAILS (Clean Structured Box) -->
                     <tr>
-                        <td width="600" align="left" bgcolor="#ffffff" class="force-white-bg" style="width: 600px !important; max-width: 600px !important; padding: 14px 18px 10px 18px; background-color: #ffffff !important; border: 0 !important;">
-                            <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 14.5px; font-weight: 800; color: #0f172a !important; margin-bottom: 3px; white-space: nowrap;">
-                                Hi {{ customer.name|title }},
-                            </div>
-                            <div style="font-family: 'Roboto', sans-serif; font-size: 11.5px; color: #475569 !important; line-height: 1.45;">
-                                Welcome to <strong>{{ event.title }}</strong>! Your booking has been <strong style="color: #16a34a !important;">confirmed</strong>. Here are your booking details:
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- 6. BOOKING DETAILS (Equal 300px / 300px Columns, Clean Sizing) -->
-                    <tr>
-                        <td width="600" align="center" bgcolor="#ffffff" class="force-white-bg" style="width: 600px !important; max-width: 600px !important; padding: 0 !important; margin: 0 !important; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 600px !important; max-width: 600px !important; margin: 0 auto !important; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; background-color: #ffffff !important; font-size: 10.5px; font-family: 'Roboto', sans-serif; table-layout: fixed !important;">
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
                                 <tr>
-                                    <td colspan="2" width="600" bgcolor="#f1f5f9" style="width: 600px !important; background-color: #f1f5f9 !important; padding: 8px 18px; border-bottom: 1px solid #cbd5e1; font-size: 10.5px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155 !important; text-transform: uppercase;">
-                                        <table role="presentation" width="564" bgcolor="#f1f5f9" cellpadding="0" cellspacing="0" border="0" style="width: 564px !important; margin: 0 auto !important; table-layout: fixed !important;">
+                                    <td colspan="2" bgcolor="#f1f5f9" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155 !important; text-transform: uppercase;">
+                                        <table role="presentation" width="100%" bgcolor="#f1f5f9" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important;">
                                             <tr>
-                                                <td width="282" align="left" class="font-mono nowrap" style="width: 282px !important; font-weight: 800; color: #334155 !important; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 10.5px; white-space: nowrap;">
+                                                <td align="left" class="font-mono nowrap" style="font-weight: 800; color: #334155 !important; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
                                                     BOOKING DETAILS
                                                 </td>
-                                                <td width="282" align="right" class="font-mono nowrap" style="width: 282px !important; color: #64748b !important; font-weight: 500; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 10.5px; white-space: nowrap;">
-                                                    Booking ID: <strong style="color: #0f172a !important;">{{ attendee.pass_code|default:pass_code }}</strong>
+                                                <td align="right" class="font-mono nowrap" style="color: #64748b !important; font-weight: 500; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
+                                                    BOOKING ID: <strong style="color: #0f172a !important;">{{ attendee.pass_code|default:pass_code }}</strong>
                                                 </td>
                                             </tr>
                                         </table>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <!-- Left Column (300px) -->
-                                    <td width="300" valign="top" bgcolor="#ffffff" style="width: 300px !important; padding: 10px 18px; border-right: 1px solid #cbd5e1; background-color: #ffffff !important;">
-                                        <table role="presentation" width="263" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 263px !important; font-size: 10.5px; font-family: 'Roboto', sans-serif; table-layout: fixed !important;">
+                                    <!-- Left Column -->
+                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 10px 14px; border-right: 1px solid #cbd5e1; background-color: #ffffff !important;">
+                                        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px; font-family: 'Roboto', sans-serif;">
                                             <tr>
-                                                <td width="48" class="nowrap" bgcolor="#ffffff" style="width: 48px !important; color: #64748b !important; font-size: 10.5px; padding: 2.5px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Name:</td>
-                                                <td width="215" align="right" class="nowrap" bgcolor="#ffffff" style="width: 215px !important; font-weight: 700; color: #0f172a !important; font-size: 10.5px; padding: 2.5px 0; border: 0 !important; white-space: nowrap;">{{ customer.name|title }}</td>
+                                                <td width="50" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Name:</td>
+                                                <td align="right" class="nowrap" bgcolor="#ffffff" style="font-weight: 700; color: #0f172a !important; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.name|title }}</td>
                                             </tr>
                                             <tr>
-                                                <td width="48" class="nowrap" bgcolor="#ffffff" style="width: 48px !important; color: #64748b !important; font-size: 10.5px; padding: 2.5px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Email:</td>
-                                                <td width="215" align="right" class="font-mono nowrap" bgcolor="#ffffff" style="width: 215px !important; font-family: 'Roboto Mono', monospace; color: #334155 !important; font-size: 9.5px; font-weight: 600; padding: 2.5px 0; border: 0 !important; white-space: nowrap;">{{ customer.email }}</td>
+                                                <td width="50" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Email:</td>
+                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; color: #1976d2 !important; font-size: 10px; font-weight: 600; padding: 3px 0; border: 0 !important; white-space: nowrap; text-decoration: underline;">{{ customer.email }}</td>
                                             </tr>
                                         </table>
                                     </td>
-                                    <!-- Right Column (300px) -->
-                                    <td width="300" valign="top" bgcolor="#ffffff" style="width: 300px !important; padding: 10px 18px; background-color: #ffffff !important;">
-                                        <table role="presentation" width="263" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 263px !important; font-size: 10.5px; font-family: 'Roboto', sans-serif; table-layout: fixed !important;">
+                                    <!-- Right Column -->
+                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 10px 14px; background-color: #ffffff !important;">
+                                        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px; font-family: 'Roboto', sans-serif;">
                                             <tr>
-                                                <td width="92" class="nowrap" bgcolor="#ffffff" style="width: 92px !important; color: #64748b !important; font-size: 10.5px; padding: 2.5px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Phone number:</td>
-                                                <td width="171" align="right" class="font-mono nowrap" bgcolor="#ffffff" style="width: 171px !important; font-family: 'Roboto Mono', monospace; font-weight: 700; color: #0f172a !important; font-size: 10.5px; padding: 2.5px 0; border: 0 !important; white-space: nowrap;">{{ customer.phone|default:"+91 9876543210" }}</td>
+                                                <td width="92" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Phone number:</td>
+                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; font-weight: 700; color: #0f172a !important; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.phone|default:"+91 9876543210" }}</td>
                                             </tr>
                                             <tr>
-                                                <td width="92" class="nowrap" bgcolor="#ffffff" style="width: 92px !important; color: #64748b !important; font-size: 10.5px; padding: 2.5px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Date of visit:</td>
-                                                <td width="171" align="right" class="nowrap" bgcolor="#ffffff" style="width: 171px !important; color: #0f172a !important; font-weight: 600; font-size: 10.5px; padding: 2.5px 0; border: 0 !important; white-space: nowrap;">{% if registration.created_at %}{{ registration.created_at|date:"d F Y" }}{% else %}{% now "d F Y" %}{% endif %}</td>
+                                                <td width="92" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Date of visit:</td>
+                                                <td align="right" class="nowrap" bgcolor="#ffffff" style="color: #0f172a !important; font-weight: 600; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{% if registration.created_at %}{{ registration.created_at|date:"d F Y" }}{% else %}{% now "d F Y" %}{% endif %}</td>
                                             </tr>
                                         </table>
                                     </td>
@@ -320,50 +311,50 @@
                         </td>
                     </tr>
 
-                    <!-- 7. TICKET DETAILS (Standard Fixed Column Widths: 230px, 60px, 80px, 80px, 150px = 600px) -->
+                    <!-- 7. TICKET DETAILS (Clean Structured Table Box) -->
                     <tr>
-                        <td width="600" align="center" bgcolor="#ffffff" class="force-white-bg" style="width: 600px !important; max-width: 600px !important; padding: 14px 0 0 0 !important; margin: 0 !important; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 600px !important; max-width: 600px !important; margin: 0 auto !important; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; border-collapse: collapse; font-size: 10.5px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; table-layout: fixed !important;">
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important;">
                                 <tr>
-                                    <td colspan="5" width="600" bgcolor="#f1f5f9" class="font-mono nowrap" style="width: 600px !important; background-color: #f1f5f9 !important; padding: 8px 18px; border-bottom: 1px solid #cbd5e1; font-size: 10.5px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase; white-space: nowrap;">
+                                    <td colspan="5" bgcolor="#f1f5f9" class="font-mono nowrap" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase; white-space: nowrap;">
                                         TICKET DETAILS
                                     </td>
                                 </tr>
-                                <tr bgcolor="#1e293b" class="font-mono nowrap" style="background-color: #1e293b !important; color: #ffffff !important; font-size: 9.5px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
-                                    <th width="230" style="width: 230px !important; padding: 7px 18px; text-align: left; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Person Name</th>
-                                    <th width="60" style="width: 60px !important; padding: 7px 6px; text-align: center; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Age</th>
-                                    <th width="80" style="width: 80px !important; padding: 7px 6px; text-align: center; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Gender</th>
-                                    <th width="80" style="width: 80px !important; padding: 7px 6px; text-align: center; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Tickets</th>
-                                    <th width="150" style="width: 150px !important; padding: 7px 18px; text-align: right; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Amount</th>
+                                <tr bgcolor="#1e293b" class="font-mono nowrap" style="background-color: #1e293b !important; color: #ffffff !important; font-size: 10px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
+                                    <th style="padding: 8px 12px; text-align: left; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Person Name</th>
+                                    <th width="45" style="width: 45px !important; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Age</th>
+                                    <th width="65" style="width: 65px !important; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Gender</th>
+                                    <th width="55" style="width: 55px !important; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Tickets</th>
+                                    <th width="90" style="width: 90px !important; padding: 8px 12px; text-align: right; font-weight: 700; color: #ffffff !important; font-family: 'Roboto Mono', monospace; border: 0 !important; white-space: nowrap;">Amount</th>
                                 </tr>
                                 {% if attendee_list %}
                                     {% for person in attendee_list %}
-                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 10.5px; color: #1e293b !important; background-color: #ffffff !important; white-space: nowrap;">
-                                        <td width="230" bgcolor="#ffffff" class="nowrap" style="width: 230px !important; padding: 7px 18px; font-weight: 700; color: #0f172a !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.name }}</td>
-                                        <td width="60" bgcolor="#ffffff" class="font-mono nowrap" style="width: 60px !important; padding: 7px 6px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.age|default:"-" }}</td>
-                                        <td width="80" bgcolor="#ffffff" class="nowrap" style="width: 80px !important; padding: 7px 6px; text-align: center; color: #475569 !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.gender|title|default:"-" }}</td>
-                                        <td width="80" bgcolor="#ffffff" class="font-mono nowrap" style="width: 80px !important; padding: 7px 6px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">1</td>
-                                        <td width="150" bgcolor="#ffffff" class="font-mono nowrap" style="width: 150px !important; padding: 7px 18px; text-align: right; font-family: 'Roboto Mono', monospace; font-weight: 600; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">
+                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #1e293b !important; background-color: #ffffff !important; white-space: nowrap;">
+                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 8px 12px; font-weight: 700; color: #0f172a !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.name }}</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.age|default:"-" }}</td>
+                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 8px 4px; text-align: center; color: #475569 !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.gender|title|default:"-" }}</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">1</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 12px; text-align: right; font-family: 'Roboto Mono', monospace; font-weight: 600; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">
                                             {% if registration.amount == 0 %}₹0.00{% elif person.amount %}₹{{ person.amount|floatformat:2 }}{% elif event.registration_fee %}₹{{ event.registration_fee|floatformat:2 }}{% else %}₹{{ registration.amount|floatformat:2 }}{% endif %}
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 10.5px; color: #1e293b !important; background-color: #ffffff !important; white-space: nowrap;">
-                                        <td width="230" bgcolor="#ffffff" class="nowrap" style="width: 230px !important; padding: 7px 18px; font-weight: 700; color: #0f172a !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ customer.name|title }} (Primary)</td>
-                                        <td width="60" bgcolor="#ffffff" class="font-mono nowrap" style="width: 60px !important; padding: 7px 6px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">-</td>
-                                        <td width="80" bgcolor="#ffffff" class="nowrap" style="width: 80px !important; padding: 7px 6px; text-align: center; color: #475569 !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">-</td>
-                                        <td width="80" bgcolor="#ffffff" class="font-mono nowrap" style="width: 80px !important; padding: 7px 6px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">1</td>
-                                        <td width="150" bgcolor="#ffffff" class="font-mono nowrap" style="width: 150px !important; padding: 7px 18px; text-align: right; font-family: 'Roboto Mono', monospace; font-weight: 600; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">
+                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #1e293b !important; background-color: #ffffff !important; white-space: nowrap;">
+                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 8px 12px; font-weight: 700; color: #0f172a !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ customer.name|title }} (Primary)</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">-</td>
+                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 8px 4px; text-align: center; color: #475569 !important; font-family: 'Roboto', sans-serif; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">-</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; font-family: 'Roboto Mono', monospace; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">1</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 12px; text-align: right; font-family: 'Roboto Mono', monospace; font-weight: 600; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">
                                             ₹{{ registration.amount|floatformat:2 }}
                                         </td>
                                     </tr>
                                 {% endif %}
                                 <tr bgcolor="#f1f5f9" class="nowrap" style="background-color: #f1f5f9 !important; font-weight: 700; border-top: 2px solid #cbd5e1; white-space: nowrap;">
-                                    <td colspan="4" width="450" bgcolor="#f1f5f9" class="font-display nowrap" style="width: 450px !important; padding: 9px 18px; color: #0f172a !important; font-size: 11px; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; border: 0 !important; white-space: nowrap;">
+                                    <td colspan="4" bgcolor="#f1f5f9" class="font-display nowrap" style="padding: 9px 12px; color: #0f172a !important; font-size: 11.5px; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; border: 0 !important; white-space: nowrap;">
                                         Total Amount Paid
                                     </td>
-                                    <td width="150" bgcolor="#f1f5f9" class="font-mono nowrap" style="width: 150px !important; padding: 9px 18px; text-align: right; font-family: 'Roboto Mono', monospace; font-size: 12.5px; color: #1976d2 !important; font-weight: 900; border: 0 !important; white-space: nowrap;">
+                                    <td bgcolor="#f1f5f9" class="font-mono nowrap" style="padding: 9px 12px; text-align: right; font-family: 'Roboto Mono', monospace; font-size: 13px; color: #1976d2 !important; font-weight: 900; border: 0 !important; white-space: nowrap;">
                                         ₹{{ registration.amount|floatformat:2 }}
                                     </td>
                                 </tr>
@@ -371,33 +362,35 @@
                         </td>
                     </tr>
 
-                    <!-- 8. IMPORTANT INFORMATION (600px Full Width) -->
+                    <!-- 8. IMPORTANT INFORMATION (Clean Structured Box) -->
                     <tr>
-                        <td width="600" align="center" bgcolor="#ffffff" class="force-white-bg" style="width: 600px !important; max-width: 600px !important; padding: 14px 0 0 0 !important; margin: 0 !important; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="600" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 600px !important; max-width: 600px !important; margin: 0 auto !important; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; table-layout: fixed !important;">
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff !important; font-family: 'Roboto', sans-serif;">
                                 <tr>
-                                    <td width="600" bgcolor="#f1f5f9" class="font-mono nowrap" style="width: 600px !important; background-color: #f1f5f9 !important; padding: 8px 18px; border-bottom: 1px solid #cbd5e1; font-size: 10.5px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase; white-space: nowrap;">
+                                    <td bgcolor="#f1f5f9" class="font-mono nowrap" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase; white-space: nowrap;">
                                         ℹ️ IMPORTANT INFORMATION
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td width="600" bgcolor="#ffffff" style="width: 600px !important; padding: 12px 18px; font-size: 11px; color: #334155 !important; line-height: 1.55; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                                    <td bgcolor="#ffffff" style="padding: 12px 14px; font-size: 11.5px; color: #334155 !important; line-height: 1.55; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important;">
                                         <ul style="margin: 0; padding-left: 16px;">
-                                            <li style="margin-bottom: 5px;">
+                                            <li style="margin-bottom: 6px;">
                                                 Join our official 
                                                 <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" style="color: #15803d !important; font-weight: 700; text-decoration: underline;">WhatsApp Community</a>
                                                 for real-time event updates and announcements.
                                             </li>
-                                            <li style="margin-bottom: 5px;">
+                                            <li style="margin-bottom: 6px;">
                                                 Follow our official 
                                                 <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #db2777 !important; font-weight: 700; text-decoration: underline;">Instagram Page</a>
                                                 for event photos, highlights, and updates.
                                             </li>
                                             <li>
-                                                After reaching the location, if you need directions or on-ground coordination, please call: 
-                                                <a href="tel:9944488286" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Priyadharshini (9944488286)</a> / 
-                                                <a href="tel:9003429590" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanya (9003429590)</a> / 
-                                                <a href="tel:9042674924" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanaa (9042674924)</a>.
+                                                After reaching the location, if you need directions or on-ground coordination, please call:<br>
+                                                <span class="nowrap" style="white-space: nowrap; display: inline-block; margin-top: 3px;">
+                                                    <a href="tel:9944488286" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Priyadharshini (9944488286)</a> / 
+                                                    <a href="tel:9003429590" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanya (9003429590)</a> / 
+                                                    <a href="tel:9042674924" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanaa (9042674924)</a>
+                                                </span>
                                             </li>
                                         </ul>
                                     </td>
@@ -406,27 +399,27 @@
                         </td>
                     </tr>
 
-                    <!-- 9. Full Width "See you there!" Bar (600px Flush Across Both Sides, Edge-to-Edge) -->
+                    <!-- 9. "SEE YOU THERE!" Pill Badge -->
                     <tr>
-                        <td width="600" bgcolor="#0f172a" align="center" style="width: 600px !important; max-width: 600px !important; background-color: #0f172a !important; padding: 10px 18px; text-align: center; border: 0 !important;">
-                            <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 11.5px; font-weight: 800; color: #ffffff !important; letter-spacing: 0.8px; text-transform: uppercase; text-align: center; margin: 0 auto; white-space: nowrap;">
-                                See you there!
-                            </div>
+                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 4px 20px 16px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
+                            <span class="font-display nowrap" style="background-color: #0f172a; color: #ffffff !important; padding: 6px 24px; font-size: 11px; font-weight: 900; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 20px; display: inline-block; white-space: nowrap;">
+                                SEE YOU THERE!
+                            </span>
                         </td>
                     </tr>
 
-                    <!-- 10. Brand Footer Bar (600px Full Width) -->
+                    <!-- 10. Brand Footer Bar -->
                     <tr>
-                        <td width="600" bgcolor="#ffffff" align="center" class="force-white-bg" style="width: 600px !important; max-width: 600px !important; padding: 12px 18px 16px 18px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
-                            <table role="presentation" width="564" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 564px !important; max-width: 564px !important; margin: 0 auto !important; font-size: 10.5px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; border: 0 !important; table-layout: fixed !important;">
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 24px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; border-bottom: 0 !important; border-left: 0 !important; border-right: 0 !important;">
                                 <tr>
-                                    <td width="300" align="left" class="nowrap" bgcolor="#ffffff" style="width: 300px !important; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important; white-space: nowrap;">
+                                    <td align="left" class="nowrap" bgcolor="#ffffff" style="background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important; white-space: nowrap; padding-top: 8px;">
                                         <a href="http://127.0.0.1:8000/register/{{ event.slug }}/" target="_blank" style="text-decoration: none; color: #0f172a !important;">
-                                            <strong class="font-display" style="font-size: 11.5px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif;">Nizhal</strong>
-                                            <span style="font-size: 10.5px; color: #64748b !important;">| The Circle of Warmth</span>
+                                            <strong class="font-display" style="font-size: 12px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif;">Nizhal</strong>
+                                            <span style="font-size: 11px; color: #64748b !important;">| The Circle of Warmth</span>
                                         </a>
                                     </td>
-                                    <td width="264" align="right" class="font-mono nowrap" bgcolor="#ffffff" style="width: 264px !important; font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important; white-space: nowrap;">
+                                    <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important; white-space: nowrap; padding-top: 8px;">
                                         Booking ID: <strong style="color: #0f172a !important;">{{ attendee.pass_code|default:pass_code }}</strong>
                                     </td>
                                 </tr>
