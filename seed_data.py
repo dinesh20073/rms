@@ -3,9 +3,6 @@ import django
 from decimal import Decimal
 from datetime import timedelta
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ems_core.settings')
-django.setup()
-
 from django.contrib.auth.models import User
 from django.utils import timezone
 from apps.tenants.models import Tenant, ApiKey
@@ -235,4 +232,6 @@ def seed():
     print("\n[SUCCESS] Database Seeding Completed Successfully!")
 
 if __name__ == '__main__':
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ems_core.settings')
+    django.setup()
     seed()

@@ -3,12 +3,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
+from django.http import HttpResponse
 
 from apps.registrations import views as reg_views
 from apps.payments import views as pay_views
 from apps.dashboard import auth_views
 
 urlpatterns = [
+    path('favicon.ico', lambda req: HttpResponse(status=204)),
     path('admin/', admin.site.urls),
     
     # Secure Authentication
