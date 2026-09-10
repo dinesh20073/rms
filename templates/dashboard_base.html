@@ -90,11 +90,21 @@
 
                 <!-- Events -->
                 <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
-                    <a href="{% url 'dashboard-events-list' %}" class="google-nav-item {% if 'event' in request.resolver_match.url_name %}active{% endif %}">
+                    <a href="{% url 'dashboard-events-list' %}" class="google-nav-item {% if request.resolver_match.url_name == 'dashboard-events-list' or request.resolver_match.url_name == 'dashboard-event-detail' or request.resolver_match.url_name == 'dashboard-event-create' %}active{% endif %}">
                         <i data-lucide="calendar" class="w-5 h-5"></i>
                     </a>
                     <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
                         Events
+                    </div>
+                </div>
+
+                <!-- Forms Builder -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-forms-list' %}" class="google-nav-item {% if 'form' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="form-input" class="w-5 h-5"></i>
+                    </a>
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Forms Builder
                     </div>
                 </div>
 

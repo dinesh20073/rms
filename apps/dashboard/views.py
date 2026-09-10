@@ -386,10 +386,34 @@ def event_detail_view(request, event_id):
     return render(request, 'dashboard/events/detail.html', context)
 
 @login_required(login_url='login')
+def forms_list_view(request):
+    tenant = get_current_tenant(request)
+    events = Event.objects.filter(tenant=tenant).order_by('-created_at')
+    
+    forms_data = []
+    for ev in events:
+        form_obj, created = Form.objects.get_or_create(event=ev)
+        if created or not form_obj.fields.exists():
+            form_obj.create_default_fields()
+        forms_data.append({
+            'event': ev,
+            'form': form_obj,
+            'fields_count': form_obj.fields.count(),
+            'responses_count': ev.registrations.count(),
+        })
+        
+    return render(request, 'dashboard/forms/list.html', {
+        'forms_data': forms_data,
+        'events': events,
+    })
+
+@login_required(login_url='login')
 def form_builder_view(request, event_id):
     tenant = get_current_tenant(request)
     event = get_object_or_404(Event, id=event_id, tenant=tenant)
-    form_obj, _ = Form.objects.get_or_create(event=event)
+    form_obj, created = Form.objects.get_or_create(event=event)
+    if created or not form_obj.fields.exists():
+        form_obj.create_default_fields()
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -402,7 +426,12 @@ def form_builder_view(request, event_id):
             options = [o.strip() for o in options_raw.split(',') if o.strip()]
 
             order_num = form_obj.fields.count() + 1
-            field_key = slugify(label).replace('-', '_')
+            base_key = slugify(label).replace('-', '_') or 'field'
+            field_key = base_key
+            counter = 1
+            while FormField.objects.filter(form=form_obj, field_key=field_key).exists():
+                counter += 1
+                field_key = f"{base_key}_{counter}"
 
             FormField.objects.create(
                 form=form_obj,
@@ -414,13 +443,19 @@ def form_builder_view(request, event_id):
                 options=options,
                 order=order_num
             )
-            messages.success(request, f"Added field '{label}' to form.")
+            messages.success(request, f"Added question '{label}' to form.")
             return redirect('dashboard-event-form', event_id=event.id)
 
         elif action == 'delete_field':
             field_id = request.POST.get('field_id')
             FormField.objects.filter(id=field_id, form=form_obj).delete()
             messages.info(request, "Field removed from form.")
+            return redirect('dashboard-event-form', event_id=event.id)
+
+        elif action == 'reset_defaults':
+            form_obj.fields.all().delete()
+            form_obj.create_default_fields()
+            messages.success(request, "Reset form to standard default questions.")
             return redirect('dashboard-event-form', event_id=event.id)
 
         elif action == 'update_form_settings':

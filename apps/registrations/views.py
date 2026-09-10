@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
+from django.utils.text import slugify
 from apps.events.models import Event
 from apps.forms_builder.models import Form, FormField
 from apps.registrations.models import Customer, Registration, Attendee
