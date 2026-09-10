@@ -88,14 +88,14 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-center gap-3 pt-2">
+            <div class="flex items-center justify-center flex-wrap gap-2.5 pt-2">
                 <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}?print=1" target="_blank" class="google-btn-primary px-4 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="printer" class="w-4 h-4"></i>
-                    <span>Print Pass (A4)</span>
+                    <span>Print Pass</span>
                 </a>
                 <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}" target="_blank" class="google-btn-outlined px-4 py-2 text-xs font-semibold flex items-center gap-1.5">
-                    <i data-lucide="eye" class="w-4 h-4"></i>
-                    <span>View Pass</span>
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Download Pass Image</span>
                 </a>
             </div>
 

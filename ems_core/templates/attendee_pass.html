@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
@@ -124,34 +125,38 @@
             color: #1e293b;
         }
 
-        /* Print Specific Styling - Locked to Email Size (600px) */
+        /* Print Specific Styling - Directly print cut page to printable area with zero page bleed */
         @media print {
             @page {
                 size: auto;
-                margin: 15px auto !important;
+                margin: 0 !important;
             }
             html, body {
                 background-color: #ffffff !important;
                 padding: 0 !important;
-                margin: 0 auto !important;
+                margin: 0 !important;
                 width: 100% !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: flex-start !important;
+                height: auto !important;
+                display: block !important;
             }
             .no-print, .action-bar {
                 display: none !important;
             }
             .ticket-wrapper {
-                width: 600px !important;
+                width: 100% !important;
                 max-width: 600px !important;
-                min-width: 600px !important;
+                min-width: 0 !important;
                 box-shadow: none !important;
-                border: 1px solid #000000 !important;
+                border: 1px solid #cbd5e1 !important;
                 margin: 0 auto !important;
                 page-break-inside: avoid !important;
+                break-inside: avoid !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+            table, tr, td, th, img, div {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
         }
     </style>
@@ -483,9 +488,9 @@
             </span>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <button id="send-email-btn" type="button" onclick="sendPassEmail('{{ attendee.pass_code|default:pass_code }}')" class="btn-primary">
-                <i data-lucide="mail" id="send-email-icon" style="width: 14px; height: 14px;"></i>
-                <span id="send-email-text">Send to Email</span>
+            <button id="download-pass-btn" type="button" onclick="downloadPassAsImage()" class="btn-primary">
+                <i data-lucide="download" id="download-pass-icon" style="width: 14px; height: 14px;"></i>
+                <span id="download-pass-text">Download Pass as Image</span>
             </button>
             <button type="button" onclick="window.print()" class="btn-outlined">
                 <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
@@ -500,52 +505,64 @@
     {% endif %}
 
     <script>
-        async function sendPassEmail(passCode) {
-            const btn = document.getElementById('send-email-btn');
-            const icon = document.getElementById('send-email-icon');
-            const text = document.getElementById('send-email-text');
-            if (!btn) return;
-            
-            btn.disabled = true;
-            btn.style.opacity = '0.75';
-            text.innerText = 'Sending to Email...';
-            
+        async function downloadPassAsImage() {
+            const btn = document.getElementById('download-pass-btn');
+            const btnText = document.getElementById('download-pass-text');
+            const passCard = document.querySelector('.ticket-wrapper');
+            if (!passCard) return;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.75';
+                if (btnText) btnText.innerText = 'Generating Image...';
+            }
+
             try {
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
-                const res = await fetch(`/pass/${passCode}/send-email/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': csrfToken
-                    }
+                if (typeof html2canvas === 'undefined') {
+                    throw new Error('Image exporter library loading. Please try again.');
+                }
+                const canvas = await html2canvas(passCard, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
                 });
-                const data = await res.json();
-                if (data.success) {
-                    btn.style.backgroundColor = '#16a34a';
-                    text.innerText = `Sent to ${data.email || 'Email'} ✓`;
-                    setTimeout(() => {
+
+                const link = document.createElement('a');
+                link.download = `Pass_{{ attendee.pass_code|default:pass_code }}.png`;
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                if (btnText) btnText.innerText = 'Pass Downloaded ✓';
+                setTimeout(() => {
+                    if (btn) {
                         btn.disabled = false;
                         btn.style.opacity = '1';
-                        btn.style.backgroundColor = '#1a73e8';
-                        text.innerText = "Resend to Email";
-                    }, 4000);
-                } else {
-                    alert(data.error || 'Failed to send email.');
+                    }
+                    if (btnText) btnText.innerText = 'Download Pass as Image';
+                }, 3000);
+            } catch (err) {
+                console.error('Error downloading pass image:', err);
+                alert('Could not download image directly. Please use the Print button to Save as PDF/Image.');
+                if (btn) {
                     btn.disabled = false;
                     btn.style.opacity = '1';
-                    text.innerText = 'Send to Email';
                 }
-            } catch (err) {
-                alert('An error occurred while sending email.');
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                text.innerText = 'Send to Email';
+                if (btnText) btnText.innerText = 'Download Pass as Image';
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
+            }
+            if (window.location.search.includes('print=1')) {
+                setTimeout(() => {
+                    window.print();
+                }, 350);
             }
         });
     </script>
