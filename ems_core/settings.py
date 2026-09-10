@@ -9,8 +9,24 @@ except ImportError:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-ems-super-secret-key-2026-v1-production-ready')
-DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
+def get_env_str(key, default=''):
+    val = os.getenv(key)
+    return val if val is not None and val != '' else default
+
+def get_env_bool(key, default=True):
+    val = os.getenv(key)
+    if val is None or val == '':
+        return default
+    return str(val).strip().lower() in ('true', '1', 'yes', 't')
+
+def get_env_int(key, default=587):
+    val = os.getenv(key)
+    if val is not None and str(val).strip().isdigit():
+        return int(str(val).strip())
+    return default
+
+SECRET_KEY = get_env_str('DJANGO_SECRET_KEY', 'django-insecure-ems-super-secret-key-2026-v1-production-ready')
+DEBUG = get_env_bool('DJANGO_DEBUG', True)
 
 ALLOWED_HOSTS = ['*']
 
@@ -132,13 +148,13 @@ REST_FRAMEWORK = {
 }
 
 # Email Configuration (Gmail SMTP)
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'nizhalcommunity@gmail.com')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_HOST_USER}>')
+EMAIL_BACKEND = get_env_str('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = get_env_str('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = get_env_int('EMAIL_PORT', 587)
+EMAIL_USE_TLS = get_env_bool('EMAIL_USE_TLS', True)
+EMAIL_HOST_USER = get_env_str('EMAIL_HOST_USER', 'nizhalcommunity@gmail.com')
+EMAIL_HOST_PASSWORD = get_env_str('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = get_env_str('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_HOST_USER}>')
 
 # CSRF & Frame Options
 CSRF_TRUSTED_ORIGINS = [
