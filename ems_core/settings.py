@@ -88,8 +88,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ems_core.wsgi.application'
 
 # Database
-# On Vercel, copy sqlite to /tmp for writable filesystem if using SQLite
-if 'VERCEL' in os.environ:
+# On Vercel / Serverless, /tmp is the only writable directory for SQLite
+if 'VERCEL' in os.environ or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
     tmp_db = Path('/tmp/db.sqlite3')
     orig_db = BASE_DIR / 'db.sqlite3'
     if orig_db.exists() and not tmp_db.exists():
@@ -97,7 +97,7 @@ if 'VERCEL' in os.environ:
             shutil.copyfile(orig_db, tmp_db)
         except Exception:
             pass
-    DB_PATH = tmp_db if tmp_db.exists() else orig_db
+    DB_PATH = tmp_db
 else:
     DB_PATH = BASE_DIR / 'db.sqlite3'
 
