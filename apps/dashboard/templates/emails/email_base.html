@@ -134,6 +134,7 @@
                     <!-- 3. Important Information & Contacts Box (Clean Rounded Card Inset) -->
                     <tr>
                         <td bgcolor="#ffffff" class="force-white-bg card-info-padding" style="padding: 0 20px 24px 20px; background-color: #ffffff !important; border: 0 !important;">
+                            {% block email_info_box %}
                             <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff !important; font-family: 'Roboto', sans-serif; margin-bottom: 16px;">
                                 <tr>
                                     <td bgcolor="#f1f5f9" class="font-mono" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase;">
@@ -173,14 +174,17 @@
                                         SEE YOU THERE!
                                     </span>
                                 </div>
+                            </div>
+                            {% endblock %}
                                 
+                            <div style="text-align: center; background-color: #ffffff !important;">
                                 <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important; border-bottom: 0 !important; border-left: 0 !important; border-right: 0 !important;">
                                     <tr>
                                         <td align="left" bgcolor="#ffffff" style="background-color: #ffffff !important; font-family: 'Roboto', sans-serif; border: 0 !important; padding-top: 8px; white-space: nowrap;">
-                                            <a href="http://127.0.0.1:8000/register/{{ event.slug }}/" target="_blank" style="text-decoration: none; color: #0f172a !important;">
+                                            <span style="text-decoration: none; color: #0f172a !important;">
                                                 <strong class="font-display" style="font-size: 12px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif;">Nizhal</strong>
                                                 <span style="font-size: 11px; color: #64748b !important;">| The Circle of Warmth</span>
-                                            </a>
+                                            </span>
                                         </td>
                                         <td align="right" bgcolor="#ffffff" class="font-mono" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important; padding-top: 8px; white-space: nowrap;">
                                             Booking ID: <strong style="color: #0f172a !important;">{{ order.order_code|default:registration.registration_code }}</strong>
