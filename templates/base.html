@@ -481,24 +481,42 @@
 </head>
 <body class="min-h-full flex flex-col bg-[#f8f9fa] text-[#202124] antialiased selection:bg-[#e8f0fe] selection:text-[#1a73e8]">
 
-    <!-- Google Material Floating Compact Snackbars Container -->
-    <div id="google-snackbar-container" class="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-1.5 max-w-[94vw] sm:max-w-md w-auto pointer-events-none select-none">
+    <!-- Unified Premium Material Toast Notifications Container -->
+    <div id="unified-toast-container" class="fixed top-4 right-4 z-[9999] flex flex-col items-end gap-2.5 max-w-[92vw] sm:max-w-md w-full pointer-events-none select-none">
         {% if messages %}
             {% for message in messages %}
-            <div onclick="dismissSnackbar(this)" class="google-snackbar toast-item pointer-events-auto transition-all duration-200 transform translate-y-0 opacity-100" role="alert" title="Tap to dismiss">
-                <div class="flex items-center gap-2 min-w-0">
-                    {% if message.tags == 'success' %}
-                    <i data-lucide="check-circle" class="w-4 h-4 text-[#81c995] shrink-0"></i>
-                    {% elif message.tags == 'error' %}
-                    <i data-lucide="alert-circle" class="w-4 h-4 text-[#f28b82] shrink-0"></i>
-                    {% elif message.tags == 'warning' %}
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-[#fdd663] shrink-0"></i>
-                    {% else %}
-                    <i data-lucide="info" class="w-4 h-4 text-[#8ab4f8] shrink-0"></i>
-                    {% endif %}
-                    <span class="text-xs text-white font-medium truncate max-w-[240px] sm:max-w-xs">{{ message }}</span>
+            <div class="toast-item pointer-events-auto bg-white border {% if message.tags == 'success' %}border-emerald-200 border-l-4 border-l-emerald-600{% elif message.tags == 'error' %}border-rose-200 border-l-4 border-l-rose-600{% elif message.tags == 'warning' %}border-amber-200 border-l-4 border-l-amber-500{% else %}border-blue-200 border-l-4 border-l-blue-600{% endif %} rounded-xl shadow-xl p-3.5 flex items-start justify-between gap-3 transition-all duration-300 transform translate-x-0 opacity-100 w-full" role="alert">
+                <div class="flex items-start gap-3 min-w-0">
+                    <div class="shrink-0 mt-0.5">
+                        {% if message.tags == 'success' %}
+                        <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        </div>
+                        {% elif message.tags == 'error' %}
+                        <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                            <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                        </div>
+                        {% elif message.tags == 'warning' %}
+                        <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                        </div>
+                        {% else %}
+                        <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <i data-lucide="info" class="w-4 h-4"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 leading-tight">
+                            {% if message.tags == 'success' %}Success
+                            {% elif message.tags == 'error' %}Authentication Alert
+                            {% elif message.tags == 'warning' %}Notice
+                            {% else %}System Information{% endif %}
+                        </p>
+                        <p class="text-xs text-slate-700 mt-1 leading-relaxed break-words font-medium">{{ message }}</p>
+                    </div>
                 </div>
-                <button type="button" onclick="event.stopPropagation(); dismissSnackbar(this.closest('.google-snackbar'))" class="text-[#8ab4f8] hover:text-white p-0.5 ml-1 shrink-0 cursor-pointer">
+                <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="text-slate-400 hover:text-slate-700 p-1 shrink-0 transition cursor-pointer" title="Dismiss">
                     <i data-lucide="x" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
@@ -510,24 +528,68 @@
     {% block body_content %}{% endblock %}
 
     <script>
-        function dismissSnackbar(el) {
+        function dismissToast(el) {
             if (!el) return;
-            el.style.transform = 'translateY(-8px) scale(0.95)';
+            el.style.transform = 'translateX(20px) scale(0.95)';
             el.style.opacity = '0';
             setTimeout(() => {
                 el.remove();
-            }, 200);
+            }, 250);
         }
 
-        // Auto-dismiss snackbars after 2.5 seconds
+        // Global toast trigger helper for anywhere in the application
+        window.showToast = function(message, type = 'success', title = '') {
+            const container = document.getElementById('unified-toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast-item pointer-events-auto bg-white border ${type === 'success' ? 'border-emerald-200 border-l-4 border-l-emerald-600' : (type === 'error' ? 'border-rose-200 border-l-4 border-l-rose-600' : 'border-blue-200 border-l-4 border-l-blue-600')} rounded-xl shadow-xl p-3.5 flex items-start justify-between gap-3 transition-all duration-300 transform translate-x-4 opacity-0 w-full`;
+            
+            const iconName = type === 'success' ? 'check-circle-2' : (type === 'error' ? 'alert-circle' : 'info');
+            const iconBg = type === 'success' ? 'bg-emerald-50 text-emerald-600' : (type === 'error' ? 'bg-rose-50 text-rose-600' : 'bg-blue-50 text-blue-600');
+            const defaultTitle = title || (type === 'success' ? 'Success' : (type === 'error' ? 'Error' : 'Notice'));
+
+            toast.innerHTML = `
+                <div class="flex items-start gap-3 min-w-0">
+                    <div class="shrink-0 mt-0.5">
+                        <div class="w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center">
+                            <i data-lucide="${iconName}" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 leading-tight">${defaultTitle}</p>
+                        <p class="text-xs text-slate-700 mt-1 leading-relaxed break-words font-medium">${message}</p>
+                    </div>
+                </div>
+                <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="text-slate-400 hover:text-slate-700 p-1 shrink-0 transition cursor-pointer" title="Dismiss">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            `;
+            container.appendChild(toast);
+            if (window.lucide) {
+                window.lucide.createIcons({ root: toast });
+            }
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-4', 'opacity-0');
+                toast.classList.add('translate-x-0', 'opacity-100');
+            });
+
+            setTimeout(() => {
+                dismissToast(toast);
+            }, 4500);
+        };
+
+        // Auto-dismiss initial server-rendered toasts after 4.5 seconds
         document.addEventListener('DOMContentLoaded', function() {
-            const snackbars = document.querySelectorAll('.google-snackbar');
-            snackbars.forEach((sb, idx) => {
+            const toasts = document.querySelectorAll('#unified-toast-container .toast-item');
+            toasts.forEach((t, idx) => {
                 setTimeout(() => {
-                    dismissSnackbar(sb);
-                }, 2500 + (idx * 300));
+                    dismissToast(t);
+                }, 4500 + (idx * 300));
             });
         });
+
 
         function toggleDateCustom(val, prefix) {
             var el = document.getElementById(prefix + '_date_custom');

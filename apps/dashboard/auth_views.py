@@ -112,8 +112,8 @@ def login_view(request):
                 # Login Success!
                 login(request, user)
 
-                # Handle session duration (7 days persistent)
-                request.session.set_expiry(604800)
+                # Handle session duration (14 days persistent)
+                request.session.set_expiry(1209600)
 
                 # Log audit record
                 log_audit_event(
@@ -124,11 +124,11 @@ def login_view(request):
                     ip_address=client_ip
                 )
 
-                messages.success(request, f"Welcome back, {user.first_name or user.username}!")
+                messages.success(request, f"Welcome back, {user.first_name or user.username}! You are signed in.")
                 return redirect(redirect_to)
         else:
             # Authentication failed
-            error_message = "Invalid username or password."
+            error_message = "Invalid username/email or password. Please verify your credentials."
             log_audit_event(
                 action='AUTH_LOGIN_FAILED',
                 reference_id=username,
@@ -143,6 +143,7 @@ def login_view(request):
         'next': redirect_to,
         'username': request.POST.get('username', '')
     })
+
 
 @never_cache
 def logout_view(request):
