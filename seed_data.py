@@ -24,8 +24,7 @@ def seed():
 
     print(">> Seeding Comprehensive EMS Platform Sample Data...")
 
-    # 1. Admin Users with constant deterministic hashes (preserves session hash across serverless lambda containers)
-    ADMIN_HASH = 'pbkdf2_sha256$1200000$TkfTgMExkiowwzK7VuKLfA$MT1/b74TKiNxd+R8ImzC3Mtj1u4Oy+dUwLNYlaxXFOc='
+    # 1. Superuser
     NIZHAL_HASH = 'pbkdf2_sha256$1200000$y375MNroI33LpWK39JlIfM$rlyDj8UzJMv4lLkugrKB/n9N4UvAOerk25OjghszwZE='
 
     nizhal_user, _ = User.objects.get_or_create(username='Nizhal')
@@ -36,16 +35,10 @@ def seed():
     nizhal_user.last_name = 'Admin'
     nizhal_user.email = 'nizhalcommunity@gmail.com'
     nizhal_user.save()
-
-    admin_user, _ = User.objects.get_or_create(username='admin')
-    admin_user.password = ADMIN_HASH
-    admin_user.is_superuser = True
-    admin_user.is_staff = True
-    admin_user.email = 'nizhalcommunity@gmail.com'
-    admin_user.save()
-    print("  [+] Configured Superusers 'Nizhal' and 'admin'")
+    print("  [+] Configured Superuser 'Nizhal'")
 
     # 2. Tenants
+
     tenant1, _ = Tenant.objects.get_or_create(
         slug='acme-tech',
         defaults={'name': 'Acme Global Events', 'domain': 'events.acmetech.com'}
