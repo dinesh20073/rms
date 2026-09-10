@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Verification{% endblock %}
+{% block header_title %}Payments{% endblock %}
 
 {% block content %}
 <div class="p-3 sm:p-6 max-w-[1600px] w-full mx-auto space-y-3 sm:space-y-5 pb-8 sm:pb-12">
@@ -10,14 +10,14 @@
         <div>
             <div class="flex items-center gap-2.5 sm:gap-3">
                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
-                    <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                    <i data-lucide="credit-card" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <h1 class="text-sm sm:text-lg font-semibold font-display text-[#202124] tracking-tight m-0">Verification</h1>
-                    <span class="text-[11px] sm:text-xs font-medium text-[#5f6368]">• Manual Review</span>
+                    <h1 class="text-sm sm:text-lg font-semibold font-display text-[#202124] tracking-tight m-0">Payments</h1>
+                    <span class="text-[11px] sm:text-xs font-medium text-[#5f6368]">• Verification & Approvals</span>
                 </div>
             </div>
-            <p class="text-[11px] sm:text-xs text-[#5f6368] mt-1">Review payment proofs and approve or reject registrations.</p>
+            <p class="text-[11px] sm:text-xs text-[#5f6368] mt-1">Review UPI payment proofs and manage transaction approvals.</p>
         </div>
         
         <div class="flex items-center gap-2">
@@ -36,7 +36,7 @@
                 {% else %}
                 <span class="px-2 py-0.5 rounded bg-[#e6f4ea] border border-[#ceead6] text-[#137333] font-medium text-[11px] sm:text-xs flex items-center gap-1.5">
                     <i data-lucide="check-circle" class="w-3.5 h-3.5 text-[#1e8e3e]"></i>
-                    <span>Queue Clear</span>
+                    <span>Payments Clear</span>
                 </span>
                 {% endif %}
             </div>
@@ -54,7 +54,7 @@
         <!-- Metric 1: Pending Queue -->
         <div class="google-card p-3 sm:p-4 flex flex-col justify-between {% if queue %}border-[#feefc3] bg-gradient-to-b from-[#fefbf0] to-white{% endif %}">
             <div class="flex items-center justify-between text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2 {% if queue %}text-[#b06000]{% else %}text-[#5f6368]{% endif %}">
-                <span class="truncate">Pending</span>
+                <span class="truncate">Pending Payments</span>
                 <i data-lucide="inbox" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 {% if queue %}text-[#b06000]{% else %}text-[#5f6368]{% endif %}"></i>
             </div>
             <div class="text-xl sm:text-2xl font-bold font-display {% if queue %}text-[#b06000]{% else %}text-[#202124]{% endif %}">
@@ -65,6 +65,7 @@
                 <span class="font-mono hidden sm:inline">Active</span>
             </div>
         </div>
+
 
         <!-- Metric 2: Approvals (Payment Received) -->
         <div class="google-card p-3 sm:p-4 flex flex-col justify-between border-[#ceead6] bg-gradient-to-b from-[#f6fbf7] to-white">

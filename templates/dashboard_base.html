@@ -98,16 +98,16 @@
                     </div>
                 </div>
 
-                <!-- Verification Queue -->
+                <!-- Payments -->
                 <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
                     <a href="{% url 'dashboard-verification-queue' %}" class="google-nav-item relative {% if 'verification' in request.resolver_match.url_name %}active{% endif %}">
-                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
                         {% if pending_reviews_count > 0 %}
                         <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#f9ab00]"></span>
                         {% endif %}
                     </a>
                     <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
-                        Verification Queue {% if pending_reviews_count > 0 %}({{ pending_reviews_count }}){% endif %}
+                        Payments {% if pending_reviews_count > 0 %}({{ pending_reviews_count }}){% endif %}
                     </div>
                 </div>
 
@@ -202,8 +202,8 @@
             <span>Events</span>
         </a>
         <a href="{% url 'dashboard-verification-queue' %}" class="flex flex-col items-center gap-0.5 p-1 relative {% if 'verification' in request.resolver_match.url_name %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
-            <i data-lucide="shield-check" class="w-5 h-5"></i>
-            <span>Queue</span>
+            <i data-lucide="credit-card" class="w-5 h-5"></i>
+            <span>Payments</span>
             {% if pending_reviews_count > 0 %}
             <span class="absolute top-0 right-1 w-2 h-2 rounded-full bg-[#f9ab00]"></span>
             {% endif %}
@@ -213,6 +213,7 @@
             <span>Emails</span>
         </a>
     </nav>
+
 
 </div>
 
