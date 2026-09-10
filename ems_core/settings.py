@@ -218,7 +218,7 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if os.path.exists(os.path.join(str(BASE_DIR), '_vendor', 'whitenoise')) or __import__('importlib.util').util.find_spec('whitenoise') else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
