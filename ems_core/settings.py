@@ -88,18 +88,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ems_core.wsgi.application'
 
 # Database
-# Support DATABASE_URL / SUPABASE_DB_URL or individual PG/Supabase environment variables
-db_url = get_env_str('DATABASE_URL') or get_env_str('SUPABASE_DB_URL')
+# Connects directly to Supabase PostgreSQL (IPv4 Session Pooler)
+DEFAULT_SUPABASE_URL = 'postgresql://postgres.zldazpkryvrqddwvdeno:Dinesh%40231401025@aws-0-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require'
+db_url = get_env_str('DATABASE_URL') or get_env_str('SUPABASE_DB_URL') or DEFAULT_SUPABASE_URL
 db_password = get_env_str('DB_PASSWORD') or get_env_str('SUPABASE_PASSWORD') or get_env_str('PGPASSWORD')
 db_host = get_env_str('DB_HOST') or get_env_str('SUPABASE_HOST') or get_env_str('PGHOST')
 db_user = get_env_str('DB_USER') or get_env_str('SUPABASE_USER') or get_env_str('PGUSER') or 'postgres'
 db_name = get_env_str('DB_NAME') or get_env_str('SUPABASE_DB') or get_env_str('PGDATABASE') or 'postgres'
 db_port = get_env_int('DB_PORT', get_env_int('PGPORT', 5432))
 
-if not db_url and db_password and db_host:
+if db_password and db_host:
     import urllib.parse
     encoded_pass = urllib.parse.quote_plus(db_password)
-    db_url = f"postgresql://{db_user}:{encoded_pass}@{db_host}:{db_port}/{db_name}"
+    db_url = f"postgresql://{db_user}:{encoded_pass}@{db_host}:{db_port}/{db_name}?sslmode=require"
 
 if db_url:
     try:
@@ -107,12 +108,13 @@ if db_url:
         DATABASES = {
             'default': dj_database_url.config(
                 default=db_url,
-                conn_max_age=0,  # Recommended for serverless/pooler
+                conn_max_age=0,
                 ssl_require=True
             )
         }
     except Exception:
         db_url = None
+
 
 if not db_url:
     if 'VERCEL' in os.environ or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
