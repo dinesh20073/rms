@@ -152,24 +152,19 @@
                 </a>
             </div>
 
-            <!-- Right: 1-Sec Live Sync Indicator, Profile & Actions -->
-            <div class="flex items-center gap-3">
-                <!-- 1s Real-Time Live Sync Status Indicator -->
-                <button type="button" onclick="if(window.triggerGlobalSync) window.triggerGlobalSync();" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[11px] font-medium select-none shadow-2xs cursor-pointer hover:bg-[#ceead6] transition" title="1-Second Background Live Sync Active (Click to sync now)">
-                    <span id="globalLiveSyncDot" class="w-2 h-2 rounded-full bg-[#1e8e3e] animate-pulse"></span>
-                    <span id="globalLiveSyncText" class="font-mono text-[10.5px] uppercase font-bold tracking-wider">Live Sync</span>
+            <!-- Right: Real-Time Backend Sync Status & Profile -->
+            <div class="flex items-center gap-2 sm:gap-3 select-none">
+                <!-- Real Backend Connection & Sync Status Indicator -->
+                <button type="button" id="backendSyncBtn" onclick="if(window.triggerGlobalSync) window.triggerGlobalSync();" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#dadce0] bg-white hover:bg-[#f8f9fa] text-[#5f6368] transition shadow-2xs cursor-pointer" title="Checking backend connection...">
+                    <i id="syncSpinIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#1a73e8] transition-transform"></i>
+                    <span id="syncStatusText" class="font-mono text-[11px] font-semibold text-[#3c4043] hidden sm:inline">Connected</span>
+                    <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-[#1e8e3e]"></span>
                 </button>
 
-                <!-- Google Account Avatar -->
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-2 px-2.5 py-1 rounded bg-[#f1f3f4] border border-[#dadce0]">
-                        <div class="w-6 h-6 rounded bg-[#1a73e8] text-white flex items-center justify-center font-medium text-xs">
-                            {{ request.user.username|slice:":1"|upper|default:'N' }}
-                        </div>
-                        <span class="hidden sm:inline font-medium text-xs text-[#202124]">{{ request.user.username|default:'Nizhal' }}</span>
-                    </div>
-
-                    <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="p-1.5 text-[#5f6368] hover:text-[#d93025] rounded hover:bg-[#fce8e6] transition" title="Sign Out">
+                <!-- User Profile & Sign Out -->
+                <div class="flex items-center gap-1.5 pl-1 border-l border-[#dadce0]">
+                    <span class="font-medium text-xs text-[#202124] pl-1">{{ request.user.username|default:'Nizhal' }}</span>
+                    <a href="{% url 'logout' %}" class="p-1 text-[#5f6368] hover:text-[#d93025] rounded hover:bg-[#fce8e6] transition" title="Sign Out">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                     </a>
                 </div>
@@ -334,8 +329,13 @@
             }
 
             isGlobalSyncing = true;
-            const liveDot = document.getElementById('globalLiveSyncDot');
-            const liveText = document.getElementById('globalLiveSyncText');
+            const spinIcon = document.getElementById('syncSpinIcon');
+            const statusText = document.getElementById('syncStatusText');
+            const statusDot = document.getElementById('syncStatusDot');
+            const syncBtn = document.getElementById('backendSyncBtn');
+
+            if (spinIcon) spinIcon.classList.add('animate-spin');
+            if (statusText) statusText.innerText = "Syncing...";
 
             try {
                 const response = await fetch(window.location.href, {
@@ -399,18 +399,24 @@
                         lucide.createIcons();
                     }
 
-                    if (liveDot && liveText) {
-                        liveText.innerText = "Synced";
-                        liveDot.className = "w-2 h-2 rounded-full bg-[#1e8e3e]";
-                        setTimeout(() => {
-                            if (liveText) liveText.innerText = "Live Sync";
-                            if (liveDot) liveDot.className = "w-2 h-2 rounded-full bg-[#1e8e3e] animate-pulse";
-                        }, 400);
-                    }
+                    const timeStr = new Date().toLocaleTimeString();
+                    if (statusText) statusText.innerText = "Connected";
+                    if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-[#1e8e3e]";
+                    if (spinIcon) spinIcon.className = "w-3.5 h-3.5 text-[#1a73e8]";
+                    if (syncBtn) syncBtn.setAttribute('title', `Connected • Synced at ${timeStr} (Click to refresh)`);
+                } else {
+                    if (statusText) statusText.innerText = "Offline";
+                    if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-[#d93025]";
+                    if (spinIcon) spinIcon.className = "w-3.5 h-3.5 text-[#d93025]";
+                    if (syncBtn) syncBtn.setAttribute('title', 'Backend offline / response error');
                 }
             } catch (err) {
-                // Silently retry on next second
+                if (statusText) statusText.innerText = "Offline";
+                if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-[#d93025]";
+                if (spinIcon) spinIcon.className = "w-3.5 h-3.5 text-[#d93025]";
+                if (syncBtn) syncBtn.setAttribute('title', 'Backend disconnected (Network error)');
             } finally {
+                if (spinIcon) spinIcon.classList.remove('animate-spin');
                 isGlobalSyncing = false;
             }
         }
@@ -421,7 +427,7 @@
                 if (!document.hidden) {
                     executeGlobalLiveSync(false);
                 }
-            }, SYNC_INTERVAL_MS);
+            }, 10000); // Periodic live sync every 10s
         }
 
         document.addEventListener('visibilitychange', () => {
@@ -430,7 +436,10 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', startGlobalSync);
+        document.addEventListener('DOMContentLoaded', () => {
+            executeGlobalLiveSync(false);
+            startGlobalSync();
+        });
         window.triggerGlobalSync = () => executeGlobalLiveSync(true);
     })();
 </script>
