@@ -344,6 +344,9 @@ def attendee_badge_view(request, pass_code):
         'ticket_count': max(ticket_count, len(attendee_list)),
         'unit_fee': unit_fee,
         'qr_base64': qr_base64,
+        'pass_code': attendee.pass_code,
+        'banner_src': 'https://iili.io/ndZzewv.png',
+        'qr_src': f"data:image/png;base64,{qr_base64}" if qr_base64 else f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={attendee.pass_code}&margin=1",
     }
 
     template_candidates = [
