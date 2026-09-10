@@ -136,8 +136,15 @@ if db_url:
                     'PASSWORD': raw_pwd,
                     'HOST': u_host,
                     'PORT': u_port,
-                    'OPTIONS': {'sslmode': 'require'},
-                    'CONN_MAX_AGE': 0,
+                    'OPTIONS': {
+                        'sslmode': 'require',
+                        'connect_timeout': 10,
+                        'keepalives': 1,
+                        'keepalives_idle': 30,
+                        'keepalives_interval': 10,
+                        'keepalives_count': 5,
+                    },
+                    'CONN_MAX_AGE': 300,
                 }
             }
     except Exception as e:

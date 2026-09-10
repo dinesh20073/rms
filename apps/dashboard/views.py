@@ -21,6 +21,8 @@ from apps.audit.models import AuditLog
 from apps.audit.services import log_audit_event
 
 def get_current_tenant(request):
+    if hasattr(request, '_current_tenant') and request._current_tenant:
+        return request._current_tenant
     tenant_id = request.session.get('active_tenant_id')
     tenant = None
     if tenant_id:
@@ -29,12 +31,14 @@ def get_current_tenant(request):
         tenant = Tenant.objects.filter(is_active=True).first()
         if tenant:
             request.session['active_tenant_id'] = tenant.id
+    request._current_tenant = tenant
     return tenant
 
 @login_required(login_url='login')
 def tenant_switch_view(request, tenant_id):
     tenant = get_object_or_404(Tenant, id=tenant_id)
     request.session['active_tenant_id'] = tenant.id
+    request._current_tenant = tenant
     messages.success(request, f"Switched active tenant to {tenant.name}")
     return redirect(request.META.get('HTTP_REFERER', 'dashboard-overview'))
 
@@ -155,8 +159,9 @@ def filter_registrations_queryset(reg_qs, request):
 def overview_dashboard_view(request):
     tenant = get_current_tenant(request)
     if not tenant:
-        tenant = Tenant.objects.create(name="Acme Tech Events", slug="acme-tech-events")
+        tenant = Tenant.objects.create(name="Nizhal Community", slug="nizhal-community")
         request.session['active_tenant_id'] = tenant.id
+        request._current_tenant = tenant
 
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -167,41 +172,57 @@ def overview_dashboard_view(request):
     events_qs = Event.objects.filter(tenant=tenant)
     reg_qs = Registration.objects.filter(event__tenant=tenant)
     order_qs = Order.objects.filter(registration__event__tenant=tenant)
-    verified_orders = order_qs.filter(status='VERIFIED')
 
-    # Comprehensive Financial & Collections Analytics
-    today_revenue = verified_orders.filter(created_at__gte=today_start).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-    week_revenue = verified_orders.filter(created_at__gte=week_start).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-    month_revenue = verified_orders.filter(created_at__gte=month_start).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
-    total_revenue = verified_orders.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+    # 1. Combined Financial & Payment Statistics (1 single SQL aggregation query)
+    order_stats = order_qs.aggregate(
+        total_revenue=Sum('amount', filter=Q(status='VERIFIED')),
+        today_revenue=Sum('amount', filter=Q(status='VERIFIED', created_at__gte=today_start)),
+        week_revenue=Sum('amount', filter=Q(status='VERIFIED', created_at__gte=week_start)),
+        month_revenue=Sum('amount', filter=Q(status='VERIFIED', created_at__gte=month_start)),
+        total_payments_count=Count('id', filter=Q(status='VERIFIED')),
+        pending_payments_count=Count('id', filter=Q(status__in=['PENDING', 'UPLOADED', 'VERIFYING'])),
+    )
 
-    # Database Registered User Statistics
-    total_events = events_qs.count()
-    total_registrations = reg_qs.count()
-    total_customers = Customer.objects.filter(tenant=tenant).count()
-    total_passes = Attendee.objects.filter(registration__event__tenant=tenant).count()
-    verified_reg_count = reg_qs.filter(status='COMPLETED').count()
-    total_payments_count = verified_orders.count()
-    pending_payments_count = order_qs.filter(status__in=['PENDING', 'UPLOADED', 'VERIFYING']).count()
-    review_queue_count = Verification.objects.filter(order__registration__event__tenant=tenant, decision='MANUAL_REVIEW').count()
+    total_revenue = order_stats['total_revenue'] or Decimal('0.00')
+    today_revenue = order_stats['today_revenue'] or Decimal('0.00')
+    week_revenue = order_stats['week_revenue'] or Decimal('0.00')
+    month_revenue = order_stats['month_revenue'] or Decimal('0.00')
+    total_payments_count = order_stats['total_payments_count'] or 0
+    pending_payments_count = order_stats['pending_payments_count'] or 0
 
-    # Rate calculation
-    auto_verified_count = Verification.objects.filter(order__registration__event__tenant=tenant, decision='AUTO_VERIFIED').count()
+    # 2. Combined Registration & User Statistics (1 single SQL query)
+    reg_stats = reg_qs.aggregate(
+        total_registrations=Count('id'),
+        verified_reg_count=Count('id', filter=Q(status='COMPLETED')),
+    )
+    total_registrations = reg_stats['total_registrations'] or 0
+    verified_reg_count = reg_stats['verified_reg_count'] or 0
+    total_customers = total_registrations
+    total_passes = verified_reg_count
+
+    # 3. Combined Verification Statistics (1 single SQL query)
+    verif_stats = Verification.objects.filter(order__registration__event__tenant=tenant).aggregate(
+        review_queue_count=Count('id', filter=Q(decision='MANUAL_REVIEW')),
+        auto_verified_count=Count('id', filter=Q(decision='AUTO_VERIFIED')),
+    )
+    review_queue_count = verif_stats['review_queue_count'] or 0
+    auto_verified_count = verif_stats['auto_verified_count'] or 0
     auto_rate = round((auto_verified_count / max(total_payments_count, 1)) * 100, 1)
 
-    # Event-wise Collections Breakdown
-    events_breakdown = events_qs.annotate(
+    # 4. Events with Annotations (1 single query used for list and breakdown)
+    all_events = list(events_qs.annotate(
+        registrations_count=Count('registrations'),
         paid_count=Count('registrations__order', filter=Q(registrations__order__status='VERIFIED')),
         total_collected=Sum('registrations__order__amount', filter=Q(registrations__order__status='VERIFIED')),
         total_reg=Count('registrations')
-    ).order_by('-total_collected')
+    ).order_by('-created_at'))
+    total_events = len(all_events)
+    events_breakdown = sorted(all_events, key=lambda e: e.total_collected or Decimal('0.00'), reverse=True)
 
-    # Filterable Registrations with full database details
+    # 5. Filterable Registrations with full database details (capped at 50 for instant response)
     table_qs = reg_qs.select_related('customer', 'event', 'order', 'attendee_pass').order_by('-created_at')
     table_qs, filter_params, active_filters_count = filter_registrations_queryset(table_qs, request)
-    recent_registrations = table_qs[:100]
-
-    all_events = events_qs.annotate(registrations_count=Count('registrations')).order_by('-created_at')
+    recent_registrations = table_qs[:50]
 
     context = {
         'tenant': tenant,
@@ -457,18 +478,22 @@ def manual_verification_queue_view(request):
     tenant = get_current_tenant(request)
     verifications_qs = Verification.objects.filter(order__registration__event__tenant=tenant)
     
-    queue = verifications_qs.filter(
+    queue = list(verifications_qs.filter(
         decision='MANUAL_REVIEW'
-    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence').order_by('-created_at')
+    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence').order_by('-created_at'))
 
-    manual_approved_count = verifications_qs.filter(decision='MANUAL_APPROVED').count()
-    rejected_count = verifications_qs.filter(decision='REJECTED').count()
+    counts = verifications_qs.aggregate(
+        manual_approved=Count('id', filter=Q(decision='MANUAL_APPROVED')),
+        rejected=Count('id', filter=Q(decision='REJECTED'))
+    )
+    manual_approved_count = counts['manual_approved'] or 0
+    rejected_count = counts['rejected'] or 0
     total_processed = manual_approved_count + rejected_count
     approval_rate = round((manual_approved_count / max(total_processed, 1)) * 100, 1) if total_processed > 0 else 100.0
 
-    recent_history = verifications_qs.exclude(
+    recent_history = list(verifications_qs.exclude(
         decision='MANUAL_REVIEW'
-    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence', 'reviewed_by').order_by('-reviewed_at', '-created_at')[:25]
+    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'reviewed_by').defer('evidence__image_base64').order_by('-reviewed_at', '-created_at')[:25])
 
     return render(request, 'dashboard/verification/queue.html', {
         'queue': queue,
@@ -594,10 +619,16 @@ def revenue_analytics_view(request):
 
     verified_orders = Order.objects.filter(registration__event__tenant=tenant, status='VERIFIED')
 
-    today_rev = verified_orders.filter(created_at__gte=today_start).aggregate(t=Sum('amount'))['t'] or Decimal('0.00')
-    week_rev = verified_orders.filter(created_at__gte=week_start).aggregate(t=Sum('amount'))['t'] or Decimal('0.00')
-    month_rev = verified_orders.filter(created_at__gte=month_start).aggregate(t=Sum('amount'))['t'] or Decimal('0.00')
-    total_rev = verified_orders.aggregate(t=Sum('amount'))['t'] or Decimal('0.00')
+    rev_stats = verified_orders.aggregate(
+        total_rev=Sum('amount'),
+        today_rev=Sum('amount', filter=Q(created_at__gte=today_start)),
+        week_rev=Sum('amount', filter=Q(created_at__gte=week_start)),
+        month_rev=Sum('amount', filter=Q(created_at__gte=month_start)),
+    )
+    today_rev = rev_stats['today_rev'] or Decimal('0.00')
+    week_rev = rev_stats['week_rev'] or Decimal('0.00')
+    month_rev = rev_stats['month_rev'] or Decimal('0.00')
+    total_rev = rev_stats['total_rev'] or Decimal('0.00')
 
     # Breakdown by Event
     events_breakdown = Event.objects.filter(tenant=tenant).annotate(
@@ -623,10 +654,16 @@ def email_logs_view(request):
     status_filter = request.GET.get('status', '').strip()
     event_type_filter = request.GET.get('event_type', '').strip()
 
-    total_count = logs_qs.count()
-    sent_count = logs_qs.filter(status='SENT').count()
-    simulated_count = logs_qs.filter(status='SIMULATED').count()
-    failed_count = logs_qs.filter(status='FAILED').count()
+    counts = logs_qs.aggregate(
+        total_count=Count('id'),
+        sent_count=Count('id', filter=Q(status='SENT')),
+        simulated_count=Count('id', filter=Q(status='SIMULATED')),
+        failed_count=Count('id', filter=Q(status='FAILED')),
+    )
+    total_count = counts['total_count'] or 0
+    sent_count = counts['sent_count'] or 0
+    simulated_count = counts['simulated_count'] or 0
+    failed_count = counts['failed_count'] or 0
 
     if status_filter:
         logs_qs = logs_qs.filter(status=status_filter)

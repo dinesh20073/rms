@@ -428,7 +428,7 @@
                 if (!document.hidden) {
                     executeGlobalLiveSync(false);
                 }
-            }, 10000); // Periodic live sync every 10s
+            }, 20000); // Passive live background sync every 20s
         }
 
         document.addEventListener('visibilitychange', () => {
@@ -438,7 +438,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            executeGlobalLiveSync(false);
             startGlobalSync();
         });
         window.triggerGlobalSync = () => executeGlobalLiveSync(true);

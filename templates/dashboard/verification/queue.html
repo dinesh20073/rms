@@ -673,7 +673,7 @@
     // ==========================================
     let isSyncing = false;
     let syncIntervalId = null;
-    const SYNC_INTERVAL_MS = 1000; // 1 second real-time background sync
+    const SYNC_INTERVAL_MS = 15000; // 15 seconds passive background sync
 
     async function syncQueueData(isManual = false) {
         if (isSyncing) return;

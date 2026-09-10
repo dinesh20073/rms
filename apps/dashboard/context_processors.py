@@ -3,19 +3,33 @@ from apps.verification.models import Verification
 
 def global_context(request):
     """
-    Supplies active tenant, pending review count, and quick stats for the UI navigation.
+    Ultra-fast context processor: supplies active tenant and pending review count.
+    Avoids database queries for unauthenticated or public/static paths.
     """
-    try:
-        tenants = Tenant.objects.filter(is_active=True)
-        tenant_id = request.session.get('active_tenant_id')
-        current_tenant = None
+    if not request.path.startswith('/dashboard/') or not getattr(request, 'user', None) or not request.user.is_authenticated:
+        return {
+            'all_tenants': [],
+            'current_tenant': None,
+            'pending_reviews_count': 0,
+        }
 
-        if tenant_id:
-            current_tenant = tenants.filter(id=tenant_id).first()
-        if not current_tenant and tenants.exists():
-            current_tenant = tenants.first()
-            if current_tenant:
-                request.session['active_tenant_id'] = current_tenant.id
+    try:
+        if hasattr(request, '_current_tenant') and request._current_tenant:
+            current_tenant = request._current_tenant
+            all_tenants = getattr(request, '_all_tenants', None) or list(Tenant.objects.filter(is_active=True))
+        else:
+            all_tenants = list(Tenant.objects.filter(is_active=True))
+            request._all_tenants = all_tenants
+            tenant_id = request.session.get('active_tenant_id')
+            current_tenant = None
+            if tenant_id:
+                for t in all_tenants:
+                    if t.id == tenant_id:
+                        current_tenant = t
+                        break
+            if not current_tenant and all_tenants:
+                current_tenant = all_tenants[0]
+            request._current_tenant = current_tenant
 
         pending_reviews_count = 0
         if current_tenant:
@@ -25,7 +39,7 @@ def global_context(request):
             ).count()
 
         return {
-            'all_tenants': tenants,
+            'all_tenants': all_tenants,
             'current_tenant': current_tenant,
             'pending_reviews_count': pending_reviews_count,
         }
