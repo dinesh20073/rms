@@ -5,15 +5,15 @@
 {% block email_content %}
 <div style="text-align: left;">
     
-    <!-- Status Header (Yellow / Amber Under Review Theme) -->
-    <div style="margin-bottom: 22px;">
-        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; padding: 5px 14px; border-radius: 14px; display: inline-block; margin-bottom: 10px;">
+    <!-- Status Header (Yellow / Amber Under Review Theme - Centered) -->
+    <div style="margin-bottom: 24px; text-align: center;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; padding: 6px 16px; border-radius: 16px; display: inline-block; margin-bottom: 12px;">
             ⏳ Payment Proof Received • Under Review
         </span>
-        <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3;">
+        <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3;">
             {{ event.title }}
         </h1>
-        <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">
+        <p style="margin: 0 auto; font-size: 14px; color: #475569; line-height: 1.6; max-width: 520px;">
             Hi <strong>{{ customer.name|title }}</strong>, we have received your payment proof for order <strong>{{ order.order_code }}</strong>. Our team is currently reviewing your transaction. Your official entrance pass and QR badge will be emailed to you as soon as verification is approved.
         </p>
     </div>
