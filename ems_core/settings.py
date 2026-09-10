@@ -87,8 +87,12 @@ TEMPLATES = [
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'),
             os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'templates'),
         ],
-        'APP_DIRS': True,
         'OPTIONS': {
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'ems_core.template_loader.Loader',
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
