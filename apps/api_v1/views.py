@@ -156,3 +156,39 @@ class RevenueReportAPIView(APIView):
             "verified_orders": verified_orders,
             "pending_review": pending_review
         })
+
+class HealthCheckAPIView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        from django.db import connection
+        from django.contrib.auth.models import User
+        db_connected = False
+        vendor = connection.vendor
+        error = None
+        user_count = 0
+        event_count = 0
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1;")
+                cursor.fetchone()
+            db_connected = True
+            user_count = User.objects.count()
+            event_count = Event.objects.count()
+        except Exception as e:
+            error = str(e)
+
+        return Response({
+            "status": "online" if db_connected else "error",
+            "database": {
+                "connected": db_connected,
+                "vendor": vendor,
+                "is_supabase_postgres": vendor == "postgresql",
+                "users_count": user_count,
+                "events_count": event_count,
+                "error": error
+            }
+        })
+
