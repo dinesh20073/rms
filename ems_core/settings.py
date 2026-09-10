@@ -107,14 +107,17 @@ if not db_url and db_password and db_host:
 # Smart Database URL Sanitizer & Pooler Adapter:
 # 1. Handles passwords with unencoded '@' symbols (e.g., user:pass@word@host:port/db)
 # 2. Converts direct IPv6 Supabase URLs to IPv4 Pooler URLs for AWS Lambda/Vercel compatibility
+# 3. Pure standard library - zero external dependency requirement
+DATABASES = None
+
 if db_url:
     try:
-        # Match postgresql://<user>:<password>@<host>[:<port>]/<database>[?<query>]
         m = re.match(r'postgresql(?:://|\+[^:]+://)([^:]+):(.*)@([^@:/]+)(?::([0-9]+))?/(.*)', db_url.strip())
         if m:
             u_user, u_pwd, u_host, u_port, u_rest = m.groups()
-            u_port = u_port or '5432'
-            # Check if host is direct IPv6 supabase
+            u_port = int(u_port or 5432)
+            
+            # Convert direct Supabase host to IPv4 Pooler for AWS Lambda/Vercel
             if 'supabase.co' in u_host:
                 proj_match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', u_host)
                 proj_ref = proj_match.group(1) if proj_match else 'zldazpkryvrqddwvdeno'
@@ -122,32 +125,25 @@ if db_url:
                 if not u_user.startswith('postgres.'):
                     u_user = f"postgres.{proj_ref}"
             
-            # URL-encode password safely
-            enc_pwd = urllib.parse.quote_plus(urllib.parse.unquote_plus(u_pwd))
-            clean_path = u_rest.split('?')[0] if u_rest else 'postgres'
-            db_url = f"postgresql://{u_user}:{enc_pwd}@{u_host}:{u_port}/{clean_path}?sslmode=require"
-    except Exception:
-        pass
+            raw_pwd = urllib.parse.unquote_plus(u_pwd)
+            clean_db = (u_rest.split('?')[0] if u_rest else 'postgres').strip() or 'postgres'
+            
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': clean_db,
+                    'USER': u_user,
+                    'PASSWORD': raw_pwd,
+                    'HOST': u_host,
+                    'PORT': u_port,
+                    'OPTIONS': {'sslmode': 'require'},
+                    'CONN_MAX_AGE': 0,
+                }
+            }
+    except Exception as e:
+        print(f"Database parsing error: {e}")
+        DATABASES = None
 
-if db_url:
-    try:
-        import dj_database_url
-        DATABASES = {
-            'default': dj_database_url.config(
-                default=db_url,
-                conn_max_age=0,
-                ssl_require=True
-            )
-        }
-        # Safeguard: ensure IPv4 pooler host & username format for AWS Lambda/Vercel
-        if 'default' in DATABASES and 'HOST' in DATABASES['default']:
-            host_val = str(DATABASES['default']['HOST'])
-            if 'supabase.co' in host_val and 'pooler' not in host_val:
-                DATABASES['default']['HOST'] = 'aws-0-ap-south-1.pooler.supabase.com'
-                if not str(DATABASES['default'].get('USER', '')).startswith('postgres.'):
-                    DATABASES['default']['USER'] = 'postgres.zldazpkryvrqddwvdeno'
-    except Exception:
-        db_url = None
 
 
 
