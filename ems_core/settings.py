@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 try:
     from dotenv import load_dotenv
@@ -70,11 +71,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ems_core.wsgi.application'
 
 # Database
-# Default: SQLite. Set DATABASE_URL or SUPABASE_DB_URL in .env to connect to Supabase PostgreSQL
+# On Vercel, copy sqlite to /tmp for writable filesystem if using SQLite
+if 'VERCEL' in os.environ:
+    tmp_db = Path('/tmp/db.sqlite3')
+    orig_db = BASE_DIR / 'db.sqlite3'
+    if orig_db.exists() and not tmp_db.exists():
+        try:
+            shutil.copyfile(orig_db, tmp_db)
+        except Exception:
+            pass
+    DB_PATH = tmp_db if tmp_db.exists() else orig_db
+else:
+    DB_PATH = BASE_DIR / 'db.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DB_PATH,
     }
 }
 
