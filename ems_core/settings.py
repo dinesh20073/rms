@@ -139,8 +139,16 @@ if db_url:
                 ssl_require=True
             )
         }
+        # Safeguard: ensure IPv4 pooler host & username format for AWS Lambda/Vercel
+        if 'default' in DATABASES and 'HOST' in DATABASES['default']:
+            host_val = str(DATABASES['default']['HOST'])
+            if 'supabase.co' in host_val and 'pooler' not in host_val:
+                DATABASES['default']['HOST'] = 'aws-0-ap-south-1.pooler.supabase.com'
+                if not str(DATABASES['default'].get('USER', '')).startswith('postgres.'):
+                    DATABASES['default']['USER'] = 'postgres.zldazpkryvrqddwvdeno'
     except Exception:
         db_url = None
+
 
 
 
