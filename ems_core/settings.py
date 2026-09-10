@@ -88,25 +88,41 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ems_core.wsgi.application'
 
 # Database
-# On Vercel / Serverless, /tmp is the only writable directory for SQLite
-if 'VERCEL' in os.environ or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
-    tmp_db = Path('/tmp/db.sqlite3')
-    orig_db = BASE_DIR / 'db.sqlite3'
-    if orig_db.exists() and not tmp_db.exists():
-        try:
-            shutil.copyfile(orig_db, tmp_db)
-        except Exception:
-            pass
-    DB_PATH = tmp_db
-else:
-    DB_PATH = BASE_DIR / 'db.sqlite3'
+# Support DATABASE_URL / SUPABASE_DB_URL or fallback to writable SQLite in /tmp on Serverless
+db_url = get_env_str('DATABASE_URL') or get_env_str('SUPABASE_DB_URL')
+if db_url:
+    try:
+        import dj_database_url
+        DATABASES = {
+            'default': dj_database_url.config(default=db_url, conn_max_age=600)
+        }
+    except Exception:
+        db_url = None
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DB_PATH,
+if not db_url:
+    if 'VERCEL' in os.environ or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
+        tmp_db = Path('/tmp/db.sqlite3')
+        orig_db = BASE_DIR / 'db.sqlite3'
+        if orig_db.exists() and not tmp_db.exists():
+            try:
+                shutil.copyfile(orig_db, tmp_db)
+            except Exception:
+                pass
+        DB_PATH = tmp_db
+    else:
+        DB_PATH = BASE_DIR / 'db.sqlite3'
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': DB_PATH,
+        }
     }
-}
+
+AUTHENTICATION_BACKENDS = [
+    'apps.dashboard.auth_backend.ServerlessAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
