@@ -60,12 +60,12 @@ def submit_registration_view(request, slug):
     form_obj = get_object_or_404(Form, event=event)
     fields = form_obj.fields.all()
 
-    # Extract customer core fields
-    name = request.POST.get('full_name', '').strip()
-    email = request.POST.get('email_address', '').strip().lower()
-    phone = request.POST.get('phone_number', '').strip()
-    company = request.POST.get('company_organization', '').strip()
-    designation = request.POST.get('designation_role', '').strip()
+    # Extract customer core fields with multi-key alias support
+    name = (request.POST.get('full_name') or request.POST.get('name') or '').strip()
+    email = (request.POST.get('email_address') or request.POST.get('email') or '').strip().lower()
+    phone = (request.POST.get('phone_number') or request.POST.get('phone') or request.POST.get('mobile') or '').strip()
+    company = (request.POST.get('company_organization') or request.POST.get('company') or '').strip()
+    designation = (request.POST.get('designation_role') or request.POST.get('designation') or '').strip()
 
     # Extract client real IP & Device info
     client_ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip() or request.META.get('REMOTE_ADDR', '127.0.0.1')
@@ -82,16 +82,27 @@ def submit_registration_view(request, slug):
 
     for f in fields:
         val = request.POST.get(f.field_key)
+        if val is None:
+            val = request.POST.get(f.label) or request.POST.get(slugify(f.label).replace('-', '_'))
         if f.field_type == 'checkbox':
-            val = request.POST.get(f.field_key) == 'on'
+            val = val == 'on' or val is True or str(val).lower() in ('true', '1')
         form_responses[f.label] = val
+
+        # Secondary fallback extraction for core fields from dynamic form questions
+        f_label_lower = f.label.lower()
+        if not name and ('name' in f_label_lower and 'company' not in f_label_lower and 'upi' not in f_label_lower and 'person' not in f_label_lower):
+            name = str(val).strip() if val else ''
+        if not email and ('email' in f_label_lower and '@' in str(val or '')):
+            email = str(val).strip().lower() if val else ''
+        if not phone and any(p in f_label_lower for p in ['phone', 'mobile', 'contact', 'whatsapp']):
+            phone = str(val).strip() if val else ''
 
         if f.is_required and not val:
             messages.error(request, f"Please fill in the required field: {f.label}")
             return redirect('public-register', slug=slug)
 
     if not name or not email:
-        messages.error(request, "Name and Email are required.")
+        messages.error(request, "Name and Email are required to register.")
         return redirect('public-register', slug=slug)
 
     customer, _ = Customer.objects.get_or_create(

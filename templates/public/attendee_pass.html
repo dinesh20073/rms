@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Booking Confirmed • {{ customer.name|title }} | {{ event.title }}{% endblock %}
 
@@ -102,7 +103,7 @@
         
         <!-- 1. Top Event Visual Header Banner (Full Uncropped Image Flush Top) -->
         <div class="w-full overflow-hidden border-b border-slate-200 m-0 p-0 leading-none bg-slate-900">
-            <img src="/static/images/nizhal_banner_image.png" alt="Nizhal Event Header" class="w-full h-auto max-h-[220px] object-cover block m-0 p-0">
+            <img src="{% static 'images/nizhal_banner_image.png' %}" onerror="this.onerror=null;this.src='https://iili.io/ndZzewv.png';" alt="Nizhal Event Header" class="w-full h-auto max-h-[220px] object-cover block m-0 p-0">
         </div>
 
         <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + Mascot + Top Right QR Code) -->
