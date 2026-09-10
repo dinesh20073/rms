@@ -66,21 +66,24 @@ class Order(models.Model):
             self.generate_qr_code()
 
     def generate_qr_code(self):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_M,
-            box_size=8,
-            border=2,
-        )
-        qr.add_data(self.upi_intent_url)
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="#1E293B", back_color="white")
-        
-        buffer = io.BytesIO()
-        img.save(buffer, format='PNG')
-        filename = f"qr_{self.order_code}.png"
-        self.qr_code_image.save(filename, ContentFile(buffer.getvalue()), save=False)
-        Order.objects.filter(pk=self.pk).update(qr_code_image=self.qr_code_image)
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=8,
+                border=2,
+            )
+            qr.add_data(self.upi_intent_url)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="#1E293B", back_color="white")
+            
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            filename = f"qr_{self.order_code}.png"
+            self.qr_code_image.save(filename, ContentFile(buffer.getvalue()), save=False)
+            Order.objects.filter(pk=self.pk).update(qr_code_image=self.qr_code_image)
+        except Exception:
+            pass
 
     @property
     def gpay_intent(self):

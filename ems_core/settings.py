@@ -232,7 +232,14 @@ STORAGES = {
 }
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME') or (os.path.exists('/tmp') and not os.access(str(BASE_DIR), os.W_OK)):
+    MEDIA_ROOT = Path('/tmp/media')
+    try:
+        os.makedirs('/tmp/media', exist_ok=True)
+    except Exception:
+        pass
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
