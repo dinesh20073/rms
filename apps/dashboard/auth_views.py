@@ -112,11 +112,8 @@ def login_view(request):
                 # Login Success!
                 login(request, user)
 
-                # Handle remember me session duration
-                if remember_me:
-                    request.session.set_expiry(1209600)  # 2 weeks
-                else:
-                    request.session.set_expiry(0)  # Expires on browser close
+                # Handle session duration (7 days persistent)
+                request.session.set_expiry(604800)
 
                 # Log audit record
                 log_audit_event(

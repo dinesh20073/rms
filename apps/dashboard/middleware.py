@@ -6,8 +6,8 @@ from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth import logout
 from apps.audit.services import log_audit_event
 
-# 15 minutes idle timeout (in seconds)
-SESSION_IDLE_TIMEOUT = 900
+# 24 hours idle timeout (in seconds)
+SESSION_IDLE_TIMEOUT = 86400
 
 class BankSessionSecurityMiddleware(MiddlewareMixin):
     """

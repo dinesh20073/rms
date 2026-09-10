@@ -169,15 +169,16 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-# Authentication & Bank-Level Session Security
+# Authentication & Stateless Session Security (works across serverless lambda instances)
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard-overview'
 LOGOUT_REDIRECT_URL = 'login'
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 1800  # 30 minutes rolling window
-SESSION_SAVE_EVERY_REQUEST = True  # Resets activity timestamp on every request
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 604800  # 7 days persistent session
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 CSRF_COOKIE_HTTPONLY = False
