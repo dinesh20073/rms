@@ -1,31 +1,31 @@
 {% extends 'emails/email_base.html' %}
 
-{% block email_title %}Order Received • {{ order.order_code }} | {{ event.title }}{% endblock %}
+{% block email_title %}Payment Proof Received • {{ order.order_code }} | {{ event.title }}{% endblock %}
 
 {% block email_content %}
 <div style="text-align: left;">
     
-    <!-- Status Header -->
+    <!-- Status Header (Yellow / Amber Under Review Theme) -->
     <div style="margin-bottom: 22px;">
-        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #15803d; background-color: #dcfce7; border: 1px solid #bbf7d0; padding: 4px 12px; border-radius: 14px; display: inline-block; margin-bottom: 10px;">
-            ✅ Payment Proof Submitted • Under Review
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; padding: 5px 14px; border-radius: 14px; display: inline-block; margin-bottom: 10px;">
+            ⏳ Payment Proof Received • Under Review
         </span>
         <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3;">
             {{ event.title }}
         </h1>
         <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">
-            Hi <strong>{{ customer.name|title }}</strong>, thank you! We have received your payment receipt for order <strong>{{ order.order_code }}</strong>. Our team is currently reviewing your payment proof.
+            Hi <strong>{{ customer.name|title }}</strong>, we have received your payment proof for order <strong>{{ order.order_code }}</strong>. Our team is currently reviewing your transaction. Your official entrance pass and QR badge will be emailed to you as soon as verification is approved.
         </p>
     </div>
 
     <!-- Order Summary Details Box -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin: 18px 0; overflow: hidden;">
         <tr>
-            <td style="padding: 16px 20px; background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 14px 20px; background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <tr>
-                        <td style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">Order Details</td>
-                        <td style="font-size: 12px; font-weight: 700; color: #1976d2; text-align: right; font-family: monospace;">{{ order.order_code }}</td>
+                        <td style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">Order Information</td>
+                        <td style="font-size: 12px; font-weight: 700; color: #b45309; text-align: right; font-family: monospace;">{{ order.order_code }}</td>
                     </tr>
                 </table>
             </td>
@@ -42,6 +42,10 @@
                         <td style="padding: 6px 0; font-weight: 600; color: #0f172a; text-align: right;">{{ customer.name|title }}</td>
                     </tr>
                     <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Email Address:</td>
+                        <td style="padding: 6px 0; font-mono font-weight: 600; color: #0f172a; text-align: right;">{{ customer.email }}</td>
+                    </tr>
+                    <tr>
                         <td style="padding: 6px 0; color: #64748b;">Total Ticket(s):</td>
                         <td style="padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;">{{ ticket_count }} Pass{{ ticket_count|pluralize:"es" }}</td>
                     </tr>
@@ -53,11 +57,11 @@
                     {% endif %}
                     <tr>
                         <td style="padding: 6px 0; color: #64748b;">Payment Status:</td>
-                        <td style="padding: 6px 0; font-weight: 700; color: #d97706; text-align: right;">Proof Submitted (Verifying)</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #b45309; text-align: right;">Proof Submitted (Under Review)</td>
                     </tr>
                     <tr style="border-top: 1px dashed #cbd5e1;">
-                        <td style="padding: 12px 0 4px 0; font-weight: 700; color: #0f172a; font-size: 14px;">Total Paid Amount:</td>
-                        <td style="padding: 12px 0 4px 0; font-weight: 900; color: #15803d; font-size: 18px; font-family: monospace; text-align: right;">₹{{ registration.amount|floatformat:2 }} INR</td>
+                        <td style="padding: 12px 0 4px 0; font-weight: 700; color: #0f172a; font-size: 14px;">Total Amount:</td>
+                        <td style="padding: 12px 0 4px 0; font-weight: 900; color: #0f172a; font-size: 18px; font-family: monospace; text-align: right;">₹{{ registration.amount|floatformat:2 }} INR</td>
                     </tr>
                 </table>
             </td>
@@ -68,7 +72,7 @@
     <!-- Co-Attendees Overview -->
     <div style="margin: 18px 0;">
         <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 8px;">
-            Registered Attendees List ({{ attendee_list|length }})
+            Registered Attendees ({{ attendee_list|length }})
         </div>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; overflow: hidden;">
             {% for att in attendee_list %}
@@ -81,29 +85,6 @@
         </table>
     </div>
     {% endif %}
-
-    <!-- Direct Status Tracking CTA -->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
-        <tr>
-            <td align="center">
-                {% if order %}
-                <a href="http://127.0.0.1:8000/pay/{{ order.order_code }}/" target="_blank" style="display: inline-block; background-color: #1976d2; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 28px; box-shadow: 0 4px 12px rgba(25, 118, 210, 0.35);">
-                    View Order & Verification Status →
-                </a>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-
-    <!-- Next Steps Note -->
-    <div style="background-color: #f0fdf4; border-radius: 8px; padding: 14px 18px; font-size: 12px; color: #166534; line-height: 1.6; border-left: 4px solid #22c55e;">
-        <strong>What Happens Next:</strong>
-        <ol style="margin: 6px 0 0 0; padding-left: 18px;">
-            <li>Our verification team is reviewing your uploaded payment screenshot.</li>
-            <li>Once approved by the event coordinator, your official <strong>digital entry pass and check-in QR badge</strong> will be delivered to your email.</li>
-            <li>You can track the real-time progress of your order anytime using the button above.</li>
-        </ol>
-    </div>
 
 </div>
 {% endblock %}

@@ -291,7 +291,7 @@ def send_order_created_email(registration):
     order = getattr(registration, 'order', None)
     
     order_code = order.order_code if order else registration.registration_code
-    subject = f"Payment Received & Under Review: {event.title} ({order_code})"
+    subject = f"Payment Proof Received: {event.title} ({order_code})"
 
     responses = registration.form_responses or {}
     def to_proper_case(val):
