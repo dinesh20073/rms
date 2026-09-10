@@ -104,21 +104,28 @@ if not db_url and db_password and db_host:
     encoded_pass = urllib.parse.quote_plus(db_password)
     db_url = f"postgresql://{db_user}:{encoded_pass}@{db_host}:{db_port}/{db_name}?sslmode=require"
 
-# Smart Serverless Supabase Adapter:
-# AWS Lambda / Vercel is IPv4-only. If a direct IPv6 Supabase URL (db.<ref>.supabase.co) is provided,
-# automatically convert it to the Supabase IPv4 Pooler (aws-0-ap-south-1.pooler.supabase.com:5432).
+# Smart Database URL Sanitizer & Pooler Adapter:
+# 1. Handles passwords with unencoded '@' symbols (e.g., user:pass@word@host:port/db)
+# 2. Converts direct IPv6 Supabase URLs to IPv4 Pooler URLs for AWS Lambda/Vercel compatibility
 if db_url:
     try:
-        parsed = urllib.parse.urlparse(db_url)
-        hostname = parsed.hostname or ''
-        if 'supabase.co' in hostname:
-            match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', hostname)
-            proj_ref = match.group(1) if match else 'zldazpkryvrqddwvdeno'
-            user = parsed.username or 'postgres'
-            if not user.startswith('postgres.'):
-                user = f"postgres.{proj_ref}"
-            pwd = urllib.parse.quote_plus(parsed.password or '') if parsed.password else ''
-            db_url = f"postgresql://{user}:{pwd}@aws-0-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require"
+        # Match postgresql://<user>:<password>@<host>[:<port>]/<database>[?<query>]
+        m = re.match(r'postgresql(?:://|\+[^:]+://)([^:]+):(.*)@([^@:/]+)(?::([0-9]+))?/(.*)', db_url.strip())
+        if m:
+            u_user, u_pwd, u_host, u_port, u_rest = m.groups()
+            u_port = u_port or '5432'
+            # Check if host is direct IPv6 supabase
+            if 'supabase.co' in u_host:
+                proj_match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', u_host)
+                proj_ref = proj_match.group(1) if proj_match else 'zldazpkryvrqddwvdeno'
+                u_host = 'aws-0-ap-south-1.pooler.supabase.com'
+                if not u_user.startswith('postgres.'):
+                    u_user = f"postgres.{proj_ref}"
+            
+            # URL-encode password safely
+            enc_pwd = urllib.parse.quote_plus(urllib.parse.unquote_plus(u_pwd))
+            clean_path = u_rest.split('?')[0] if u_rest else 'postgres'
+            db_url = f"postgresql://{u_user}:{enc_pwd}@{u_host}:{u_port}/{clean_path}?sslmode=require"
     except Exception:
         pass
 
@@ -134,6 +141,7 @@ if db_url:
         }
     except Exception:
         db_url = None
+
 
 
 
