@@ -88,8 +88,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ems_core.wsgi.application'
 
 # Database
-# Support DATABASE_URL / SUPABASE_DB_URL or fallback to writable SQLite in /tmp on Serverless
+# Support DATABASE_URL / SUPABASE_DB_URL or individual PG/Supabase environment variables
 db_url = get_env_str('DATABASE_URL') or get_env_str('SUPABASE_DB_URL')
+db_password = get_env_str('DB_PASSWORD') or get_env_str('SUPABASE_PASSWORD') or get_env_str('PGPASSWORD')
+db_host = get_env_str('DB_HOST') or get_env_str('SUPABASE_HOST') or get_env_str('PGHOST') or 'db.zldazpkryvrqddwvdeno.supabase.co'
+db_user = get_env_str('DB_USER') or get_env_str('SUPABASE_USER') or get_env_str('PGUSER') or 'postgres'
+db_name = get_env_str('DB_NAME') or get_env_str('SUPABASE_DB') or get_env_str('PGDATABASE') or 'postgres'
+db_port = get_env_int('DB_PORT', get_env_int('PGPORT', 5432))
+
+if not db_url and db_password:
+    import urllib.parse
+    encoded_pass = urllib.parse.quote_plus(db_password)
+    db_url = f"postgresql://{db_user}:{encoded_pass}@{db_host}:{db_port}/{db_name}"
+
 if db_url:
     try:
         import dj_database_url
