@@ -335,7 +335,7 @@ def attendee_badge_view(request, pass_code):
     except Exception:
         qr_base64 = None
 
-    return render(request, 'public/attendee_pass.html', {
+    context = {
         'attendee': attendee,
         'registration': registration,
         'event': event,
@@ -344,7 +344,15 @@ def attendee_badge_view(request, pass_code):
         'ticket_count': max(ticket_count, len(attendee_list)),
         'unit_fee': unit_fee,
         'qr_base64': qr_base64,
-    })
+    }
+
+    template_candidates = [
+        'public/attendee_pass.html',
+        'attendee_pass.html',
+        'registrations/attendee_pass.html',
+        'emails/registration_confirmed.html',
+    ]
+    return render(request, template_candidates, context)
 
 def send_pass_email_view(request, pass_code):
     from apps.notifications.services import send_registration_success_email

@@ -1,0 +1,431 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed • {{ customer.name|title }} | {{ event.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Screen View Container */
+    .voucher-container {
+        width: 100%;
+        max-width: 590px;
+        margin: 0 auto;
+        background: #ffffff;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    {% if request.GET.embed %}
+    html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .a4-print-wrapper {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-height: 100% !important;
+    }
+    .voucher-container {
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    .embed-hidden {
+        display: none !important;
+    }
+    {% endif %}
+
+    /* Strict Single A4 Sheet Print / PDF Styling */
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 0mm !important;
+            padding: 0mm !important;
+        }
+        *, *:before, *:after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            box-sizing: border-box !important;
+        }
+        html, body {
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            overflow: visible !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+        .a4-print-wrapper {
+            padding: 0 !important;
+            margin: 0 !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            width: 100% !important;
+        }
+        .voucher-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-shadow: none !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+        }
+        .voucher-container img {
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body_content %}
+<div class="min-h-screen bg-[#edf2f7] flex flex-col items-center justify-start pt-0 pb-8 px-2 sm:px-4 a4-print-wrapper">
+
+    <!-- Official Confirmation Voucher Card (Starts directly at page top with the banner image) -->
+    <div class="voucher-container bg-white text-slate-800 font-sans shadow-lg mx-auto">
+        
+        <!-- 1. Top Event Visual Header Banner (Full Uncropped Image Flush Top) -->
+        <div class="w-full overflow-hidden border-b border-slate-200 m-0 p-0 leading-none bg-slate-900">
+            <img src="{% static 'images/nizhal_banner_image.png' %}" onerror="this.onerror=null;this.src='https://iili.io/ndZzewv.png';" alt="Nizhal Event Header" class="w-full h-auto max-h-[220px] object-cover block m-0 p-0">
+        </div>
+
+        <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + Mascot + Top Right QR Code) -->
+        <div class="bg-gradient-to-r from-[#1976d2] via-[#1565c0] to-[#0d47a1] px-4 py-3.5 text-white relative overflow-hidden">
+            <div class="grid grid-cols-12 gap-2.5 items-center relative z-10">
+                
+                <!-- Left Title & Subtext -->
+                <div class="col-span-8 space-y-1">
+                    <h1 class="text-xl sm:text-2xl font-black font-display tracking-tight text-white leading-tight">
+                        Booking confirmed!
+                    </h1>
+                    <p class="text-[11px] text-blue-100 max-w-xs leading-snug">
+                        Thank you for joining! Awaiting your presence at <strong>{{ event.title }}</strong>.
+                    </p>
+                    
+                    <!-- Mascot Badge -->
+                    <div class="pt-0.5 flex items-center gap-1.5">
+                        <div class="w-5 h-5 rounded-full bg-amber-400 border border-white flex items-center justify-center text-amber-900 text-[10px] font-black shadow-xs">
+                            ★
+                        </div>
+                        <span class="text-[9px] font-bold text-blue-100 uppercase tracking-wider font-mono">
+                            {{ ticket_count }} SPOT CONFIRMED
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Right Prominent Square QR Box -->
+                <div class="col-span-4 flex justify-end">
+                    <div class="bg-white p-1.5 rounded-lg shadow-md border border-white text-center space-y-0.5 shrink-0">
+                        {% if qr_base64 %}
+                        <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Ticket" class="w-20 h-20 sm:w-22 sm:h-22 object-contain block mx-auto">
+                        {% else %}
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code }}" alt="QR Ticket" class="w-20 h-20 sm:w-22 sm:h-22 object-contain block mx-auto">
+                        {% endif %}
+                        <div class="font-mono text-[8px] font-black text-slate-900 tracking-wider leading-none">
+                            {{ attendee.pass_code }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Dark Meta Info Strip (Date, Time, Location) -->
+        <div class="bg-[#1e293b] text-slate-200 px-4 py-1.5 text-[10px] sm:text-[11px] flex flex-wrap items-center justify-between gap-1.5 font-medium">
+            <div class="flex items-center gap-1">
+                <i data-lucide="calendar" class="w-3 h-3 text-blue-400 shrink-0"></i>
+                <span>Date: <strong class="text-white">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></span>
+            </div>
+            <div class="flex items-center gap-1">
+                <i data-lucide="clock" class="w-3 h-3 text-blue-400 shrink-0"></i>
+                <span>Time: <strong class="text-white">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></span>
+            </div>
+            <div class="flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-3 h-3 text-blue-400 shrink-0"></i>
+                <span><strong class="text-white">{{ event.venue|default:"BIEC Convention Centre"|truncatechars:28 }}</strong></span>
+            </div>
+        </div>
+
+        <!-- 4. Three Colorful Summary KPI Cards (Venue, Tickets, Total Paid) -->
+        <div class="p-3 grid grid-cols-3 gap-2 bg-[#f8fafc] border-b border-slate-200">
+            <!-- Card 1: Full Venue Name & Get Directions (Coral/Red) -->
+            <div class="bg-gradient-to-br from-[#ff5252] to-[#e53935] p-2.5 text-white rounded-lg shadow-xs flex flex-col justify-between relative overflow-hidden h-[74px]">
+                <div class="relative z-10">
+                    <h3 class="text-[11px] sm:text-xs font-black font-display leading-tight line-clamp-2">
+                        {{ event.venue|default:"BIEC Convention Centre" }}
+                    </h3>
+                </div>
+                <div class="relative z-10">
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ event.venue|default:'BIEC Bangalore'|urlencode }}" target="_blank" class="inline-flex items-center gap-1 bg-white text-[#e53935] font-bold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded shadow-2xs font-mono hover:bg-rose-50 transition">
+                        <i data-lucide="navigation" class="w-2 h-2 text-[#e53935]"></i>
+                        <span>DIRECTIONS</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2: Tickets / Quantity (Sky Blue) -->
+            <div class="bg-gradient-to-br from-[#42a5f5] to-[#1e88e5] p-2.5 text-white rounded-lg shadow-xs flex flex-col justify-between relative overflow-hidden h-[74px]">
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-black font-display leading-none tracking-tight">
+                        {{ ticket_count }}
+                    </h3>
+                    <p class="text-[9px] sm:text-[10px] text-blue-50 font-bold mt-1 uppercase tracking-wide">
+                        Ticket{{ ticket_count|pluralize }} / Person{{ ticket_count|pluralize }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 3: Total Paid (Amber/Gold) -->
+            <div class="bg-gradient-to-br from-[#ffa726] to-[#fb8c00] p-2.5 text-white rounded-lg shadow-xs flex flex-col justify-between relative overflow-hidden h-[74px]">
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-black font-display leading-none tracking-tight">
+                        {% if registration.amount == 0 %}FREE{% else %}₹{{ registration.amount|floatformat:0 }}{% endif %}
+                    </h3>
+                    <p class="text-[9px] sm:text-[10px] text-amber-50 font-bold mt-1 uppercase tracking-wide">
+                        Total Paid
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Delegate Greeting & Booking Details 2x2 Box -->
+        <div class="p-4 space-y-2.5 bg-white">
+            <div class="space-y-0.5">
+                <h2 class="text-xs font-bold text-slate-900">
+                    Hi {{ customer.name|title }},
+                </h2>
+                <p class="text-[11px] text-slate-600 leading-tight">
+                    Welcome to <strong>{{ event.title }}</strong>! Your booking has been <strong class="text-emerald-700 font-bold">confirmed</strong>. Here are your booking details:
+                </p>
+            </div>
+
+            <!-- Booking Details Grid Box -->
+            <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs text-[11px]">
+                <div class="bg-[#f1f5f9] px-3 py-1.5 border-b border-slate-200 flex items-center justify-between font-bold text-slate-700 text-[10px] uppercase font-mono">
+                    <span>Booking Details</span>
+                    <span class="text-slate-500 font-normal">Booking ID: <strong class="text-slate-900">{{ attendee.pass_code }}</strong></span>
+                </div>
+                <div class="grid grid-cols-2 divide-x divide-slate-200">
+                    <div class="p-2.5 space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400 text-[10px]">Name:</span>
+                            <strong class="text-slate-900 font-semibold text-xs">{{ customer.name|title }}</strong>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400 text-[10px]">Email:</span>
+                            <span class="font-mono text-slate-700 text-[10px] truncate max-w-[140px]">{{ customer.email }}</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400 text-[10px]">Phone number:</span>
+                            <strong class="text-slate-900 font-mono text-[10px]">{{ customer.phone|default:"+91 9876543210" }}</strong>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400 text-[10px]">Date of visit:</span>
+                            <span class="text-slate-800 font-medium text-[10px]">{% if registration.created_at %}{{ registration.created_at|date:"d F Y" }}{% else %}{% now "d F Y" %}{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Ticket Details & Persons Table -->
+        <div class="px-4 pb-3 bg-white space-y-2">
+            <div class="border border-slate-300 rounded-lg overflow-hidden shadow-2xs text-[11px]">
+                <div class="bg-[#f1f5f9] px-3 py-1.5 border-b border-slate-300 text-[10px] font-bold text-slate-800 uppercase font-mono">
+                    <span>Ticket Details</span>
+                </div>
+                
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-[#1e293b] text-white font-bold text-[9px] uppercase tracking-wider font-mono">
+                        <tr>
+                            <th class="py-1.5 px-3">Person Name</th>
+                            <th class="py-1.5 px-3 w-16 text-center">Age</th>
+                            <th class="py-1.5 px-3 w-20">Gender</th>
+                            <th class="py-1.5 px-3 w-24 text-center">Tickets</th>
+                            <th class="py-1.5 px-3 w-24 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-800 text-[10px]">
+                        {% for person in attendee_list %}
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="py-1.5 px-3 font-semibold text-slate-900">
+                                <span>{{ person.name|title }}</span>
+                            </td>
+                            <td class="py-1.5 px-3 text-center font-mono font-bold text-slate-800">
+                                {{ person.age|default:"-" }}
+                            </td>
+                            <td class="py-1.5 px-3 text-slate-600">
+                                {{ person.gender|title|default:"-" }}
+                            </td>
+                            <td class="py-1.5 px-3 text-slate-700 font-mono text-center">
+                                1
+                            </td>
+                            <td class="py-1.5 px-3 text-right font-mono font-semibold text-slate-800">
+                                {% if registration.amount == 0 %}₹0.00{% elif person.amount %}₹{{ person.amount|floatformat:2 }}{% elif event.registration_fee %}₹{{ event.registration_fee|floatformat:2 }}{% else %}₹{{ registration.amount|floatformat:2 }}{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                        <tr class="bg-slate-100 font-bold border-t-2 border-slate-300">
+                            <td colspan="4" class="py-2 px-3 text-slate-900 font-display text-xs">
+                                Total Amount Paid
+                            </td>
+                            <td class="py-2 px-3 text-right font-mono text-sm text-[#1976d2] font-black">
+                                ₹{{ registration.amount|floatformat:2 }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. Important Information Section -->
+        <div class="px-4 pb-3 bg-white space-y-2">
+            <div class="border border-slate-300 rounded-lg overflow-hidden shadow-2xs text-[11px]">
+                <div class="bg-[#f1f5f9] px-3 py-1.5 border-b border-slate-300 flex items-center gap-1.5 text-[10px] font-bold text-slate-800 uppercase font-mono">
+                    <i data-lucide="info" class="w-3.5 h-3.5 text-[#1976d2]"></i>
+                    <span>Important Information</span>
+                </div>
+                <div class="p-3 bg-white">
+                    <ul class="space-y-1.5 list-disc pl-4 text-slate-700 text-[11px] leading-relaxed">
+                        <li>
+                            Join our official 
+                            <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-700 hover:text-emerald-800 hover:underline">WhatsApp Community</a>
+                            for real-time event updates and announcements.
+                        </li>
+                        <li>
+                            Follow our official 
+                            <a href="https://www.instagram.com/nizhal.community/" target="_blank" rel="noopener noreferrer" class="font-bold text-blue-600 hover:text-blue-700 hover:underline">Instagram Page</a>
+                            for event photos, highlights, and updates.
+                        </li>
+                        <li>
+                            After reaching the location, if you need directions or on-ground coordination, please call:<br>
+                            <span class="inline-block mt-0.5 whitespace-nowrap">
+                                <a href="tel:9944488286" class="font-bold text-[#1976d2] hover:underline whitespace-nowrap">Priyadharshini (9944488286)</a> / 
+                                <a href="tel:9003429590" class="font-bold text-[#1976d2] hover:underline whitespace-nowrap">Lakshanya (9003429590)</a> / 
+                                <a href="tel:9042674924" class="font-bold text-[#1976d2] hover:underline whitespace-nowrap">Lakshanaa (9042674924)</a>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Sign-off & Brand Footer Bar -->
+            <div class="pt-2 text-center space-y-2">
+                <div>
+                    <span class="inline-block bg-[#0f172a] text-white px-5 py-1.5 rounded-full text-xs font-bold font-display shadow-2xs">
+                        See you there!
+                    </span>
+                </div>
+                
+                <div class="pt-2 border-t border-slate-200 flex items-center justify-between text-xs px-1">
+                    <a href="{% url 'public-register' event.slug %}" class="flex items-baseline gap-1.5 text-slate-800 hover:text-[#1976d2] transition font-sans" title="Return to Event Home">
+                        <span class="text-xs sm:text-sm font-bold text-slate-900">Nizhal</span>
+                        <span class="text-[11px] sm:text-xs text-slate-500 font-normal">| The Circle of Warmth</span>
+                    </a>
+                    <div class="font-mono text-[11px] sm:text-xs text-slate-700">
+                        <span class="text-slate-400 text-[10px]">Booking ID: </span>
+                        <strong class="text-slate-900 font-bold select-all">{{ attendee.pass_code }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Action Toolbar (Positioned cleanly below the pass, hidden in print/PDF and modal embed) -->
+    <div class="w-full max-w-[590px] mt-4 flex flex-wrap items-center justify-between gap-2 bg-white p-3 border border-slate-300 shadow-sm rounded-lg no-print embed-hidden">
+        {% csrf_token %}
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-slate-900 font-display">Official E-Ticket Confirmation ({{ ticket_count }} Person{{ ticket_count|pluralize }})</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="send-email-btn" type="button" onclick="sendPassEmail('{{ attendee.pass_code }}')" class="google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold cursor-pointer rounded transition-all">
+                <i data-lucide="mail" id="send-email-icon" class="w-4 h-4"></i>
+                <span id="send-email-text">Send to Email</span>
+            </button>
+            <a href="{% url 'public-register' event.slug %}" class="google-btn-outlined px-3 py-2 text-xs flex items-center gap-1 font-bold rounded">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                <span>Event Home</span>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    async function sendPassEmail(passCode) {
+        const btn = document.getElementById('send-email-btn');
+        const icon = document.getElementById('send-email-icon');
+        const text = document.getElementById('send-email-text');
+        
+        btn.disabled = true;
+        btn.classList.add('opacity-75', 'cursor-wait');
+        text.innerText = 'Sending to Email...';
+        
+        try {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+            const res = await fetch(`/pass/${passCode}/send-email/`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold rounded transition-all";
+                text.innerText = `Sent to ${data.email || 'Email'} ✓`;
+                if (icon) {
+                    icon.setAttribute('data-lucide', 'check');
+                    lucide.createIcons();
+                }
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-wait');
+                    btn.className = "google-btn-primary px-4 py-2 text-xs flex items-center gap-1.5 shadow-md font-bold cursor-pointer rounded transition-all";
+                    text.innerText = "Resend to Email";
+                    if (icon) {
+                        icon.setAttribute('data-lucide', 'mail');
+                        lucide.createIcons();
+                    }
+                }, 4000);
+            } else {
+                alert(data.error || 'Failed to send email. Please try again.');
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-wait');
+                text.innerText = 'Send to Email';
+            }
+        } catch (err) {
+            console.error(err);
+            alert('An error occurred while sending email. Please try again.');
+            btn.disabled = false;
+            btn.classList.remove('opacity-75', 'cursor-wait');
+            text.innerText = 'Send to Email';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}
