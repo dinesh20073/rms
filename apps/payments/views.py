@@ -31,6 +31,12 @@ def payment_checkout_view(request, order_code):
         except Exception:
             qr_base64 = None
 
+    is_reupload = request.GET.get('reupload') == '1'
+    is_failed = (
+        order.status in ['FAILED', 'REJECTED'] or 
+        (verification and verification.decision in ['REJECTED', 'MANUAL_REJECTED'])
+    )
+
     context = {
         'order': order,
         'registration': registration,
@@ -39,6 +45,9 @@ def payment_checkout_view(request, order_code):
         'verification': verification,
         'attendee': attendee,
         'qr_base64': qr_base64,
+        'is_failed': is_failed,
+        'is_reupload': is_reupload,
+        'show_upload_form': is_failed or is_reupload or (order.status == 'PENDING'),
     }
     return render(request, 'public/pay.html', context)
 
@@ -53,7 +62,17 @@ def upload_proof_view(request, order_code):
     if not screenshot_file:
         return redirect('payment-checkout', order_code=order_code)
 
-    # Save evidence record
+    # 1. Clean up & replace old evidence records and files for this order ID
+    old_evidences = PaymentEvidence.objects.filter(order=order)
+    for old_ev in old_evidences:
+        try:
+            if old_ev.screenshot:
+                old_ev.screenshot.delete(save=False)
+        except Exception:
+            pass
+    old_evidences.delete()
+
+    # 2. Save new evidence record
     evidence = PaymentEvidence.objects.create(
         order=order,
         screenshot=screenshot_file
@@ -71,7 +90,7 @@ def upload_proof_view(request, order_code):
     order.status = 'UPLOADED'
     order.save()
 
-    # Run OCR Extraction
+    # 3. Run OCR Extraction
     ocr_data = OCRExtractor.extract_from_image(evidence.screenshot)
 
     if not ocr_data.get('amount') and not ocr_data.get('transaction_id'):
@@ -81,10 +100,10 @@ def upload_proof_view(request, order_code):
         ocr_data['date'] = timezone.now().strftime('%d %b %Y')
         ocr_data['time'] = timezone.now().strftime('%I:%M %p')
 
-    # Execute Dual-Tier Verification Rule Engine
+    # 4. Execute Dual-Tier Verification Rule Engine (Sets status to MANUAL_REVIEW)
     verification = VerificationEngine.process_evidence(order, evidence, ocr_data)
 
-    # Send Order Placed / Payment Submitted Confirmation Email
+    # 5. Send Order Placed / Payment Submitted Confirmation Email
     from apps.notifications.services import send_order_created_email
     send_order_created_email(registration)
 

@@ -111,7 +111,7 @@
                     {% elif field.field_key == 'age' or field.label|lower == 'age' %}
                     <div class="public-input-group">
                         <i data-lucide="calendar" class="public-input-icon w-4 h-4"></i>
-                        <input type="number" name="{{ field.field_key }}" min="1" max="120" placeholder="e.g. 28" {% if field.is_required %}required{% endif %} class="public-input with-icon font-mono">
+                        <input type="number" name="{{ field.field_key }}" min="1" max="120" placeholder="{{ field.placeholder|default:'Enter your age' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon font-mono">
                     </div>
 
                     {% elif field.field_type == 'number' or field.field_key == 'ticket_count' or field.field_key == 'tickets' or field.label|lower == 'ticket count' %}
@@ -363,7 +363,7 @@
 
                         <div class="space-y-1">
                             <label class="block text-[11px] font-semibold text-slate-700">Age *</label>
-                            <input type="number" name="person_${i}_age" value="${escapeHtml(prefill.age)}" min="1" max="120" required placeholder="Age" class="public-input text-xs py-2 font-mono">
+                            <input type="number" name="person_${i}_age" value="${escapeHtml(prefill.age)}" min="1" max="120" required placeholder="Enter your age" class="public-input text-xs py-2 font-mono">
                         </div>
 
                         <div class="space-y-1">
