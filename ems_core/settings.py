@@ -88,7 +88,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ems_core.wsgi.application'
 
 # Database
-# Clean environment-based database configuration (reads from DATABASE_URL or Supabase env vars)
+# Support DATABASE_URL, SUPABASE_DB_URL, or individual PG/Supabase environment variables
+import re
+import urllib.parse
+
 db_url = get_env_str('DATABASE_URL') or get_env_str('SUPABASE_DB_URL')
 db_password = get_env_str('DB_PASSWORD') or get_env_str('SUPABASE_PASSWORD') or get_env_str('PGPASSWORD')
 db_host = get_env_str('DB_HOST') or get_env_str('SUPABASE_HOST') or get_env_str('PGHOST')
@@ -96,10 +99,28 @@ db_user = get_env_str('DB_USER') or get_env_str('SUPABASE_USER') or get_env_str(
 db_name = get_env_str('DB_NAME') or get_env_str('SUPABASE_DB') or get_env_str('PGDATABASE') or 'postgres'
 db_port = get_env_int('DB_PORT', get_env_int('PGPORT', 5432))
 
+# Auto-construct db_url from components if provided
 if not db_url and db_password and db_host:
-    import urllib.parse
     encoded_pass = urllib.parse.quote_plus(db_password)
     db_url = f"postgresql://{db_user}:{encoded_pass}@{db_host}:{db_port}/{db_name}?sslmode=require"
+
+# Smart Serverless Supabase Adapter:
+# AWS Lambda / Vercel is IPv4-only. If a direct IPv6 Supabase URL (db.<ref>.supabase.co) is provided,
+# automatically convert it to the Supabase IPv4 Pooler (aws-0-ap-south-1.pooler.supabase.com:5432).
+if db_url:
+    try:
+        parsed = urllib.parse.urlparse(db_url)
+        hostname = parsed.hostname or ''
+        if 'supabase.co' in hostname:
+            match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', hostname)
+            proj_ref = match.group(1) if match else 'zldazpkryvrqddwvdeno'
+            user = parsed.username or 'postgres'
+            if not user.startswith('postgres.'):
+                user = f"postgres.{proj_ref}"
+            pwd = urllib.parse.quote_plus(parsed.password or '') if parsed.password else ''
+            db_url = f"postgresql://{user}:{pwd}@aws-0-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require"
+    except Exception:
+        pass
 
 if db_url:
     try:
@@ -113,6 +134,7 @@ if db_url:
         }
     except Exception:
         db_url = None
+
 
 
 
