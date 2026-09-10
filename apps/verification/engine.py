@@ -178,4 +178,9 @@ class VerificationEngine:
         registration.save()
 
         log_audit_event('PAYMENT_REJECTED', order.order_code, {'reason': notes}, tenant=tenant, actor=reviewer_user.username if reviewer_user else 'Admin')
+
+        # Trigger failed payment notification email
+        from apps.notifications.services import send_payment_rejected_email
+        send_payment_rejected_email(registration, reason=notes)
+
         return verification
