@@ -117,11 +117,12 @@ if db_url:
             u_user, u_pwd, u_host, u_port, u_rest = m.groups()
             u_port = int(u_port or 5432)
             
-            # Convert direct Supabase host to IPv4 Pooler for AWS Lambda/Vercel
-            if 'supabase.co' in u_host:
+            # Convert Supabase host to IPv4 Transaction Pooler (Port 6543) for AWS Lambda / Vercel
+            if 'supabase.co' in u_host or 'pooler.supabase.com' in u_host:
                 proj_match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', u_host)
                 proj_ref = proj_match.group(1) if proj_match else 'zldazpkryvrqddwvdeno'
                 u_host = 'aws-0-ap-south-1.pooler.supabase.com'
+                u_port = 6543  # Transaction Mode Pooler (unlimited clients, avoids EMAXCONNSESSION)
                 if not u_user.startswith('postgres.'):
                     u_user = f"postgres.{proj_ref}"
             
@@ -144,7 +145,7 @@ if db_url:
                         'keepalives_interval': 10,
                         'keepalives_count': 5,
                     },
-                    'CONN_MAX_AGE': 300,
+                    'CONN_MAX_AGE': 0,
                 }
             }
     except Exception as e:
