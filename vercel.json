@@ -9,8 +9,13 @@
         "runtime": "python3.12",
         "includeFiles": [
           "templates/**",
+          "templates/**/*",
+          "ems_core/templates/**",
+          "ems_core/templates/**/*",
+          "apps/**",
+          "apps/**/*",
           "static/**",
-          "apps/**"
+          "static/**/*"
         ]
       }
     }

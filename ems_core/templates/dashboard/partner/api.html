@@ -1,0 +1,141 @@
+{% extends 'dashboard_base.html' %}
+
+{% block header_title %}API & Integrations{% endblock %}
+
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+
+    <!-- Header bar -->
+    <div class="google-card p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2.5">
+                <h2 class="text-xl font-semibold font-display text-[#202124] flex items-center gap-2">
+                    <i data-lucide="code-2" class="w-5 h-5 text-[#1a73e8]"></i>
+                    <span>API & Integrations</span>
+                </h2>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono">
+                    v1.0
+                </span>
+            </div>
+            <p class="text-xs text-[#5f6368] mt-1">Integrate external websites and apps with the platform.</p>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="generate_key" value="1">
+            <button type="submit" class="google-btn-primary cursor-pointer">
+                <i data-lucide="key" class="w-4 h-4"></i>
+                <span>Generate Key</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- API Keys List -->
+    <div class="google-card p-5 sm:p-6 space-y-4">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-[#137333]"></i>
+            <span>Active API Authorization Credentials ({{ api_keys.count }})</span>
+        </h3>
+
+        <div class="space-y-3">
+            {% for k in api_keys %}
+            <div class="bg-[#f8f9fa] border border-[#dadce0] rounded p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group hover:border-[#1a73e8] transition">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-8 h-8 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
+                        <i data-lucide="key" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-[#202124]">{{ k.name }}</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="font-mono text-xs text-[#1a73e8] font-semibold bg-white px-2 py-0.5 rounded border border-[#dadce0] select-all">{{ k.key }}</span>
+                            <button type="button" onclick="navigator.clipboard.writeText('{{ k.key }}')" class="google-btn-outlined text-xs py-0.5 px-2">
+                                <i data-lucide="copy" class="w-3 h-3"></i>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right text-xs text-[#5f6368] font-mono flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    <span>Created: {{ k.created_at|date:"d M Y" }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="py-8 text-center text-xs text-[#5f6368]">
+                No custom API keys generated yet. Click "Generate API Key" above.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- API Endpoints & Interactive Documentation -->
+    <div class="google-card p-5 sm:p-6 space-y-6">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-2">
+            <i data-lucide="terminal" class="w-4 h-4 text-[#1a73e8]"></i>
+            <span>Endpoints Reference (REST API v1)</span>
+        </h3>
+
+        <!-- Endpoint 1: Create Registration -->
+        <div class="bg-[#f8f9fa] rounded-2xl border border-[#dadce0] p-5 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="px-2.5 py-1 rounded-md bg-[#e6f4ea] text-[#137333] border border-[#ceead6] font-semibold font-mono text-xs">POST</span>
+                    <span class="font-mono text-xs text-[#202124] font-semibold">/api/v1/registrations/</span>
+                </div>
+                <span class="text-xs text-[#5f6368] font-medium">Headless Attendee Registration</span>
+            </div>
+            <p class="text-xs text-[#5f6368]">Register an attendee from your frontend and receive instant checkout URL + UPI QR payload.</p>
+
+            <div class="bg-[#202124] p-4 rounded-xl text-xs font-mono text-[#f8fafc] overflow-x-auto shadow-inner">
+<pre class="text-[#8ab4f8]">// JSON Request Body
+{
+  "event_code": "{{ sample_event.event_code|default:'EVT-2026-0001' }}",
+  "name": "Attendee Full Name",
+  "email": "attendee@organization.com",
+  "phone": "+919876543210",
+  "organization": "Corporate Partner",
+  "designation": "Staff Engineer"
+}</pre>
+            </div>
+
+            <div class="bg-[#202124] p-4 rounded-xl text-xs font-mono text-[#f8fafc] overflow-x-auto shadow-inner">
+<pre class="text-[#81c995]">// Response (HTTP 201 Created)
+{
+  "status": "success",
+  "registration_id": "REG-000123",
+  "order_id": "ORD-000123",
+  "amount": 500.0,
+  "currency": "INR",
+  "payment_url": "http://127.0.0.1:8000/pay/ORD-000123/",
+  "status_url": "http://127.0.0.1:8000/status/REG-000123/"
+}</pre>
+            </div>
+        </div>
+
+        <!-- Endpoint 2: Check Status -->
+        <div class="bg-[#f8f9fa] rounded-2xl border border-[#dadce0] p-5 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="px-2.5 py-1 rounded-md bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-semibold font-mono text-xs">GET</span>
+                    <span class="font-mono text-xs text-[#202124] font-semibold">/api/v1/orders/{order_code}/status/</span>
+                </div>
+                <span class="text-xs text-[#5f6368] font-medium">Query Live Verification State</span>
+            </div>
+            <p class="text-xs text-[#5f6368]">Poll live payment reconciliation and badge generation status.</p>
+        </div>
+
+        <!-- Endpoint 3: Upload Proof -->
+        <div class="bg-[#f8f9fa] rounded-2xl border border-[#dadce0] p-5 space-y-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="px-2.5 py-1 rounded-md bg-[#e6f4ea] text-[#137333] border border-[#ceead6] font-semibold font-mono text-xs">POST</span>
+                    <span class="font-mono text-xs text-[#202124] font-semibold">/api/v1/orders/{order_code}/payment-proof/</span>
+                </div>
+                <span class="text-xs text-[#5f6368] font-medium">Submit Proof & Trigger OCR</span>
+            </div>
+            <p class="text-xs text-[#5f6368]">Upload receipt screenshot or test metadata to trigger AI OCR and rule engine.</p>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

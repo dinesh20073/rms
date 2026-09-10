@@ -1,0 +1,65 @@
+{% extends 'emails/email_base.html' %}
+
+{% block email_title %}Payment Pending • {{ customer.name|title }} | {{ event.title }}{% endblock %}
+
+{% block email_content %}
+<div style="text-align: left;">
+    
+    <!-- Status Header -->
+    <div style="margin-bottom: 20px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; padding: 3px 10px; border-radius: 12px; display: inline-block; margin-bottom: 8px;">
+            ⚠️ Payment Pending
+        </span>
+        <h1 style="margin: 0 0 6px 0; font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.3;">
+            Complete your booking for {{ event.title }}
+        </h1>
+        <p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.5;">
+            Hi <strong>{{ customer.name|title }}</strong>, your registration is reserved. Complete your UPI payment of <strong>₹{{ registration.amount|floatformat:2 }}</strong> to activate your official attendee entry badge.
+        </p>
+    </div>
+
+    <!-- Payment Summary Box -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; margin: 18px 0;">
+        <tr>
+            <td style="padding: 14px 16px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 12px; color: #334155;">
+                    <tr>
+                        <td style="padding: 5px 0; color: #64748b;">Registration Code:</td>
+                        <td style="padding: 5px 0; font-weight: 700; color: #1976d2; font-family: monospace; text-align: right;">{{ registration.registration_code }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0; color: #64748b;">Event Name:</td>
+                        <td style="padding: 5px 0; font-weight: 700; color: #0f172a; text-align: right;">{{ event.title }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0; color: #64748b;">Payee UPI ID:</td>
+                        <td style="padding: 5px 0; font-family: monospace; font-weight: 700; color: #0f172a; text-align: right;">{{ event.upi_id }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0; color: #64748b;">Total Amount Due:</td>
+                        <td style="padding: 5px 0; font-weight: 900; color: #dc2626; font-size: 15px; font-family: monospace; text-align: right;">₹{{ registration.amount|floatformat:2 }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Direct 1-Click Pay CTA -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 22px 0;">
+        <tr>
+            <td align="center">
+                {% if order %}
+                <a href="http://127.0.0.1:8000/pay/{{ order.order_code }}/" target="_blank" style="display: inline-block; background-color: #1976d2; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; padding: 12px 28px; border-radius: 24px; box-shadow: 0 3px 8px rgba(25, 118, 210, 0.35);">
+                    Pay Now via UPI (₹{{ registration.amount|floatformat:0 }}) →
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <div style="background-color: #f1f5f9; border-radius: 6px; padding: 12px 16px; font-size: 11px; color: #475569; line-height: 1.5; border-left: 4px solid #1976d2;">
+        You can pay using any UPI application (Google Pay, WhatsApp Pay, PhonePe, Paytm, BHIM) by clicking the button above or scanning the QR code on the checkout portal.
+    </div>
+
+</div>
+{% endblock %}

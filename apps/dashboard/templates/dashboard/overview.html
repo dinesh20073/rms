@@ -1,0 +1,244 @@
+{% extends 'dashboard_base.html' %}
+
+{% block header_title %}Overview{% endblock %}
+
+{% block content %}
+<div class="p-3 sm:p-6 max-w-[1600px] w-full mx-auto flex flex-col space-y-3 sm:space-y-5 pb-8 sm:pb-12">
+
+    <!-- 1. Google Metric KPI Cards Grid -->
+    <div id="overviewMetricsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        
+        <!-- Metric 1: Active Events -->
+        <a href="{% url 'dashboard-events-list' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between hover:border-[#1a73e8] transition group">
+            <div class="flex items-center justify-between text-[#5f6368] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Active Events</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0 group-hover:bg-[#1a73e8] group-hover:text-white transition">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display text-[#202124] tracking-tight">
+                    {{ total_events }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#dadce0] text-[#5f6368]">
+                    <span class="text-[#1a73e8] font-medium group-hover:underline">View all events</span>
+                    <i data-lucide="arrow-right" class="w-3 h-3 text-[#1a73e8]"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Metric 2: Registrations -->
+        <a href="{% url 'dashboard-registrations-list' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between hover:border-[#1a73e8] transition group">
+            <div class="flex items-center justify-between text-[#5f6368] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Registrations</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0 group-hover:bg-[#1a73e8] group-hover:text-white transition">
+                    <i data-lucide="users" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display text-[#202124] tracking-tight">
+                    {{ total_registrations }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#dadce0] text-[#5f6368]">
+                    <span>{{ total_customers }} attendees</span>
+                    <span class="text-[#1a73e8] font-medium group-hover:underline">View logs</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Metric 3: Passes -->
+        <a href="{% url 'dashboard-registrations-list' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between border-[#ceead6] bg-gradient-to-b from-[#f6fbf7] to-white hover:border-[#1e8e3e] transition group">
+            <div class="flex items-center justify-between text-[#137333] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Passes</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded bg-[#e6f4ea] text-[#137333] flex items-center justify-center shrink-0 group-hover:bg-[#1e8e3e] group-hover:text-white transition">
+                    <i data-lucide="badge-check" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display text-[#137333] tracking-tight">
+                    {{ total_passes }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#ceead6] text-[#137333]">
+                    <span class="font-medium flex items-center gap-1">
+                        <i data-lucide="shield-check" class="w-3 h-3"></i>
+                        <span>{{ verified_reg_count }} Confirmed</span>
+                    </span>
+                    <span class="font-medium">Active</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Metric 4: Verification / Payments -->
+        <a href="{% url 'dashboard-verification-queue' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between {% if review_queue_count > 0 %}border-[#feefc3] bg-gradient-to-b from-[#fefbf0] to-white hover:border-[#f9ab00]{% else %}hover:border-[#1a73e8]{% endif %} transition group">
+            <div class="flex items-center justify-between {% if review_queue_count > 0 %}text-[#b06000]{% else %}text-[#5f6368]{% endif %} text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Payments</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded {% if review_queue_count > 0 %}bg-[#fef7e0] text-[#b06000] group-hover:bg-[#f9ab00] group-hover:text-[#202124]{% else %}bg-[#f1f3f4] text-[#5f6368] group-hover:bg-[#1a73e8] group-hover:text-white{% endif %} flex items-center justify-center shrink-0 transition">
+                    <i data-lucide="credit-card" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display {% if review_queue_count > 0 %}text-[#b06000]{% else %}text-[#202124]{% endif %} tracking-tight">
+                    {{ review_queue_count }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#dadce0]">
+                    {% if review_queue_count > 0 %}
+                    <span class="text-[#b06000] font-semibold flex items-center gap-0.5">
+                        <span>Review Payments</span>
+                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    </span>
+                    <span class="text-[#b06000] font-mono">Pending</span>
+                    {% else %}
+                    <span class="text-[#137333] font-medium flex items-center gap-1">
+                        <i data-lucide="check" class="w-3 h-3"></i>
+                        <span>Payments Clear</span>
+                    </span>
+                    <span class="text-[#5f6368]">Audited</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- 2. Main Dashboard Section: Events & Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-5">
+        
+        <!-- Left 2 Cols: Events (Clean: Name & Registration Count Alone) -->
+        <div class="lg:col-span-2 google-card p-3.5 sm:p-5 flex flex-col justify-between">
+            <div>
+                <!-- Header -->
+                <div class="flex items-center justify-between border-b border-[#dadce0] pb-2.5 sm:pb-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                        </div>
+                        <h2 class="text-sm sm:text-base font-semibold text-[#202124]">Events</h2>
+                    </div>
+                    <a href="{% url 'dashboard-events-list' %}" class="google-btn-outlined py-0.5 px-2.5 text-[11px] sm:text-xs">
+                        <span>All Events</span>
+                    </a>
+                </div>
+
+                <!-- Clean Events List: Name & Registration Count Alone -->
+                <div id="overviewEventsList" class="divide-y divide-[#dadce0]">
+                    {% for ev in events %}
+                    <a href="{% url 'dashboard-event-detail' ev.id %}" class="py-3 px-2 sm:px-3 flex items-center justify-between hover:bg-[#f8f9fa] rounded transition group">
+                        <!-- Left: Event Name -->
+                        <div class="flex items-center gap-3 min-w-0 pr-4">
+                            <div class="w-2 h-2 rounded-full bg-[#1a73e8] shrink-0"></div>
+                            <span class="font-medium text-xs sm:text-sm text-[#202124] group-hover:text-[#1a73e8] group-hover:underline truncate">
+                                {{ ev.title }}
+                            </span>
+                        </div>
+
+                        <!-- Right: Registration Count Alone -->
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-xs sm:text-sm font-semibold text-[#202124] font-mono">
+                                {{ ev.registrations_count|default:ev.registrations.count }}
+                            </span>
+                            <span class="text-[11px] text-[#5f6368]">
+                                registered
+                            </span>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#5f6368] group-hover:text-[#1a73e8] transition ml-1"></i>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="py-8 text-center text-[#5f6368] text-xs">
+                        No events found. <a href="{% url 'dashboard-event-create' %}" class="text-[#1a73e8] font-semibold underline">Create event</a>.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="mt-3 pt-3 border-t border-[#dadce0] flex items-center justify-between text-xs">
+                <span class="text-[#5f6368] text-[11px] sm:text-xs">{{ total_events }} active event{% if total_events != 1 %}s{% endif %}</span>
+                <a href="{% url 'dashboard-event-create' %}" class="text-[#1a73e8] font-semibold hover:underline flex items-center gap-1 text-[11px] sm:text-xs">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>New Event</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Right 1 Col: Quick Actions -->
+        <div class="google-card p-3.5 sm:p-5 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-2 border-b border-[#dadce0] pb-2.5 sm:pb-3 mb-3">
+                    <div class="w-7 h-7 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                    </div>
+                    <h2 class="text-sm sm:text-base font-semibold text-[#202124]">Quick Actions</h2>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-2.5">
+                    <!-- Action 1: New Event -->
+                    <a href="{% url 'dashboard-event-create' %}" class="flex items-center justify-between p-2.5 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-7 h-7 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center group-hover:bg-[#1a73e8] group-hover:text-white transition shrink-0">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div class="text-left min-w-0">
+                                <div class="text-xs font-semibold text-[#202124] truncate">New Event</div>
+                                <div class="text-[10px] text-[#5f6368] truncate hidden sm:block">Create event & form</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0 hidden lg:block"></i>
+                    </a>
+
+                    <!-- Action 2: Verification / Payments -->
+                    <a href="{% url 'dashboard-verification-queue' %}" class="flex items-center justify-between p-2.5 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-7 h-7 rounded {% if review_queue_count > 0 %}bg-[#fef7e0] text-[#b06000] group-hover:bg-[#f9ab00] group-hover:text-[#202124]{% else %}bg-[#f1f3f4] text-[#5f6368] group-hover:bg-[#1a73e8] group-hover:text-white{% endif %} flex items-center justify-center transition shrink-0">
+                                <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div class="text-left min-w-0">
+                                <div class="text-xs font-semibold text-[#202124] truncate">Payments</div>
+                                <div class="text-[10px] text-[#5f6368] truncate hidden sm:block">Review ({{ review_queue_count }})</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0 hidden lg:block"></i>
+                    </a>
+
+                    <!-- Action 3: Registrations -->
+                    <a href="{% url 'dashboard-registrations-list' %}" class="flex items-center justify-between p-2.5 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-7 h-7 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center group-hover:bg-[#1a73e8] group-hover:text-white transition shrink-0">
+                                <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div class="text-left min-w-0">
+                                <div class="text-xs font-semibold text-[#202124] truncate">Registrations</div>
+                                <div class="text-[10px] text-[#5f6368] truncate hidden sm:block">Search & export</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0 hidden lg:block"></i>
+                    </a>
+
+                    <!-- Action 4: Emails -->
+                    <a href="{% url 'dashboard-email-logs' %}" class="flex items-center justify-between p-2.5 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-7 h-7 rounded bg-[#e6f4ea] text-[#137333] flex items-center justify-center group-hover:bg-[#1e8e3e] group-hover:text-white transition shrink-0">
+                                <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div class="text-left min-w-0">
+                                <div class="text-xs font-semibold text-[#202124] truncate">Emails</div>
+                                <div class="text-[10px] text-[#5f6368] truncate hidden sm:block">Delivery logs</div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0 hidden lg:block"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Operational System Status -->
+            <div class="mt-3 pt-3 border-t border-[#dadce0] flex items-center justify-between text-[11px] text-[#5f6368]">
+                <span class="flex items-center gap-1.5 text-[#137333]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e]"></span>
+                    <span>System Operational</span>
+                </span>
+                <span class="font-mono text-[10px] text-[#5f6368]">Nizhal v2.0</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

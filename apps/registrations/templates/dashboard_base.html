@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body_content %}
+<style>
+    /* Google Console Topbar & Sidebar Styles */
+    .google-topbar {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #dadce0 !important;
+    }
+    .google-sidebar {
+        background-color: #ffffff !important;
+        border-right: 1px solid #dadce0 !important;
+    }
+    .google-nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 50% !important;
+        color: #5f6368;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+    }
+    .google-nav-item:hover {
+        background-color: #f1f3f4 !important;
+        color: #202124 !important;
+    }
+    .google-nav-item.active {
+        background-color: #e8f0fe !important;
+        color: #1a73e8 !important;
+    }
+    .google-nav-item.active i {
+        stroke-width: 2.2px;
+        color: #1a73e8 !important;
+    }
+    
+    /* Google Floating Tooltip */
+    .google-tooltip {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        transform: translateX(-4px);
+        box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+    }
+    .sidebar-item-wrap:hover .google-tooltip {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(0);
+    }
+</style>
+
+<div class="flex h-screen overflow-hidden bg-[#f8f9fa] font-sans text-[#202124]">
+
+    <!-- 1. Left Google Slim Navigation Rail (Desktop lg+) -->
+    <aside class="google-sidebar hidden lg:flex w-16 flex-col items-center justify-between py-3 shrink-0 z-30 select-none">
+        
+        <!-- Top: Logo & Nav items -->
+        <div class="flex flex-col items-center gap-3 w-full">
+            <!-- Nizhal Logo Link -->
+            <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 rounded-full flex items-center justify-center transition hover:bg-[#f1f3f4] p-1.5" title="Nizhal Console">
+                <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-7 h-7 object-contain">
+            </a>
+
+            <div class="w-8 h-[1px] bg-[#dadce0] my-1"></div>
+
+            <!-- Navigation Rail Icons -->
+            <div class="flex flex-col items-center gap-2 w-full px-2">
+                
+                <!-- Overview -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-overview' %}" class="google-nav-item {% if request.resolver_match.url_name == 'dashboard-overview' %}active{% endif %}">
+                        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                    </a>
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Overview
+                    </div>
+                </div>
+
+                <!-- Registrations / Logs -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-registrations-list' %}" class="google-nav-item {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}active{% endif %}">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                    </a>
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Registrations
+                    </div>
+                </div>
+
+                <!-- Events -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-events-list' %}" class="google-nav-item {% if request.resolver_match.url_name == 'dashboard-events-list' or request.resolver_match.url_name == 'dashboard-event-detail' or request.resolver_match.url_name == 'dashboard-event-create' %}active{% endif %}">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                    </a>
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Events
+                    </div>
+                </div>
+
+                <!-- Forms Builder -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-forms-list' %}" class="google-nav-item {% if 'form' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="form-input" class="w-5 h-5"></i>
+                    </a>
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Forms Builder
+                    </div>
+                </div>
+
+                <!-- Payments -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-verification-queue' %}" class="google-nav-item relative {% if 'verification' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                        {% if pending_reviews_count > 0 %}
+                        <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#f9ab00]"></span>
+                        {% endif %}
+                    </a>
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Payments {% if pending_reviews_count > 0 %}({{ pending_reviews_count }}){% endif %}
+                    </div>
+                </div>
+
+                <!-- Email Logs -->
+                <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                    <a href="{% url 'dashboard-email-logs' %}" class="google-nav-item {% if 'email' in request.resolver_match.url_name %}active{% endif %}">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
+                    </a>
+                    <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                        Email Logs
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Rail Bottom: User Profile & Sign Out -->
+        <div class="flex flex-col items-center gap-2 w-full px-2 pt-2 border-t border-[#dadce0]">
+            <div class="sidebar-item-wrap relative flex items-center justify-center w-full">
+                <a href="{% url 'logout' %}" onclick="if(window.NizhalAuthSync) window.NizhalAuthSync.notifyLogout();" class="google-nav-item hover:text-[#d93025] hover:bg-[#fce8e6]" title="Sign Out">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </a>
+                <div class="google-tooltip absolute left-14 px-2.5 py-1 bg-[#202124] text-white text-xs font-medium rounded-md whitespace-nowrap z-50 pointer-events-none">
+                    Sign Out ({{ request.user.username|default:'Nizhal' }})
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 3. Main Application Container -->
+    <div class="flex-1 flex flex-col overflow-hidden bg-[#f8f9fa]">
+        
+        <!-- Google Console Top Header Bar -->
+        <header class="google-topbar h-14 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
+            <!-- Left: Nizhal Logo & Nizhal Community Only -->
+            <div class="flex items-center gap-3">
+                <a href="{% url 'dashboard-overview' %}" class="flex items-center gap-2.5 hover:opacity-90 transition select-none" title="Nizhal Community">
+                    <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal" class="w-7 h-7 object-contain">
+                    <span class="font-display font-semibold text-sm sm:text-base text-[#202124] tracking-tight">
+                        Nizhal Community
+                    </span>
+                </a>
+            </div>
+
+            <!-- Right: Real-Time Backend Sync Status & Profile -->
+            <div class="flex items-center gap-2 sm:gap-3 select-none">
+                <!-- Real Backend Connection & Sync Status Indicator -->
+                <button type="button" id="backendSyncBtn" onclick="if(window.triggerGlobalSync) window.triggerGlobalSync();" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#dadce0] bg-white hover:bg-[#f8f9fa] text-[#5f6368] transition shadow-2xs cursor-pointer" title="Checking backend connection...">
+                    <i id="syncSpinIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#1a73e8] transition-transform"></i>
+                    <span id="syncStatusText" class="font-mono text-[11px] font-semibold text-[#3c4043] hidden sm:inline">Connected</span>
+                    <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-[#1e8e3e]"></span>
+                </button>
+
+                <!-- User Profile & Sign Out -->
+                <div class="flex items-center gap-1.5 pl-1 border-l border-[#dadce0]">
+                    <span class="font-medium text-xs text-[#202124] pl-1">{{ request.user.username|default:'Nizhal' }}</span>
+                    <a href="{% url 'logout' %}" class="p-1 text-[#5f6368] hover:text-[#d93025] rounded hover:bg-[#fce8e6] transition" title="Sign Out">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <script>
+            // Notify other open browser tabs of active authenticated session
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.NizhalAuthSync && typeof window.NizhalAuthSync.notifyLogin === 'function') {
+                    window.NizhalAuthSync.notifyLogin("{{ request.user.username|default:'Nizhal' }}");
+                }
+            });
+        </script>
+
+        <!-- Main Body Scroll Area -->
+        <main class="flex-1 min-h-0 overflow-y-auto bg-[#f8f9fa] {% if 'email' in request.resolver_match.url_name %}bg-white pb-0 overflow-hidden{% else %}pb-16 lg:pb-4{% endif %} flex flex-col">
+            {% block content %}{% endblock %}
+        </main>
+
+    </div>
+
+    <!-- 4. Mobile Bottom Navigation Bar -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#dadce0] flex items-center justify-around py-2 px-1 text-[11px] font-medium text-[#5f6368] shadow-lg">
+        <a href="{% url 'dashboard-overview' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-overview' %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            <span>Overview</span>
+        </a>
+        <a href="{% url 'dashboard-registrations-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if request.resolver_match.url_name == 'dashboard-registrations-list' %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+            <span>Logs</span>
+        </a>
+        <a href="{% url 'dashboard-events-list' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'event' in request.resolver_match.url_name %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+            <span>Events</span>
+        </a>
+        <a href="{% url 'dashboard-verification-queue' %}" class="flex flex-col items-center gap-0.5 p-1 relative {% if 'verification' in request.resolver_match.url_name %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
+            <i data-lucide="credit-card" class="w-5 h-5"></i>
+            <span>Payments</span>
+            {% if pending_reviews_count > 0 %}
+            <span class="absolute top-0 right-1 w-2 h-2 rounded-full bg-[#f9ab00]"></span>
+            {% endif %}
+        </a>
+        <a href="{% url 'dashboard-email-logs' %}" class="flex flex-col items-center gap-0.5 p-1 {% if 'email' in request.resolver_match.url_name %}text-[#1a73e8] font-semibold{% else %}hover:text-[#202124]{% endif %}">
+            <i data-lucide="mail" class="w-5 h-5"></i>
+            <span>Emails</span>
+        </a>
+    </nav>
+
+
+</div>
+
+<!-- Global Pass Viewer Modal Popup (Google Material Dialog) -->
+<div id="passViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-xs transition-opacity duration-200">
+    <div class="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl border border-[#dadce0] overflow-hidden flex flex-col h-[92vh] max-h-[850px]">
+        
+        <!-- Modal Topbar -->
+        <div class="px-4 py-2.5 sm:px-5 sm:py-3 bg-white text-[#202124] flex items-center justify-between shrink-0 border-b border-[#dadce0]">
+            <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <div class="w-8 h-8 rounded bg-[#e6f4ea] text-[#137333] flex items-center justify-center shrink-0">
+                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                </div>
+                <div class="min-w-0">
+                    <h3 id="passModalTitle" class="text-xs sm:text-sm font-semibold text-[#202124] tracking-tight flex items-center gap-2 truncate">
+                        <span>Attendee Pass</span>
+                        <span id="passModalBadge" class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded">PASS-CODE</span>
+                    </h3>
+                    <p id="passModalSubtitle" class="text-[11px] text-[#5f6368] truncate hidden sm:block">Official Voucher & QR Pass</p>
+                </div>
+            </div>
+
+            <!-- Top Actions -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="printPassModalIframe()" class="google-btn-primary py-1 px-3 text-xs flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                    <span>Print</span>
+                </button>
+                <a id="passModalFullLink" href="#" target="_blank" class="google-btn-outlined py-1 px-2.5 text-xs flex items-center gap-1" title="Open full screen in new tab">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                </a>
+                <button type="button" onclick="closePassModal()" class="p-1.5 text-[#5f6368] hover:text-[#202124] rounded hover:bg-[#f1f3f4] transition cursor-pointer" title="Close (Esc)">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Iframe Body -->
+        <div class="flex-1 min-h-0 bg-white relative overflow-hidden">
+            <iframe id="passModalIframe" src="" class="w-full h-full border-0 bg-white" title="Attendee Pass Voucher View"></iframe>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function openPassModal(passCode, attendeeName, eventTitle) {
+        const modal = document.getElementById('passViewerModal');
+        const iframe = document.getElementById('passModalIframe');
+        const title = document.getElementById('passModalTitle');
+        const badge = document.getElementById('passModalBadge');
+        const subtitle = document.getElementById('passModalSubtitle');
+        const fullLink = document.getElementById('passModalFullLink');
+
+        if (!modal || !iframe) return;
+
+        const passUrl = `/pass/${passCode}/?embed=1`;
+        iframe.src = passUrl;
+        if (badge) badge.innerText = passCode;
+        if (title) title.innerHTML = `<span class="truncate">${attendeeName || 'Attendee'}</span> <span class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] font-mono text-[11px] px-2 py-0.5 rounded">${passCode}</span>`;
+        if (subtitle) subtitle.innerText = `${eventTitle || 'Event'} • Official Voucher`;
+        if (fullLink) fullLink.href = `/pass/${passCode}/`;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function closePassModal() {
+        const modal = document.getElementById('passViewerModal');
+        const iframe = document.getElementById('passModalIframe');
+        if (!modal) return;
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        if (iframe) iframe.src = '';
+        document.body.style.overflow = '';
+    }
+
+    function printPassModalIframe() {
+        const iframe = document.getElementById('passModalIframe');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePassModal();
+        }
+    });
+
+    // ========================================================
+    // 1-Second Real-Time Live Sync Engine Across All Dashboard Pages
+    // ========================================================
+    (function() {
+        let isGlobalSyncing = false;
+        let globalSyncInterval = null;
+        const SYNC_INTERVAL_MS = 1000; // Exact 1-second interval
+
+        async function executeGlobalLiveSync(force = false) {
+            if (isGlobalSyncing) return;
+            
+            // Skip sync if user is currently typing in an input, an active form is focused, or modal is open
+            const activeEl = document.activeElement;
+            const isUserTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT') && !activeEl.classList.contains('no-sync-lock');
+            const isAnyModalOpen = document.querySelector('.modal:not(.hidden), [id*="Modal"]:not(.hidden), [id*="modal"]:not(.hidden)');
+            const hasCheckedBoxes = document.querySelector('input[type="checkbox"]:checked:not(#selectAllHistoryCheckbox):not(#selectAllCheckbox)');
+
+            if (!force && (isUserTyping || isAnyModalOpen || hasCheckedBoxes)) {
+                return;
+            }
+
+            isGlobalSyncing = true;
+            const spinIcon = document.getElementById('syncSpinIcon');
+            const statusText = document.getElementById('syncStatusText');
+            const statusDot = document.getElementById('syncStatusDot');
+            const syncBtn = document.getElementById('backendSyncBtn');
+
+            if (spinIcon) spinIcon.classList.add('animate-spin');
+            if (statusText) statusText.innerText = "Syncing...";
+
+            try {
+                const response = await fetch(window.location.href, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // If custom before hook exists
+                    if (typeof window.onBeforePageLiveSync === 'function') {
+                        window.onBeforePageLiveSync(doc);
+                    }
+
+                    // Key sync selectors
+                    const syncSelectors = [
+                        '#kpiMetricsGrid',
+                        '#overviewMetricsGrid',
+                        '#activeQueueContainer',
+                        '#historyTableBody',
+                        '#registrationsTableBody',
+                        '#emailLogsTableBody',
+                        '#eventsTableBody',
+                        '#recordCountBadge',
+                        '#historyCountBadge',
+                        '#headerQueueBadge'
+                    ];
+
+                    let matchedAny = false;
+                    syncSelectors.forEach(selector => {
+                        const newEl = doc.querySelector(selector);
+                        const currEl = document.querySelector(selector);
+                        if (newEl && currEl) {
+                            if (newEl.innerHTML !== currEl.innerHTML) {
+                                currEl.innerHTML = newEl.innerHTML;
+                            }
+                            matchedAny = true;
+                        }
+                    });
+
+                    // Fallback for tables without specific IDs
+                    if (!matchedAny) {
+                        const newTbody = doc.querySelector('table tbody');
+                        const currTbody = document.querySelector('table tbody');
+                        if (newTbody && currTbody && newTbody.innerHTML !== currTbody.innerHTML) {
+                            currTbody.innerHTML = newTbody.innerHTML;
+                        }
+                    }
+
+                    // If custom after hook exists
+                    if (typeof window.onAfterPageLiveSync === 'function') {
+                        window.onAfterPageLiveSync(doc);
+                    }
+
+                    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                        lucide.createIcons();
+                    }
+
+                    const timeStr = new Date().toLocaleTimeString();
+                    if (statusText) statusText.innerText = "Connected";
+                    if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-[#1e8e3e]";
+                    if (spinIcon) spinIcon.className = "w-3.5 h-3.5 text-[#1a73e8]";
+                    if (syncBtn) syncBtn.setAttribute('title', `Connected • Synced at ${timeStr} (Click to refresh)`);
+                } else {
+                    if (statusText) statusText.innerText = "Offline";
+                    if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-[#d93025]";
+                    if (spinIcon) spinIcon.className = "w-3.5 h-3.5 text-[#d93025]";
+                    if (syncBtn) syncBtn.setAttribute('title', 'Backend offline / response error');
+                }
+            } catch (err) {
+                if (statusText) statusText.innerText = "Offline";
+                if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-[#d93025]";
+                if (spinIcon) spinIcon.className = "w-3.5 h-3.5 text-[#d93025]";
+                if (syncBtn) syncBtn.setAttribute('title', 'Backend disconnected (Network error)');
+            } finally {
+                if (spinIcon) spinIcon.classList.remove('animate-spin');
+                isGlobalSyncing = false;
+            }
+        }
+
+        function startGlobalSync() {
+            if (globalSyncInterval) clearInterval(globalSyncInterval);
+            globalSyncInterval = setInterval(() => {
+                if (!document.hidden) {
+                    executeGlobalLiveSync(false);
+                }
+            }, 20000); // Passive live background sync every 20s
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                executeGlobalLiveSync(false);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            startGlobalSync();
+        });
+        window.triggerGlobalSync = () => executeGlobalLiveSync(true);
+    })();
+</script>
+{% endblock %}
+

@@ -1,0 +1,414 @@
+{% extends 'public_base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} | Register Online{% endblock %}
+
+{% block main_content %}
+<div class="w-full public-card">
+
+    <!-- 1. Header Hero Banner -->
+    <div class="w-full overflow-hidden bg-slate-900 border-b border-slate-200">
+        <picture class="w-full block">
+            <source media="(max-width: 639px)" srcset="{% static 'images/banners/form_header_mobile.png' %}">
+            <source media="(min-width: 640px)" srcset="{% static 'images/banners/form_header_pc.png' %}">
+            <img src="{% static 'images/banners/form_header_pc.png' %}" alt="Event Banner" class="w-full h-auto object-cover select-none">
+        </picture>
+    </div>
+
+    <!-- 2. Event Overview Card (Apple Clear Glass) -->
+    <div class="p-6 sm:p-8 bg-white/40 backdrop-blur-2xl border-b border-white/50 space-y-4">
+        <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 border border-blue-500/20 mb-2.5 shadow-2xs backdrop-blur-md">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span>Official Registration</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 tracking-tight leading-tight">
+                {{ event.title }}
+            </h1>
+            <p class="text-sm text-slate-700 mt-2 leading-relaxed">
+                {{ event.description|default:"Fill in your details below to register and secure your official digital entrance pass." }}
+            </p>
+        </div>
+
+        <!-- Event Key Details Chips -->
+        <div class="pt-4 border-t border-white/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+            
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <!-- Location Chip -->
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                    <span class="font-medium">{{ event.venue|default:"BIEC, Bengaluru & Online" }}</span>
+                </div>
+                
+                <!-- Date & Time Chip -->
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                    <span class="font-medium">{{ event.start_time|date:"d M Y"|default:"28 Aug 2026" }} • {{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</span>
+                </div>
+
+                {% if event.registration_closes %}
+                <!-- Deadline Chip -->
+                <div class="chip-badge bg-amber-500/15 text-amber-900 border border-amber-500/30 shadow-2xs font-semibold">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-700 shrink-0"></i>
+                    <span>Closes: {{ event.registration_closes|date:"d M, h:i A" }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Fee Badge -->
+            <div class="chip-badge {% if event.registration_fee == 0 %}bg-emerald-500/15 text-emerald-900 border border-emerald-500/30 font-bold{% else %}bg-blue-500/15 text-blue-900 border border-blue-500/30 font-bold{% endif %} backdrop-blur-xl shadow-2xs">
+                <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
+                {% if event.registration_fee == 0 %}
+                <span>Free Registration</span>
+                {% else %}
+                <span>₹{{ event.registration_fee|floatformat:0 }} INR / pass</span>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Form Body (Apple Clear Glass) -->
+    <div class="p-6 sm:p-8 space-y-6 bg-white/30 backdrop-blur-2xl">
+        
+        <div class="flex items-center justify-between pb-2 border-b border-white/40">
+            <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-xs"></div>
+                <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Primary Attendee Details</h2>
+            </div>
+            <span class="text-xs text-rose-600 font-medium">* Required fields</span>
+        </div>
+
+        <form method="POST" action="{% url 'public-register-submit' event.slug %}" class="space-y-5" id="publicRegForm">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 gap-4">
+                {% for field in fields %}
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-800">
+                        {{ field.label }}
+                        {% if field.is_required %}<span class="text-rose-500">*</span>{% endif %}
+                    </label>
+
+                    {% if field.help_text %}
+                    <p class="text-[11px] text-slate-500">{{ field.help_text }}</p>
+                    {% endif %}
+
+                    {% if field.field_type == 'textarea' %}
+                    <textarea name="{{ field.field_key }}" rows="3" placeholder="{{ field.placeholder|default:'Enter your response...' }}" {% if field.is_required %}required{% endif %} class="public-input"></textarea>
+
+                    {% elif field.field_type == 'dropdown' %}
+                    <div class="public-input-group">
+                        <i data-lucide="chevron-down" class="public-input-icon !left-auto !right-3.5 w-4 h-4"></i>
+                        <select name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="public-input cursor-pointer appearance-none pr-10">
+                            <option value="">Select an option...</option>
+                            {% for opt in field.options %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {% elif field.field_key == 'age' or field.label|lower == 'age' %}
+                    <div class="public-input-group">
+                        <i data-lucide="calendar" class="public-input-icon w-4 h-4"></i>
+                        <input type="number" name="{{ field.field_key }}" min="1" max="120" placeholder="e.g. 28" {% if field.is_required %}required{% endif %} class="public-input with-icon font-mono">
+                    </div>
+
+                    {% elif field.field_type == 'number' or field.field_key == 'ticket_count' or field.field_key == 'tickets' or field.label|lower == 'ticket count' %}
+                    <!-- Interactive Pass Quantity Stepper (Apple Clear Glass Pill) -->
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-3">
+                            <div class="inline-flex items-center border border-white/80 rounded-2xl bg-white/55 shadow-sm p-1 backdrop-blur-xl">
+                                <button type="button" onclick="adjustTickets(-1)" class="w-8 h-8 rounded-xl bg-white/70 hover:bg-white flex items-center justify-center font-bold text-slate-800 text-base transition-all select-none cursor-pointer shadow-2xs">
+                                    −
+                                </button>
+                                <input type="number" id="ticket-count-input" name="{{ field.field_key }}" value="1" min="1" class="w-16 text-center bg-transparent border-none font-bold text-slate-900 font-mono text-base focus:outline-none" oninput="handleTicketCountChange(this.value)">
+                                <button type="button" onclick="adjustTickets(1)" class="w-8 h-8 rounded-xl bg-white/70 hover:bg-white flex items-center justify-center font-bold text-slate-800 text-base transition-all select-none cursor-pointer shadow-2xs">
+                                    +
+                                </button>
+                            </div>
+                            <span class="text-xs text-slate-600 font-medium">Select number of passes</span>
+                        </div>
+
+                        <!-- Quick Chips -->
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-[11px] text-slate-500 mr-1">Quick Select:</span>
+                            <button type="button" onclick="setTickets(1)" class="px-3 py-1 text-xs font-semibold rounded-xl bg-white/55 hover:bg-white/90 text-slate-800 border border-white/75 backdrop-blur-lg transition-all cursor-pointer shadow-2xs">1 Pass</button>
+                            <button type="button" onclick="setTickets(2)" class="px-3 py-1 text-xs font-semibold rounded-xl bg-white/55 hover:bg-white/90 text-slate-800 border border-white/75 backdrop-blur-lg transition-all cursor-pointer shadow-2xs">2 Passes</button>
+                            <button type="button" onclick="setTickets(5)" class="px-3 py-1 text-xs font-semibold rounded-xl bg-white/55 hover:bg-white/90 text-slate-800 border border-white/75 backdrop-blur-lg transition-all cursor-pointer shadow-2xs">5 Passes</button>
+                            <button type="button" onclick="setTickets(10)" class="px-3 py-1 text-xs font-semibold rounded-xl bg-white/55 hover:bg-white/90 text-slate-800 border border-white/75 backdrop-blur-lg transition-all cursor-pointer shadow-2xs">10 Passes</button>
+                            <button type="button" onclick="setTickets(20)" class="px-3 py-1 text-xs font-semibold rounded-xl bg-white/55 hover:bg-white/90 text-slate-800 border border-white/75 backdrop-blur-lg transition-all cursor-pointer shadow-2xs">20 Passes</button>
+                        </div>
+                    </div>
+
+                    {% elif field.field_type == 'checkbox' %}
+                    <div class="flex items-center gap-2.5 pt-1">
+                        <input type="checkbox" id="chk_{{ field.field_key }}" name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
+                        <label for="chk_{{ field.field_key }}" class="text-xs font-medium text-slate-700 cursor-pointer select-none">
+                            {{ field.placeholder|default:field.label }}
+                        </label>
+                    </div>
+
+                    {% elif field.field_key == 'full_name' or field.label|lower == 'full name' or field.label|lower == 'name' %}
+                    <div class="public-input-group">
+                        <i data-lucide="user" class="public-input-icon w-4 h-4"></i>
+                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'e.g. Alex Johnson' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif field.field_key == 'email_address' or field.field_type == 'email' or field.label|lower == 'email' or 'email' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="mail" class="public-input-icon w-4 h-4"></i>
+                        <input type="email" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'alex@company.com' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif field.field_key == 'phone_number' or field.field_type == 'tel' or 'phone' in field.label|lower or 'mobile' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="phone" class="public-input-icon w-4 h-4"></i>
+                        <input type="tel" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'+91 98765 43210' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif 'company' in field.label|lower or 'organization' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="building-2" class="public-input-icon w-4 h-4"></i>
+                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'Company or University' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% elif 'designation' in field.label|lower or 'role' in field.label|lower %}
+                    <div class="public-input-group">
+                        <i data-lucide="briefcase" class="public-input-icon w-4 h-4"></i>
+                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'e.g. Lead Engineer' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                    </div>
+
+                    {% else %}
+                    <input type="{{ field.field_type }}" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'Your answer' }}" {% if field.is_required %}required{% endif %} class="public-input">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Dynamic Additional Attendees Container (Person 2 to N) -->
+            <div id="additional-attendees-container" class="space-y-4 pt-3 hidden">
+                <!-- Injected dynamically via JavaScript -->
+            </div>
+
+            <!-- Order Live Summary Box (Apple Clear Glass) -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-white/45 backdrop-blur-xl border border-white/70 space-y-2.5 text-xs shadow-sm">
+                <div class="flex items-center justify-between text-slate-700">
+                    <span class="font-medium">Ticket Breakdown (<span id="summary-pass-count">1</span> × ₹{{ event.registration_fee|floatformat:0 }})</span>
+                    <span id="summary-subtotal" class="font-mono font-semibold text-slate-900">₹{{ event.registration_fee|floatformat:0 }} INR</span>
+                </div>
+                <div class="flex items-center justify-between pt-2.5 border-t border-white/50 font-bold text-slate-900 text-sm">
+                    <span>Total Payable</span>
+                    <span id="summary-total" class="font-mono text-blue-600 text-base font-extrabold">₹{{ event.registration_fee|floatformat:0 }} INR</span>
+                </div>
+            </div>
+
+            <!-- Submit Button Area -->
+            <div class="pt-2 space-y-2.5">
+                <input type="hidden" name="client_device_label" id="client_device_label_input" value="">
+                <button type="submit" class="public-btn-primary w-full text-sm py-3.5">
+                    <span id="submit-btn-label">{% if event.registration_fee == 0 %}Confirm Free Registration (1 Pass){% else %}Continue to Payment • ₹{{ event.registration_fee|floatformat:0 }}{% endif %}</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Real Device & IP Address Verification Badge -->
+                <div class="flex items-center justify-center gap-1.5 text-[11px] text-slate-600 font-mono text-center select-none pt-0.5">
+                    <i data-lucide="laptop" class="w-3.5 h-3.5 text-slate-500 shrink-0"></i>
+                    <span id="clientDeviceBadge">
+                        Submitting from: <strong id="detectedDeviceText" class="text-slate-900 font-semibold">Detecting...</strong> • IP: <strong id="detectedIpText" class="text-slate-900 font-semibold">{{ client_ip|default:'127.0.0.1' }}</strong>
+                    </span>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+    const unitPrice = parseFloat("{{ event.registration_fee|default:'0' }}") || 0;
+    const genderOptions = ['Male', 'Female', 'Other / Prefer not to say'];
+
+    function setTickets(val) {
+        const input = document.getElementById('ticket-count-input');
+        if (input) {
+            input.value = val;
+            handleTicketCountChange(val);
+        }
+    }
+
+    function adjustTickets(delta) {
+        const input = document.getElementById('ticket-count-input');
+        if (!input) return;
+        let val = parseInt(input.value, 10) || 1;
+        val = Math.max(1, val + delta);
+        input.value = val;
+        handleTicketCountChange(val);
+    }
+
+    function removeAttendeeBox(indexToRemove) {
+        const input = document.getElementById('ticket-count-input');
+        const currentCount = parseInt(input?.value, 10) || 1;
+        if (currentCount <= 1) return;
+
+        // 1. Collect currently entered values from existing boxes, skipping the removed one
+        const existingData = [];
+        for (let i = 2; i <= currentCount; i++) {
+            if (i === indexToRemove) continue;
+            const nameVal = document.querySelector(`input[name="person_${i}_name"]`)?.value || '';
+            const ageVal = document.querySelector(`input[name="person_${i}_age"]`)?.value || '';
+            const genderVal = document.querySelector(`select[name="person_${i}_gender"]`)?.value || '';
+            existingData.push({ name: nameVal, age: ageVal, gender: genderVal });
+        }
+
+        // 2. Decrement count
+        const newCount = currentCount - 1;
+        if (input) input.value = newCount;
+
+        // 3. Update total price and re-render
+        handleTicketCountChange(newCount, existingData);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function handleTicketCountChange(qty, prefilledData = null) {
+        let count = parseInt(qty, 10);
+        if (isNaN(count) || count < 1) count = 1;
+
+        // If no prefilled data passed, collect existing values before re-render
+        if (!prefilledData) {
+            prefilledData = [];
+            for (let i = 2; i <= 30; i++) {
+                const nameEl = document.querySelector(`input[name="person_${i}_name"]`);
+                if (!nameEl) break;
+                prefilledData.push({
+                    name: nameEl.value || '',
+                    age: document.querySelector(`input[name="person_${i}_age"]`)?.value || '',
+                    gender: document.querySelector(`select[name="person_${i}_gender"]`)?.value || ''
+                });
+            }
+        }
+
+        // 1. Update Breakdown & Price Labels
+        const total = count * unitPrice;
+        const formattedTotal = total.toLocaleString('en-IN');
+
+        const summaryCount = document.getElementById('summary-pass-count');
+        if (summaryCount) summaryCount.innerText = count;
+
+        const summarySubtotal = document.getElementById('summary-subtotal');
+        if (summarySubtotal) summarySubtotal.innerText = `₹${formattedTotal} INR`;
+
+        const summaryTotal = document.getElementById('summary-total');
+        if (summaryTotal) summaryTotal.innerText = `₹${formattedTotal} INR`;
+
+        const btnLabel = document.getElementById('submit-btn-label');
+        if (btnLabel) {
+            if (unitPrice === 0) {
+                btnLabel.innerText = `Confirm Free Registration (${count} Pass${count > 1 ? 'es' : ''})`;
+            } else {
+                btnLabel.innerText = `Continue to Payment • ₹${formattedTotal} (${count} Pass${count > 1 ? 'es' : ''})`;
+            }
+        }
+
+        // 2. Render Person 2 to Person N Subforms
+        const container = document.getElementById('additional-attendees-container');
+        if (!container) return;
+
+        if (count <= 1) {
+            container.innerHTML = '';
+            container.classList.add('hidden');
+            return;
+        }
+
+        container.classList.remove('hidden');
+        let html = `
+            <div class="pt-3 border-t border-white/40">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-xs"></div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                        <i data-lucide="users" class="w-4 h-4 text-blue-600"></i>
+                        <span>Co-Attendee Passes (${count - 1} Additional)</span>
+                    </h3>
+                </div>
+            </div>
+        `;
+
+        for (let i = 2; i <= count; i++) {
+            const prefill = prefilledData[i - 2] || { name: '', age: '', gender: '' };
+            html += `
+                <div class="p-4 bg-white/45 backdrop-blur-xl border border-white/75 rounded-2xl space-y-3 relative transition group shadow-sm">
+                    <div class="font-bold text-xs text-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-500/15 text-blue-800 border border-blue-500/25 flex items-center justify-center text-[10px] font-bold">${i}</span>
+                            <span>Attendee #${i}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-600 font-mono bg-white/70 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-white/80 shadow-2xs">Pass ${i} of ${count}</span>
+                            <button type="button" onclick="removeAttendeeBox(${i})" class="text-[11px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200/80 bg-white/80 backdrop-blur-md px-2.5 py-0.5 rounded-lg flex items-center gap-1 font-semibold transition cursor-pointer shadow-2xs" title="Remove Attendee #${i}">
+                                <i data-lucide="trash-2" class="w-3 h-3 text-rose-500"></i>
+                                <span>Remove</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-semibold text-slate-700">Full Name *</label>
+                            <input type="text" name="person_${i}_name" value="${escapeHtml(prefill.name)}" required placeholder="Full Name" class="public-input text-xs py-2">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-semibold text-slate-700">Age *</label>
+                            <input type="number" name="person_${i}_age" value="${escapeHtml(prefill.age)}" min="1" max="120" required placeholder="Age" class="public-input text-xs py-2 font-mono">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-semibold text-slate-700">Gender *</label>
+                            <select name="person_${i}_gender" required class="public-input text-xs py-2 cursor-pointer">
+                                <option value="">Select...</option>
+                                ${genderOptions.map(opt => `<option value="${opt}" ${prefill.gender === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // Real Device & Browser Detection
+    (function detectDeviceAndIp() {
+        const ua = navigator.userAgent;
+        let device = "Desktop PC";
+        if (/iPhone/i.test(ua)) device = "iPhone";
+        else if (/iPad/i.test(ua)) device = "iPad";
+        else if (/Android/i.test(ua)) device = "Android Device";
+        else if (/Macintosh/i.test(ua)) device = "Mac";
+        else if (/Windows NT 10.0/i.test(ua)) device = "Windows 10/11 PC";
+        else if (/Windows/i.test(ua)) device = "Windows PC";
+        else if (/Linux/i.test(ua)) device = "Linux PC";
+
+        let browser = "Browser";
+        if (/Edg/i.test(ua)) browser = "Edge";
+        else if (/Chrome|CriOS/i.test(ua)) browser = "Chrome";
+        else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Safari";
+        else if (/Firefox|FxiOS/i.test(ua)) browser = "Firefox";
+
+        const fullLabel = `${device} (${browser})`;
+        const deviceTextEl = document.getElementById('detectedDeviceText');
+        const hiddenInput = document.getElementById('client_device_label_input');
+        if (deviceTextEl) deviceTextEl.innerText = fullLabel;
+        if (hiddenInput) hiddenInput.value = fullLabel;
+    })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+{% endblock %}

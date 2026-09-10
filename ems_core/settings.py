@@ -79,8 +79,13 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             BASE_DIR / 'templates',
+            BASE_DIR / 'ems_core' / 'templates',
             os.path.join(str(BASE_DIR), 'templates'),
+            os.path.join(str(BASE_DIR), 'ems_core', 'templates'),
             '/var/task/templates',
+            '/var/task/ems_core/templates',
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
