@@ -24,9 +24,12 @@ def seed():
 
     print(">> Seeding Comprehensive EMS Platform Sample Data...")
 
-    # 1. Admin Users
+    # 1. Admin Users with constant deterministic hashes (preserves session hash across serverless lambda containers)
+    ADMIN_HASH = 'pbkdf2_sha256$1200000$TkfTgMExkiowwzK7VuKLfA$MT1/b74TKiNxd+R8ImzC3Mtj1u4Oy+dUwLNYlaxXFOc='
+    NIZHAL_HASH = 'pbkdf2_sha256$1200000$y375MNroI33LpWK39JlIfM$rlyDj8UzJMv4lLkugrKB/n9N4UvAOerk25OjghszwZE='
+
     nizhal_user, _ = User.objects.get_or_create(username='Nizhal')
-    nizhal_user.set_password('Community4all')
+    nizhal_user.password = NIZHAL_HASH
     nizhal_user.is_superuser = True
     nizhal_user.is_staff = True
     nizhal_user.first_name = 'Nizhal'
@@ -35,7 +38,7 @@ def seed():
     nizhal_user.save()
 
     admin_user, _ = User.objects.get_or_create(username='admin')
-    admin_user.set_password('admin123')
+    admin_user.password = ADMIN_HASH
     admin_user.is_superuser = True
     admin_user.is_staff = True
     admin_user.email = 'nizhalcommunity@gmail.com'

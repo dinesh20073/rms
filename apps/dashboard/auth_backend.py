@@ -10,13 +10,15 @@ class ServerlessAuthBackend(ModelBackend):
     def get_user(self, user_id):
         UserModel = get_user_model()
         try:
-            return UserModel._default_manager.get(pk=user_id)
+            user = UserModel._default_manager.get(pk=user_id)
+            return user if self.user_can_authenticate(user) else None
         except Exception:
             try:
                 from django.core.management import call_command
                 call_command('migrate', interactive=False)
                 from seed_data import seed
                 seed()
-                return UserModel._default_manager.get(pk=user_id)
+                user = UserModel._default_manager.get(pk=user_id)
+                return user if self.user_can_authenticate(user) else None
             except Exception:
                 return None

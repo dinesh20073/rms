@@ -182,8 +182,10 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8001',
     'http://localhost:8001',
     'https://*.vercel.app',
+    'https://admin-nizhal-community.vercel.app',
 ]
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Authentication & Stateless Session Security (works across serverless lambda instances)
 LOGIN_URL = 'login'
@@ -191,11 +193,13 @@ LOGIN_REDIRECT_URL = 'dashboard-overview'
 LOGOUT_REDIRECT_URL = 'login'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_COOKIE_NAME = 'ems_sessionid'
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 604800  # 7 days persistent session
+SESSION_COOKIE_AGE = 1209600  # 14 days persistent session
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = False
 
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
