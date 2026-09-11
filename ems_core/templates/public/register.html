@@ -22,41 +22,50 @@
                 <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
                 <span>Official Registration</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 tracking-tight leading-tight">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold font-display text-slate-900 tracking-tight leading-snug break-words">
                 {{ event.title }}
             </h1>
-            <p class="text-sm text-slate-700 mt-2 leading-relaxed">
+            <p class="text-xs sm:text-sm text-slate-700 mt-2 leading-relaxed break-words">
                 {{ event.description|default:"Fill in your details below to register and secure your official digital entrance pass." }}
             </p>
         </div>
 
         <!-- Event Key Details Chips -->
-        <div class="pt-4 border-t border-white/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="pt-4 border-t border-white/40 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 text-xs">
             
-            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                {% if event.venue %}
                 <!-- Location Chip -->
-                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs">
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs max-w-full">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
-                    <span class="font-medium">{{ event.venue|default:"BIEC, Bengaluru & Online" }}</span>
+                    <span class="font-medium break-words">{{ event.venue }}</span>
                 </div>
+                {% endif %}
                 
+                {% if event.event_start_date %}
                 <!-- Date & Time Chip -->
-                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs">
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs max-w-full">
                     <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
-                    <span class="font-medium">{{ event.start_time|date:"d M Y"|default:"28 Aug 2026" }} • {{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</span>
+                    <span class="font-medium whitespace-nowrap">{{ event.event_start_date|date:"d M Y" }} • {{ event.event_start_date|date:"h:i A" }} IST</span>
                 </div>
+                {% elif event.start_time %}
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs max-w-full">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                    <span class="font-medium whitespace-nowrap">{{ event.start_time|date:"d M Y" }} • {{ event.start_time|date:"h:i A" }} IST</span>
+                </div>
+                {% endif %}
 
                 {% if event.registration_closes %}
                 <!-- Deadline Chip -->
-                <div class="chip-badge bg-amber-500/15 text-amber-900 border border-amber-500/30 shadow-2xs font-semibold">
+                <div class="chip-badge bg-amber-500/15 text-amber-900 border border-amber-500/30 shadow-2xs font-semibold max-w-full">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-700 shrink-0"></i>
-                    <span>Closes: {{ event.registration_closes|date:"d M, h:i A" }}</span>
+                    <span class="whitespace-nowrap">Closes: {{ event.registration_closes|date:"d M, h:i A" }}</span>
                 </div>
                 {% endif %}
             </div>
 
             <!-- Fee Badge -->
-            <div class="chip-badge {% if event.registration_fee == 0 %}bg-emerald-500/15 text-emerald-900 border border-emerald-500/30 font-bold{% else %}bg-blue-500/15 text-blue-900 border border-blue-500/30 font-bold{% endif %} backdrop-blur-xl shadow-2xs">
+            <div class="chip-badge {% if event.registration_fee == 0 %}bg-emerald-500/15 text-emerald-900 border border-emerald-500/30 font-bold{% else %}bg-blue-500/15 text-blue-900 border border-blue-500/30 font-bold{% endif %} backdrop-blur-xl shadow-2xs shrink-0">
                 <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
                 {% if event.registration_fee == 0 %}
                 <span>Free Registration</span>

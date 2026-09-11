@@ -289,6 +289,39 @@ def create_event_view(request):
             venue=venue,
             status=status_val
         )
+
+        start_date_raw = request.POST.get('event_start_date', '').strip()
+        reg_opens_raw = request.POST.get('registration_opens', '').strip()
+        reg_closes_raw = request.POST.get('registration_closes', '').strip()
+        max_cap_raw = request.POST.get('max_capacity', '').strip()
+
+        if start_date_raw:
+            try:
+                event.event_start_date = timezone.datetime.fromisoformat(start_date_raw)
+                if timezone.is_naive(event.event_start_date):
+                    event.event_start_date = timezone.make_aware(event.event_start_date)
+            except Exception:
+                pass
+
+        if reg_opens_raw:
+            try:
+                event.registration_opens = timezone.datetime.fromisoformat(reg_opens_raw)
+                if timezone.is_naive(event.registration_opens):
+                    event.registration_opens = timezone.make_aware(event.registration_opens)
+            except Exception:
+                pass
+
+        if reg_closes_raw:
+            try:
+                event.registration_closes = timezone.datetime.fromisoformat(reg_closes_raw)
+                if timezone.is_naive(event.registration_closes):
+                    event.registration_closes = timezone.make_aware(event.registration_closes)
+            except Exception:
+                pass
+
+        if max_cap_raw and str(max_cap_raw).isdigit():
+            event.max_capacity = int(max_cap_raw)
+
         if request.FILES.get('upi_qr_code'):
             import base64
             qr_file = request.FILES['upi_qr_code']
@@ -430,6 +463,7 @@ def edit_event_view(request, event_id):
         venue = request.POST.get('venue', '').strip()
         status_val = request.POST.get('status', 'OPEN')
         max_capacity_raw = request.POST.get('max_capacity', '').strip()
+        start_date_raw = request.POST.get('event_start_date', '').strip()
         reg_opens_raw = request.POST.get('registration_opens', '').strip()
         reg_closes_raw = request.POST.get('registration_closes', '').strip()
 
@@ -450,6 +484,16 @@ def edit_event_view(request, event_id):
 
         if max_capacity_raw and str(max_capacity_raw).isdigit():
             event.max_capacity = int(max_capacity_raw)
+
+        if start_date_raw:
+            try:
+                event.event_start_date = timezone.datetime.fromisoformat(start_date_raw)
+                if timezone.is_naive(event.event_start_date):
+                    event.event_start_date = timezone.make_aware(event.event_start_date)
+            except Exception:
+                pass
+        else:
+            event.event_start_date = None
 
         if reg_opens_raw:
             try:
@@ -626,11 +670,22 @@ def form_builder_view(request, event_id):
             status_val = request.POST.get('status', 'OPEN')
             event.status = 'OPEN' if status_val == 'OPEN' else 'CLOSED'
             
+            start_date_raw = request.POST.get('event_start_date', '').strip()
             reg_opens_raw = request.POST.get('registration_opens', '').strip()
             reg_closes_raw = request.POST.get('registration_closes', '').strip()
             max_capacity_raw = request.POST.get('max_capacity', '').strip()
             form_desc = request.POST.get('form_description', '').strip()
             event_venue = request.POST.get('venue', '').strip()
+
+            if start_date_raw:
+                try:
+                    event.event_start_date = timezone.datetime.fromisoformat(start_date_raw)
+                    if timezone.is_naive(event.event_start_date):
+                        event.event_start_date = timezone.make_aware(event.event_start_date)
+                except Exception:
+                    pass
+            else:
+                event.event_start_date = None
 
             if reg_opens_raw:
                 try:
@@ -639,6 +694,8 @@ def form_builder_view(request, event_id):
                         event.registration_opens = timezone.make_aware(event.registration_opens)
                 except Exception:
                     pass
+            else:
+                event.registration_opens = None
             
             if reg_closes_raw:
                 try:

@@ -71,7 +71,14 @@
                 <span>Schedule & Deadlines</span>
             </h3>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="text-xs font-medium text-[#202124] block mb-1.5">
+                        <i data-lucide="calendar-check" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Event Date & Time (Start)
+                    </label>
+                    <input type="datetime-local" name="event_start_date" value="{{ event.event_start_date|date:'Y-m-d\TH:i' }}" class="google-input">
+                </div>
+
                 <div>
                     <label class="text-xs font-medium text-[#202124] block mb-1.5">
                         <i data-lucide="calendar" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Opens At
@@ -81,7 +88,7 @@
 
                 <div>
                     <label class="text-xs font-medium text-[#202124] block mb-1.5">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#c5221f]"></i> Registration Deadline (Closes At)
+                        <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#c5221f]"></i> Registration Deadline (Closes)
                     </label>
                     <input type="datetime-local" name="registration_closes" value="{{ event.registration_closes|date:'Y-m-d\TH:i' }}" class="google-input">
                 </div>

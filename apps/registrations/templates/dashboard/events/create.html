@@ -39,9 +39,37 @@
                 <textarea name="description" rows="3" placeholder="Detailed event description, agenda, guidelines, and highlights." class="google-input"></textarea>
             </div>
 
-            <div>
-                <label class="text-xs font-medium text-[#202124] block mb-1.5">Venue / Platform</label>
-                <input type="text" name="venue" value="Campus Auditorium & Online Broadcast" class="google-input">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-xs font-medium text-[#202124] block mb-1.5">Venue / Platform</label>
+                    <input type="text" name="venue" value="Campus Auditorium & Online Broadcast" placeholder="e.g. Edward Elliot's Beach / Main Hall" class="google-input">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-[#202124] block mb-1.5">Max Attendee Capacity</label>
+                    <input type="number" name="max_capacity" value="1000" min="1" class="google-input">
+                </div>
+            </div>
+
+            <!-- Schedule & Event Date -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div>
+                    <label class="text-xs font-medium text-[#202124] block mb-1.5">
+                        <i data-lucide="calendar-check" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Event Date & Time (Start)
+                    </label>
+                    <input type="datetime-local" name="event_start_date" class="google-input">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-[#202124] block mb-1.5">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Opens At
+                    </label>
+                    <input type="datetime-local" name="registration_opens" class="google-input">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-[#202124] block mb-1.5">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#c5221f]"></i> Registration Closes (Deadline)
+                    </label>
+                    <input type="datetime-local" name="registration_closes" class="google-input">
+                </div>
             </div>
         </div>
 

@@ -53,11 +53,11 @@
             </div>
             <div class="flex items-center justify-between text-slate-700">
                 <span class="flex items-center gap-2 text-slate-500"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-600"></i> Venue</span>
-                <span class="font-medium text-slate-900">{{ event.venue|default:"BIEC, Bengaluru" }}</span>
+                <span class="font-medium text-slate-900">{{ event.venue|default:"Online / Campus" }}</span>
             </div>
             <div class="flex items-center justify-between text-slate-700">
                 <span class="flex items-center gap-2 text-slate-500"><i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600"></i> Date</span>
-                <span class="font-medium text-slate-900">{{ event.event_start_date|date:"d M Y, h:i A"|default:"28 Aug 2026, 09:30 AM" }}</span>
+                <span class="font-medium text-slate-900">{% if event.event_start_date %}{{ event.event_start_date|date:"d M Y, h:i A" }} IST{% else %}Date TBA{% endif %}</span>
             </div>
             <div class="flex items-center justify-between text-slate-700">
                 <span class="flex items-center gap-2 text-slate-500"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-600"></i> Organizer</span>

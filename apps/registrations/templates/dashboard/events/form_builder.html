@@ -73,21 +73,29 @@
                     </div>
 
                     <!-- Deadline & Schedule Pickers -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="text-xs font-medium text-[#202124] block mb-1">
-                                <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Deadline (Closes At)
+                                <i data-lucide="calendar-check" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Event Date & Time (Start)
                             </label>
-                            <input type="datetime-local" name="registration_closes" value="{{ event.registration_closes|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
-                            <p class="text-[10px] text-[#5f6368] mt-1">Form automatically stops accepting responses after this timestamp.</p>
+                            <input type="datetime-local" name="event_start_date" value="{{ event.event_start_date|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
+                            <p class="text-[10px] text-[#5f6368] mt-1">When the event takes place.</p>
                         </div>
 
                         <div>
                             <label class="text-xs font-medium text-[#202124] block mb-1">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Opens At
+                                <i data-lucide="calendar" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Opens
                             </label>
                             <input type="datetime-local" name="registration_opens" value="{{ event.registration_opens|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
-                            <p class="text-[10px] text-[#5f6368] mt-1">When users are allowed to start submitting entries.</p>
+                            <p class="text-[10px] text-[#5f6368] mt-1">When submissions open.</p>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#c5221f]"></i> Deadline (Closes)
+                            </label>
+                            <input type="datetime-local" name="registration_closes" value="{{ event.registration_closes|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
+                            <p class="text-[10px] text-[#5f6368] mt-1">When submissions close.</p>
                         </div>
                     </div>
 
