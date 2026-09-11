@@ -290,7 +290,15 @@ def create_event_view(request):
             status=status_val
         )
         if request.FILES.get('upi_qr_code'):
-            event.upi_qr_code = request.FILES['upi_qr_code']
+            import base64
+            qr_file = request.FILES['upi_qr_code']
+            content = qr_file.read()
+            qr_file.seek(0)
+            b64 = base64.b64encode(content).decode('utf-8')
+            name = str(getattr(qr_file, 'name', '')).lower()
+            mime = 'image/png' if name.endswith('.png') else ('image/webp' if name.endswith('.webp') else 'image/jpeg')
+            event.upi_qr_base64 = f"data:{mime};base64,{b64}"
+            event.upi_qr_code = qr_file
         event.save()
 
         # Initialize form builder
@@ -408,6 +416,111 @@ def forms_list_view(request):
     })
 
 @login_required(login_url='login')
+def edit_event_view(request, event_id):
+    tenant = get_current_tenant(request)
+    event = get_object_or_404(Event, id=event_id, tenant=tenant)
+    form_obj, _ = Form.objects.get_or_create(event=event)
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        fee_raw = request.POST.get('registration_fee', '0')
+        upi_id = request.POST.get('upi_id', '').strip()
+        upi_name = request.POST.get('upi_name', '').strip()
+        venue = request.POST.get('venue', '').strip()
+        status_val = request.POST.get('status', 'OPEN')
+        max_capacity_raw = request.POST.get('max_capacity', '').strip()
+        reg_opens_raw = request.POST.get('registration_opens', '').strip()
+        reg_closes_raw = request.POST.get('registration_closes', '').strip()
+
+        try:
+            event.registration_fee = Decimal(fee_raw)
+        except Exception:
+            pass
+
+        if title:
+            event.title = title
+        event.description = description
+        if upi_id:
+            event.upi_id = upi_id
+        if upi_name:
+            event.upi_name = upi_name
+        event.venue = venue
+        event.status = 'OPEN' if status_val == 'OPEN' else 'CLOSED'
+
+        if max_capacity_raw and str(max_capacity_raw).isdigit():
+            event.max_capacity = int(max_capacity_raw)
+
+        if reg_opens_raw:
+            try:
+                event.registration_opens = timezone.datetime.fromisoformat(reg_opens_raw)
+                if timezone.is_naive(event.registration_opens):
+                    event.registration_opens = timezone.make_aware(event.registration_opens)
+            except Exception:
+                pass
+        else:
+            event.registration_opens = None
+
+        if reg_closes_raw:
+            try:
+                event.registration_closes = timezone.datetime.fromisoformat(reg_closes_raw)
+                if timezone.is_naive(event.registration_closes):
+                    event.registration_closes = timezone.make_aware(event.registration_closes)
+            except Exception:
+                pass
+        else:
+            event.registration_closes = None
+
+        if request.FILES.get('upi_qr_code'):
+            import base64
+            qr_file = request.FILES['upi_qr_code']
+            content = qr_file.read()
+            qr_file.seek(0)
+            b64 = base64.b64encode(content).decode('utf-8')
+            name = str(getattr(qr_file, 'name', '')).lower()
+            mime = 'image/png' if name.endswith('.png') else ('image/webp' if name.endswith('.webp') else 'image/jpeg')
+            event.upi_qr_base64 = f"data:{mime};base64,{b64}"
+            event.upi_qr_code = qr_file
+
+        event.save()
+
+        form_desc = request.POST.get('form_description', '').strip()
+        if form_desc is not None:
+            form_obj.description = form_desc
+            form_obj.save()
+
+        log_audit_event('EVENT_UPDATED', event.event_code, {'title': event.title}, tenant=tenant, actor=request.user.username if request.user else 'Admin')
+        messages.success(request, f"Event '{event.title}' updated successfully!")
+        return redirect('dashboard-event-detail', event_id=event.id)
+
+    return render(request, 'dashboard/events/edit.html', {
+        'event': event,
+        'form_obj': form_obj,
+        'tenant': tenant
+    })
+
+@login_required(login_url='login')
+def delete_event_view(request, event_id):
+    tenant = get_current_tenant(request)
+    event = get_object_or_404(Event, id=event_id, tenant=tenant)
+
+    if request.method == 'POST':
+        title = event.title
+        event_code = event.event_code
+        log_audit_event(
+            action='EVENT_DELETED',
+            reference_id=event_code,
+            details={'title': title, 'event_id': event_id},
+            tenant=tenant,
+            actor=request.user.username if request.user else 'Admin'
+        )
+        event.delete()
+        messages.success(request, f"Event '{title}' ({event_code}) and its associated forms and records were deleted successfully.")
+        return redirect('dashboard-events-list')
+
+    return redirect('dashboard-event-detail', event_id=event.id)
+
+@login_required(login_url='login')
 def form_builder_view(request, event_id):
     tenant = get_current_tenant(request)
     event = get_object_or_404(Event, id=event_id, tenant=tenant)
@@ -446,16 +559,67 @@ def form_builder_view(request, event_id):
             messages.success(request, f"Added question '{label}' to form.")
             return redirect('dashboard-event-form', event_id=event.id)
 
+        elif action == 'edit_field':
+            field_id = request.POST.get('field_id')
+            field = get_object_or_404(FormField, id=field_id, form=form_obj)
+            label = request.POST.get('label', '').strip()
+            field_type = request.POST.get('field_type', field.field_type)
+            is_required = request.POST.get('is_required') == 'on'
+            placeholder = request.POST.get('placeholder', '')
+            options_raw = request.POST.get('options_csv', '')
+            options = [o.strip() for o in options_raw.split(',') if o.strip()]
+
+            if label:
+                field.label = label
+            field.field_type = field_type
+            field.is_required = is_required
+            field.placeholder = placeholder
+            field.options = options
+            field.save()
+
+            messages.success(request, f"Question '{field.label}' updated successfully.")
+            return redirect('dashboard-event-form', event_id=event.id)
+
         elif action == 'delete_field':
             field_id = request.POST.get('field_id')
             FormField.objects.filter(id=field_id, form=form_obj).delete()
             messages.info(request, "Field removed from form.")
             return redirect('dashboard-event-form', event_id=event.id)
 
+        elif action == 'clear_form':
+            form_obj.fields.all().delete()
+            messages.info(request, "All questions cleared from form.")
+            return redirect('dashboard-event-form', event_id=event.id)
+
         elif action == 'reset_defaults':
             form_obj.fields.all().delete()
             form_obj.create_default_fields()
             messages.success(request, "Reset form to standard default questions.")
+            return redirect('dashboard-event-form', event_id=event.id)
+
+        elif action == 'upload_qr_code':
+            if request.FILES.get('upi_qr_code'):
+                import base64
+                qr_file = request.FILES['upi_qr_code']
+                content = qr_file.read()
+                qr_file.seek(0)
+                b64 = base64.b64encode(content).decode('utf-8')
+                name = str(getattr(qr_file, 'name', '')).lower()
+                mime = 'image/png' if name.endswith('.png') else ('image/webp' if name.endswith('.webp') else 'image/jpeg')
+                event.upi_qr_base64 = f"data:{mime};base64,{b64}"
+                event.upi_qr_code = qr_file
+                event.save()
+                log_audit_event('EVENT_QR_UPDATED', event.event_code, {'mode': 'CUSTOM_UPLOAD'}, tenant=tenant, actor=request.user.username if request.user else 'Admin')
+                messages.success(request, "Custom Payment QR code uploaded and embedded directly into database!")
+            else:
+                messages.warning(request, "Please select an image file to upload as QR code.")
+            return redirect('dashboard-event-form', event_id=event.id)
+
+        elif action == 'regenerate_qr':
+            event.generate_master_event_qr()
+            event.save()
+            log_audit_event('EVENT_QR_REGENERATED', event.event_code, {'mode': 'DYNAMIC_UPI'}, tenant=tenant, actor=request.user.username if request.user else 'Admin')
+            messages.success(request, "Dynamic Master UPI QR regenerated and embedded successfully into database!")
             return redirect('dashboard-event-form', event_id=event.id)
 
         elif action == 'update_form_settings':
@@ -528,7 +692,7 @@ def manual_verification_queue_view(request):
 
     recent_history = list(verifications_qs.exclude(
         decision='MANUAL_REVIEW'
-    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'reviewed_by').defer('evidence__image_base64').order_by('-reviewed_at', '-created_at')[:25])
+    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'reviewed_by', 'evidence').order_by('-reviewed_at', '-created_at')[:25])
 
     return render(request, 'dashboard/verification/queue.html', {
         'queue': queue,
@@ -541,6 +705,41 @@ def manual_verification_queue_view(request):
     })
 
 @login_required(login_url='login')
+def delete_payment_image_view(request, verification_id):
+    if request.method != 'POST':
+        return redirect('dashboard-verification-queue')
+
+    tenant = get_current_tenant(request)
+    verification = get_object_or_404(Verification, id=verification_id, order__registration__event__tenant=tenant)
+    
+    if verification.evidence:
+        evidence = verification.evidence
+        order_code = verification.order.order_code
+        
+        if evidence.screenshot:
+            try:
+                evidence.screenshot.delete(save=False)
+            except Exception:
+                pass
+            evidence.screenshot = None
+            
+        evidence.image_base64 = ''
+        evidence.save()
+        
+        log_audit_event(
+            action='PAYMENT_IMAGE_DELETED',
+            reference_id=order_code,
+            details={'verification_id': verification.id, 'order_code': order_code},
+            tenant=tenant,
+            actor=request.user.username if request.user else 'Admin'
+        )
+        messages.success(request, f"Payment proof image for order {order_code} has been deleted.")
+    else:
+        messages.info(request, "No proof image found to delete.")
+
+    return redirect(request.META.get('HTTP_REFERER', 'dashboard-verification-queue'))
+
+@login_required(login_url='login')
 def verification_action_view(request, verification_id):
     if request.method != 'POST':
         return redirect('dashboard-verification-queue')
@@ -548,7 +747,7 @@ def verification_action_view(request, verification_id):
     tenant = get_current_tenant(request)
     verification = get_object_or_404(Verification, id=verification_id, order__registration__event__tenant=tenant)
     action = request.POST.get('action')
-    notes = request.POST.get('notes', '')
+    notes = request.POST.get('notes', '').strip()
 
     user = request.user if request.user.is_authenticated else None
 
@@ -556,7 +755,7 @@ def verification_action_view(request, verification_id):
         VerificationEngine.manual_approve(verification.order, reviewer_user=user, notes=notes or 'Approved by admin review')
         messages.success(request, f"Order {verification.order.order_code} has been approved and marked as Payment Received!")
     elif action == 'REJECT':
-        VerificationEngine.manual_reject(verification.order, reviewer_user=user, notes=notes or 'Rejected by admin review')
+        VerificationEngine.manual_reject(verification.order, reviewer_user=user, notes=notes or 'Rejected by Admin')
         messages.warning(request, f"Order {verification.order.order_code} has been marked as Not Received.")
     elif action == 'DELETE':
         order_code = verification.order.order_code
@@ -569,6 +768,18 @@ def verification_action_view(request, verification_id):
         )
         verification.delete()
         messages.success(request, f"Verification log for order {order_code} has been deleted.")
+    elif action == 'DELETE_IMAGE':
+        if verification.evidence:
+            if verification.evidence.screenshot:
+                try:
+                    verification.evidence.screenshot.delete(save=False)
+                except Exception:
+                    pass
+                verification.evidence.screenshot = None
+            verification.evidence.image_base64 = ''
+            verification.evidence.save()
+            log_audit_event('PAYMENT_IMAGE_DELETED', verification.order.order_code, {'verification_id': verification.id}, tenant=tenant, actor=user.username if user else 'Admin')
+            messages.success(request, f"Payment proof image for order {verification.order.order_code} has been deleted.")
 
     return redirect('dashboard-verification-queue')
 
@@ -579,7 +790,7 @@ def verification_bulk_action_view(request):
 
     tenant = get_current_tenant(request)
     action = request.POST.get('action')
-    notes = request.POST.get('notes', '')
+    notes = request.POST.get('notes', '').strip()
     ids_raw = request.POST.getlist('selected_ids') or request.POST.get('selected_ids', '').split(',')
     
     verification_ids = []
@@ -594,7 +805,7 @@ def verification_bulk_action_view(request):
     verifications = list(Verification.objects.filter(
         id__in=verification_ids,
         order__registration__event__tenant=tenant
-    ).select_related('order', 'order__registration', 'order__registration__event'))
+    ).select_related('order', 'order__registration', 'order__registration__event', 'evidence'))
 
     user = request.user if request.user.is_authenticated else None
     count = len(verifications)
@@ -609,7 +820,7 @@ def verification_bulk_action_view(request):
         messages.success(request, f"Successfully marked {count} order(s) as Payment Received.")
     elif action == 'REJECT':
         for v in verifications:
-            VerificationEngine.manual_reject(v.order, reviewer_user=user, notes=notes or 'Bulk rejected by admin')
+            VerificationEngine.manual_reject(v.order, reviewer_user=user, notes=notes or 'Rejected by Admin')
         messages.warning(request, f"Successfully marked {count} order(s) as Not Received.")
     elif action == 'DELETE':
         for v in verifications:
@@ -622,6 +833,21 @@ def verification_bulk_action_view(request):
             )
             v.delete()
         messages.success(request, f"Successfully deleted {count} verification log(s).")
+    elif action == 'DELETE_IMAGE':
+        deleted_count = 0
+        for v in verifications:
+            if v.evidence and (v.evidence.image_base64 or v.evidence.screenshot):
+                if v.evidence.screenshot:
+                    try:
+                        v.evidence.screenshot.delete(save=False)
+                    except Exception:
+                        pass
+                    v.evidence.screenshot = None
+                v.evidence.image_base64 = ''
+                v.evidence.save()
+                deleted_count += 1
+                log_audit_event('PAYMENT_IMAGE_DELETED', v.order.order_code, {'verification_id': v.id}, tenant=tenant, actor=user.username if user else 'Admin')
+        messages.success(request, f"Successfully purged payment proof images for {deleted_count} record(s).")
     else:
         messages.error(request, "Invalid action requested.")
 

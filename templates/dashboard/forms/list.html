@@ -69,16 +69,25 @@
 
             <!-- Action buttons -->
             <div class="mt-3 pt-2.5 border-t border-[#dadce0] flex items-center justify-between gap-2">
-                <a href="{% url 'dashboard-event-form' item.event.id %}" class="google-btn-primary text-[11px] py-1 px-3">
-                    <i data-lucide="sliders" class="w-3 h-3"></i>
-                    <span>Form Builder</span>
-                </a>
+                <div class="flex items-center gap-1.5">
+                    <a href="{% url 'dashboard-event-form' item.event.id %}" class="google-btn-primary text-[11px] py-1 px-3">
+                        <i data-lucide="sliders" class="w-3 h-3"></i>
+                        <span>Form Builder</span>
+                    </a>
+                    <a href="{% url 'dashboard-event-edit' item.event.id %}" class="google-btn-outlined text-[11px] py-1 px-2.5" title="Edit Event Details">
+                        <i data-lucide="edit" class="w-3 h-3 text-[#1a73e8]"></i>
+                        <span class="hidden sm:inline">Edit Event</span>
+                    </a>
+                </div>
 
                 <div class="flex items-center gap-1">
                     <a href="{% url 'public-register' item.event.slug %}" target="_blank" title="Open Public Form" class="google-btn-tonal text-[11px] py-1 px-2.5 flex items-center gap-1">
                         <i data-lucide="external-link" class="w-3 h-3 text-[#1a73e8]"></i>
                         <span class="hidden sm:inline">Live Form</span>
                     </a>
+                    <button type="button" onclick="openDeleteFormModal('{{ item.event.id }}', '{{ item.event.title|escapejs }}', '{{ item.event.event_code }}')" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#fce8e6] text-[#5f6368] hover:text-[#d93025] transition cursor-pointer" title="Delete Event">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -95,4 +104,55 @@
     </div>
 
 </div>
+
+<!-- Delete Event Modal -->
+<div id="deleteFormModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-xl shadow-2xl border border-[#dadce0] w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div class="p-5">
+            <div class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#fce8e6] text-[#d93025]">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <h3 class="text-base font-bold text-[#202124] leading-snug">Delete Event & Form?</h3>
+                    <p class="text-xs text-[#5f6368] mt-1.5 leading-relaxed">
+                        Are you sure you want to delete <strong id="deleteFormModalTitle"></strong> (<span id="deleteFormModalCode" class="font-mono"></span>)?
+                    </p>
+                    <div class="mt-3 p-2.5 bg-[#fef7e0] border border-[#feefc3] rounded-lg text-[11px] text-[#b06000]">
+                        ⚠️ This will permanently remove this event, its registration questions, and all attendee registrations.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form id="deleteFormModalForm" method="POST" action="" class="px-5 py-3 bg-[#f8f9fa] border-t border-[#dadce0] flex items-center justify-end gap-2">
+            {% csrf_token %}
+            <button type="button" onclick="closeDeleteFormModal()" class="google-btn-outlined text-xs py-1.5 px-3.5 cursor-pointer">
+                Cancel
+            </button>
+            <button type="submit" class="google-btn-danger text-xs py-1.5 px-4 font-semibold cursor-pointer">
+                Yes, Delete Event & Form
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openDeleteFormModal(eventId, eventTitle, eventCode) {
+    document.getElementById('deleteFormModalTitle').innerText = eventTitle;
+    document.getElementById('deleteFormModalCode').innerText = eventCode;
+    document.getElementById('deleteFormModalForm').action = `/dashboard/events/${eventId}/delete/`;
+    document.getElementById('deleteFormModal').classList.remove('hidden');
+}
+
+function closeDeleteFormModal() {
+    document.getElementById('deleteFormModal').classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
 {% endblock %}

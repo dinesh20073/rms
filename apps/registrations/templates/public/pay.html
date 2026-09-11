@@ -179,12 +179,12 @@
             <!-- QR Code Card -->
             <div class="flex flex-col items-center justify-center space-y-3 pt-1">
                 <div class="p-3 bg-white border border-[#dadce0] rounded-xl shadow-xs">
-                    {% if event.upi_qr_code %}
-                    <img src="{{ event.upi_qr_code.url }}" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
-                    {% elif order.qr_code_image %}
-                    <img src="{{ order.qr_code_image.url }}" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
+                    {% if event.qr_display_url %}
+                    <img src="{{ event.qr_display_url }}" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
+                    {% elif order.qr_display_url %}
+                    <img src="{{ order.qr_display_url }}" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
                     {% else %}
-                    <div class="w-48 h-48 flex items-center justify-center text-xs text-slate-400">Loading QR...</div>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa={{ event.upi_id }}&pn={{ event.upi_name }}&am={{ order.amount|floatformat:2 }}&cu=INR" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
                     {% endif %}
                 </div>
 

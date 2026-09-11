@@ -281,17 +281,18 @@ def send_payment_under_review_email(registration):
         error_message=error_msg
     )
 
-def send_payment_rejected_email(registration, reason=''):
+def send_payment_rejected_email(registration, reason='Rejected by Admin'):
     """
     Sends payment verification failed email when a coordinator marks a transaction as rejected / not received.
     Provides direct action links to re-upload payment proof or register afresh.
     """
+    reason = str(reason).strip() if reason and str(reason).strip() else 'Rejected by Admin'
     customer = registration.customer
     event = registration.event
     order = getattr(registration, 'order', None)
     order_code = order.order_code if order else registration.registration_code
 
-    subject = f"Payment Verification Failed: {event.title} ({order_code})"
+    subject = f"Payment Status (Not Received): {event.title} ({order_code})"
 
     responses = registration.form_responses or {}
     def to_proper_case(val):

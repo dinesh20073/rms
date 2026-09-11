@@ -1,4 +1,5 @@
 import io
+import base64
 import urllib.parse
 from decimal import Decimal
 import qrcode
@@ -24,6 +25,7 @@ class Order(models.Model):
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='PENDING', db_index=True)
     upi_intent_url = models.TextField(blank=True)
     qr_code_image = models.ImageField(upload_to='qrcodes/%Y/%m/', blank=True, null=True)
+    qr_code_base64 = models.TextField(blank=True, default='', help_text="Permanent Base64 QR Image stored in DB")
     expires_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -33,6 +35,20 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.order_code} - ₹{self.amount} ({self.status})"
+
+    @property
+    def qr_display_url(self):
+        """Returns the embedded Base64 data URI or file URL or dynamic QR API fallback."""
+        if self.qr_code_base64:
+            return self.qr_code_base64
+        if self.qr_code_image:
+            try:
+                return self.qr_code_image.url
+            except Exception:
+                pass
+        if self.upi_intent_url:
+            return f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={urllib.parse.quote(self.upi_intent_url)}"
+        return ''
 
     def save(self, *args, **kwargs):
         if not self.order_code:
@@ -62,7 +78,7 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
         # Generate QR code if not present
-        if not self.qr_code_image and self.upi_intent_url:
+        if (not self.qr_code_base64 and not self.qr_code_image) and self.upi_intent_url:
             self.generate_qr_code()
 
     def generate_qr_code(self):
@@ -79,9 +95,13 @@ class Order(models.Model):
             
             buffer = io.BytesIO()
             img.save(buffer, format='PNG')
+            raw_bytes = buffer.getvalue()
+            b64_str = base64.b64encode(raw_bytes).decode('utf-8')
+            self.qr_code_base64 = f"data:image/png;base64,{b64_str}"
+
             filename = f"qr_{self.order_code}.png"
-            self.qr_code_image.save(filename, ContentFile(buffer.getvalue()), save=False)
-            Order.objects.filter(pk=self.pk).update(qr_code_image=self.qr_code_image)
+            self.qr_code_image.save(filename, ContentFile(raw_bytes), save=False)
+            Order.objects.filter(pk=self.pk).update(qr_code_image=self.qr_code_image, qr_code_base64=self.qr_code_base64)
         except Exception:
             pass
 

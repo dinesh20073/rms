@@ -330,6 +330,7 @@
                         <th class="py-2 px-2.5 sm:px-4">Customer</th>
                         <th class="py-2 px-2.5 sm:px-4">Status</th>
                         <th class="py-2 px-2.5 sm:px-4">Amount</th>
+                        <th class="py-2 px-2.5 sm:px-4">Proof</th>
                         <th class="py-2 px-2.5 sm:px-4 text-right">Time</th>
                     </tr>
                 </thead>
@@ -377,6 +378,45 @@
                             ₹{{ h.order.amount|floatformat:0 }}
                         </td>
 
+                        <td class="py-2 px-2.5 sm:px-4 whitespace-nowrap">
+                            <div class="flex items-center gap-1.5">
+                                {% if h.evidence.display_url %}
+                                <a href="{{ h.evidence.display_url }}" target="_blank" class="p-1 rounded hover:bg-[#e8f0fe] text-[#1a73e8] transition" title="View Receipt Proof">
+                                    <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                </a>
+                                {% if h.decision == 'MANUAL_APPROVED' or h.decision == 'AUTO_VERIFIED' %}
+                                <button type="button" onclick="openSingleActionModal('{{ h.id }}', '{{ h.order.order_code }}', 'DELETE_IMAGE')" class="p-1 rounded hover:bg-[#fee2e2] text-[#d93025] transition cursor-pointer" title="Delete / Purge Proof Image">
+                                    <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                                </button>
+                                {% endif %}
+                                {% elif h.evidence.screenshot %}
+                                <a href="{{ h.evidence.screenshot.url }}" target="_blank" class="p-1 rounded hover:bg-[#e8f0fe] text-[#1a73e8] transition" title="View Receipt Proof">
+                                    <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                </a>
+                                {% if h.decision == 'MANUAL_APPROVED' or h.decision == 'AUTO_VERIFIED' %}
+                                <button type="button" onclick="openSingleActionModal('{{ h.id }}', '{{ h.order.order_code }}', 'DELETE_IMAGE')" class="p-1 rounded hover:bg-[#fee2e2] text-[#d93025] transition cursor-pointer" title="Delete / Purge Proof Image">
+                                    <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                                </button>
+                                {% endif %}
+                                {% elif h.order.proof_image %}
+                                <a href="{{ h.order.proof_image.url }}" target="_blank" class="p-1 rounded hover:bg-[#e8f0fe] text-[#1a73e8] transition" title="View Receipt Proof">
+                                    <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                </a>
+                                {% if h.decision == 'MANUAL_APPROVED' or h.decision == 'AUTO_VERIFIED' %}
+                                <button type="button" onclick="openSingleActionModal('{{ h.id }}', '{{ h.order.order_code }}', 'DELETE_IMAGE')" class="p-1 rounded hover:bg-[#fee2e2] text-[#d93025] transition cursor-pointer" title="Delete / Purge Proof Image">
+                                    <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                                </button>
+                                {% endif %}
+                                {% else %}
+                                {% if h.decision == 'MANUAL_APPROVED' or h.decision == 'AUTO_VERIFIED' %}
+                                <span class="text-[10px] text-[#5f6368] font-mono bg-[#f1f3f4] px-1.5 py-0.5 rounded select-none" title="Proof image has been deleted / purged">Purged</span>
+                                {% else %}
+                                <span class="text-[10px] text-[#9aa0a6] italic select-none">None</span>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+
                         <td class="py-2 px-2.5 sm:px-4 text-right font-mono text-[#5f6368] text-[10px] sm:text-[11px] whitespace-nowrap">
                             {{ h.reviewed_at|default:h.created_at|date:"d M, H:i" }}
                         </td>
@@ -406,6 +446,10 @@
             <button type="button" onclick="openBulkActionModal('REJECT')" class="bg-[#e37400] hover:bg-[#b06000] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition cursor-pointer shadow-xs">
                 <i data-lucide="x" class="w-3.5 h-3.5"></i>
                 <span>Mark Not Received</span>
+            </button>
+            <button type="button" onclick="openBulkActionModal('DELETE_IMAGE')" class="bg-[#5f6368] hover:bg-[#3c4043] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition cursor-pointer shadow-xs" title="Delete payment proof images for approved orders">
+                <i data-lucide="image-minus" class="w-3.5 h-3.5"></i>
+                <span>Purge Images</span>
             </button>
             <button type="button" onclick="openBulkActionModal('DELETE')" class="bg-[#d93025] hover:bg-[#b31412] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition cursor-pointer shadow-xs">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -622,6 +666,14 @@
             submitBtn.className += "bg-[#e37400] hover:bg-[#b06000] text-white";
             submitText.innerText = "Confirm Not Received";
             if (noteGroup) noteGroup.style.display = '';
+        } else if (action === 'DELETE_IMAGE') {
+            titleEl.innerText = isBulk ? `Purge Payment Images for ${codes.length} Orders` : `Purge Payment Image for ${codes[0]}`;
+            descEl.innerText = "This will permanently delete the uploaded receipt screenshots/images to reclaim storage, while preserving all transaction records, UTR, and audit verification history.";
+            iconBg.className = "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#f1f3f4] text-[#5f6368]";
+            iconEl.setAttribute('data-lucide', 'image-minus');
+            submitBtn.className += "bg-[#5f6368] hover:bg-[#3c4043] text-white";
+            submitText.innerText = "Purge Image Proof";
+            if (noteGroup) noteGroup.style.display = 'none';
         } else if (action === 'DELETE') {
             titleEl.innerText = isBulk ? `Delete ${codes.length} Verification Logs` : `Delete Log for ${codes[0]}`;
             descEl.innerText = "Are you sure you want to permanently delete these verification records from the history log?";

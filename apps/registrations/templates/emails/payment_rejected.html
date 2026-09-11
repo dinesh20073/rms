@@ -8,13 +8,13 @@
     <!-- Status Header (Red Failed / Not Received Theme - Centered) -->
     <div style="margin-bottom: 24px; text-align: center;">
         <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b91c1c; background-color: #fee2e2; border: 1px solid #fca5a5; padding: 6px 16px; border-radius: 16px; display: inline-block; margin-bottom: 12px;">
-            ❌ Payment Verification Failed • Not Received
+            ❌ Payment Status: Not Received
         </span>
         <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3;">
             {{ event.title }}
         </h1>
         <p style="margin: 0 auto; font-size: 14px; color: #475569; line-height: 1.6; max-width: 520px;">
-            Hi <strong>{{ customer.name|title }}</strong>, your last payment verification for order <strong>{{ order.order_code }}</strong> was not successful as the transaction was not received or could not be verified on our bank feed. Please click below to update your payment proof or submit a new registration.
+            Hi <strong>{{ customer.name|title }}</strong>, your payment for order <strong>{{ order.order_code }}</strong> was marked as <strong>Not Received</strong>. Remarks: <strong>{{ reason|default:"Rejected by Admin" }}</strong>. Please click below to update your payment proof or submit a new registration.
         </p>
     </div>
 
@@ -57,14 +57,12 @@
                     {% endif %}
                     <tr>
                         <td style="padding: 6px 0; color: #64748b;">Payment Status:</td>
-                        <td style="padding: 6px 0; font-weight: 700; color: #dc2626; text-align: right;">Not Received / Declined</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #dc2626; text-align: right;">Not Received</td>
                     </tr>
-                    {% if reason %}
                     <tr>
-                        <td style="padding: 6px 0; color: #64748b;">Reason / Remark:</td>
-                        <td style="padding: 6px 0; font-weight: 600; color: #b91c1c; text-align: right;">{{ reason }}</td>
+                        <td style="padding: 6px 0; color: #64748b;">Remarks:</td>
+                        <td style="padding: 6px 0; font-weight: 600; color: #b91c1c; text-align: right;">{{ reason|default:"Rejected by Admin" }}</td>
                     </tr>
-                    {% endif %}
                     <tr style="border-top: 1px dashed #cbd5e1;">
                         <td style="padding: 12px 0 4px 0; font-weight: 700; color: #0f172a; font-size: 14px;">Amount Due:</td>
                         <td style="padding: 12px 0 4px 0; font-weight: 900; color: #dc2626; font-size: 18px; font-family: monospace; text-align: right;">₹{{ registration.amount|floatformat:2 }} INR</td>

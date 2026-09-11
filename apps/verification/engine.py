@@ -161,15 +161,16 @@ class VerificationEngine:
         return verification
 
     @classmethod
-    def manual_reject(cls, order, reviewer_user, notes='Rejected during verification'):
+    def manual_reject(cls, order, reviewer_user, notes='Rejected by Admin'):
         tenant = order.registration.event.tenant
         registration = order.registration
+        final_notes = str(notes).strip() if notes and str(notes).strip() else 'Rejected by Admin'
 
         verification, _ = Verification.objects.get_or_create(order=order)
         verification.decision = 'REJECTED'
         verification.reviewed_by = reviewer_user
         verification.reviewed_at = timezone.now()
-        verification.review_notes = notes
+        verification.review_notes = final_notes
         verification.save()
 
         order.status = 'FAILED'
@@ -177,10 +178,10 @@ class VerificationEngine:
         registration.status = 'FAILED'
         registration.save()
 
-        log_audit_event('PAYMENT_REJECTED', order.order_code, {'reason': notes}, tenant=tenant, actor=reviewer_user.username if reviewer_user else 'Admin')
+        log_audit_event('PAYMENT_REJECTED', order.order_code, {'reason': final_notes}, tenant=tenant, actor=reviewer_user.username if reviewer_user else 'Admin')
 
         # Trigger failed payment notification email
         from apps.notifications.services import send_payment_rejected_email
-        send_payment_rejected_email(registration, reason=notes)
+        send_payment_rejected_email(registration, reason=final_notes)
 
         return verification

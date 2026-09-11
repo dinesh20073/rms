@@ -1,4 +1,5 @@
 import io
+import base64
 import urllib.parse
 import qrcode
 from django.db import models
@@ -27,6 +28,7 @@ class Event(models.Model):
     upi_id = models.CharField(max_length=100, default='dinesh.b@superyes')
     upi_name = models.CharField(max_length=100, default='Dinesh')
     upi_qr_code = models.ImageField(upload_to='event_qrs/', blank=True, null=True)
+    upi_qr_base64 = models.TextField(blank=True, default='', help_text="Permanent Base64 QR Image stored in DB")
     
     # Schedule & Capacity
     registration_opens = models.DateTimeField(default=timezone.now)
@@ -44,6 +46,29 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.event_code})"
+
+    @property
+    def qr_display_url(self):
+        """Returns the embedded Base64 data URI or file URL or dynamic QR API fallback."""
+        if self.upi_qr_base64:
+            return self.upi_qr_base64
+        if self.upi_qr_code:
+            try:
+                return self.upi_qr_code.url
+            except Exception:
+                pass
+        if self.upi_id:
+            params = {
+                'pa': self.upi_id,
+                'pn': self.upi_name,
+                'cu': 'INR',
+            }
+            if self.registration_fee > 0:
+                params['am'] = f"{self.registration_fee:.2f}"
+                params['tn'] = f"{self.title} Entry Fee"[:60]
+            upi_url = f"upi://pay?{urllib.parse.urlencode(params, quote_via=urllib.parse.quote, safe='@')}"
+            return f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={urllib.parse.quote(upi_url)}"
+        return ''
 
     def generate_master_event_qr(self):
         """Generates the master UPI QR code for this event based on UPI ID and fixed fee."""
@@ -70,8 +95,12 @@ class Event(models.Model):
         
         buffer = io.BytesIO()
         img.save(buffer, format='PNG')
+        raw_bytes = buffer.getvalue()
+        b64_str = base64.b64encode(raw_bytes).decode('utf-8')
+        self.upi_qr_base64 = f"data:image/png;base64,{b64_str}"
+
         filename = f"event_qr_{self.event_code}.png"
-        self.upi_qr_code.save(filename, ContentFile(buffer.getvalue()), save=False)
+        self.upi_qr_code.save(filename, ContentFile(raw_bytes), save=False)
 
     def save(self, *args, **kwargs):
         self.currency = 'INR'  # Always INR
@@ -90,8 +119,21 @@ class Event(models.Model):
             count = Event.objects.filter(event_code__startswith=f"EVT-{year}-").count() + 1
             self.event_code = f"EVT-{year}-{count:04d}"
 
-        # If no QR code uploaded, generate master event QR
-        if not self.upi_qr_code and self.upi_id:
+        # If image file uploaded without base64, auto-encode to base64
+        if self.upi_qr_code and not self.upi_qr_base64:
+            try:
+                self.upi_qr_code.seek(0)
+                content = self.upi_qr_code.read()
+                if content:
+                    b64 = base64.b64encode(content).decode('utf-8')
+                    name = str(getattr(self.upi_qr_code, 'name', '')).lower()
+                    mime = 'image/png' if name.endswith('.png') else ('image/webp' if name.endswith('.webp') else 'image/jpeg')
+                    self.upi_qr_base64 = f"data:{mime};base64,{b64}"
+            except Exception:
+                pass
+
+        # If no QR code uploaded or present, generate master event QR
+        if not self.upi_qr_base64 and not self.upi_qr_code and self.upi_id:
             self.generate_master_event_qr()
 
         super().save(*args, **kwargs)
