@@ -58,8 +58,15 @@
                     <input type="text" name="venue" value="{{ event.venue }}" placeholder="e.g. Bengaluru & Online Broadcast" class="google-input">
                 </div>
                 <div>
-                    <label class="text-xs font-medium text-[#202124] block mb-1.5">Max Attendee Capacity</label>
-                    <input type="number" name="max_capacity" value="{{ event.max_capacity }}" min="1" class="google-input">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-xs font-medium text-[#202124] block">Max Attendee Capacity</label>
+                        <label class="text-[11px] text-[#1a73e8] font-medium flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" id="unlimited_cap_edit" name="unlimited_capacity" value="1" {% if not event.max_capacity %}checked{% endif %} class="rounded text-[#1a73e8] focus:ring-0 cursor-pointer" onchange="const inp = document.getElementById('max_cap_input_edit'); if(this.checked){ inp.dataset.prevVal = inp.value; inp.value=''; inp.disabled=true; inp.placeholder='Unlimited (No limit)'; } else { inp.disabled=false; inp.value = inp.dataset.prevVal || '1000'; inp.placeholder='e.g. 1000'; }">
+                            <span>No Limit (Unlimited)</span>
+                        </label>
+                    </div>
+                    <input type="number" id="max_cap_input_edit" name="max_capacity" value="{% if event.max_capacity %}{{ event.max_capacity }}{% endif %}" min="1" placeholder="{% if not event.max_capacity %}Unlimited (No limit){% else %}e.g. 1000{% endif %}" {% if not event.max_capacity %}disabled{% endif %} class="google-input">
+                    <p class="text-[10px] text-[#5f6368] mt-1">Leave blank, set 0, or check "No Limit" for unlimited tickets.</p>
                 </div>
             </div>
         </div>

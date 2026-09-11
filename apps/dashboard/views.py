@@ -319,7 +319,10 @@ def create_event_view(request):
             except Exception:
                 pass
 
-        if max_cap_raw and str(max_cap_raw).isdigit():
+        unlimited_cap = request.POST.get('unlimited_capacity') in ('1', 'true', 'on', True)
+        if unlimited_cap or max_cap_raw == '0' or not max_cap_raw:
+            event.max_capacity = None
+        elif max_cap_raw and str(max_cap_raw).isdigit():
             event.max_capacity = int(max_cap_raw)
 
         if request.FILES.get('upi_qr_code'):
@@ -482,7 +485,10 @@ def edit_event_view(request, event_id):
         event.venue = venue
         event.status = 'OPEN' if status_val == 'OPEN' else 'CLOSED'
 
-        if max_capacity_raw and str(max_capacity_raw).isdigit():
+        unlimited_cap = request.POST.get('unlimited_capacity') in ('1', 'true', 'on', True)
+        if unlimited_cap or max_capacity_raw == '0' or not max_capacity_raw:
+            event.max_capacity = None
+        elif max_capacity_raw and str(max_capacity_raw).isdigit():
             event.max_capacity = int(max_capacity_raw)
 
         if start_date_raw:
@@ -707,7 +713,10 @@ def form_builder_view(request, event_id):
             else:
                 event.registration_closes = None
 
-            if max_capacity_raw and str(max_capacity_raw).isdigit():
+            unlimited_cap = request.POST.get('unlimited_capacity') in ('1', 'true', 'on', True)
+            if unlimited_cap or max_capacity_raw == '0' or not max_capacity_raw:
+                event.max_capacity = None
+            elif max_capacity_raw and str(max_capacity_raw).isdigit():
                 event.max_capacity = int(max_capacity_raw)
 
             if event_venue:

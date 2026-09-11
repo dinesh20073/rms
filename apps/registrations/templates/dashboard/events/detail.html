@@ -65,7 +65,7 @@
         </div>
         <div class="google-card p-4 border-[#ceead6] bg-gradient-to-b from-[#f6fbf7] to-white">
             <span class="text-[11px] text-[#137333] font-semibold uppercase tracking-wider block">Ticket Count</span>
-            <span class="text-2xl font-bold font-display text-[#137333] mt-1 block">{{ total_tickets }} <span class="text-xs text-[#5f6368] font-normal">/ {{ event.max_capacity }} max</span></span>
+            <span class="text-2xl font-bold font-display text-[#137333] mt-1 block">{{ total_tickets }} <span class="text-xs text-[#5f6368] font-normal">/ {% if event.max_capacity and event.max_capacity > 0 %}{{ event.max_capacity }} max{% else %}Unlimited{% endif %}</span></span>
         </div>
         <div class="google-card p-4 border-[#d2e3fc] bg-gradient-to-b from-[#f8fafd] to-white">
             <span class="text-[11px] text-[#1a73e8] font-semibold uppercase tracking-wider block">Issued Passes</span>

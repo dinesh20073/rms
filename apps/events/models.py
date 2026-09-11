@@ -35,7 +35,7 @@ class Event(models.Model):
     registration_closes = models.DateTimeField(null=True, blank=True)
     event_start_date = models.DateTimeField(null=True, blank=True)
     venue = models.CharField(max_length=255, default='Online / Main Campus', blank=True)
-    max_capacity = models.PositiveIntegerField(default=1000)
+    max_capacity = models.PositiveIntegerField(default=1000, null=True, blank=True, help_text="Set to blank or None for unlimited attendee capacity")
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OPEN')
     created_at = models.DateTimeField(auto_now_add=True)

@@ -102,8 +102,14 @@
                     <!-- Capacity & Venue -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="text-xs font-medium text-[#202124] block mb-1">Max Attendee Capacity</label>
-                            <input type="number" name="max_capacity" value="{{ event.max_capacity }}" min="1" class="google-input text-xs">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-medium text-[#202124] block">Max Attendee Capacity</label>
+                                <label class="text-[11px] text-[#1a73e8] font-medium flex items-center gap-1 cursor-pointer">
+                                    <input type="checkbox" id="unlimited_cap_fb" name="unlimited_capacity" value="1" {% if not event.max_capacity %}checked{% endif %} class="rounded text-[#1a73e8] focus:ring-0 cursor-pointer" onchange="const inp = document.getElementById('max_cap_input_fb'); if(this.checked){ inp.dataset.prevVal = inp.value; inp.value=''; inp.disabled=true; inp.placeholder='Unlimited (No limit)'; } else { inp.disabled=false; inp.value = inp.dataset.prevVal || '1000'; inp.placeholder='e.g. 1000'; }">
+                                    <span>No Limit</span>
+                                </label>
+                            </div>
+                            <input type="number" id="max_cap_input_fb" name="max_capacity" value="{% if event.max_capacity %}{{ event.max_capacity }}{% endif %}" min="1" placeholder="{% if not event.max_capacity %}Unlimited (No limit){% else %}e.g. 1000{% endif %}" {% if not event.max_capacity %}disabled{% endif %} class="google-input text-xs">
                         </div>
                         <div>
                             <label class="text-xs font-medium text-[#202124] block mb-1">Event Venue / Location</label>
