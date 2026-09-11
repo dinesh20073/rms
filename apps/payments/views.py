@@ -21,7 +21,14 @@ def payment_checkout_view(request, order_code):
     verification = getattr(order, 'verification', None)
     attendee = getattr(registration, 'attendee_pass', None)
     
-    if not attendee and (registration.status == 'COMPLETED' or order.status == 'SUCCESS'):
+    is_completed = (
+        registration.status == 'COMPLETED' or 
+        order.status in ['VERIFIED', 'SUCCESS'] or 
+        (verification and verification.decision in ['APPROVED', 'VERIFIED']) or 
+        attendee is not None
+    )
+
+    if not attendee and is_completed:
         attendee, _ = Attendee.objects.get_or_create(registration=registration)
 
     qr_base64 = None
@@ -31,11 +38,17 @@ def payment_checkout_view(request, order_code):
         except Exception:
             qr_base64 = None
 
-    is_reupload = request.GET.get('reupload') == '1'
-    is_failed = (
-        order.status in ['FAILED', 'REJECTED'] or 
-        (verification and verification.decision in ['REJECTED', 'MANUAL_REJECTED'])
-    )
+    if is_completed:
+        is_failed = False
+        is_reupload = False
+        show_upload_form = False
+    else:
+        is_reupload = request.GET.get('reupload') == '1'
+        is_failed = (
+            order.status in ['FAILED', 'REJECTED'] or 
+            (verification and verification.decision in ['REJECTED', 'MANUAL_REJECTED'])
+        )
+        show_upload_form = is_failed or is_reupload or (order.status == 'PENDING')
 
     context = {
         'order': order,
@@ -45,9 +58,10 @@ def payment_checkout_view(request, order_code):
         'verification': verification,
         'attendee': attendee,
         'qr_base64': qr_base64,
+        'is_completed': is_completed,
         'is_failed': is_failed,
         'is_reupload': is_reupload,
-        'show_upload_form': is_failed or is_reupload or (order.status == 'PENDING'),
+        'show_upload_form': show_upload_form,
     }
     return render(request, 'public/pay.html', context)
 
