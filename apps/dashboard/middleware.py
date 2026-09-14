@@ -17,6 +17,7 @@ class BankSessionSecurityMiddleware(MiddlewareMixin):
         '/api/',
         '/static/',
         '/media/',
+        '/register/',
         '/pay/',
         '/pass/',
         '/status/',
