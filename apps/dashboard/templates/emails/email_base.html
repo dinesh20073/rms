@@ -187,7 +187,13 @@
                                             </span>
                                         </td>
                                         <td align="right" bgcolor="#ffffff" class="font-mono" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important; padding-top: 8px; white-space: nowrap;">
-                                            Booking ID: <strong style="color: #0f172a !important;">{{ order.order_code|default:registration.registration_code }}</strong>
+                                            {% if order.order_code %}
+                                                Order ID: <strong style="color: #0f172a !important;">{{ order.order_code }}</strong>
+                                            {% elif attendee.pass_code %}
+                                                {% if "ORD-" in attendee.pass_code %}Order ID: <strong style="color: #0f172a !important;">{{ attendee.pass_code }}</strong>{% else %}Pass ID: <strong style="color: #0f172a !important;">{{ attendee.pass_code }}</strong>{% endif %}
+                                            {% elif registration.registration_code %}
+                                                Registration ID: <strong style="color: #0f172a !important;">{{ registration.registration_code }}</strong>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 </table>

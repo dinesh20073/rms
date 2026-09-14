@@ -1,7 +1,9 @@
+import re
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.text import slugify
+from django.db import models
 from apps.events.models import Event
 from apps.forms_builder.models import Form, FormField
 from apps.registrations.models import Customer, Registration, Attendee
@@ -39,11 +41,17 @@ def public_registration_view(request, slug):
     if not client_ip:
         client_ip = '127.0.0.1'
 
+    # Retrieve any preserved form data and field errors (if previously submitted with errors)
+    preserved_data = request.session.pop('reg_preserved_data', None) or {}
+    field_errors = request.session.pop('reg_field_errors', None) or {}
+
     context = {
         'event': event,
         'form_obj': form_obj,
         'fields': fields,
         'client_ip': client_ip,
+        'preserved_data': preserved_data,
+        'field_errors': field_errors,
     }
     return render(request, 'public/register.html', context)
 
@@ -64,7 +72,9 @@ def submit_registration_view(request, slug):
     # Extract customer core fields with multi-key alias support
     name = (request.POST.get('full_name') or request.POST.get('name') or '').strip()
     email = (request.POST.get('email_address') or request.POST.get('email') or '').strip().lower()
-    phone = (request.POST.get('phone_number') or request.POST.get('phone') or request.POST.get('mobile') or '').strip()
+    raw_phone = (request.POST.get('phone_number') or request.POST.get('phone') or request.POST.get('mobile') or '').strip()
+    age_str = (request.POST.get('age') or '').strip()
+    gender = (request.POST.get('gender') or '').strip()
     company = (request.POST.get('company_organization') or request.POST.get('company') or '').strip()
     designation = (request.POST.get('designation_role') or request.POST.get('designation') or '').strip()
 
@@ -95,33 +105,82 @@ def submit_registration_view(request, slug):
             name = str(val).strip() if val else ''
         if not email and ('email' in f_label_lower and '@' in str(val or '')):
             email = str(val).strip().lower() if val else ''
-        if not phone and any(p in f_label_lower for p in ['phone', 'mobile', 'contact', 'whatsapp']):
-            phone = str(val).strip() if val else ''
+        if not raw_phone and any(p in f_label_lower for p in ['phone', 'mobile', 'contact', 'whatsapp']):
+            raw_phone = str(val).strip() if val else ''
+        if not age_str and 'age' in f_label_lower:
+            age_str = str(val).strip() if val else ''
+        if not gender and 'gender' in f_label_lower:
+            gender = str(val).strip() if val else ''
 
-        if f.is_required and not val:
-            messages.error(request, f"Please fill in the required field: {f.label}")
-            return redirect('public-register', slug=slug)
+    field_errors = {}
 
-    if not name or not email:
-        messages.error(request, "Name and Email are required to register.")
+    # 1. Validate Full Name
+    if not name:
+        field_errors['full_name'] = "Full Name is required."
+
+    # 2. Validate Email Address (@gmail.com only)
+    if not email:
+        field_errors['email_address'] = "Email Address is required."
+    elif not re.match(r'^[a-zA-Z0-9._%+-]+@gmail\.com$', email, re.IGNORECASE):
+        field_errors['email_address'] = "Only @gmail.com email addresses are allowed (e.g. yourname@gmail.com)."
+
+    # 3. Validate Phone Number (Strictly 10 digits)
+    phone_digits = re.sub(r'\D', '', raw_phone)
+    if len(phone_digits) == 12 and phone_digits.startswith('91'):
+        phone_digits = phone_digits[2:]
+
+    if not phone_digits:
+        field_errors['phone_number'] = "Phone number is required."
+    elif len(phone_digits) < 10:
+        field_errors['phone_number'] = "Phone number must be 10 digits."
+    elif len(phone_digits) > 10:
+        field_errors['phone_number'] = "Phone number cannot exceed 10 digits."
+    else:
+        phone = phone_digits
+
+    # 4. Validate Age (Numeric between 1 and 120)
+    if age_str:
+        try:
+            age_val = int(age_str)
+            if age_val < 1 or age_val > 120:
+                field_errors['age'] = "Please enter a valid age between 1 and 120."
+        except (ValueError, TypeError):
+            field_errors['age'] = "Age must be a valid number."
+
+    # 5. Validate Gender
+    for f in fields:
+        if 'gender' in f.label.lower() and f.is_required:
+            if not gender or gender.lower() in ('select...', 'select an option...', 'select your gender...'):
+                field_errors['gender'] = "Please select your gender."
+
+    # 6. Validate other required fields
+    for f in fields:
+        f_key = f.field_key or slugify(f.label).replace('-', '_')
+        if f_key not in ['full_name', 'email_address', 'phone_number', 'age', 'gender', 'ticket_count']:
+            v = form_responses.get(f.label) or request.POST.get(f_key)
+            if f.is_required and (v is None or str(v).strip() == ''):
+                field_errors[f_key] = f"This field is required."
+
+    if field_errors:
+        # Preserve all user-entered POST values so user NEVER loses details!
+        preserved_dict = {}
+        for k in request.POST:
+            if k != 'csrfmiddlewaretoken':
+                preserved_dict[k] = request.POST.get(k, '')
+        request.session['reg_preserved_data'] = preserved_dict
+        request.session['reg_field_errors'] = field_errors
         return redirect('public-register', slug=slug)
 
-    customer, _ = Customer.objects.get_or_create(
+    # Intelligently resolve and merge profiles if same mobile number or same email is found
+    from apps.registrations.services import get_or_merge_customer
+    customer = get_or_merge_customer(
         tenant=event.tenant,
+        phone=phone,
         email=email,
-        defaults={
-            'name': name,
-            'phone': phone,
-            'company': company,
-            'designation': designation
-        }
+        name=name,
+        company=company,
+        designation=designation
     )
-    # Update latest details
-    customer.name = name
-    if phone: customer.phone = phone
-    if company: customer.company = company
-    if designation: customer.designation = designation
-    customer.save()
 
     # Calculate ticket count & total amount
     ticket_count = 1
@@ -150,8 +209,8 @@ def submit_registration_view(request, slug):
 
     total_amount = event.registration_fee * ticket_count
 
+    # Free Event: Instant pass confirmation
     if total_amount == 0:
-        # Direct Instant Confirmation for Free Events
         registration = Registration.objects.create(
             event=event,
             customer=customer,
@@ -240,7 +299,15 @@ def attendee_badge_view(request, pass_code):
                     return redirect('payment-checkout', order_code=order.order_code)
                 reg = order.registration
         if reg:
-            attendee, _ = Attendee.objects.get_or_create(registration=reg)
+            if reg.status == 'COMPLETED':
+                attendee, _ = Attendee.objects.get_or_create(registration=reg)
+            else:
+                # Registration is NOT completed - do not issue pass!
+                messages.warning(request, "Payment proof verification is pending. Your pass will be generated once verified.")
+                order = getattr(reg, 'order', None)
+                if order:
+                    return redirect('payment-checkout', order_code=order.order_code)
+                return redirect('public-register', slug=reg.event.slug)
             
     if not attendee:
         return get_object_or_404(Attendee, pass_code=pass_code)
@@ -336,9 +403,22 @@ def attendee_badge_view(request, pass_code):
     except Exception:
         qr_base64 = None
 
+    order = getattr(registration, 'order', None)
+    order_code = getattr(order, 'order_code', None) or registration.registration_code or attendee.pass_code
+
+    raw_name = customer.name.strip() if customer and customer.name else 'Attendee'
+    raw_event = event.title.strip() if event and event.title else 'Event'
+    raw_filename = f"{raw_name}-{raw_event}-{order_code}"
+    clean_filename_base = re.sub(r'[\\/*?:"<>|]', '', raw_filename).strip()
+    pdf_filename = f"{clean_filename_base}.pdf"
+
     context = {
         'attendee': attendee,
         'registration': registration,
+        'order': order,
+        'order_code': order_code,
+        'pdf_filename': pdf_filename,
+        'ticket_filename_base': clean_filename_base,
         'event': event,
         'customer': customer,
         'attendee_list': attendee_list,
@@ -370,8 +450,10 @@ def send_pass_email_view(request, pass_code):
             order = Order.objects.filter(order_code=pass_code).first()
             if order:
                 reg = order.registration
-        if reg:
+        if reg and reg.status == 'COMPLETED':
             attendee, _ = Attendee.objects.get_or_create(registration=reg)
+        elif reg and reg.status != 'COMPLETED':
+            return JsonResponse({'success': False, 'error': 'Payment verification is pending. Pass has not been issued.'}, status=400)
             
     if not attendee:
         return JsonResponse({'success': False, 'error': 'Attendee pass not found.'}, status=404)

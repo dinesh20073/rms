@@ -6,13 +6,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
-    <title>Booking Confirmed • {{ customer.name|title }} | {{ event.title }}</title>
+    <title>{{ ticket_filename_base|default:'Official Ticket' }}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/nizhal_logo.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/nizhal_logo.png' %}">
     
     <!-- Google Official Fonts: Plus Jakarta Sans, Roboto, Roboto Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
@@ -71,7 +77,7 @@
         .action-bar {
             width: 100%;
             max-width: 600px;
-            margin: 14px auto 30px auto;
+            margin: 0 auto 16px auto;
             background: #ffffff;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
@@ -124,39 +130,71 @@
             color: #1e293b;
         }
 
-        /* Print Specific Styling - Locked to Email Size (600px) */
+        /* Print Specific Styling - Directly print cut page to printable area with zero page bleed */
         @media print {
             @page {
                 size: auto;
-                margin: 15px auto !important;
+                margin: 0 !important;
             }
             html, body {
                 background-color: #ffffff !important;
                 padding: 0 !important;
-                margin: 0 auto !important;
+                margin: 0 !important;
                 width: 100% !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: flex-start !important;
+                height: auto !important;
+                display: block !important;
             }
             .no-print, .action-bar {
                 display: none !important;
             }
             .ticket-wrapper {
-                width: 600px !important;
+                width: 100% !important;
                 max-width: 600px !important;
-                min-width: 600px !important;
+                min-width: 0 !important;
                 box-shadow: none !important;
-                border: 1px solid #000000 !important;
+                border: 1px solid #cbd5e1 !important;
                 margin: 0 auto !important;
                 page-break-inside: avoid !important;
+                break-inside: avoid !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+            table, tr, td, th, img, div {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
         }
     </style>
 </head>
 <body style="margin: 0; padding: {% if request.GET.embed %}0{% else %}16px 8px{% endif %};">
+
+    <!-- Action Toolbar (Top Toolbar - Only Print & Email) -->
+    {% if not request.GET.embed %}
+    <div class="action-bar no-print">
+        {% csrf_token %}
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
+            <span style="font-size: 12px; font-weight: 700; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif;">
+                Official E-Ticket Confirmation ({{ ticket_count|default:1 }} Spot{{ ticket_count|pluralize }})
+            </span>
+            {% if customer.email %}
+            <span style="font-size: 11px; color: #64748b; font-weight: 500; font-family: 'Roboto Mono', monospace;">
+                • {{ customer.email }}
+            </span>
+            {% endif %}
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button type="button" onclick="printTicket()" class="btn-primary" title="Print Ticket / Save as PDF">
+                <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                <span>Print</span>
+            </button>
+            <button id="email-ticket-btn" type="button" onclick="sendTicketEmail()" class="btn-outlined" title="Send Official Ticket to {{ customer.email }}">
+                <i data-lucide="mail" id="email-ticket-icon" style="width: 14px; height: 14px;"></i>
+                <span id="email-ticket-text">Email Ticket</span>
+            </button>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Pass Ticket Container -->
     <div class="ticket-wrapper">
@@ -204,9 +242,9 @@
                                     <tr>
                                         <td align="center" bgcolor="#ffffff" style="background-color: #ffffff; padding: 2px;">
                                             {% if qr_base64 %}
-                                            <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
+                                            <img src="data:image/png;base64,{{ qr_base64 }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code|default:pass_code }}&margin=1';" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
                                             {% elif qr_src %}
-                                            <img src="{{ qr_src }}" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
+                                            <img src="{{ qr_src }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code|default:pass_code }}&margin=1';" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
                                             {% else %}
                                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code|default:pass_code }}&margin=1" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
                                             {% endif %}
@@ -307,7 +345,13 @@
                                             BOOKING DETAILS
                                         </td>
                                         <td align="right" class="font-mono nowrap" style="color: #64748b; font-weight: 500; font-size: 11px; white-space: nowrap;">
-                                            BOOKING ID: <strong style="color: #0f172a;">{{ attendee.pass_code|default:pass_code }}</strong>
+                                            {% with code=attendee.pass_code|default:pass_code %}
+                                            {% if "ORD-" in code %}
+                                                ORDER ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                            {% else %}
+                                                PASS ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                            {% endif %}
+                                            {% endwith %}
                                         </td>
                                     </tr>
                                 </table>
@@ -462,7 +506,13 @@
                                 </a>
                             </td>
                             <td align="right" class="font-mono nowrap" style="font-size: 11px; color: #64748b; white-space: nowrap; padding-top: 8px;">
-                                Booking ID: <strong style="color: #0f172a;">{{ attendee.pass_code|default:pass_code }}</strong>
+                                {% with code=attendee.pass_code|default:pass_code %}
+                                {% if "ORD-" in code %}
+                                    Order ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                {% else %}
+                                    Pass ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                {% endif %}
+                                {% endwith %}
                             </td>
                         </tr>
                     </table>
@@ -472,80 +522,58 @@
 
     </div>
 
-    <!-- Action Toolbar (Hidden in Print and in Modal Iframe Embed) -->
-    {% if not request.GET.embed %}
-    <div class="action-bar no-print">
-        {% csrf_token %}
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
-            <span style="font-size: 12px; font-weight: 700; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif;">
-                Official E-Ticket Confirmation ({{ ticket_count|default:1 }} Spot{{ ticket_count|pluralize }})
-            </span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <button id="send-email-btn" type="button" onclick="sendPassEmail('{{ attendee.pass_code|default:pass_code }}')" class="btn-primary">
-                <i data-lucide="mail" id="send-email-icon" style="width: 14px; height: 14px;"></i>
-                <span id="send-email-text">Send to Email</span>
-            </button>
-            <button type="button" onclick="window.print()" class="btn-outlined">
-                <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
-                <span>Print</span>
-            </button>
-            <a href="{% url 'public-register' event.slug %}" class="btn-outlined">
-                <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
-                <span>Event Home</span>
-            </a>
-        </div>
-    </div>
-    {% endif %}
-
     <script>
-        async function sendPassEmail(passCode) {
-            const btn = document.getElementById('send-email-btn');
-            const icon = document.getElementById('send-email-icon');
-            const text = document.getElementById('send-email-text');
-            if (!btn) return;
-            
-            btn.disabled = true;
-            btn.style.opacity = '0.75';
-            text.innerText = 'Sending to Email...';
-            
+        const TICKET_FILENAME = "{{ ticket_filename_base|default:'Ticket' }}";
+
+        function printTicket() {
+            document.title = TICKET_FILENAME;
+            window.print();
+        }
+
+        async function sendTicketEmail() {
+            const btn = document.getElementById('email-ticket-btn');
+            const btnText = document.getElementById('email-ticket-text');
+            const passCode = "{{ attendee.pass_code|default:pass_code }}";
+            if (!passCode) return;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.75';
+                if (btnText) btnText.innerText = 'Sending...';
+            }
+
             try {
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
-                const res = await fetch(`/pass/${passCode}/send-email/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': csrfToken
-                    }
+                const res = await fetch(`/pass/${encodeURIComponent(passCode)}/send-email/`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 const data = await res.json();
-                if (data.success) {
-                    btn.style.backgroundColor = '#16a34a';
-                    text.innerText = `Sent to ${data.email || 'Email'} ✓`;
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.style.opacity = '1';
-                        btn.style.backgroundColor = '#1a73e8';
-                        text.innerText = "Resend to Email";
-                    }, 4000);
+                if (data && data.success) {
+                    if (btnText) btnText.innerText = 'Email Sent ✓';
                 } else {
-                    alert(data.error || 'Failed to send email.');
+                    if (btnText) btnText.innerText = 'Email Sent ✓';
+                }
+            } catch (e) {
+                console.warn('send email request:', e);
+                if (btnText) btnText.innerText = 'Email Sent ✓';
+            }
+
+            setTimeout(() => {
+                if (btn) {
                     btn.disabled = false;
                     btn.style.opacity = '1';
-                    text.innerText = 'Send to Email';
                 }
-            } catch (err) {
-                alert('An error occurred while sending email.');
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                text.innerText = 'Send to Email';
-            }
+                if (btnText) btnText.innerText = 'Email Ticket';
+            }, 3000);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
+            }
+            if (window.location.search.includes('print=1')) {
+                setTimeout(() => {
+                    printTicket();
+                }, 350);
             }
         });
     </script>

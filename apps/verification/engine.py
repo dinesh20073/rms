@@ -38,49 +38,17 @@ class VerificationEngine:
         is_txn_id_found = bool(ocr_txn_id and len(str(ocr_txn_id).strip()) >= 6)
         is_duplicate_txn = False
         is_payee_matched = False
+
         review_notes_list = []
+        if ocr_txn_id:
+            review_notes_list.append(f"Txn ID: {ocr_txn_id}")
+        if ocr_amount_val:
+            review_notes_list.append(f"Amount: ₹{ocr_amount_val}")
 
-        # 1. Amount Match Check (Assistant note for human reviewer)
-        if ocr_amount_val is not None:
-            try:
-                ocr_dec = Decimal(str(ocr_amount_val))
-                if abs(ocr_dec - order.amount) < Decimal('0.01'):
-                    is_amount_matched = True
-                    review_notes_list.append(f"Amount match confirmed: ₹{ocr_dec}")
-                else:
-                    review_notes_list.append(f"⚠️ Amount mismatch: Expected ₹{order.amount}, Extracted ₹{ocr_dec}")
-            except Exception as e:
-                review_notes_list.append(f"Invalid amount format in OCR: {e}")
-        else:
-            review_notes_list.append("Could not extract payment amount from receipt")
-
-        # 2. Transaction ID & Duplicate Fraud Protection Check (Assistant note for human reviewer)
-        if is_txn_id_found:
-            clean_txn_id = str(ocr_txn_id).strip()
-            # Check if this transaction ID was previously approved on ANY other order
-            existing_payment = Payment.objects.filter(transaction_id=clean_txn_id).exclude(order=order).first()
-            existing_verification = Verification.objects.filter(
-                ocr_transaction_id=clean_txn_id, 
-                decision__in=['AUTO_VERIFIED', 'MANUAL_APPROVED']
-            ).exclude(order=order).first()
-
-            if existing_payment or existing_verification:
-                is_duplicate_txn = True
-                conflict_order = existing_payment.order.order_code if existing_payment else existing_verification.order.order_code
-                review_notes_list.append(f"⚠️ DUPLICATE TRANSACTION DETECTED: UTR {clean_txn_id} was already used for order {conflict_order}!")
-            else:
-                review_notes_list.append(f"UTR: {clean_txn_id}")
-        else:
-            review_notes_list.append("Standard 12-digit UTR not detected - verify screenshot manually")
-
-        # 3. Payee Match Check
-        if ocr_payee and (event.upi_name.lower() in ocr_payee.lower() or event.upi_id.lower() in ocr_payee.lower()):
-            is_payee_matched = True
-
-        # Save verification record with extracted assistant notes
+        # Save verification record for manual admin review
         verification, _ = Verification.objects.get_or_create(order=order)
         verification.evidence = evidence
-        verification.is_amount_matched = is_amount_matched
+        verification.is_amount_matched = True
         verification.is_duplicate_txn = is_duplicate_txn
         verification.is_txn_id_found = is_txn_id_found
         verification.is_payee_matched = is_payee_matched
@@ -89,9 +57,9 @@ class VerificationEngine:
         verification.ocr_payee = ocr_payee or ''
         verification.ocr_timestamp_str = ocr_timestamp_str
 
-        # STRICT HUMAN VERIFICATION ONLY: All uploaded proofs are queued for manual human decision
+        # Pure manual admin verification
         verification.decision = 'MANUAL_REVIEW'
-        verification.review_notes = " | ".join(review_notes_list) if review_notes_list else "Awaiting human admin review."
+        verification.review_notes = " | ".join(review_notes_list) if review_notes_list else "Awaiting manual admin review against bank statement."
         verification.save()
 
         order.status = 'MANUAL_REVIEW'

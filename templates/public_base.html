@@ -24,6 +24,11 @@
         -webkit-font-smoothing: antialiased;
     }
 
+    /* Suppress popup toast notifications on public registration forms */
+    #unified-toast-container {
+        display: none !important;
+    }
+
     /* Fixed Clear Full-Color Background Image */
     .public-canvas-bg {
         position: fixed;
@@ -180,6 +185,14 @@
 
 <div class="public-canvas flex flex-col justify-start items-center py-6 sm:py-12 px-3 sm:px-6 relative min-h-screen">
     
+    <!-- Brand Logo & Platform Title Header -->
+    <header class="relative z-10 flex items-center justify-center gap-3 mb-5 sm:mb-6 select-none">
+        <div class="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/65 backdrop-blur-md border border-white/20 shadow-xl">
+            <img src="{% static 'images/nizhal_logo.png' %}" alt="Nizhal Community" class="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-sm">
+            <span class="text-white font-display font-bold text-sm tracking-tight">Nizhal Community</span>
+        </div>
+    </header>
+
     <!-- Main Content Container -->
     <main class="relative z-10 w-full max-w-2xl">
         {% block main_content %}{% endblock %}

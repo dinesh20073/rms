@@ -10,7 +10,7 @@ from apps.payments import views as pay_views
 from apps.dashboard import auth_views
 
 urlpatterns = [
-    path('favicon.ico', lambda req: HttpResponse(status=204)),
+    path('favicon.ico', lambda req: redirect('/static/images/nizhal_logo.png')),
     path('admin/', admin.site.urls),
     
     # Secure Authentication

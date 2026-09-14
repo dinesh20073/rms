@@ -14,18 +14,18 @@ class Form(models.Model):
         return f"Form for {self.event.title}"
 
     def create_default_fields(self):
-        """Provision streamlined 1-6 standard fields for event registration"""
+        """Provision streamlined standard fields for event registration"""
         defaults = [
             {'label': 'Full Name', 'field_type': 'text', 'is_required': True, 'order': 1, 'placeholder': 'Enter your full name'},
             {'label': 'Email Address', 'field_type': 'email', 'is_required': True, 'order': 2, 'placeholder': 'Enter your email address'},
             {'label': 'Phone Number', 'field_type': 'phone', 'is_required': True, 'order': 3, 'placeholder': 'Enter your phone number'},
             {'label': 'Age', 'field_type': 'number', 'is_required': True, 'order': 4, 'placeholder': 'Enter your age'},
-            {'label': 'Gender', 'field_type': 'dropdown', 'is_required': True, 'order': 5, 'options': ['Male', 'Female', 'Other / Prefer not to say']},
+            {'label': 'Gender', 'field_type': 'dropdown', 'is_required': True, 'order': 5, 'options': ['Male', 'Female', 'Other']},
             {'label': 'Ticket Count', 'field_type': 'number', 'is_required': True, 'order': 6, 'placeholder': '1'},
         ]
         for item in defaults:
             field_key = slugify(item['label']).replace('-', '_')
-            FormField.objects.get_or_create(
+            f_obj, created = FormField.objects.get_or_create(
                 form=self,
                 field_key=field_key,
                 defaults={
@@ -34,9 +34,18 @@ class Form(models.Model):
                     'is_required': item['is_required'],
                     'order': item['order'],
                     'placeholder': item.get('placeholder', ''),
+                    'help_text': item.get('help_text', ''),
                     'options': item.get('options', [])
                 }
             )
+            if not created:
+                f_obj.label = item['label']
+                f_obj.placeholder = item.get('placeholder', '')
+                if item.get('help_text'):
+                    f_obj.help_text = item.get('help_text', '')
+                if item.get('options'):
+                    f_obj.options = item.get('options', [])
+                f_obj.save()
 
 class FormField(models.Model):
     FIELD_TYPE_CHOICES = [

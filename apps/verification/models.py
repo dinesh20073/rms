@@ -28,8 +28,12 @@ class PaymentEvidence(models.Model):
         if self.screenshot and not self.image_base64:
             try:
                 import base64
-                self.screenshot.seek(0)
-                content = self.screenshot.read()
+                file_obj = getattr(self.screenshot, 'file', self.screenshot)
+                if hasattr(file_obj, 'seek'):
+                    file_obj.seek(0)
+                content = file_obj.read()
+                if hasattr(file_obj, 'seek'):
+                    file_obj.seek(0)
                 if content:
                     b64 = base64.b64encode(content).decode('utf-8')
                     name = str(getattr(self.screenshot, 'name', '')).lower()

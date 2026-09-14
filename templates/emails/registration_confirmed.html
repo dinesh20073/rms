@@ -273,7 +273,13 @@
                                                     BOOKING DETAILS
                                                 </td>
                                                 <td align="right" class="font-mono nowrap" style="color: #64748b !important; font-weight: 500; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
-                                                    BOOKING ID: <strong style="color: #0f172a !important;">{{ attendee.pass_code|default:pass_code }}</strong>
+                                                    {% with code=attendee.pass_code|default:pass_code %}
+                                                    {% if "ORD-" in code %}
+                                                        ORDER ID: <strong style="color: #0f172a !important;">{{ code }}</strong>
+                                                    {% else %}
+                                                        PASS ID: <strong style="color: #0f172a !important;">{{ code }}</strong>
+                                                    {% endif %}
+                                                    {% endwith %}
                                                 </td>
                                             </tr>
                                         </table>
@@ -420,7 +426,13 @@
                                         </a>
                                     </td>
                                     <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #64748b !important; background-color: #ffffff !important; border: 0 !important; white-space: nowrap; padding-top: 8px;">
-                                        Booking ID: <strong style="color: #0f172a !important;">{{ attendee.pass_code|default:pass_code }}</strong>
+                                        {% with code=attendee.pass_code|default:pass_code %}
+                                        {% if "ORD-" in code %}
+                                            Order ID: <strong style="color: #0f172a !important;">{{ code }}</strong>
+                                        {% else %}
+                                            Pass ID: <strong style="color: #0f172a !important;">{{ code }}</strong>
+                                        {% endif %}
+                                        {% endwith %}
                                     </td>
                                 </tr>
                             </table>

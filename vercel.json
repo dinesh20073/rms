@@ -15,12 +15,20 @@
           "apps/**",
           "apps/**/*",
           "static/**",
-          "static/**/*"
+          "static/**/*",
+          "staticfiles/**"
         ]
       }
     }
   ],
   "routes": [
+    {
+      "src": "/static/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      },
+      "dest": "ems_core/wsgi.py"
+    },
     {
       "src": "/(.*)",
       "dest": "ems_core/wsgi.py"

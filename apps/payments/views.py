@@ -24,12 +24,13 @@ def payment_checkout_view(request, order_code):
     is_completed = (
         registration.status == 'COMPLETED' or 
         order.status in ['VERIFIED', 'SUCCESS'] or 
-        (verification and verification.decision in ['APPROVED', 'VERIFIED']) or 
-        attendee is not None
+        (verification and verification.decision in ['APPROVED', 'VERIFIED', 'MANUAL_APPROVED', 'AUTO_VERIFIED'])
     )
 
     if not attendee and is_completed:
         attendee, _ = Attendee.objects.get_or_create(registration=registration)
+    elif not is_completed:
+        attendee = None
 
     qr_base64 = None
     if attendee:
@@ -74,6 +75,7 @@ def upload_proof_view(request, order_code):
     screenshot_file = request.FILES.get('screenshot')
 
     if not screenshot_file:
+        messages.error(request, "Please choose a payment screenshot to upload.")
         return redirect('payment-checkout', order_code=order_code)
 
     # 1. Clean up & replace old evidence records and files for this order ID
@@ -86,10 +88,28 @@ def upload_proof_view(request, order_code):
             pass
     old_evidences.delete()
 
+    # Pre-encode Base64 to ensure serverless persistence in PostgreSQL/Supabase
+    image_base64 = ''
+    try:
+        screenshot_file.seek(0)
+        file_bytes = screenshot_file.read()
+        screenshot_file.seek(0)
+        if file_bytes:
+            import base64 as b64_mod
+            b64 = b64_mod.b64encode(file_bytes).decode('utf-8')
+            mime = getattr(screenshot_file, 'content_type', '') or 'image/jpeg'
+            if not mime.startswith('image/'):
+                name = str(getattr(screenshot_file, 'name', '')).lower()
+                mime = 'image/png' if name.endswith('.png') else ('image/webp' if name.endswith('.webp') else 'image/jpeg')
+            image_base64 = f"data:{mime};base64,{b64}"
+    except Exception:
+        pass
+
     # 2. Save new evidence record
     evidence = PaymentEvidence.objects.create(
         order=order,
-        screenshot=screenshot_file
+        screenshot=screenshot_file,
+        image_base64=image_base64
     )
 
     event_tenant = registration.event.tenant
@@ -104,20 +124,10 @@ def upload_proof_view(request, order_code):
     order.status = 'UPLOADED'
     order.save()
 
-    # 3. Run OCR Extraction
-    ocr_data = OCRExtractor.extract_from_image(evidence.screenshot)
+    # 3. Queue for Manual Admin Verification (Status: MANUAL_REVIEW)
+    verification = VerificationEngine.process_evidence(order, evidence, ocr_data={})
 
-    if not ocr_data.get('amount') and not ocr_data.get('transaction_id'):
-        ocr_data['amount'] = float(order.amount)
-        ocr_data['transaction_id'] = f"{random.randint(100000000000, 999999999999)}"
-        ocr_data['payee'] = registration.event.upi_name
-        ocr_data['date'] = timezone.now().strftime('%d %b %Y')
-        ocr_data['time'] = timezone.now().strftime('%I:%M %p')
-
-    # 4. Execute Dual-Tier Verification Rule Engine (Sets status to MANUAL_REVIEW)
-    verification = VerificationEngine.process_evidence(order, evidence, ocr_data)
-
-    # 5. Send Order Placed / Payment Submitted Confirmation Email
+    # 4. Send Order Placed / Payment Submitted Confirmation Email
     from apps.notifications.services import send_order_created_email
     send_order_created_email(registration)
 
@@ -164,11 +174,15 @@ def simulate_test_proof_view(request, order_code):
 
     buffer = io.BytesIO()
     img.save(buffer, format='PNG')
+    img_bytes = buffer.getvalue()
     filename = f"sim_{test_scenario.lower()}_{order.order_code}.png"
+    import base64 as b64_mod
+    sim_base64 = f"data:image/png;base64,{b64_mod.b64encode(img_bytes).decode('utf-8')}"
 
     evidence = PaymentEvidence.objects.create(
         order=order,
-        screenshot=ContentFile(buffer.getvalue(), name=filename)
+        screenshot=ContentFile(img_bytes, name=filename),
+        image_base64=sim_base64
     )
 
     ocr_data = {

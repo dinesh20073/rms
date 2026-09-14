@@ -5,18 +5,26 @@
 {% block email_content %}
 <div style="text-align: left;">
     
-    <!-- Status Header (Yellow / Amber Under Review Theme - Centered) -->
-    <div style="margin-bottom: 24px; text-align: center;">
-        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; padding: 6px 16px; border-radius: 16px; display: inline-block; margin-bottom: 12px;">
-            ⏳ Payment Proof Received • Under Review
-        </span>
-        <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3;">
-            {{ event.title }}
-        </h1>
-        <p style="margin: 0 auto; font-size: 14px; color: #475569; line-height: 1.6; max-width: 520px;">
-            Hi <strong>{{ customer.name|title }}</strong>, we have received your payment proof for order <strong>{{ order.order_code }}</strong>. Our team is currently reviewing your transaction. Your official entrance pass and QR badge will be emailed to you as soon as verification is approved.
-        </p>
-    </div>
+    <!-- Status Header (Bulletproof Centered Table) -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="width: 100% !important; margin: 0 auto 24px auto; text-align: center;">
+        <tr>
+            <td align="center" style="text-align: center; border: 0 !important; padding: 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto 12px auto; display: inline-table;">
+                    <tr>
+                        <td align="center" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; padding: 6px 18px; border-radius: 16px; text-align: center; white-space: nowrap;">
+                            ⏳ Payment Proof Received • Under Review
+                        </td>
+                    </tr>
+                </table>
+                <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3; text-align: center;">
+                    {{ event.title }}
+                </h1>
+                <p style="margin: 0 auto; font-size: 14px; color: #475569; line-height: 1.6; max-width: 520px; text-align: center;">
+                    Hi <strong>{{ customer.name|title }}</strong>, we have received your payment proof for order <strong>{{ order.order_code }}</strong>. Our team is currently reviewing your transaction. Your official entrance pass and QR badge will be emailed to you as soon as verification is approved.
+                </p>
+            </td>
+        </tr>
+    </table>
 
     <!-- Order Summary Details Box -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin: 18px 0; overflow: hidden;">

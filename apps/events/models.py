@@ -49,7 +49,7 @@ class Event(models.Model):
 
     @property
     def qr_display_url(self):
-        """Returns the embedded Base64 data URI or file URL or dynamic QR API fallback."""
+        """Returns only the custom uploaded QR (Base64 data or uploaded file)."""
         if self.upi_qr_base64:
             return self.upi_qr_base64
         if self.upi_qr_code:
@@ -57,17 +57,6 @@ class Event(models.Model):
                 return self.upi_qr_code.url
             except Exception:
                 pass
-        if self.upi_id:
-            params = {
-                'pa': self.upi_id,
-                'pn': self.upi_name,
-                'cu': 'INR',
-            }
-            if self.registration_fee > 0:
-                params['am'] = f"{self.registration_fee:.2f}"
-                params['tn'] = f"{self.title} Entry Fee"[:60]
-            upi_url = f"upi://pay?{urllib.parse.urlencode(params, quote_via=urllib.parse.quote, safe='@')}"
-            return f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={urllib.parse.quote(upi_url)}"
         return ''
 
     def generate_master_event_qr(self):

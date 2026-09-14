@@ -4,6 +4,20 @@
 {% block title %}{{ event.title }} | Register Online{% endblock %}
 
 {% block main_content %}
+<style>
+    .input-error {
+        border-color: #e11d48 !important;
+        background-color: rgba(255, 241, 242, 0.8) !important;
+        box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.22) !important;
+    }
+    .input-error:focus {
+        border-color: #e11d48 !important;
+        box-shadow: 0 0 0 3.5px rgba(225, 29, 72, 0.35) !important;
+    }
+    .public-input-group.has-error .public-input-icon {
+        color: #e11d48 !important;
+    }
+</style>
 <div class="w-full public-card">
 
     <!-- 1. Header Hero Banner -->
@@ -22,41 +36,50 @@
                 <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
                 <span>Official Registration</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 tracking-tight leading-tight">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold font-display text-slate-900 tracking-tight leading-snug break-words">
                 {{ event.title }}
             </h1>
-            <p class="text-sm text-slate-700 mt-2 leading-relaxed">
+            <p class="text-xs sm:text-sm text-slate-700 mt-2 leading-relaxed break-words">
                 {{ event.description|default:"Fill in your details below to register and secure your official digital entrance pass." }}
             </p>
         </div>
 
         <!-- Event Key Details Chips -->
-        <div class="pt-4 border-t border-white/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="pt-4 border-t border-white/40 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 text-xs">
             
-            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                {% if event.venue %}
                 <!-- Location Chip -->
-                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs">
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs max-w-full">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
-                    <span class="font-medium">{{ event.venue|default:"BIEC, Bengaluru & Online" }}</span>
+                    <span class="font-medium break-words">{{ event.venue }}</span>
                 </div>
+                {% endif %}
                 
+                {% if event.event_start_date %}
                 <!-- Date & Time Chip -->
-                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs">
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs max-w-full">
                     <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
-                    <span class="font-medium">{{ event.start_time|date:"d M Y"|default:"28 Aug 2026" }} • {{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</span>
+                    <span class="font-medium whitespace-nowrap">{{ event.event_start_date|date:"d M Y" }} • {{ event.event_start_date|date:"h:i A" }} IST</span>
                 </div>
+                {% elif event.start_time %}
+                <div class="chip-badge bg-white/55 backdrop-blur-xl text-slate-800 border border-white/80 shadow-2xs max-w-full">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-600 shrink-0"></i>
+                    <span class="font-medium whitespace-nowrap">{{ event.start_time|date:"d M Y" }} • {{ event.start_time|date:"h:i A" }} IST</span>
+                </div>
+                {% endif %}
 
                 {% if event.registration_closes %}
                 <!-- Deadline Chip -->
-                <div class="chip-badge bg-amber-500/15 text-amber-900 border border-amber-500/30 shadow-2xs font-semibold">
+                <div class="chip-badge bg-amber-500/15 text-amber-900 border border-amber-500/30 shadow-2xs font-semibold max-w-full">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-700 shrink-0"></i>
-                    <span>Closes: {{ event.registration_closes|date:"d M, h:i A" }}</span>
+                    <span class="whitespace-nowrap">Closes: {{ event.registration_closes|date:"d M, h:i A" }}</span>
                 </div>
                 {% endif %}
             </div>
 
             <!-- Fee Badge -->
-            <div class="chip-badge {% if event.registration_fee == 0 %}bg-emerald-500/15 text-emerald-900 border border-emerald-500/30 font-bold{% else %}bg-blue-500/15 text-blue-900 border border-blue-500/30 font-bold{% endif %} backdrop-blur-xl shadow-2xs">
+            <div class="chip-badge {% if event.registration_fee == 0 %}bg-emerald-500/15 text-emerald-900 border border-emerald-500/30 font-bold{% else %}bg-blue-500/15 text-blue-900 border border-blue-500/30 font-bold{% endif %} backdrop-blur-xl shadow-2xs shrink-0">
                 <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
                 {% if event.registration_fee == 0 %}
                 <span>Free Registration</span>
@@ -79,7 +102,7 @@
             <span class="text-xs text-rose-600 font-medium">* Required fields</span>
         </div>
 
-        <form method="POST" action="{% url 'public-register-submit' event.slug %}" class="space-y-5" id="publicRegForm">
+        <form method="POST" action="{% url 'public-register-submit' event.slug %}" class="space-y-5" id="publicRegForm" novalidate>
             {% csrf_token %}
 
             <div class="grid grid-cols-1 gap-4">
@@ -90,28 +113,80 @@
                         {% if field.is_required %}<span class="text-rose-500">*</span>{% endif %}
                     </label>
 
-                    {% if field.help_text %}
-                    <p class="text-[11px] text-slate-500">{{ field.help_text }}</p>
+                    {% if field.help_text and '@gmail' not in field.help_text|lower and '10 digit' not in field.help_text|lower %}
+                    <p class="text-[11px] text-slate-500 font-medium">{{ field.help_text }}</p>
                     {% endif %}
 
-                    {% if field.field_type == 'textarea' %}
-                    <textarea name="{{ field.field_key }}" rows="3" placeholder="{{ field.placeholder|default:'Enter your response...' }}" {% if field.is_required %}required{% endif %} class="public-input"></textarea>
+                    {% if field.field_key == 'full_name' or field.label|lower == 'full name' or field.label|lower == 'name' %}
+                    <div class="space-y-1">
+                        <div class="public-input-group {% if field_errors.full_name or field_errors.name %}has-error{% endif %}">
+                            <i data-lucide="user" class="public-input-icon w-4 h-4"></i>
+                            <input type="text" id="name_input" name="{{ field.field_key }}" data-validate="name" value="{% if preserved_data.full_name %}{{ preserved_data.full_name }}{% elif preserved_data.name %}{{ preserved_data.name }}{% endif %}" placeholder="{{ field.placeholder|default:'Enter your full name' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon {% if field_errors.full_name or field_errors.name %}input-error{% endif %}">
+                        </div>
+                        <p id="name_error_msg" class="text-[11.5px] font-semibold text-rose-600 {% if not field_errors.full_name and not field_errors.name %}hidden{% endif %} flex items-center gap-1.5 pt-0.5">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 text-rose-600"></i>
+                            <span class="msg-text">{% if field_errors.full_name %}{{ field_errors.full_name }}{% elif field_errors.name %}{{ field_errors.name }}{% endif %}</span>
+                        </p>
+                    </div>
 
-                    {% elif field.field_type == 'dropdown' %}
-                    <div class="public-input-group">
-                        <i data-lucide="chevron-down" class="public-input-icon !left-auto !right-3.5 w-4 h-4"></i>
-                        <select name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="public-input cursor-pointer appearance-none pr-10">
-                            <option value="">Select an option...</option>
-                            {% for opt in field.options %}
-                            <option value="{{ opt }}">{{ opt }}</option>
-                            {% endfor %}
-                        </select>
+                    {% elif field.field_key == 'email_address' or field.field_type == 'email' or field.label|lower == 'email' or 'email' in field.label|lower %}
+                    <div class="space-y-1">
+                        <div class="public-input-group {% if field_errors.email_address or field_errors.email %}has-error{% endif %}">
+                            <i data-lucide="mail" class="public-input-icon w-4 h-4"></i>
+                            <input type="email" id="email_input" name="{{ field.field_key }}" data-validate="email" value="{% if preserved_data.email_address %}{{ preserved_data.email_address }}{% elif preserved_data.email %}{{ preserved_data.email }}{% endif %}" placeholder="{{ field.placeholder|default:'Enter your email address' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon {% if field_errors.email_address or field_errors.email %}input-error{% endif %}" autocomplete="email">
+                        </div>
+                        <p id="email_error_msg" class="text-[11.5px] font-semibold text-rose-600 {% if not field_errors.email_address and not field_errors.email %}hidden{% endif %} flex items-center gap-1.5 pt-0.5">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 text-rose-600"></i>
+                            <span class="msg-text">{% if field_errors.email_address %}{{ field_errors.email_address }}{% elif field_errors.email %}{{ field_errors.email }}{% endif %}</span>
+                        </p>
+                    </div>
+
+                    {% elif field.field_key == 'phone_number' or field.field_type == 'phone' or field.field_type == 'tel' or 'phone' in field.label|lower or 'mobile' in field.label|lower %}
+                    <div class="space-y-1">
+                        <div class="public-input-group {% if field_errors.phone_number or field_errors.phone %}has-error{% endif %}">
+                            <i data-lucide="phone" class="public-input-icon w-4 h-4"></i>
+                            <input type="tel" id="phone_input" name="{{ field.field_key }}" data-validate="phone" value="{% if preserved_data.phone_number %}{{ preserved_data.phone_number }}{% elif preserved_data.phone %}{{ preserved_data.phone }}{% elif preserved_data.mobile %}{{ preserved_data.mobile }}{% endif %}" inputmode="numeric" placeholder="{{ field.placeholder|default:'Enter your phone number' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon font-mono {% if field_errors.phone_number or field_errors.phone %}input-error{% endif %}" autocomplete="tel">
+                        </div>
+                        <p id="phone_error_msg" class="text-[11.5px] font-semibold text-rose-600 {% if not field_errors.phone_number and not field_errors.phone %}hidden{% endif %} flex items-center gap-1.5 pt-0.5">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 text-rose-600"></i>
+                            <span class="msg-text">{% if field_errors.phone_number %}{{ field_errors.phone_number }}{% elif field_errors.phone %}{{ field_errors.phone }}{% endif %}</span>
+                        </p>
                     </div>
 
                     {% elif field.field_key == 'age' or field.label|lower == 'age' %}
-                    <div class="public-input-group">
-                        <i data-lucide="calendar" class="public-input-icon w-4 h-4"></i>
-                        <input type="number" name="{{ field.field_key }}" min="1" max="120" placeholder="{{ field.placeholder|default:'Enter your age' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon font-mono">
+                    <div class="space-y-1">
+                        <div class="public-input-group {% if field_errors.age %}has-error{% endif %}">
+                            <i data-lucide="calendar" class="public-input-icon w-4 h-4"></i>
+                            <input type="number" id="age_input" name="{{ field.field_key }}" data-validate="age" value="{% if preserved_data.age %}{{ preserved_data.age }}{% endif %}" min="1" max="120" inputmode="numeric" placeholder="{{ field.placeholder|default:'Enter your age' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon font-mono {% if field_errors.age %}input-error{% endif %}">
+                        </div>
+                        <p id="age_error_msg" class="text-[11.5px] font-semibold text-rose-600 {% if not field_errors.age %}hidden{% endif %} flex items-center gap-1.5 pt-0.5">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 text-rose-600"></i>
+                            <span class="msg-text">{% if field_errors.age %}{{ field_errors.age }}{% endif %}</span>
+                        </p>
+                    </div>
+
+                    {% elif field.field_key == 'gender' or field.label|lower == 'gender' %}
+                    <div class="space-y-1">
+                        <div class="public-input-group {% if field_errors.gender %}has-error{% endif %}">
+                            <i data-lucide="user-check" class="public-input-icon w-4 h-4"></i>
+                            <i data-lucide="chevron-down" class="public-input-icon !left-auto !right-3.5 w-4 h-4 pointer-events-none"></i>
+                            <select id="gender_input" name="{{ field.field_key }}" data-validate="gender" {% if field.is_required %}required{% endif %} class="public-input with-icon cursor-pointer appearance-none pr-10 {% if field_errors.gender %}input-error{% endif %}">
+                                <option value="">Select your gender...</option>
+                                {% if field.options %}
+                                    {% for opt in field.options %}
+                                    <option value="{{ opt }}" {% if preserved_data.gender == opt %}selected{% endif %}>{{ opt }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="Male" {% if preserved_data.gender == 'Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if preserved_data.gender == 'Female' %}selected{% endif %}>Female</option>
+                                    <option value="Other" {% if preserved_data.gender == 'Other' %}selected{% endif %}>Other</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <p id="gender_error_msg" class="text-[11.5px] font-semibold text-rose-600 {% if not field_errors.gender %}hidden{% endif %} flex items-center gap-1.5 pt-0.5">
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 shrink-0 text-rose-600"></i>
+                            <span class="msg-text">{% if field_errors.gender %}{{ field_errors.gender }}{% endif %}</span>
+                        </p>
                     </div>
 
                     {% elif field.field_type == 'number' or field.field_key == 'ticket_count' or field.field_key == 'tickets' or field.label|lower == 'ticket count' %}
@@ -141,6 +216,20 @@
                         </div>
                     </div>
 
+                    {% elif field.field_type == 'textarea' %}
+                    <textarea name="{{ field.field_key }}" rows="3" placeholder="{{ field.placeholder|default:'Enter your response...' }}" {% if field.is_required %}required{% endif %} class="public-input"></textarea>
+
+                    {% elif field.field_type == 'dropdown' %}
+                    <div class="public-input-group">
+                        <i data-lucide="chevron-down" class="public-input-icon !left-auto !right-3.5 w-4 h-4 pointer-events-none"></i>
+                        <select name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="public-input cursor-pointer appearance-none pr-10">
+                            <option value="">Select an option...</option>
+                            {% for opt in field.options %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
                     {% elif field.field_type == 'checkbox' %}
                     <div class="flex items-center gap-2.5 pt-1">
                         <input type="checkbox" id="chk_{{ field.field_key }}" name="{{ field.field_key }}" {% if field.is_required %}required{% endif %} class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer">
@@ -149,34 +238,16 @@
                         </label>
                     </div>
 
-                    {% elif field.field_key == 'full_name' or field.label|lower == 'full name' or field.label|lower == 'name' %}
-                    <div class="public-input-group">
-                        <i data-lucide="user" class="public-input-icon w-4 h-4"></i>
-                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'e.g. Alex Johnson' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
-                    </div>
-
-                    {% elif field.field_key == 'email_address' or field.field_type == 'email' or field.label|lower == 'email' or 'email' in field.label|lower %}
-                    <div class="public-input-group">
-                        <i data-lucide="mail" class="public-input-icon w-4 h-4"></i>
-                        <input type="email" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'alex@company.com' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
-                    </div>
-
-                    {% elif field.field_key == 'phone_number' or field.field_type == 'tel' or 'phone' in field.label|lower or 'mobile' in field.label|lower %}
-                    <div class="public-input-group">
-                        <i data-lucide="phone" class="public-input-icon w-4 h-4"></i>
-                        <input type="tel" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'+91 98765 43210' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
-                    </div>
-
                     {% elif 'company' in field.label|lower or 'organization' in field.label|lower %}
                     <div class="public-input-group">
                         <i data-lucide="building-2" class="public-input-icon w-4 h-4"></i>
-                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'Company or University' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                        <input type="text" name="{{ field.field_key }}" value="{% if preserved_data.company_organization %}{{ preserved_data.company_organization }}{% elif preserved_data.company %}{{ preserved_data.company }}{% endif %}" placeholder="{{ field.placeholder|default:'Company or University' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
                     </div>
 
                     {% elif 'designation' in field.label|lower or 'role' in field.label|lower %}
                     <div class="public-input-group">
                         <i data-lucide="briefcase" class="public-input-icon w-4 h-4"></i>
-                        <input type="text" name="{{ field.field_key }}" placeholder="{{ field.placeholder|default:'e.g. Lead Engineer' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
+                        <input type="text" name="{{ field.field_key }}" value="{% if preserved_data.designation_role %}{{ preserved_data.designation_role }}{% elif preserved_data.designation %}{{ preserved_data.designation }}{% endif %}" placeholder="{{ field.placeholder|default:'e.g. Lead Engineer' }}" {% if field.is_required %}required{% endif %} class="public-input with-icon">
                     </div>
 
                     {% else %}
@@ -227,7 +298,7 @@
 
 <script>
     const unitPrice = parseFloat("{{ event.registration_fee|default:'0' }}") || 0;
-    const genderOptions = ['Male', 'Female', 'Other / Prefer not to say'];
+    const genderOptions = ['Male', 'Female', 'Other'];
 
     function setTickets(val) {
         const input = document.getElementById('ticket-count-input');
@@ -358,7 +429,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="space-y-1">
                             <label class="block text-[11px] font-semibold text-slate-700">Full Name *</label>
-                            <input type="text" name="person_${i}_name" value="${escapeHtml(prefill.name)}" required placeholder="Full Name" class="public-input text-xs py-2">
+                            <input type="text" name="person_${i}_name" value="${escapeHtml(prefill.name)}" required placeholder="Enter your full name" class="public-input text-xs py-2">
                         </div>
 
                         <div class="space-y-1">
@@ -369,7 +440,7 @@
                         <div class="space-y-1">
                             <label class="block text-[11px] font-semibold text-slate-700">Gender *</label>
                             <select name="person_${i}_gender" required class="public-input text-xs py-2 cursor-pointer">
-                                <option value="">Select...</option>
+                                <option value="">Select your gender...</option>
                                 ${genderOptions.map(opt => `<option value="${opt}" ${prefill.gender === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                             </select>
                         </div>
@@ -409,6 +480,226 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        const nameInput = document.getElementById('name_input') || document.querySelector('input[data-validate="name"]');
+        const nameError = document.getElementById('name_error_msg');
+        const phoneInput = document.getElementById('phone_input') || document.querySelector('input[data-validate="phone"]');
+        const phoneError = document.getElementById('phone_error_msg');
+        const emailInput = document.getElementById('email_input') || document.querySelector('input[data-validate="email"]');
+        const emailError = document.getElementById('email_error_msg');
+        const ageInput = document.getElementById('age_input') || document.querySelector('input[data-validate="age"]');
+        const ageError = document.getElementById('age_error_msg');
+        const genderInput = document.getElementById('gender_input') || document.querySelector('select[data-validate="gender"]');
+        const genderError = document.getElementById('gender_error_msg');
+        const regForm = document.getElementById('publicRegForm');
+
+        function setFieldState(input, errorEl, hasError, message) {
+            if (!input) return;
+            const group = input.closest('.public-input-group') || input.parentElement;
+            if (hasError) {
+                input.classList.add('input-error');
+                if (group) group.classList.add('has-error');
+                if (errorEl) {
+                    const textSpan = errorEl.querySelector('.msg-text') || errorEl;
+                    textSpan.textContent = message;
+                    errorEl.classList.remove('hidden');
+                }
+            } else {
+                input.classList.remove('input-error');
+                if (group) group.classList.remove('has-error');
+                if (errorEl) {
+                    errorEl.classList.add('hidden');
+                }
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function validateName(isTyping = false) {
+            if (!nameInput) return true;
+            const val = nameInput.value.trim();
+            if (val.length === 0) {
+                if (isTyping) {
+                    setFieldState(nameInput, nameError, false, '');
+                    return true;
+                } else if (nameInput.hasAttribute('required')) {
+                    setFieldState(nameInput, nameError, true, 'Full Name is required.');
+                    return false;
+                }
+            }
+            setFieldState(nameInput, nameError, false, '');
+            return true;
+        }
+
+        function validatePhone(isTyping = false) {
+            if (!phoneInput) return true;
+            const raw = phoneInput.value;
+            const digits = raw.replace(/\D/g, '');
+            if (raw !== digits) {
+                phoneInput.value = digits;
+            }
+
+            if (digits.length === 0) {
+                if (isTyping) {
+                    setFieldState(phoneInput, phoneError, false, '');
+                    return true;
+                } else if (phoneInput.hasAttribute('required')) {
+                    setFieldState(phoneInput, phoneError, true, 'Phone number is required.');
+                    return false;
+                } else {
+                    setFieldState(phoneInput, phoneError, false, '');
+                    return true;
+                }
+            }
+
+            if (digits.length < 10) {
+                setFieldState(phoneInput, phoneError, true, 'Phone number must be 10 digits.');
+                return false;
+            } else if (digits.length > 10) {
+                setFieldState(phoneInput, phoneError, true, 'Phone number cannot exceed 10 digits.');
+                return false;
+            } else {
+                setFieldState(phoneInput, phoneError, false, '');
+                return true;
+            }
+        }
+
+        function validateEmail(isTyping = false) {
+            if (!emailInput) return true;
+            const val = emailInput.value.trim();
+
+            if (val.length === 0) {
+                if (isTyping) {
+                    setFieldState(emailInput, emailError, false, '');
+                    return true;
+                } else if (emailInput.hasAttribute('required')) {
+                    setFieldState(emailInput, emailError, true, 'Email address is required.');
+                    return false;
+                } else {
+                    setFieldState(emailInput, emailError, false, '');
+                    return true;
+                }
+            }
+
+            // Strictly require @gmail.com
+            const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+            if (!gmailRegex.test(val)) {
+                if (isTyping && !val.includes('@') && val.length < 4) {
+                    setFieldState(emailInput, emailError, false, '');
+                    return true;
+                }
+                setFieldState(emailInput, emailError, true, 'Only @gmail.com email addresses are allowed (e.g. yourname@gmail.com).');
+                return false;
+            } else {
+                setFieldState(emailInput, emailError, false, '');
+                return true;
+            }
+        }
+
+        function validateAge(isTyping = false) {
+            if (!ageInput) return true;
+            const val = ageInput.value.trim();
+            if (val.length === 0) {
+                if (isTyping) {
+                    setFieldState(ageInput, ageError, false, '');
+                    return true;
+                } else if (ageInput.hasAttribute('required')) {
+                    setFieldState(ageInput, ageError, true, 'Age is required.');
+                    return false;
+                }
+            } else {
+                const num = parseInt(val, 10);
+                if (isNaN(num) || num < 1 || num > 120) {
+                    setFieldState(ageInput, ageError, true, 'Please enter a valid age between 1 and 120.');
+                    return false;
+                } else {
+                    setFieldState(ageInput, ageError, false, '');
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        function validateGender() {
+            if (!genderInput) return true;
+            const val = genderInput.value.trim();
+            if (!val || val.toLowerCase().includes('select')) {
+                if (genderInput.hasAttribute('required')) {
+                    setFieldState(genderInput, genderError, true, 'Please select your gender.');
+                    return false;
+                }
+            }
+            setFieldState(genderInput, genderError, false, '');
+            return true;
+        }
+
+        if (nameInput) {
+            nameInput.addEventListener('input', () => validateName(true));
+            nameInput.addEventListener('blur', () => validateName(false));
+        }
+        if (phoneInput) {
+            phoneInput.addEventListener('input', () => validatePhone(true));
+            phoneInput.addEventListener('blur', () => validatePhone(false));
+        }
+        if (emailInput) {
+            emailInput.addEventListener('input', () => validateEmail(true));
+            emailInput.addEventListener('blur', () => validateEmail(false));
+        }
+        if (ageInput) {
+            ageInput.addEventListener('input', () => validateAge(true));
+            ageInput.addEventListener('blur', () => validateAge(false));
+        }
+        if (genderInput) {
+            genderInput.addEventListener('change', () => validateGender());
+        }
+
+        // Live clear error on any other required input
+        regForm.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('input', () => {
+                el.classList.remove('input-error');
+                const grp = el.closest('.public-input-group');
+                if (grp) grp.classList.remove('has-error');
+            });
+        });
+
+        if (regForm) {
+            regForm.addEventListener('submit', function(e) {
+                const nameOk = validateName(false);
+                const emailOk = validateEmail(false);
+                const phoneOk = validatePhone(false);
+                const ageOk = validateAge(false);
+                const genderOk = validateGender();
+
+                let firstInvalidEl = null;
+                if (!nameOk && !firstInvalidEl) firstInvalidEl = nameInput;
+                if (!emailOk && !firstInvalidEl) firstInvalidEl = emailInput;
+                if (!phoneOk && !firstInvalidEl) firstInvalidEl = phoneInput;
+                if (!ageOk && !firstInvalidEl) firstInvalidEl = ageInput;
+                if (!genderOk && !firstInvalidEl) firstInvalidEl = genderInput;
+
+                const requiredInputs = regForm.querySelectorAll('input[required], select[required], textarea[required]');
+                let genericRequiredOk = true;
+                requiredInputs.forEach(input => {
+                    if (input === nameInput || input === emailInput || input === phoneInput || input === ageInput || input === genderInput) return;
+                    if (!input.value || !input.value.trim()) {
+                        input.classList.add('input-error');
+                        const grp = input.closest('.public-input-group');
+                        if (grp) grp.classList.add('has-error');
+                        genericRequiredOk = false;
+                        if (!firstInvalidEl) firstInvalidEl = input;
+                    }
+                });
+
+                if (!nameOk || !emailOk || !phoneOk || !ageOk || !genderOk || !genericRequiredOk) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (firstInvalidEl) {
+                        firstInvalidEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstInvalidEl.focus();
+                    }
+                    return false;
+                }
+            });
+        }
     });
 </script>
 {% endblock %}

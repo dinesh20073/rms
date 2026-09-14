@@ -104,13 +104,9 @@
             </div>
 
             <div class="flex items-center justify-center flex-wrap gap-2.5 pt-2">
-                <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}?print=1" target="_blank" class="google-btn-primary px-4 py-2 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}?print=1" target="_blank" class="google-btn-primary px-5 py-2.5 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="printer" class="w-4 h-4"></i>
                     <span>Print Pass</span>
-                </a>
-                <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}" target="_blank" class="google-btn-outlined px-4 py-2 text-xs font-semibold flex items-center gap-1.5">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span>Download Pass Image</span>
                 </a>
             </div>
 
@@ -195,9 +191,9 @@
             <div class="flex flex-col items-center justify-center space-y-3 pt-1">
                 <div class="p-3 bg-white border border-[#dadce0] rounded-xl shadow-xs">
                     {% if event.qr_display_url %}
-                    <img src="{{ event.qr_display_url }}" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
+                    <img src="{{ event.qr_display_url }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D{{ event.upi_id }}%26pn%3D{{ event.upi_name|urlencode }}%26am%3D{{ order.amount|floatformat:2 }}%26cu%3DINR';" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
                     {% elif order.qr_display_url %}
-                    <img src="{{ order.qr_display_url }}" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
+                    <img src="{{ order.qr_display_url }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D{{ event.upi_id }}%26pn%3D{{ event.upi_name|urlencode }}%26am%3D{{ order.amount|floatformat:2 }}%26cu%3DINR';" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
                     {% else %}
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa={{ event.upi_id }}&pn={{ event.upi_name }}&am={{ order.amount|floatformat:2 }}&cu=INR" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
                     {% endif %}

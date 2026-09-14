@@ -6,477 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}Nizhal • Registration & Event Platform{% endblock %}</title>
     
-    <!-- Google Official Fonts: Roboto, Google Sans / Plus Jakarta Sans, Roboto Mono -->
+    <!-- Favicon & Brand Icons -->
+    <link rel="icon" type="image/png" href="{% static 'images/nizhal_logo.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/nizhal_logo.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/nizhal_logo.png' %}">
+    
+    <!-- Google Fonts: Optimized with font-display=swap & reduced weights -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS with Google Material Theme -->
-    <script>
-        tailwind = {
-            config: {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        fontFamily: {
-                            sans: ['Roboto', -apple-system, 'BlinkMacSystemFont', 'Segoe UI', 'Arial', 'sans-serif'],
-                            display: ['Plus Jakarta Sans', 'Roboto', 'sans-serif'],
-                            mono: ['Roboto Mono', 'monospace'],
-                        },
-                        colors: {
-                            google: {
-                                blue: '#1a73e8',
-                                blueHover: '#1557b0',
-                                blueActive: '#174ea6',
-                                blueTint: '#e8f0fe',
-                                blueBorder: '#dadce0',
-                                green: '#1e8e3e',
-                                greenDark: '#137333',
-                                greenTint: '#e6f4ea',
-                                red: '#d93025',
-                                redDark: '#c5221f',
-                                redTint: '#fce8e6',
-                                yellow: '#f9ab00',
-                                yellowDark: '#b06000',
-                                yellowTint: '#fef7e0',
-                                gray: '#5f6368',
-                                dark: '#202124',
-                                border: '#dadce0',
-                                bg: '#f8f9fa',
-                            },
-                            brand: {
-                                DEFAULT: '#1a73e8',
-                                hover: '#1557b0',
-                                active: '#174ea6',
-                                tint: '#e8f0fe',
-                                border: '#dadce0',
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pre-compiled Tailwind CSS + Design System (local, cached) -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
     
-    <!-- HTMX & Lucide Icons -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Bootstrap Icons (Official v1.13.1) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+    
+    <!-- Pinned Vendor JS (local, no CDN blocking) -->
+    <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
+    <script src="{% static 'js/vendor/lucide.min.js' %}" defer></script>
 
-    <!-- Google Design System Stylesheet -->
-    <style>
-        *, *::before, *::after { 
-            box-sizing: border-box; 
-        }
-        html, body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background-color: #f8f9fa !important;
-            color: #202124 !important;
-            min-height: 100%;
-            -webkit-font-smoothing: antialiased;
-        }
-        .font-display { font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important; }
-        .font-mono { font-family: 'Roboto Mono', monospace !important; }
-
-        /* Google Material Input Styles */
-        .google-input, .clean-input, .survey-input {
-            width: 100%;
-            background-color: #ffffff !important;
-            color: #202124 !important;
-            border: 1px solid #dadce0 !important;
-            border-radius: 8px !important;
-            padding: 10px 14px !important;
-            font-size: 14px !important;
-            font-family: 'Roboto', sans-serif !important;
-            font-weight: 400 !important;
-            outline: none !important;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-        .google-input:hover, .clean-input:hover, .survey-input:hover {
-            border-color: #5f6368 !important;
-        }
-        .google-input:focus, .clean-input:focus, .survey-input:focus {
-            border-color: #1a73e8 !important;
-            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
-            background-color: #ffffff !important;
-        }
-        .google-input::placeholder, .clean-input::placeholder, .survey-input::placeholder {
-            color: #80868b !important;
-        }
-
-        .google-select {
-            background-color: #ffffff !important;
-            color: #202124 !important;
-            border: 1px solid #dadce0 !important;
-            border-radius: 8px !important;
-            padding: 9px 14px !important;
-            font-size: 13px !important;
-            font-family: 'Roboto', sans-serif !important;
-            outline: none !important;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-        .google-select:hover {
-            border-color: #5f6368 !important;
-        }
-        .google-select:focus {
-            border-color: #1a73e8 !important;
-            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
-        }
-
-        .google-search-pill {
-            width: 100%;
-            background-color: #ffffff !important;
-            color: #202124 !important;
-            border: 1px solid #dadce0 !important;
-            border-radius: 24px !important;
-            padding: 9px 16px 9px 40px !important;
-            font-size: 13px !important;
-            font-family: 'Roboto', sans-serif !important;
-            outline: none !important;
-            transition: all 0.2s ease !important;
-        }
-        .google-search-pill:hover {
-            box-shadow: 0 1px 6px rgba(32,33,36,0.18) !important;
-            border-color: rgba(223,225,229,0) !important;
-        }
-        .google-search-pill:focus {
-            border-color: #1a73e8 !important;
-            box-shadow: 0 1px 6px rgba(32,33,36,0.24) !important;
-        }
-
-        /* Clean Flat Buttons (Google Cloud Style) */
-        .google-btn-primary, .btn-auth-primary, .survey-btn-submit {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background-color: #1a73e8 !important;
-            color: #ffffff !important;
-            border: 1px solid #1a73e8 !important;
-            border-radius: 4px !important;
-            padding: 6px 14px !important;
-            font-size: 13px !important;
-            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            cursor: pointer;
-            box-shadow: none !important;
-            transition: background-color 0.15s ease !important;
-            white-space: nowrap;
-            line-height: 1.4 !important;
-        }
-        .google-btn-primary:hover, .btn-auth-primary:hover, .survey-btn-submit:hover {
-            background-color: #1557b0 !important;
-            border-color: #1557b0 !important;
-        }
-        .google-btn-primary:active, .btn-auth-primary:active {
-            background-color: #174ea6 !important;
-        }
-
-        .google-btn-outlined {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            background-color: #ffffff !important;
-            color: #1a73e8 !important;
-            border: 1px solid #dadce0 !important;
-            border-radius: 4px !important;
-            padding: 5px 12px !important;
-            font-size: 13px !important;
-            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            cursor: pointer;
-            transition: all 0.15s ease !important;
-            white-space: nowrap;
-            line-height: 1.4 !important;
-        }
-        .google-btn-outlined:hover {
-            background-color: #f1f3f4 !important;
-            border-color: #dadce0 !important;
-            color: #1557b0 !important;
-        }
-
-        .google-btn-tonal {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            background-color: #f1f3f4 !important;
-            color: #202124 !important;
-            border: 1px solid #dadce0 !important;
-            border-radius: 4px !important;
-            padding: 5px 12px !important;
-            font-size: 13px !important;
-            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            cursor: pointer;
-            transition: all 0.15s ease !important;
-            white-space: nowrap;
-            line-height: 1.4 !important;
-        }
-        .google-btn-tonal:hover {
-            background-color: #e8eaed !important;
-        }
-
-        .google-btn-danger {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            background-color: #ffffff !important;
-            color: #d93025 !important;
-            border: 1px solid #dadce0 !important;
-            border-radius: 4px !important;
-            padding: 5px 12px !important;
-            font-size: 13px !important;
-            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            cursor: pointer;
-            transition: all 0.15s ease !important;
-            white-space: nowrap;
-            line-height: 1.4 !important;
-        }
-        .google-btn-danger:hover {
-            background-color: #fce8e6 !important;
-            border-color: #fad2cf !important;
-        }
-
-        .google-btn-warning {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            background-color: #fef7e0 !important;
-            color: #b06000 !important;
-            border: 1px solid #f9ab00 !important;
-            border-radius: 4px !important;
-            padding: 5px 12px !important;
-            font-size: 13px !important;
-            font-family: 'Roboto', 'Plus Jakarta Sans', sans-serif !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            cursor: pointer;
-            transition: all 0.15s ease !important;
-            white-space: nowrap;
-            line-height: 1.4 !important;
-        }
-        .google-btn-warning:hover {
-            background-color: #fde293 !important;
-            color: #8c4500 !important;
-            border-color: #f9ab00 !important;
-        }
-
-        /* Clean Flat Status Badges (No Curved Capsules) */
-        .pill-green, .badge-green {
-            color: #137333 !important;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            background: none !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        .pill-green::before, .badge-green::before {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #1e8e3e;
-        }
-
-        .pill-orange, .badge-orange {
-            color: #b06000 !important;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            background: none !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        .pill-orange::before, .badge-orange::before {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #f9ab00;
-        }
-
-        .pill-blue, .badge-blue {
-            color: #1a73e8 !important;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            background: none !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        .pill-blue::before, .badge-blue::before {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #1a73e8;
-        }
-
-        .pill-red, .badge-red {
-            color: #c5221f !important;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            background: none !important;
-            border: none !important;
-            padding: 0 !important;
-        }
-        .pill-red::before, .badge-red::before {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #d93025;
-        }
-
-        /* Clean Flat Cards */
-        .google-card, .auth-card, .survey-card-container {
-            background-color: #ffffff !important;
-            border: 1px solid #dadce0 !important;
-            border-radius: 8px !important;
-            box-shadow: none !important;
-        }
-
-        /* Clean scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
-
-        /* Clean Table Container */
-        .table-scroll-container {
-            flex: 1 1 0%;
-            height: 100%;
-            overflow-x: auto;
-            overflow-y: auto;
-            position: relative;
-            background-color: #ffffff;
-            -webkit-overflow-scrolling: touch;
-        }
-        .table-scroll-container thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dadce0;
-        }
-
-        /* Responsive Mobile Table Styles */
-        @media (max-width: 768px) {
-            .table-scroll-container table,
-            .google-card table {
-                font-size: 12px !important;
-            }
-            .table-scroll-container th,
-            .google-card table th {
-                padding: 8px 10px !important;
-                font-size: 11px !important;
-                white-space: nowrap !important;
-            }
-            .table-scroll-container td,
-            .google-card table td {
-                padding: 8px 10px !important;
-                font-size: 12px !important;
-            }
-            .pill-green, .pill-orange, .pill-blue, .pill-red {
-                padding: 2px 7px !important;
-                font-size: 10.5px !important;
-            }
-            .google-btn-primary, .google-btn-outlined, .google-btn-tonal, .google-btn-danger {
-                padding: 5px 10px !important;
-                font-size: 11.5px !important;
-                gap: 4px !important;
-            }
-        }
-
-        /* Status-Based Row Background Coloring */
-        tbody tr.row-verified {
-            background-color: #f6fcf8 !important;
-            border-left: 4px solid #1e8e3e !important;
-        }
-        tbody tr.row-verified:hover {
-            background-color: #e6f4ea !important;
-        }
-
-        tbody tr.row-review {
-            background-color: #fefdf5 !important;
-            border-left: 4px solid #f9ab00 !important;
-        }
-        tbody tr.row-review:hover {
-            background-color: #fef7e0 !important;
-        }
-
-        tbody tr.row-pending {
-            background-color: #f8fafd !important;
-            border-left: 4px solid #1a73e8 !important;
-        }
-        tbody tr.row-pending:hover {
-            background-color: #e8f0fe !important;
-        }
-
-        tbody tr.row-failed {
-            background-color: #fdf6f5 !important;
-            border-left: 4px solid #d93025 !important;
-        }
-        tbody tr.row-failed:hover {
-            background-color: #fce8e6 !important;
-        }
-
-        /* Google Material Compact Pill Snackbar Styles */
-        .google-snackbar {
-            background-color: #202124;
-            color: #ffffff;
-            border-radius: 9999px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 6px 12px;
-            max-width: 92vw;
-            width: auto;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        @media (min-width: 640px) {
-            .google-snackbar {
-                border-radius: 8px;
-                font-size: 13px;
-                padding: 8px 14px;
-                max-width: 400px;
-            }
-        }
-    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-full flex flex-col bg-[#f8f9fa] text-[#202124] antialiased selection:bg-[#e8f0fe] selection:text-[#1a73e8]">
@@ -490,19 +40,19 @@
                     <div class="shrink-0 mt-0.5">
                         {% if message.tags == 'success' %}
                         <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            <i class="bi bi-check-circle-fill text-sm"></i>
                         </div>
                         {% elif message.tags == 'error' %}
                         <div class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
-                            <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                            <i class="bi bi-exclamation-circle-fill text-sm"></i>
                         </div>
                         {% elif message.tags == 'warning' %}
                         <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                            <i class="bi bi-exclamation-triangle-fill text-sm"></i>
                         </div>
                         {% else %}
                         <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                            <i data-lucide="info" class="w-4 h-4"></i>
+                            <i class="bi bi-info-circle-fill text-sm"></i>
                         </div>
                         {% endif %}
                     </div>
@@ -517,7 +67,7 @@
                     </div>
                 </div>
                 <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="text-slate-400 hover:text-slate-700 p-1 shrink-0 transition cursor-pointer" title="Dismiss">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    <i class="bi bi-x-lg text-xs"></i>
                 </button>
             </div>
             {% endfor %}
@@ -545,7 +95,7 @@
             const toast = document.createElement('div');
             toast.className = `toast-item pointer-events-auto bg-white border ${type === 'success' ? 'border-emerald-200 border-l-4 border-l-emerald-600' : (type === 'error' ? 'border-rose-200 border-l-4 border-l-rose-600' : 'border-blue-200 border-l-4 border-l-blue-600')} rounded-xl shadow-xl p-3.5 flex items-start justify-between gap-3 transition-all duration-300 transform translate-x-4 opacity-0 w-full`;
             
-            const iconName = type === 'success' ? 'check-circle-2' : (type === 'error' ? 'alert-circle' : 'info');
+            const iconClass = type === 'success' ? 'bi-check-circle-fill' : (type === 'error' ? 'bi-exclamation-circle-fill' : 'bi-info-circle-fill');
             const iconBg = type === 'success' ? 'bg-emerald-50 text-emerald-600' : (type === 'error' ? 'bg-rose-50 text-rose-600' : 'bg-blue-50 text-blue-600');
             const defaultTitle = title || (type === 'success' ? 'Success' : (type === 'error' ? 'Error' : 'Notice'));
 
@@ -553,7 +103,7 @@
                 <div class="flex items-start gap-3 min-w-0">
                     <div class="shrink-0 mt-0.5">
                         <div class="w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center">
-                            <i data-lucide="${iconName}" class="w-4 h-4"></i>
+                            <i class="bi ${iconClass} text-sm"></i>
                         </div>
                     </div>
                     <div class="min-w-0">
@@ -562,7 +112,7 @@
                     </div>
                 </div>
                 <button type="button" onclick="dismissToast(this.closest('.toast-item'))" class="text-slate-400 hover:text-slate-700 p-1 shrink-0 transition cursor-pointer" title="Dismiss">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    <i class="bi bi-x-lg text-xs"></i>
                 </button>
             `;
             container.appendChild(toast);
@@ -613,9 +163,78 @@
             }, 2000);
         }
 
-        lucide.createIcons();
+        // Map data-lucide icons automatically to Bootstrap Icons
+        function initBootstrapIcons() {
+            const map = {
+                'layout-grid': 'bi-grid-fill',
+                'receipt': 'bi-receipt',
+                'database': 'bi-database',
+                'form-input': 'bi-calendar2-event',
+                'credit-card': 'bi-credit-card',
+                'mail': 'bi-envelope',
+                'log-out': 'bi-box-arrow-right',
+                'refresh-cw': 'bi-arrow-clockwise',
+                'badge-check': 'bi-patch-check-fill',
+                'shield-check': 'bi-shield-check',
+                'calendar': 'bi-calendar-event',
+                'calendar-x': 'bi-calendar-x',
+                'users': 'bi-people',
+                'trending-up': 'bi-graph-up-arrow',
+                'pie-chart': 'bi-pie-chart-fill',
+                'zap': 'bi-lightning-charge-fill',
+                'plus': 'bi-plus-lg',
+                'check': 'bi-check-lg',
+                'check-circle': 'bi-check-circle-fill',
+                'check-circle-2': 'bi-check-circle-fill',
+                'arrow-right': 'bi-arrow-right',
+                'chevron-right': 'bi-chevron-right',
+                'chevron-down': 'bi-chevron-down',
+                'clock': 'bi-clock',
+                'lock': 'bi-lock-fill',
+                'map-pin': 'bi-geo-alt',
+                'user': 'bi-person',
+                'user-check': 'bi-person-check',
+                'alert-circle': 'bi-exclamation-circle-fill',
+                'alert-triangle': 'bi-exclamation-triangle-fill',
+                'printer': 'bi-printer',
+                'trash-2': 'bi-trash3',
+                'upload-cloud': 'bi-cloud-arrow-up',
+                'sparkles': 'bi-stars',
+                'ticket': 'bi-ticket-perforated',
+                'building-2': 'bi-building',
+                'briefcase': 'bi-briefcase',
+                'laptop': 'bi-laptop',
+                'search': 'bi-search',
+                'info': 'bi-info-circle',
+                'bell': 'bi-bell',
+                'eye': 'bi-eye',
+                'eye-off': 'bi-eye-slash',
+                'download': 'bi-download',
+                'filter': 'bi-funnel',
+                'x': 'bi-x-lg'
+            };
+            document.querySelectorAll('[data-lucide]').forEach(el => {
+                const name = el.getAttribute('data-lucide');
+                if (name && map[name]) {
+                    el.classList.add('bi', map[name]);
+                } else if (name) {
+                    el.classList.add('bi', `bi-${name}`);
+                }
+            });
+        }
+
+        // Initialize icons after DOM + deferred scripts load
+        document.addEventListener('DOMContentLoaded', function() {
+            initBootstrapIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
         document.body.addEventListener('htmx:afterSwap', function() {
-            lucide.createIcons();
+            initBootstrapIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         });
     </script>
     <script src="{% static 'js/bank_session_sync.js' %}"></script>

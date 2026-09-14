@@ -1,6 +1,6 @@
 {% extends 'dashboard_base.html' %}
 
-{% block header_title %}Form Builder • {{ event.title }}{% endblock %}
+{% block header_title %}Form • {{ event.title }}{% endblock %}
 
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
@@ -24,6 +24,10 @@
             <p class="text-xs text-[#5f6368] mt-1">Configure registration form questions, response deadlines, and capacity controls.</p>
         </div>
         <div class="flex items-center gap-2.5">
+            <a href="{% url 'dashboard-event-edit' event.id %}" class="google-btn-outlined text-xs rounded-full">
+                <i data-lucide="edit" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                <span>Edit Event</span>
+            </a>
             <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-outlined text-xs rounded-full">
                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                 <span>Live Form</span>
@@ -69,29 +73,43 @@
                     </div>
 
                     <!-- Deadline & Schedule Pickers -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="text-xs font-medium text-[#202124] block mb-1">
-                                <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Deadline (Closes At)
+                                <i data-lucide="calendar-check" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Event Date & Time (Start)
                             </label>
-                            <input type="datetime-local" name="registration_closes" value="{{ event.registration_closes|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
-                            <p class="text-[10px] text-[#5f6368] mt-1">Form automatically stops accepting responses after this timestamp.</p>
+                            <input type="datetime-local" name="event_start_date" value="{{ event.event_start_date|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
+                            <p class="text-[10px] text-[#5f6368] mt-1">When the event takes place.</p>
                         </div>
 
                         <div>
                             <label class="text-xs font-medium text-[#202124] block mb-1">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Opens At
+                                <i data-lucide="calendar" class="w-3.5 h-3.5 inline text-[#1a73e8]"></i> Registration Opens
                             </label>
                             <input type="datetime-local" name="registration_opens" value="{{ event.registration_opens|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
-                            <p class="text-[10px] text-[#5f6368] mt-1">When users are allowed to start submitting entries.</p>
+                            <p class="text-[10px] text-[#5f6368] mt-1">When submissions open.</p>
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 inline text-[#c5221f]"></i> Deadline (Closes)
+                            </label>
+                            <input type="datetime-local" name="registration_closes" value="{{ event.registration_closes|date:'Y-m-d\TH:i' }}" class="google-input text-xs">
+                            <p class="text-[10px] text-[#5f6368] mt-1">When submissions close.</p>
                         </div>
                     </div>
 
                     <!-- Capacity & Venue -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="text-xs font-medium text-[#202124] block mb-1">Max Attendee Capacity</label>
-                            <input type="number" name="max_capacity" value="{{ event.max_capacity }}" min="1" class="google-input text-xs">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-medium text-[#202124] block">Max Attendee Capacity</label>
+                                <label class="text-[11px] text-[#1a73e8] font-medium flex items-center gap-1 cursor-pointer">
+                                    <input type="checkbox" id="unlimited_cap_fb" name="unlimited_capacity" value="1" {% if not event.max_capacity %}checked{% endif %} class="rounded text-[#1a73e8] focus:ring-0 cursor-pointer" onchange="const inp = document.getElementById('max_cap_input_fb'); if(this.checked){ inp.dataset.prevVal = inp.value; inp.value=''; inp.disabled=true; inp.placeholder='Unlimited (No limit)'; } else { inp.disabled=false; inp.value = inp.dataset.prevVal || '1000'; inp.placeholder='e.g. 1000'; }">
+                                    <span>No Limit</span>
+                                </label>
+                            </div>
+                            <input type="number" id="max_cap_input_fb" name="max_capacity" value="{% if event.max_capacity %}{{ event.max_capacity }}{% endif %}" min="1" placeholder="{% if not event.max_capacity %}Unlimited (No limit){% else %}e.g. 1000{% endif %}" {% if not event.max_capacity %}disabled{% endif %} class="google-input text-xs">
                         </div>
                         <div>
                             <label class="text-xs font-medium text-[#202124] block mb-1">Event Venue / Location</label>
@@ -113,6 +131,86 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Form Payment QR Code (Custom Upload Only) -->
+            <div class="google-card p-5 sm:p-6 space-y-4 border-t-4 border-t-[#137333]">
+                <div class="flex items-center justify-between border-b border-[#dadce0] pb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-[#e6f4ea] text-[#137333] flex items-center justify-center">
+                            <i data-lucide="qr-code" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-[#137333]">
+                                Form Payment QR Code
+                            </h3>
+                            <div class="text-[11px] text-[#5f6368]">Custom Upload Only • Embedded directly in database</div>
+                        </div>
+                    </div>
+                    {% if event.upi_qr_base64 or event.upi_qr_code %}
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[10px] font-semibold flex items-center gap-1 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#137333]"></span> Custom QR Uploaded
+                    </span>
+                    {% else %}
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#fef7e0] text-[#b06000] border border-[#fce8b2] text-[10px] font-semibold flex items-center gap-1 font-mono">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#b06000]"></span> No Custom QR
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-[#f8f9fa] p-4 rounded-xl border border-[#dadce0]">
+                    <!-- Embedded QR Preview -->
+                    <div class="relative group shrink-0">
+                        {% if event.qr_display_url %}
+                        <img src="{{ event.qr_display_url }}" alt="Event UPI QR" class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border border-[#dadce0] bg-white p-1.5 shadow-2xs">
+                        <button type="button" onclick="openProofModal('{{ event.qr_display_url|escapejs }}', 'Event UPI QR Code', '{{ event.title|escapejs }}')" class="absolute inset-0 bg-slate-900/60 text-white rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-[10px] font-semibold gap-1 backdrop-blur-2xs cursor-pointer" title="Preview QR Code">
+                            <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                            <span>Preview</span>
+                        </button>
+                        {% else %}
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border border-dashed border-[#dadce0] bg-white flex flex-col items-center justify-center p-2 text-center">
+                            <i data-lucide="image" class="w-6 h-6 text-[#9aa0a6] mb-1"></i>
+                            <span class="text-[10px] text-[#5f6368] font-medium leading-tight">No Custom QR</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- UPI Info & Actions -->
+                    <div class="space-y-2.5 flex-1 min-w-0">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <span class="text-[#5f6368] text-[10px] font-semibold uppercase block">Payee UPI ID</span>
+                                <span class="font-mono font-bold text-[#202124] text-xs truncate block select-all">{{ event.upi_id }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[#5f6368] text-[10px] font-semibold uppercase block">Payee Name</span>
+                                <span class="font-medium text-[#202124] text-xs truncate block">{{ event.upi_name }}</span>
+                            </div>
+                            <div>
+                                <span class="text-[#5f6368] text-[10px] font-semibold uppercase block">Ticket Fee</span>
+                                <span class="font-mono font-bold text-[#137333] text-xs">₹{{ event.registration_fee|floatformat:2 }} INR</span>
+                            </div>
+                            <div>
+                                <span class="text-[#5f6368] text-[10px] font-semibold uppercase block">QR Mode</span>
+                                <span class="font-mono text-[#137333] font-semibold text-[11px]">Custom Upload Only</span>
+                            </div>
+                        </div>
+
+                        <!-- Upload Controls (Custom Upload Only) -->
+                        <div class="pt-2 border-t border-[#dadce0] flex flex-wrap items-center gap-2">
+                            <form method="POST" enctype="multipart/form-data" class="flex flex-wrap items-center gap-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="upload_qr_code">
+                                <label class="google-btn-primary text-xs py-1.5 px-3.5 rounded-full cursor-pointer flex items-center gap-1.5" title="Upload custom UPI QR screenshot from PhonePe/GooglePay/Paytm">
+                                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                    <span>{% if event.upi_qr_base64 or event.upi_qr_code %}Replace Custom QR{% else %}Upload Custom QR{% endif %}</span>
+                                    <input type="file" name="upi_qr_code" accept="image/*" class="hidden" onchange="this.form.submit()">
+                                </label>
+                            </form>
+                            <span class="text-[11px] text-[#5f6368]">Upload your merchant or personal UPI QR screenshot (PhonePe, GPay, Paytm)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <!-- Existing Fields List -->
             <div class="google-card p-5 sm:p-6 space-y-4">
@@ -120,14 +218,25 @@
                     <h3 class="text-xs font-semibold uppercase tracking-wider text-[#5f6368]">
                         Form Questions ({{ fields.count }})
                     </h3>
-                    <form method="POST" onsubmit="return confirm('Reset all questions to standard default fields (Full Name, Email, Phone, Age, Gender, Ticket Count)?');" class="inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="reset_defaults">
-                        <button type="submit" class="text-[11px] text-[#1a73e8] hover:underline flex items-center gap-1 font-medium cursor-pointer">
-                            <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
-                            <span>Reset Defaults</span>
-                        </button>
-                    </form>
+                    <div class="flex items-center gap-3">
+                        <form method="POST" onsubmit="return confirm('Clear all custom form questions?');" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="clear_form">
+                            <button type="submit" class="text-[11px] text-[#c5221f] hover:underline flex items-center gap-1 font-medium cursor-pointer">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                <span>Clear Form</span>
+                            </button>
+                        </form>
+                        <span class="text-[#dadce0]">•</span>
+                        <form method="POST" onsubmit="return confirm('Reset all questions to standard default fields (Full Name, Email, Phone, Age, Gender, Ticket Count)?');" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="reset_defaults">
+                            <button type="submit" class="text-[11px] text-[#1a73e8] hover:underline flex items-center gap-1 font-medium cursor-pointer">
+                                <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                                <span>Reset Defaults</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="space-y-2.5">
@@ -155,15 +264,23 @@
                             </div>
                         </div>
 
-                        <!-- Delete field action -->
-                        <form method="POST" onsubmit="return confirm('Remove field {{ field.label }}?');">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="delete_field">
-                            <input type="hidden" name="field_id" value="{{ field.id }}">
-                            <button type="submit" class="p-2 text-[#5f6368] hover:text-[#d93025] hover:bg-[#fce8e6] rounded-full transition cursor-pointer" title="Delete Field">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <!-- Action buttons: Edit & Delete -->
+                        <div class="flex items-center gap-1">
+                            <button type="button" 
+                                    onclick="openEditFieldModal('{{ field.id }}', '{{ field.label|escapejs }}', '{{ field.field_type }}', '{{ field.placeholder|default:''|escapejs }}', '{{ field.options|join:', '|escapejs }}', {{ field.is_required|yesno:'true,false' }})" 
+                                    class="p-2 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-full transition cursor-pointer" 
+                                    title="Edit Question">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
                             </button>
-                        </form>
+                            <form method="POST" onsubmit="return confirm('Remove question {{ field.label }}?');" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_field">
+                                <input type="hidden" name="field_id" value="{{ field.id }}">
+                                <button type="submit" class="p-2 text-[#5f6368] hover:text-[#d93025] hover:bg-[#fce8e6] rounded-full transition cursor-pointer" title="Delete Question">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     {% empty %}
                     <div class="py-8 text-center text-xs text-[#5f6368]">No custom fields added yet.</div>
@@ -173,10 +290,13 @@
 
             <!-- Add Field Card -->
             <div class="google-card p-5 sm:p-6">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-[#1a73e8] mb-4 flex items-center gap-2">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    <span>Add Question</span>
-                </h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-[#1a73e8] flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Add Question</span>
+                    </h3>
+                    <span class="text-[11px] text-[#5f6368]">Enter field name & question details</span>
+                </div>
 
                 <form method="POST" class="space-y-4">
                     {% csrf_token %}
@@ -184,14 +304,19 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="text-xs font-medium text-[#202124] block mb-1">Field Label *</label>
-                            <input type="text" name="label" required placeholder="e.g. GitHub URL / Dietary Requirements" class="google-input">
+                            <label class="text-xs font-medium text-[#202124] block mb-1">
+                                Field Name / Label <span class="text-[#d93025]">*</span>
+                            </label>
+                            <input type="text" name="label" required placeholder="Enter field name (e.g. College Name, Roll No, GitHub URL)" class="google-input">
+                            <p class="text-[10px] text-[#5f6368] mt-1">Properly enter the field name to show to attendees.</p>
                         </div>
 
                         <div>
-                            <label class="text-xs font-medium text-[#202124] block mb-1">Field Type *</label>
-                            <select name="field_type" class="google-select w-full">
-                                <option value="text">Short Text</option>
+                            <label class="text-xs font-medium text-[#202124] block mb-1">
+                                Field Type <span class="text-[#d93025]">*</span>
+                            </label>
+                            <select name="field_type" id="add_field_type" class="google-select w-full" onchange="toggleOptionsVisibility(this, 'add_field_options_container')">
+                                <option value="text" selected>Short Text</option>
                                 <option value="email">Email Address</option>
                                 <option value="phone">Phone Number</option>
                                 <option value="number">Number</option>
@@ -203,13 +328,18 @@
                     </div>
 
                     <div>
-                        <label class="text-xs font-medium text-[#202124] block mb-1">Placeholder Text</label>
-                        <input type="text" name="placeholder" placeholder="e.g. https://github.com/username" class="google-input">
+                        <label class="text-xs font-medium text-[#202124] block mb-1">
+                            Placeholder Text <span class="text-[10px] text-[#5f6368] font-normal">(Optional preview hint)</span>
+                        </label>
+                        <input type="text" name="placeholder" placeholder="Enter placeholder hint (e.g. Enter your answer here)" class="google-input">
                     </div>
 
-                    <div>
-                        <label class="text-xs font-medium text-[#202124] block mb-1">Options (Comma-separated for Dropdown)</label>
-                        <input type="text" name="options_csv" placeholder="e.g. Vegetarian, Non-Vegetarian, Vegan" class="google-input">
+                    <div id="add_field_options_container" class="hidden">
+                        <label class="text-xs font-medium text-[#202124] block mb-1">
+                            Options (Comma-separated for Dropdown) <span class="text-[#d93025]">*</span>
+                        </label>
+                        <input type="text" name="options_csv" placeholder="e.g. Option 1, Option 2, Option 3" class="google-input">
+                        <p class="text-[10px] text-[#5f6368] mt-1">Enter choices separated by commas.</p>
                     </div>
 
                     <div class="flex items-center gap-2 pt-1">
@@ -282,4 +412,112 @@
     </div>
 
 </div>
+
+<!-- Edit Field Modal -->
+<div id="editFieldModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-xl shadow-2xl border border-[#dadce0] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit_field">
+            <input type="hidden" name="field_id" id="edit_field_id" value="">
+
+            <div class="px-6 py-4 border-b border-[#dadce0] flex items-center justify-between">
+                <h3 class="text-sm font-bold font-display text-[#202124] flex items-center gap-2">
+                    <i data-lucide="edit-3" class="w-4 h-4 text-[#1a73e8]"></i>
+                    <span>Edit Question</span>
+                </h3>
+                <button type="button" onclick="closeEditFieldModal()" class="text-[#5f6368] hover:text-[#202124] cursor-pointer">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="text-xs font-medium text-[#202124] block mb-1">Field Name / Label <span class="text-[#d93025]">*</span></label>
+                    <input type="text" name="label" id="edit_field_label" required placeholder="Enter field name" class="google-input">
+                    <p class="text-[10px] text-[#5f6368] mt-1">Properly enter the field name to show to attendees.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-medium text-[#202124] block mb-1">Field Type <span class="text-[#d93025]">*</span></label>
+                        <select name="field_type" id="edit_field_type" class="google-select w-full" onchange="toggleOptionsVisibility(this, 'edit_field_options_container')">
+                            <option value="text">Short Text</option>
+                            <option value="email">Email Address</option>
+                            <option value="phone">Phone Number</option>
+                            <option value="number">Number</option>
+                            <option value="textarea">Paragraph</option>
+                            <option value="dropdown">Dropdown</option>
+                            <option value="checkbox">Checkbox</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-medium text-[#202124] block mb-1">Placeholder Text <span class="text-[10px] text-[#5f6368] font-normal">(Optional)</span></label>
+                        <input type="text" name="placeholder" id="edit_field_placeholder" class="google-input" placeholder="Enter placeholder hint">
+                    </div>
+                </div>
+
+                <div id="edit_field_options_container" class="hidden">
+                    <label class="text-xs font-medium text-[#202124] block mb-1">Options (Comma-separated for Dropdown) <span class="text-[#d93025]">*</span></label>
+                    <input type="text" name="options_csv" id="edit_field_options" class="google-input" placeholder="e.g. Option 1, Option 2, Option 3">
+                    <p class="text-[10px] text-[#5f6368] mt-1">Enter choices separated by commas.</p>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="edit_field_is_required" name="is_required" class="rounded border-[#dadce0] text-[#1a73e8] focus:ring-0 cursor-pointer">
+                    <label for="edit_field_is_required" class="text-xs font-medium text-[#202124] cursor-pointer">Mark this question as required</label>
+                </div>
+            </div>
+
+            <div class="px-6 py-3 bg-[#f8f9fa] border-t border-[#dadce0] flex items-center justify-end gap-2">
+                <button type="button" onclick="closeEditFieldModal()" class="google-btn-outlined text-xs py-1.5 px-3.5 cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit" class="google-btn-primary text-xs py-1.5 px-4 rounded-full">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>Save Changes</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleOptionsVisibility(selectEl, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (selectEl.value === 'dropdown') {
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+function openEditFieldModal(id, label, type, placeholder, options, isRequired) {
+    document.getElementById('edit_field_id').value = id;
+    document.getElementById('edit_field_label').value = label;
+    const typeSelect = document.getElementById('edit_field_type');
+    typeSelect.value = type;
+    document.getElementById('edit_field_placeholder').value = placeholder;
+    document.getElementById('edit_field_options').value = options;
+    document.getElementById('edit_field_is_required').checked = isRequired;
+    toggleOptionsVisibility(typeSelect, 'edit_field_options_container');
+    document.getElementById('editFieldModal').classList.remove('hidden');
+}
+
+function closeEditFieldModal() {
+    document.getElementById('editFieldModal').classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    const addTypeSelect = document.getElementById('add_field_type');
+    if (addTypeSelect) {
+        toggleOptionsVisibility(addTypeSelect, 'add_field_options_container');
+    }
+});
+</script>
 {% endblock %}

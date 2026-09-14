@@ -1,5 +1,4 @@
 import os
-import shutil
 from pathlib import Path
 try:
     from dotenv import load_dotenv
@@ -8,6 +7,11 @@ except ImportError:
     pass
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# ==========================================================================
+# Environment Helpers
+# ==========================================================================
 
 def get_env_str(key, default=''):
     val = os.getenv(key)
@@ -25,10 +29,28 @@ def get_env_int(key, default=587):
         return int(str(val).strip())
     return default
 
+
+# ==========================================================================
+# Core Settings
+# ==========================================================================
+
 SECRET_KEY = get_env_str('DJANGO_SECRET_KEY', 'django-insecure-ems-super-secret-key-2026-v1-production-ready')
 DEBUG = get_env_bool('DJANGO_DEBUG', True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.vercel.app',
+    'admin-nizhal-community.vercel.app',
+]
+# Allow all hosts in development
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+
+
+# ==========================================================================
+# Installed Apps
+# ==========================================================================
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,6 +76,11 @@ INSTALLED_APPS = [
     'apps.dashboard',
 ]
 
+
+# ==========================================================================
+# Middleware
+# ==========================================================================
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 ]
@@ -74,25 +101,30 @@ MIDDLEWARE.extend([
 
 ROOT_URLCONF = 'ems_core.urls'
 
+
+# ==========================================================================
+# Templates — Clean configuration with optional caching in production
+# ==========================================================================
+
+# Choose loaders based on DEBUG mode: cached in production for performance
+_template_loaders = [
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+]
+if not DEBUG:
+    _template_loaders = [
+        ('django.template.loaders.cached.Loader', _template_loaders),
+    ]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             BASE_DIR / 'templates',
             BASE_DIR / 'ems_core' / 'templates',
-            os.path.join(str(BASE_DIR), 'templates'),
-            os.path.join(str(BASE_DIR), 'ems_core', 'templates'),
-            '/var/task/templates',
-            '/var/task/ems_core/templates',
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'),
-            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'templates'),
         ],
         'OPTIONS': {
-            'loaders': [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-                'ems_core.template_loader.Loader',
-            ],
+            'loaders': _template_loaders,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -106,8 +138,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ems_core.wsgi.application'
 
-# Database
-# Support DATABASE_URL, SUPABASE_DB_URL, or individual PG/Supabase environment variables
+
+# ==========================================================================
+# Database — Supabase PostgreSQL (primary) / SQLite (local dev fallback)
+# ==========================================================================
+
 import re
 import urllib.parse
 
@@ -131,64 +166,70 @@ DATABASES = None
 
 if db_url:
     try:
-        m = re.match(r'postgresql(?:://|\+[^:]+://)([^:]+):(.*)@([^@:/]+)(?::([0-9]+))?/(.*)', db_url.strip())
-        if m:
-            u_user, u_pwd, u_host, u_port, u_rest = m.groups()
-            u_port = int(u_port or 5432)
-            
-            # Convert Supabase host to IPv4 Transaction Pooler (Port 6543) for AWS Lambda / Vercel
-            if 'supabase.co' in u_host or 'pooler.supabase.com' in u_host:
-                proj_match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', u_host)
-                proj_ref = proj_match.group(1) if proj_match else 'zldazpkryvrqddwvdeno'
-                u_host = 'aws-0-ap-south-1.pooler.supabase.com'
-                u_port = 6543  # Transaction Mode Pooler (unlimited clients, avoids EMAXCONNSESSION)
-                if not u_user.startswith('postgres.'):
-                    u_user = f"postgres.{proj_ref}"
-            
-            raw_pwd = urllib.parse.unquote_plus(u_pwd)
-            clean_db = (u_rest.split('?')[0] if u_rest else 'postgres').strip() or 'postgres'
-            
-            DATABASES = {
-                'default': {
-                    'ENGINE': 'django.db.backends.postgresql',
-                    'NAME': clean_db,
-                    'USER': u_user,
-                    'PASSWORD': raw_pwd,
-                    'HOST': u_host,
-                    'PORT': u_port,
-                    'OPTIONS': {
-                        'sslmode': 'require',
-                        'connect_timeout': 10,
-                        'keepalives': 1,
-                        'keepalives_idle': 30,
-                        'keepalives_interval': 10,
-                        'keepalives_count': 5,
-                    },
-                    'CONN_MAX_AGE': 0,
-                }
+        url_clean = db_url.strip()
+        if '://' in url_clean:
+            prefix, rest = url_clean.split('://', 1)
+        else:
+            rest = url_clean
+
+        # Split credentials from host/path
+        auth_part, host_path = rest.rsplit('@', 1)
+        if ':' in auth_part:
+            u_user, u_pwd = auth_part.split(':', 1)
+        else:
+            u_user, u_pwd = auth_part, ''
+
+        # Split host:port from path/database
+        if '/' in host_path:
+            host_port, path_query = host_path.split('/', 1)
+        else:
+            host_port, path_query = host_path, 'postgres'
+
+        if ':' in host_port:
+            u_host, u_port_str = host_port.split(':', 1)
+            u_port = int(u_port_str)
+        else:
+            u_host = host_port
+            u_port = 5432
+
+        # Convert Supabase direct host to IPv4 Transaction Pooler (Port 6543)
+        if 'supabase.co' in u_host or 'pooler.supabase.com' in u_host:
+            proj_match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', u_host)
+            proj_ref = proj_match.group(1) if proj_match else 'zldazpkryvrqddwvdeno'
+            u_host = 'aws-0-ap-south-1.pooler.supabase.com'
+            u_port = 6543
+            if not u_user.startswith('postgres.'):
+                u_user = f"postgres.{proj_ref}"
+
+        raw_pwd = urllib.parse.unquote_plus(u_pwd)
+        clean_db = (path_query.split('?')[0] if path_query else 'postgres').strip() or 'postgres'
+
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': clean_db,
+                'USER': u_user,
+                'PASSWORD': raw_pwd,
+                'HOST': u_host,
+                'PORT': u_port,
+                'OPTIONS': {
+                    'sslmode': 'require',
+                    'connect_timeout': 10,
+                    'keepalives': 1,
+                    'keepalives_idle': 30,
+                    'keepalives_interval': 10,
+                    'keepalives_count': 5,
+                },
+                'CONN_MAX_AGE': 60,
+                'CONN_HEALTH_CHECKS': True,
             }
+        }
     except Exception as e:
         print(f"Database parsing error: {e}")
         DATABASES = None
 
-
-
-
-
-
-
 if not db_url:
-    if 'VERCEL' in os.environ or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
-        tmp_db = Path('/tmp/db.sqlite3')
-        orig_db = BASE_DIR / 'db.sqlite3'
-        if orig_db.exists() and not tmp_db.exists():
-            try:
-                shutil.copyfile(orig_db, tmp_db)
-            except Exception:
-                pass
-        DB_PATH = tmp_db
-    else:
-        DB_PATH = BASE_DIR / 'db.sqlite3'
+    DB_PATH = BASE_DIR / 'db.sqlite3'
 
     DATABASES = {
         'default': {
@@ -196,6 +237,20 @@ if not db_url:
             'NAME': DB_PATH,
         }
     }
+
+if DATABASES is None:
+    DB_PATH = BASE_DIR / 'db.sqlite3'
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': DB_PATH,
+        }
+    }
+
+
+# ==========================================================================
+# Authentication
+# ==========================================================================
 
 AUTHENTICATION_BACKENDS = [
     'apps.dashboard.auth_backend.ServerlessAuthBackend',
@@ -210,24 +265,42 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
+
+# ==========================================================================
+# Internationalization
+# ==========================================================================
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
+
+
+# ==========================================================================
+# Static & Media Files
+# ==========================================================================
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 WHITENOISE_USE_FINDERS = True
-WHITENOISE_AUTOREFRESH = True
+WHITENOISE_AUTOREFRESH = DEBUG  # Only auto-refresh in development
+
+# Determine whitenoise availability cleanly
+_has_whitenoise = False
+try:
+    import whitenoise
+    _has_whitenoise = True
+except ImportError:
+    pass
 
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if os.path.exists(os.path.join(str(BASE_DIR), '_vendor', 'whitenoise')) or __import__('importlib.util').util.find_spec('whitenoise') else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if _has_whitenoise else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
@@ -243,6 +316,11 @@ else:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# ==========================================================================
+# REST Framework
+# ==========================================================================
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -251,16 +329,24 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 25,
 }
 
-# Email Configuration (Gmail SMTP)
+
+# ==========================================================================
+# Email Configuration (Gmail SMTP) — credentials from .env only
+# ==========================================================================
+
 EMAIL_BACKEND = get_env_str('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = get_env_str('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = get_env_int('EMAIL_PORT', 587)
 EMAIL_USE_TLS = get_env_bool('EMAIL_USE_TLS', True)
-EMAIL_HOST_USER = get_env_str('EMAIL_HOST_USER', 'nizhalcommunity@gmail.com')
+EMAIL_HOST_USER = get_env_str('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = get_env_str('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = get_env_str('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_HOST_USER}>')
+DEFAULT_FROM_EMAIL = get_env_str('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_HOST_USER}>' if EMAIL_HOST_USER else 'noreply@example.com')
 
-# CSRF & Frame Options
+
+# ==========================================================================
+# Security — CSRF, Cookies, HTTPS
+# ==========================================================================
+
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
@@ -284,9 +370,15 @@ SESSION_COOKIE_AGE = 1209600  # 14 days persistent session
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = not DEBUG
 
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
 CSRF_FAILURE_VIEW = 'apps.dashboard.auth_views.csrf_failure_view'
 
+# Production HTTPS security headers
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True

@@ -38,17 +38,29 @@ class Order(models.Model):
 
     @property
     def qr_display_url(self):
-        """Returns the embedded Base64 data URI or file URL or dynamic QR API fallback."""
+        """Returns the embedded Base64 data URI or dynamic QR API fallback."""
         if self.qr_code_base64:
             return self.qr_code_base64
+        if self.upi_intent_url:
+            return f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={urllib.parse.quote(self.upi_intent_url)}"
         if self.qr_code_image:
             try:
                 return self.qr_code_image.url
             except Exception:
                 pass
-        if self.upi_intent_url:
-            return f"https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={urllib.parse.quote(self.upi_intent_url)}"
         return ''
+
+    @property
+    def latest_evidence(self):
+        ev = getattr(self, 'verification', None)
+        if ev and getattr(ev, 'evidence', None):
+            return ev.evidence
+        return self.evidence_records.first()
+
+    @property
+    def proof_display_url(self):
+        ev = self.latest_evidence
+        return ev.display_url if ev else ''
 
     def save(self, *args, **kwargs):
         if not self.order_code:
@@ -78,7 +90,7 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
         # Generate QR code if not present
-        if (not self.qr_code_base64 and not self.qr_code_image) and self.upi_intent_url:
+        if not self.qr_code_base64 and self.upi_intent_url:
             self.generate_qr_code()
 
     def generate_qr_code(self):
