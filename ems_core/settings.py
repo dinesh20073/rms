@@ -37,11 +37,18 @@ def get_env_int(key, default=587):
 SECRET_KEY = get_env_str('DJANGO_SECRET_KEY', 'django-insecure-ems-super-secret-key-2026-v1-production-ready')
 DEBUG = get_env_bool('DJANGO_DEBUG', True)
 
+# Public Customer-Facing and Admin Dashboard Base URLs
+PUBLIC_WEB_URL = get_env_str('PUBLIC_WEB_URL', 'https://nizhalcommunity.in').rstrip('/')
+ADMIN_WEB_URL = get_env_str('ADMIN_WEB_URL', 'https://admin.nizhalcommunity.in').rstrip('/')
+
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.vercel.app',
     'admin-nizhal-community.vercel.app',
+    'admin.nizhalcommunity.in',
+    'nizhalcommunity.in',
+    '.nizhalcommunity.in',
 ]
 # Allow all hosts in development
 if DEBUG:
@@ -361,9 +368,13 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8001',
     'https://*.vercel.app',
     'https://admin-nizhal-community.vercel.app',
+    'https://admin.nizhalcommunity.in',
+    'https://nizhalcommunity.in',
+    'https://*.nizhalcommunity.in',
 ]
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 # Authentication & Stateless Session Security (works across serverless lambda instances)
 LOGIN_URL = 'login'

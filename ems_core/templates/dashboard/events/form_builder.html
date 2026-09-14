@@ -28,7 +28,7 @@
                 <i data-lucide="edit" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                 <span>Edit Event</span>
             </a>
-            <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-outlined text-xs rounded-full">
+            <a href="{{ event.public_register_url }}" target="_blank" class="google-btn-outlined text-xs rounded-full" title="Open Customer Form (nizhalcommunity.in)">
                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                 <span>Live Form</span>
             </a>

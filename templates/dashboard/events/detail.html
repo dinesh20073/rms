@@ -46,10 +46,14 @@
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
                 <span>Export CSV</span>
             </a>
-            <a href="{% url 'public-register' event.slug %}" target="_blank" class="google-btn-primary text-xs">
+            <a href="{{ event.public_register_url }}" target="_blank" class="google-btn-primary text-xs" title="Open Customer Registration Form (nizhalcommunity.in)">
                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                 <span>Public Form</span>
             </a>
+            <button type="button" onclick="copyToClipboard('{{ event.public_register_url }}', this)" class="google-btn-outlined text-xs cursor-pointer" title="Copy Customer Registration Link">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copy Link</span>
+            </button>
             <button type="button" onclick="document.getElementById('deleteEventModal').classList.remove('hidden')" class="google-btn-danger text-xs py-1.5 px-3 rounded flex items-center gap-1 cursor-pointer" title="Delete Event">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 <span>Delete</span>

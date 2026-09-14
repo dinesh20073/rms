@@ -1,4 +1,5 @@
 import time
+from django.conf import settings
 from apps.tenants.models import Tenant
 from apps.verification.models import Verification
 
@@ -7,15 +8,24 @@ _TENANTS_CACHE = ([], 0)  # (all_tenants, timestamp)
 
 def global_context(request):
     """
-    Ultra-fast cached context processor: supplies active tenant and pending review count.
-    Avoids redundant database queries across requests and live-sync polling.
+    Ultra-fast cached context processor: supplies active tenant, pending review count,
+    and public customer/admin base URLs.
     """
+    public_url = getattr(settings, 'PUBLIC_WEB_URL', 'https://nizhalcommunity.in').rstrip('/')
+    admin_url = getattr(settings, 'ADMIN_WEB_URL', 'https://admin.nizhalcommunity.in').rstrip('/')
+
+    base_ctx = {
+        'PUBLIC_WEB_URL': public_url,
+        'ADMIN_WEB_URL': admin_url,
+    }
+
     if not request.path.startswith('/dashboard/') or not getattr(request, 'user', None) or not request.user.is_authenticated:
-        return {
+        base_ctx.update({
             'all_tenants': [],
             'current_tenant': None,
             'pending_reviews_count': 0,
-        }
+        })
+        return base_ctx
 
     try:
         now = time.monotonic()

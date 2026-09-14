@@ -48,6 +48,13 @@ class Event(models.Model):
         return f"{self.title} ({self.event_code})"
 
     @property
+    def public_register_url(self):
+        """Returns the customer-side registration URL (https://nizhalcommunity.in/register/<slug>/)."""
+        from django.conf import settings
+        base = getattr(settings, 'PUBLIC_WEB_URL', 'https://nizhalcommunity.in').rstrip('/')
+        return f"{base}/register/{self.slug}/"
+
+    @property
     def qr_display_url(self):
         """Returns only the custom uploaded QR (Base64 data or uploaded file)."""
         if self.upi_qr_base64:
