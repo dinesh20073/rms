@@ -14,7 +14,21 @@ class PaymentEvidence(models.Model):
         ordering = ['-uploaded_at']
 
     @property
+    def has_image(self):
+        if self.screenshot:
+            try:
+                if self.screenshot.name:
+                    return True
+            except Exception:
+                pass
+        if self.image_base64 and self.image_base64.strip():
+            return True
+        return False
+
+    @property
     def display_url(self):
+        if not self.has_image:
+            return ''
         if hasattr(self, 'order') and self.order and getattr(self.order, 'order_code', None):
             return f'/dashboard/verification/proof/{self.order.order_code}/'
         if self.screenshot:
@@ -81,6 +95,14 @@ class Verification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    @property
+    def has_proof_image(self):
+        if self.evidence and getattr(self.evidence, 'has_image', False):
+            return True
+        if hasattr(self, 'order') and self.order and getattr(self.order, 'has_proof_image', False):
+            return True
+        return False
 
     def __str__(self):
         return f"Verification for {self.order.order_code} - {self.decision}"

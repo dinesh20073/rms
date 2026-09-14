@@ -149,8 +149,8 @@
                             <i data-lucide="image" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
                             <span>Receipt Screenshot</span>
                         </span>
-                        {% if item.evidence.display_url or item.order.proof_display_url %}
-                        {% with proof_url=item.evidence.display_url|default:item.order.proof_display_url %}
+                        {% if item.has_proof_image or item.order.has_proof_image %}
+                        {% with proof_url=item.order.proof_display_url|default:item.evidence.display_url %}
                         <div class="border border-[#dadce0] rounded overflow-hidden bg-[#f8f9fa] flex items-center justify-center p-2 group relative min-h-[160px]">
                             <img src="{{ proof_url }}" alt="Receipt" class="max-h-52 w-auto object-contain rounded cursor-pointer hover:opacity-95 transition" onclick="openProofModal('{{ proof_url|escapejs }}', '{{ item.order.order_code|escapejs }}', '{{ item.order.registration.customer.name|escapejs }}', '{{ item.order.registration.registration_code|escapejs }}', '{{ item.order.registration.status|escapejs }}')" title="Click to enlarge / preview receipt">
                             <button type="button" onclick="openProofModal('{{ proof_url|escapejs }}', '{{ item.order.order_code|escapejs }}', '{{ item.order.registration.customer.name|escapejs }}', '{{ item.order.registration.registration_code|escapejs }}', '{{ item.order.registration.status|escapejs }}')" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 hover:bg-slate-900 text-white text-[11px] font-semibold px-2.5 py-1 rounded flex items-center gap-1 shadow-sm backdrop-blur-xs transition cursor-pointer" title="Preview receipt in popup">
@@ -165,20 +165,6 @@
                             </button>
                         </div>
                         {% endwith %}
-                        {% elif item.evidence.screenshot %}
-                        <div class="border border-[#dadce0] rounded overflow-hidden bg-[#f8f9fa] flex items-center justify-center p-2 group relative min-h-[160px]">
-                            <img src="{{ item.evidence.screenshot.url }}" alt="Receipt" class="max-h-52 w-auto object-contain rounded cursor-pointer hover:opacity-95 transition" onclick="openProofModal('{{ item.evidence.screenshot.url|escapejs }}', '{{ item.order.order_code|escapejs }}', '{{ item.order.registration.customer.name|escapejs }}', '{{ item.order.registration.registration_code|escapejs }}', '{{ item.order.registration.status|escapejs }}')" title="Click to enlarge / preview receipt">
-                            <button type="button" onclick="openProofModal('{{ item.evidence.screenshot.url|escapejs }}', '{{ item.order.order_code|escapejs }}', '{{ item.order.registration.customer.name|escapejs }}', '{{ item.order.registration.registration_code|escapejs }}', '{{ item.order.registration.status|escapejs }}')" class="absolute bottom-2.5 right-2.5 bg-slate-900/85 hover:bg-slate-900 text-white text-[11px] font-semibold px-2.5 py-1 rounded flex items-center gap-1 shadow-sm backdrop-blur-xs transition cursor-pointer" title="Preview receipt in popup">
-                                <i data-lucide="maximize-2" class="w-3 h-3"></i>
-                                <span>Preview</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center gap-2 pt-1">
-                            <button type="button" onclick="openSingleActionModal('{{ item.id }}', '{{ item.order.order_code }}', 'DELETE_IMAGE')" class="w-full py-1.5 px-2.5 text-xs font-semibold bg-[#fee2e2] hover:bg-[#fecaca] text-[#d93025] border border-[#fca5a5] flex items-center justify-center gap-1.5 cursor-pointer transition rounded" title="Delete / Purge Proof Image">
-                                <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-                                <span>Delete Proof Image</span>
-                            </button>
-                        </div>
                         {% else %}
                         <div class="border border-[#dadce0] rounded p-4 bg-[#f8f9fa] text-center text-xs text-[#5f6368] flex flex-col items-center justify-center h-44">
                             <i data-lucide="file-question" class="w-7 h-7 text-slate-400 mb-1.5"></i>
@@ -355,8 +341,8 @@
                 <!-- Action Strip (Direct Proof Preview & Delete Proof Image on Mobile) -->
                 <div class="pt-2 border-t border-[#f1f3f4] flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-1.5">
-                        {% if h.evidence.display_url or h.order.proof_display_url %}
-                        {% with proof_url=h.evidence.display_url|default:h.order.proof_display_url %}
+                        {% if h.has_proof_image or h.order.has_proof_image %}
+                        {% with proof_url=h.order.proof_display_url|default:h.evidence.display_url %}
                         <button type="button" onclick="openProofModal('{{ proof_url|escapejs }}', '{{ h.order.order_code|escapejs }}', '{{ h.order.registration.customer.name|escapejs }}', '{{ h.order.registration.registration_code|escapejs }}', '{{ h.order.registration.status|escapejs }}')" class="px-2.5 py-1 text-xs font-semibold bg-[#e8f0fe] hover:bg-[#d2e3fc] text-[#1a73e8] border border-[#d2e3fc] flex items-center gap-1 cursor-pointer transition">
                             <i data-lucide="image" class="w-3.5 h-3.5"></i>
                             <span>View Proof</span>
@@ -366,19 +352,6 @@
                             <span>Delete Proof</span>
                         </button>
                         {% endwith %}
-                        {% elif h.evidence.screenshot %}
-                        <button type="button" onclick="openProofModal('{{ h.evidence.screenshot.url|escapejs }}', '{{ h.order.order_code|escapejs }}', '{{ h.order.registration.customer.name|escapejs }}', '{{ h.order.registration.registration_code|escapejs }}', '{{ h.order.registration.status|escapejs }}')" class="px-2.5 py-1 text-xs font-semibold bg-[#e8f0fe] hover:bg-[#d2e3fc] text-[#1a73e8] border border-[#d2e3fc] flex items-center gap-1 cursor-pointer transition">
-                            <i data-lucide="image" class="w-3.5 h-3.5"></i>
-                            <span>View Proof</span>
-                        </button>
-                        <button type="button" onclick="openSingleActionModal('{{ h.id }}', '{{ h.order.order_code }}', 'DELETE_IMAGE')" class="px-2.5 py-1 text-xs font-semibold bg-[#fee2e2] hover:bg-[#fecaca] text-[#d93025] border border-[#fca5a5] flex items-center gap-1 cursor-pointer transition" title="Delete / Purge Proof Image">
-                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-                            <span>Delete Proof</span>
-                        </button>
-                        {% else %}
-                        <span class="text-[10px] text-[#5f6368] font-mono bg-[#f1f3f4] px-2 py-0.5 border border-[#dadce0] select-none">
-                            Proof Purged
-                        </span>
                         {% endif %}
                     </div>
 
@@ -454,8 +427,8 @@
 
                         <td class="py-2 px-2.5 sm:px-4 whitespace-nowrap">
                             <div class="flex items-center gap-1.5">
-                                {% if h.evidence.display_url or h.order.proof_display_url %}
-                                {% with proof_url=h.evidence.display_url|default:h.order.proof_display_url %}
+                                {% if h.has_proof_image or h.order.has_proof_image %}
+                                {% with proof_url=h.order.proof_display_url|default:h.evidence.display_url %}
                                 <button type="button" onclick="openProofModal('{{ proof_url|escapejs }}', '{{ h.order.order_code|escapejs }}', '{{ h.order.registration.customer.name|escapejs }}', '{{ h.order.registration.registration_code|escapejs }}', '{{ h.order.registration.status|escapejs }}')" class="p-1 hover:bg-[#e8f0fe] text-[#1a73e8] transition cursor-pointer" title="View Receipt Proof">
                                     <i data-lucide="image" class="w-3.5 h-3.5"></i>
                                 </button>
@@ -463,15 +436,8 @@
                                     <i data-lucide="trash" class="w-3.5 h-3.5"></i>
                                 </button>
                                 {% endwith %}
-                                {% elif h.evidence.screenshot %}
-                                <button type="button" onclick="openProofModal('{{ h.evidence.screenshot.url|escapejs }}', '{{ h.order.order_code|escapejs }}', '{{ h.order.registration.customer.name|escapejs }}', '{{ h.order.registration.registration_code|escapejs }}', '{{ h.order.registration.status|escapejs }}')" class="p-1 hover:bg-[#e8f0fe] text-[#1a73e8] transition cursor-pointer" title="View Receipt Proof">
-                                    <i data-lucide="image" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <button type="button" onclick="openSingleActionModal('{{ h.id }}', '{{ h.order.order_code }}', 'DELETE_IMAGE')" class="p-1 hover:bg-[#fee2e2] text-[#d93025] transition cursor-pointer" title="Delete / Purge Proof Image">
-                                    <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-                                </button>
                                 {% else %}
-                                <span class="text-[10px] text-[#5f6368] font-mono bg-[#f1f3f4] px-1.5 py-0.5 select-none" title="Proof image has been deleted / purged">Purged</span>
+                                <span class="text-[11px] text-[#9aa0a6] select-none font-mono px-1">-</span>
                                 {% endif %}
                                 <button type="button" onclick="openSingleActionModal('{{ h.id }}', '{{ h.order.order_code }}', 'DELETE')" class="p-1 text-[#5f6368] hover:text-[#d93025] hover:bg-[#fee2e2] transition cursor-pointer ml-1" title="Delete Record">
                                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>

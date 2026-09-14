@@ -58,12 +58,32 @@ class Order(models.Model):
         return self.evidence_records.first()
 
     @property
-    def proof_display_url(self):
+    def has_proof_image(self):
         ev = self.latest_evidence
-        if ev:
+        if ev and getattr(ev, 'has_image', False):
+            return True
+        if hasattr(self, 'proof_image') and self.proof_image:
+            try:
+                if self.proof_image.name:
+                    return True
+            except Exception:
+                pass
+        return False
+
+    @property
+    def proof_display_url(self):
+        if not self.has_proof_image:
+            return ''
+        ev = self.latest_evidence
+        if ev and getattr(ev, 'has_image', False):
             if self.order_code:
                 return f'/dashboard/verification/proof/{self.order_code}/'
             return ev.display_url
+        if hasattr(self, 'proof_image') and self.proof_image:
+            try:
+                return self.proof_image.url
+            except Exception:
+                pass
         return ''
 
     def save(self, *args, **kwargs):

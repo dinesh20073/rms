@@ -360,7 +360,7 @@ select.filter-ctrl {
                                         <span>View Entrance Pass</span>
                                     </a>
                                     {% endif %}
-                                    {% if reg.order.proof_display_url %}
+                                    {% if reg.order.has_proof_image %}
                                     <button type="button" onclick="openProofModal('{{ reg.order.proof_display_url }}', '{{ reg.order.order_code }}', '{{ reg.customer.name|escapejs }}', '{{ reg.registration_code }}', '{{ reg.status }}')" class="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#202124] text-left cursor-pointer">
                                         <i data-lucide="image" class="w-3.5 h-3.5 text-[#1e8e3e]"></i>
                                         <span>View Payment Proof</span>
