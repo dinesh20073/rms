@@ -212,70 +212,9 @@ def overview_dashboard_view(request):
         registrations_count=Count('registrations'),
         paid_count=Count('registrations__order', filter=Q(registrations__order__status='VERIFIED')),
         total_collected=Sum('registrations__order__amount', filter=Q(registrations__order__status='VERIFIED')),
-        total_reg=Count('registrations')
     ).order_by('-created_at'))
     total_events = len(all_events)
     events_breakdown = sorted(all_events, key=lambda e: e.total_collected or Decimal('0.00'), reverse=True)
-
-    # 5. Filterable Registrations with full database details (capped at 50 for instant response)
-    table_qs = reg_qs.select_related('customer', 'event', 'order', 'attendee_pass').defer('order__qr_code_base64').order_by('-created_at')
-    table_qs, filter_params, active_filters_count = filter_registrations_queryset(table_qs, request)
-    recent_registrations = table_qs[:50]
-
-    # 6. Real Data for Interactive Charts (Line, Donut, Bar)
-    days_list = [(now.date() - timedelta(days=i)) for i in range(13, -1, -1)]
-    chart_dates = [d.strftime('%b %d') for d in days_list]
-
-    daily_regs_map = {d: 0 for d in days_list}
-    for item in reg_qs.filter(created_at__date__gte=days_list[0]).values('created_at__date').annotate(c=Count('id')):
-        d = item['created_at__date']
-        if d in daily_regs_map:
-            daily_regs_map[d] = item['c']
-
-    daily_revenue_map = {d: 0.0 for d in days_list}
-    for item in order_qs.filter(status='VERIFIED', created_at__date__gte=days_list[0]).values('created_at__date').annotate(s=Sum('amount')):
-        d = item['created_at__date']
-        if d in daily_revenue_map:
-            daily_revenue_map[d] = float(item['s'] or 0)
-
-    chart_regs_data = [daily_regs_map[d] for d in days_list]
-    chart_revenue_data = [daily_revenue_map[d] for d in days_list]
-
-    # Donut 1: Registration Status Breakdown (Single aggregated query)
-    status_aggs = reg_qs.aggregate(
-        completed=Count('id', filter=Q(status='COMPLETED')),
-        pending=Count('id', filter=Q(status='PENDING')),
-        manual=Count('id', filter=Q(status='MANUAL_REVIEW')),
-        failed=Count('id', filter=Q(status__in=['FAILED', 'CANCELLED'])),
-    )
-    completed_regs = status_aggs['completed'] or 0
-    pending_regs = status_aggs['pending'] or 0
-    manual_regs = status_aggs['manual'] or 0
-    failed_regs = status_aggs['failed'] or 0
-
-    donut_status_labels = ['Verified Pass', 'Pending Verification', 'Review Queue', 'Failed / Cancelled']
-    donut_status_data = [completed_regs, pending_regs, manual_regs, failed_regs]
-
-    # Donut 2: Gender Demographics
-    male_count = 0
-    female_count = 0
-    other_count = 0
-    for r in reg_qs:
-        g = (r.form_responses.get('Gender') or r.form_responses.get('gender') or '').strip().lower()
-        if 'female' in g:
-            female_count += 1
-        elif 'male' in g:
-            male_count += 1
-        elif g:
-            other_count += 1
-
-    donut_gender_labels = ['Male', 'Female', 'Other']
-    donut_gender_data = [male_count, female_count, other_count]
-
-    # Bar Chart: Top Events Comparison (Registrations vs Verified Passes)
-    bar_event_labels = [e.title[:20] + ('...' if len(e.title) > 20 else '') for e in all_events[:6]]
-    bar_event_regs = [getattr(e, 'registrations_count', 0) for e in all_events[:6]]
-    bar_event_passes = [getattr(e, 'paid_count', 0) for e in all_events[:6]]
 
     context = {
         'tenant': tenant,
@@ -294,21 +233,7 @@ def overview_dashboard_view(request):
         'review_queue_count': review_queue_count,
         'auto_rate': auto_rate,
         'pass_conversion_rate': pass_conversion_rate,
-        'recent_registrations': recent_registrations,
         'events': all_events,
-        'filter_params': filter_params,
-        'active_filters_count': active_filters_count,
-        'search_query': filter_params.get('q', ''),
-        'status_filter': filter_params.get('status', ''),
-        'chart_dates_json': json.dumps(chart_dates),
-        'chart_regs_json': json.dumps(chart_regs_data),
-        'chart_revenue_json': json.dumps(chart_revenue_data),
-        'donut_status_labels_json': json.dumps(donut_status_labels),
-        'donut_status_data_json': json.dumps(donut_status_data),
-        'donut_gender_labels_json': json.dumps(donut_gender_labels),
-        'donut_gender_data_json': json.dumps(donut_gender_data),
-        'bar_event_labels_json': json.dumps(bar_event_labels),
-        'bar_event_regs_json': json.dumps(bar_event_regs),
-        'bar_event_passes_json': json.dumps(bar_event_passes),
     }
     return render(request, 'dashboard/overview.html', context)
+
