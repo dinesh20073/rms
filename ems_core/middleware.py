@@ -1,4 +1,5 @@
 from django.utils.deprecation import MiddlewareMixin
+from django.shortcuts import redirect
 from django.conf import settings
 import re
 

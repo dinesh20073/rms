@@ -350,13 +350,16 @@ REST_FRAMEWORK = {
 # ==========================================================================
 
 EMAIL_HOST_USER = get_env_str('EMAIL_HOST_USER', '').strip()
-EMAIL_HOST_PASSWORD = get_env_str('EMAIL_HOST_PASSWORD', '').strip()
+EMAIL_HOST_PASSWORD = get_env_str('EMAIL_HOST_PASSWORD', '').strip().replace(' ', '')
 _default_email_backend = 'django.core.mail.backends.smtp.EmailBackend' if (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD) else 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = get_env_str('EMAIL_BACKEND', _default_email_backend)
 EMAIL_HOST = get_env_str('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = get_env_int('EMAIL_PORT', 587)
 EMAIL_USE_TLS = get_env_bool('EMAIL_USE_TLS', True)
+EMAIL_USE_SSL = get_env_bool('EMAIL_USE_SSL', False)
+EMAIL_TIMEOUT = get_env_int('EMAIL_TIMEOUT', 15)
 DEFAULT_FROM_EMAIL = get_env_str('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_HOST_USER}>' if EMAIL_HOST_USER else 'noreply@example.com')
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 
 
