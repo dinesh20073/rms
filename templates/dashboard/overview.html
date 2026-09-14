@@ -349,9 +349,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    function initOverviewCharts() {
         if (typeof Chart === 'undefined') {
-            console.error('Chart.js library not loaded');
             return;
         }
 
@@ -558,6 +557,12 @@
                 }).join('');
             }
         }
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initOverviewCharts);
+    } else {
+        initOverviewCharts();
+    }
 </script>
 {% endblock %}

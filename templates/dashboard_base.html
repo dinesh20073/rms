@@ -253,6 +253,8 @@
     }
 </style>
 
+<div id="instantProgressBar" style="position: fixed; top: 0; left: 0; width: 0%; height: 2.5px; background: #1a73e8; z-index: 999999; transition: width 0.15s ease, opacity 0.2s ease; opacity: 0; pointer-events: none;"></div>
+
 <!-- Main Wrapper with Top Header and Left Sidebar on PC view -->
 <div class="min-h-screen flex flex-col bg-[#f8f9fa] font-sans text-[#202124]">
 
@@ -952,6 +954,233 @@
             globalActiveActionMenu = null;
         }
     }, true);
+
+    // =========================================================================
+    // NIZHAL INSTANT ZERO-DELAY ENGINE (Preload Everything & Instant DOM Swap)
+    // =========================================================================
+    (function () {
+        const pageCache = new Map();
+        const coreDashboardUrls = [
+            "{% url 'dashboard-overview' %}",
+            "{% url 'dashboard-registrations-list' %}",
+            "{% url 'dashboard-events-list' %}",
+            "{% url 'dashboard-verification-queue' %}",
+            "{% url 'dashboard-email-logs' %}",
+            "{% url 'dashboard-database' %}"
+        ];
+
+        const pBar = document.getElementById('instantProgressBar');
+        function showProgress() {
+            if (!pBar) return;
+            pBar.style.opacity = '1';
+            pBar.style.width = '35%';
+            setTimeout(() => { if (pBar.style.opacity === '1') pBar.style.width = '70%'; }, 100);
+        }
+        function hideProgress() {
+            if (!pBar) return;
+            pBar.style.width = '100%';
+            setTimeout(() => {
+                pBar.style.opacity = '0';
+                setTimeout(() => { pBar.style.width = '0%'; }, 200);
+            }, 100);
+        }
+
+        // Store current page in cache on load
+        function cacheCurrentPage() {
+            const main = document.querySelector('.dashboard-main-content');
+            if (main) {
+                pageCache.set(window.location.pathname, {
+                    title: document.title,
+                    content: main.innerHTML,
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        // Prefetch helper
+        function prefetchDashboardUrl(url) {
+            if (!url || !url.startsWith('/dashboard/') || url.includes('logout') || url.includes('export') || url.includes('delete')) {
+                return Promise.resolve(null);
+            }
+            if (pageCache.has(url)) {
+                return Promise.resolve(pageCache.get(url));
+            }
+            return fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Instant-Prefetch': '1'
+                }
+            })
+            .then(res => {
+                if (!res.ok) return null;
+                return res.text();
+            })
+            .then(html => {
+                if (!html) return null;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const mainEl = doc.querySelector('.dashboard-main-content');
+                if (mainEl) {
+                    const data = {
+                        title: doc.title,
+                        content: mainEl.innerHTML,
+                        timestamp: Date.now()
+                    };
+                    pageCache.set(url, data);
+                    return data;
+                }
+                return null;
+            })
+            .catch(() => null);
+        }
+
+        // Preload all dashboard pages in background
+        function preloadAllDashboardPages() {
+            coreDashboardUrls.forEach((url, i) => {
+                if (url !== window.location.pathname) {
+                    setTimeout(() => {
+                        prefetchDashboardUrl(url);
+                    }, 100 * (i + 1));
+                }
+            });
+        }
+
+        // Script runner for dynamically swapped content
+        function runSwappedScripts(container) {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+            const scripts = Array.from(container.querySelectorAll('script'));
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.text = oldScript.textContent;
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+            window.dispatchEvent(new Event('DOMContentLoaded'));
+            window.dispatchEvent(new CustomEvent('nizhal:pageSwapped', { detail: { path: window.location.pathname } }));
+        }
+
+        // Active Link Highlighter
+        function updateActiveNavClasses(currentPath) {
+            const links = document.querySelectorAll('.pc-sidebar-link, .mobile-drawer-link, .mobile-bottom-link');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href) return;
+                const linkPath = new URL(href, window.location.origin).pathname;
+                const isExact = linkPath === currentPath;
+                const isSub = (linkPath !== '/dashboard/' && currentPath.startsWith(linkPath));
+                if (isExact || isSub) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Zero-Delay Switcher (0ms DOM swap from cache)
+        async function instantSwitch(url, push = true) {
+            const cleanUrl = new URL(url, window.location.origin).pathname;
+            const mainContainer = document.querySelector('.dashboard-main-content');
+            if (!mainContainer) {
+                window.location.href = url;
+                return;
+            }
+
+            // 1. Check in-memory cache for 0ms instant swap
+            const cached = pageCache.get(cleanUrl);
+            if (cached) {
+                // INSTANT 0ms DOM REPLACEMENT
+                mainContainer.innerHTML = cached.content;
+                document.title = cached.title;
+                if (push) {
+                    window.history.pushState({ path: cleanUrl }, cached.title, cleanUrl);
+                }
+                updateActiveNavClasses(cleanUrl);
+                runSwappedScripts(mainContainer);
+                window.scrollTo(0, 0);
+                mainContainer.scrollTop = 0;
+                if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
+
+                // Silently revalidate fresh copy in background after 2.5s
+                setTimeout(() => {
+                    fetch(cleanUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(r => r.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            const freshMain = doc.querySelector('.dashboard-main-content');
+                            if (freshMain) {
+                                pageCache.set(cleanUrl, {
+                                    title: doc.title,
+                                    content: freshMain.innerHTML,
+                                    timestamp: Date.now()
+                                });
+                            }
+                        })
+                        .catch(() => {});
+                }, 2500);
+                return;
+            }
+
+            // 2. If not yet cached, fetch fast with sleek progress bar
+            showProgress();
+            try {
+                const fresh = await prefetchDashboardUrl(cleanUrl);
+                if (fresh && mainContainer) {
+                    mainContainer.innerHTML = fresh.content;
+                    document.title = fresh.title;
+                    if (push) {
+                        window.history.pushState({ path: cleanUrl }, fresh.title, cleanUrl);
+                    }
+                    updateActiveNavClasses(cleanUrl);
+                    runSwappedScripts(mainContainer);
+                    window.scrollTo(0, 0);
+                    mainContainer.scrollTop = 0;
+                    if (typeof closeMobileDrawer === 'function') closeMobileDrawer();
+                } else {
+                    window.location.href = cleanUrl;
+                }
+            } catch (e) {
+                window.location.href = cleanUrl;
+            } finally {
+                hideProgress();
+            }
+        }
+
+        // Intercept clicks on navigation elements for ZERO-DELAY switch
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest('.pc-sidebar-link, .mobile-drawer-link, .mobile-bottom-link');
+            if (link) {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('/dashboard/') && !href.includes('logout') && !href.includes('export')) {
+                    e.preventDefault();
+                    instantSwitch(href, true);
+                }
+            }
+        });
+
+        // Hover & Touch prefetch boost
+        document.addEventListener('pointerenter', function (e) {
+            const link = e.target.closest('a[href^="/dashboard/"]');
+            if (link) {
+                prefetchDashboardUrl(link.getAttribute('href'));
+            }
+        }, true);
+
+        // Handle Browser Back / Forward buttons instantly
+        window.addEventListener('popstate', function (e) {
+            instantSwitch(window.location.pathname, false);
+        });
+
+        // Initialize immediately
+        cacheCurrentPage();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', preloadAllDashboardPages);
+        } else {
+            preloadAllDashboardPages();
+        }
+    })();
 </script>
 {% endblock %}
 
