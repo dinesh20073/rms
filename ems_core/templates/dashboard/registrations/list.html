@@ -365,6 +365,14 @@ select.filter-ctrl {
                                         <i data-lucide="image" class="w-3.5 h-3.5 text-[#1e8e3e]"></i>
                                         <span>View Payment Proof</span>
                                     </button>
+                                    <form method="POST" action="{% url 'dashboard-registration-status-change' reg.registration_code %}" onsubmit="return confirm('Delete payment proof image for {{ reg.registration_code }}?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="target_status" value="DELETE_IMAGE">
+                                        <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#fee2e2] text-[#d93025] transition text-left cursor-pointer font-medium">
+                                            <i data-lucide="trash" class="w-3.5 h-3.5 text-[#d93025]"></i>
+                                            <span>Delete Payment Proof</span>
+                                        </button>
+                                    </form>
                                     {% endif %}
                                     <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#202124]">
                                         <i data-lucide="compass" class="w-3.5 h-3.5 text-[#5f6368]"></i>

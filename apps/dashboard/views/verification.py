@@ -49,29 +49,50 @@ def delete_payment_image_view(request, verification_id):
 
     tenant = get_current_tenant(request)
     verification = get_object_or_404(Verification, id=verification_id, order__registration__event__tenant=tenant)
-    
+    order = verification.order
+    deleted = False
+
     if verification.evidence:
         evidence = verification.evidence
-        order_code = verification.order.order_code
-        
         if evidence.screenshot:
             try:
                 evidence.screenshot.delete(save=False)
             except Exception:
                 pass
             evidence.screenshot = None
-            
         evidence.image_base64 = ''
         evidence.save()
-        
+        deleted = True
+
+    if order:
+        for ev in order.evidence_records.all():
+            if ev.screenshot:
+                try:
+                    ev.screenshot.delete(save=False)
+                except Exception:
+                    pass
+                ev.screenshot = None
+            ev.image_base64 = ''
+            ev.save()
+            deleted = True
+        if hasattr(order, 'proof_image') and order.proof_image:
+            try:
+                order.proof_image.delete(save=False)
+            except Exception:
+                pass
+            order.proof_image = None
+            order.save()
+            deleted = True
+
+    if deleted:
         log_audit_event(
             action='PAYMENT_IMAGE_DELETED',
-            reference_id=order_code,
-            details={'verification_id': verification.id, 'order_code': order_code},
+            reference_id=order.order_code if order else str(verification.id),
+            details={'verification_id': verification.id, 'order_code': order.order_code if order else ''},
             tenant=tenant,
             actor=request.user.username if request.user else 'Admin'
         )
-        messages.success(request, f"Payment proof image for order {order_code} has been deleted.")
+        messages.success(request, f"Payment proof image for order {order.order_code if order else verification.id} has been deleted.")
     else:
         messages.info(request, "No proof image found to delete.")
 
@@ -108,6 +129,8 @@ def verification_action_view(request, verification_id):
         verification.delete()
         messages.success(request, f"Verification log for order {order_code} has been deleted.")
     elif action == 'DELETE_IMAGE':
+        order = verification.order
+        deleted = False
         if verification.evidence:
             if verification.evidence.screenshot:
                 try:
@@ -117,8 +140,28 @@ def verification_action_view(request, verification_id):
                 verification.evidence.screenshot = None
             verification.evidence.image_base64 = ''
             verification.evidence.save()
-            log_audit_event('PAYMENT_IMAGE_DELETED', verification.order.order_code, {'verification_id': verification.id}, tenant=tenant, actor=user.username if user else 'Admin')
-            messages.success(request, f"Payment proof image for order {verification.order.order_code} has been deleted.")
+            deleted = True
+        if order:
+            for ev in order.evidence_records.all():
+                if ev.screenshot:
+                    try:
+                        ev.screenshot.delete(save=False)
+                    except Exception:
+                        pass
+                    ev.screenshot = None
+                ev.image_base64 = ''
+                ev.save()
+                deleted = True
+            if hasattr(order, 'proof_image') and order.proof_image:
+                try:
+                    order.proof_image.delete(save=False)
+                except Exception:
+                    pass
+                order.proof_image = None
+                order.save()
+                deleted = True
+        log_audit_event('PAYMENT_IMAGE_DELETED', verification.order.order_code, {'verification_id': verification.id}, tenant=tenant, actor=user.username if user else 'Admin')
+        messages.success(request, f"Payment proof image for order {verification.order.order_code} has been deleted.")
 
     return redirect('dashboard-verification-queue')
 

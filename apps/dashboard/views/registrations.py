@@ -147,6 +147,43 @@ def change_registration_status_view(request, registration_code):
             registration.save()
             log_audit_event('REGISTRATION_FAILED', registration.registration_code, {}, tenant=tenant, actor=user.username if user else 'Admin')
         messages.warning(request, f"Registration {registration.registration_code} ({registration.customer.name}) marked as Failed.")
+    elif target_status == 'DELETE_IMAGE':
+        deleted = False
+        if hasattr(registration, 'order') and registration.order:
+            for ev in PaymentEvidence.objects.filter(order=registration.order):
+                if ev.screenshot:
+                    try:
+                        ev.screenshot.delete(save=False)
+                    except Exception:
+                        pass
+                    ev.screenshot = None
+                ev.image_base64 = ''
+                ev.save()
+                deleted = True
+            if hasattr(registration.order, 'proof_image') and registration.order.proof_image:
+                try:
+                    registration.order.proof_image.delete(save=False)
+                except Exception:
+                    pass
+                registration.order.proof_image = None
+                registration.order.save()
+                deleted = True
+            if hasattr(registration.order, 'verification') and registration.order.verification and registration.order.verification.evidence:
+                vev = registration.order.verification.evidence
+                if vev.screenshot:
+                    try:
+                        vev.screenshot.delete(save=False)
+                    except Exception:
+                        pass
+                    vev.screenshot = None
+                vev.image_base64 = ''
+                vev.save()
+                deleted = True
+        if deleted:
+            log_audit_event('PAYMENT_IMAGE_DELETED', registration.order.order_code if hasattr(registration, 'order') and registration.order else registration.registration_code, {'reg_code': registration.registration_code}, tenant=tenant, actor=user.username if user else 'Admin')
+            messages.success(request, f"Payment proof image for {registration.registration_code} has been deleted.")
+        else:
+            messages.info(request, f"No payment proof image found for {registration.registration_code}.")
 
     return redirect(request.META.get('HTTP_REFERER', 'dashboard-registrations-list'))
 

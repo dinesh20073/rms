@@ -110,6 +110,7 @@ ROOT_URLCONF = 'ems_core.urls'
 _template_loaders = [
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+    'ems_core.template_loader.EmbeddedTemplateLoader',
 ]
 if not DEBUG:
     _template_loaders = [
@@ -124,6 +125,8 @@ TEMPLATES = [
             BASE_DIR / 'ems_core' / 'templates',
             Path('/var/task/templates'),
             Path('/var/task/ems_core/templates'),
+            Path(__file__).resolve().parent.parent / 'templates',
+            Path(__file__).resolve().parent / 'templates',
         ],
         'OPTIONS': {
             'loaders': _template_loaders,
