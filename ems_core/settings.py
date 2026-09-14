@@ -47,7 +47,9 @@ ALLOWED_HOSTS = [
     '.vercel.app',
     'admin-nizhal-community.vercel.app',
     'admin.nizhalcommunity.in',
+    'www.admin.nizhalcommunity.in',
     'nizhalcommunity.in',
+    'www.nizhalcommunity.in',
     '.nizhalcommunity.in',
 ]
 # Allow all hosts in development
@@ -89,6 +91,7 @@ INSTALLED_APPS = [
 # ==========================================================================
 
 MIDDLEWARE = [
+    'ems_core.middleware.RewriteHostPreserveMiddleware',
     'django.middleware.security.SecurityMiddleware',
 ]
 try:
@@ -369,7 +372,9 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
     'https://admin-nizhal-community.vercel.app',
     'https://admin.nizhalcommunity.in',
+    'https://www.admin.nizhalcommunity.in',
     'https://nizhalcommunity.in',
+    'https://www.nizhalcommunity.in',
     'https://*.nizhalcommunity.in',
 ]
 X_FRAME_OPTIONS = 'SAMEORIGIN'

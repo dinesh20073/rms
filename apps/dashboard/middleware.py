@@ -35,11 +35,13 @@ class BankSessionSecurityMiddleware(MiddlewareMixin):
         )
 
         if is_admin_host:
+            # Allow root path to proceed directly to the root view
+            if path in ('', '/'):
+                return None
+
             # If path does not start with an allowed admin or service prefix:
             if not any(path.startswith(prefix) for prefix in self.EXEMPT_PREFIXES):
-                if getattr(request, 'user', None) and request.user.is_authenticated:
-                    return redirect('dashboard-overview')
-                return redirect('login')
+                return redirect(f"{request.scheme}://{host}/")
 
         return None
 

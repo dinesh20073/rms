@@ -25,7 +25,18 @@
     {
       "src": "/static/(.*)",
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS, HEAD"
+      },
+      "dest": "ems_core/wsgi.py"
+    },
+    {
+      "src": "/register/static/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS, HEAD"
       },
       "dest": "ems_core/wsgi.py"
     },

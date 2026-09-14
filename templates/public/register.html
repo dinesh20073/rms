@@ -3,6 +3,18 @@
 
 {% block title %}{{ event.title }} | Register Online{% endblock %}
 
+{% block extra_head %}
+    <!-- Canonical & OpenGraph Metadata: Strictly forces nizhalcommunity.in as canonical public URL -->
+    <link rel="canonical" href="https://nizhalcommunity.in/register/{{ event.slug }}/">
+    <meta property="og:url" content="https://nizhalcommunity.in/register/{{ event.slug }}/">
+    <meta property="og:title" content="{{ event.title }} | Register Online">
+    <meta property="og:description" content="{{ event.description|default:'Register and secure your official digital entrance pass.' }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ event.title }} | Register Online">
+    <meta name="twitter:url" content="https://nizhalcommunity.in/register/{{ event.slug }}/">
+{% endblock %}
+
 {% block main_content %}
 <style>
     .input-error {

@@ -19,13 +19,6 @@ def ai_innovators_register_view(request):
 
 
 def public_registration_view(request, slug):
-    host = request.get_host().lower()
-    forwarded_host = request.META.get('HTTP_X_FORWARDED_HOST', '').lower()
-    
-    # Enforce customer-side registration URL: redirect direct visits from admin domain to customer domain
-    if ('admin.nizhalcommunity.in' in host or 'admin-nizhal-community' in host) and 'nizhalcommunity.in' not in forwarded_host:
-        return redirect(f"https://nizhalcommunity.in/register/{slug}/")
-
     event = get_object_or_404(Event, slug=slug)
     
     # Check if registration is open / active
