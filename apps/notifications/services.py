@@ -46,6 +46,29 @@ def get_banner_base64():
             return base64.b64encode(f.read()).decode('utf-8')
     return ''
 
+def dispatch_email_message(msg):
+    """
+    Safely sends an email message or logs it gracefully as simulated.
+    Prevents unauthenticated socket errors (such as Gmail 530 Authentication Required)
+    when environment credentials (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD) are unset.
+    Returns: (status, error_msg) where status is 'SENT', 'SIMULATED', or 'FAILED'.
+    """
+    has_creds = bool(getattr(settings, 'EMAIL_HOST_USER', None) and getattr(settings, 'EMAIL_HOST_PASSWORD', None))
+    backend = getattr(settings, 'EMAIL_BACKEND', '')
+
+    # If backend is SMTP but credentials are missing in env, do not attempt live network socket
+    if 'smtp' in backend.lower() and not has_creds:
+        return 'SIMULATED', 'Simulated in database (EMAIL_HOST_USER & EMAIL_HOST_PASSWORD not configured in environment)'
+
+    try:
+        msg.send(fail_silently=False)
+        return ('SENT' if has_creds else 'SIMULATED'), ('' if has_creds else 'Simulated via console backend')
+    except Exception as e:
+        err_str = str(e)
+        if '530' in err_str or 'Authentication' in err_str or 'Username and Password not accepted' in err_str:
+            err_str = 'Gmail SMTP Authentication Failed: Please check EMAIL_HOST_USER and 16-character Gmail App Password.'
+        return 'FAILED', err_str
+
 def send_registration_success_email(registration):
     """
     Sends confirmation email with images loading directly from the web (zero email attachments).
@@ -156,20 +179,14 @@ def send_registration_success_email(registration):
     }
     email_html = render_to_string('emails/registration_confirmed.html', email_context)
 
-    status = 'SENT'
-    error_msg = ''
-    try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=f"Hi {customer.name}, Your registration {registration.registration_code} for {event.title} is confirmed!",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[customer.email]
-        )
-        msg.attach_alternative(email_html, "text/html")
-        msg.send(fail_silently=False)
-    except Exception as e:
-        status = 'FAILED'
-        error_msg = str(e)
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Hi {customer.name}, Your registration {registration.registration_code} for {event.title} is confirmed!",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[customer.email]
+    )
+    msg.attach_alternative(email_html, "text/html")
+    status, error_msg = dispatch_email_message(msg)
 
     email_log = EmailLog.objects.create(
         tenant=event.tenant,
@@ -210,20 +227,14 @@ def send_payment_reminder_email(registration):
     }
     email_html = render_to_string('emails/payment_reminder.html', email_context)
 
-    status = 'SENT'
-    error_msg = ''
-    try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=f"Hi {customer.name}, Complete your UPI payment for {event.title}.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[customer.email]
-        )
-        msg.attach_alternative(email_html, "text/html")
-        msg.send(fail_silently=False)
-    except Exception as e:
-        status = 'FAILED'
-        error_msg = str(e)
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Hi {customer.name}, Complete your UPI payment for {event.title}.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[customer.email]
+    )
+    msg.attach_alternative(email_html, "text/html")
+    status, error_msg = dispatch_email_message(msg)
 
     return EmailLog.objects.create(
         tenant=event.tenant,
@@ -255,20 +266,14 @@ def send_payment_under_review_email(registration):
     }
     email_html = render_to_string('emails/payment_under_review.html', email_context)
 
-    status = 'SENT'
-    error_msg = ''
-    try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=f"Hi {customer.name}, We have received your payment proof for {event.title}.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[customer.email]
-        )
-        msg.attach_alternative(email_html, "text/html")
-        msg.send(fail_silently=False)
-    except Exception as e:
-        status = 'FAILED'
-        error_msg = str(e)
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Hi {customer.name}, We have received your payment proof for {event.title}.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[customer.email]
+    )
+    msg.attach_alternative(email_html, "text/html")
+    status, error_msg = dispatch_email_message(msg)
 
     return EmailLog.objects.create(
         tenant=event.tenant,
@@ -364,20 +369,14 @@ def send_payment_rejected_email(registration, reason='Rejected by Admin'):
     }
     email_html = render_to_string('emails/payment_rejected.html', email_context)
 
-    status = 'SENT'
-    error_msg = ''
-    try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=f"Hi {customer.name}, your payment verification for order {order_code} ({event.title}) could not be completed. Please visit https://admin-nizhal-community.vercel.app/pay/{order_code}/ to re-upload your payment proof or submit a new registration.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[customer.email]
-        )
-        msg.attach_alternative(email_html, "text/html")
-        msg.send(fail_silently=False)
-    except Exception as e:
-        status = 'FAILED'
-        error_msg = str(e)
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Hi {customer.name}, your payment verification for order {order_code} ({event.title}) could not be completed. Please visit https://admin-nizhal-community.vercel.app/pay/{order_code}/ to re-upload your payment proof or submit a new registration.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[customer.email]
+    )
+    msg.attach_alternative(email_html, "text/html")
+    status, error_msg = dispatch_email_message(msg)
 
     email_log = EmailLog.objects.create(
         tenant=event.tenant,
@@ -480,20 +479,14 @@ def send_order_created_email(registration):
     }
     email_html = render_to_string('emails/order_created.html', email_context)
 
-    status = 'SENT'
-    error_msg = ''
-    try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=f"Hi {customer.name}, we have received your payment proof for order {order_code} ({event.title}). Our team is reviewing your transaction and your official pass will be delivered upon approval.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[customer.email]
-        )
-        msg.attach_alternative(email_html, "text/html")
-        msg.send(fail_silently=False)
-    except Exception as e:
-        status = 'FAILED'
-        error_msg = str(e)
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Hi {customer.name}, we have received your payment proof for order {order_code} ({event.title}). Our team is reviewing your transaction and your official pass will be delivered upon approval.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[customer.email]
+    )
+    msg.attach_alternative(email_html, "text/html")
+    status, error_msg = dispatch_email_message(msg)
 
     email_log = EmailLog.objects.create(
         tenant=event.tenant,

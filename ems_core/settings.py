@@ -339,13 +339,15 @@ REST_FRAMEWORK = {
 # Email Configuration (Gmail SMTP) — credentials from .env only
 # ==========================================================================
 
-EMAIL_BACKEND = get_env_str('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST_USER = get_env_str('EMAIL_HOST_USER', '').strip()
+EMAIL_HOST_PASSWORD = get_env_str('EMAIL_HOST_PASSWORD', '').strip()
+_default_email_backend = 'django.core.mail.backends.smtp.EmailBackend' if (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD) else 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = get_env_str('EMAIL_BACKEND', _default_email_backend)
 EMAIL_HOST = get_env_str('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = get_env_int('EMAIL_PORT', 587)
 EMAIL_USE_TLS = get_env_bool('EMAIL_USE_TLS', True)
-EMAIL_HOST_USER = get_env_str('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = get_env_str('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = get_env_str('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_HOST_USER}>' if EMAIL_HOST_USER else 'noreply@example.com')
+
 
 
 # ==========================================================================

@@ -92,6 +92,19 @@ def resend_email_log_view(request, email_id):
             except Exception:
                 pass
 
+    has_creds = bool(getattr(settings, 'EMAIL_HOST_USER', None) and getattr(settings, 'EMAIL_HOST_PASSWORD', None))
+    backend = getattr(settings, 'EMAIL_BACKEND', '')
+    
+    if 'smtp' in backend.lower() and not has_creds:
+        email_log.status = 'SIMULATED'
+        email_log.error_message = 'Simulated: EMAIL_HOST_USER and EMAIL_HOST_PASSWORD (Gmail App Password) not configured in environment.'
+        email_log.save()
+        messages.warning(
+            request, 
+            "Email simulated: Please configure EMAIL_HOST_USER and EMAIL_HOST_PASSWORD (Gmail 16-character App Password) in your Vercel Environment Variables to dispatch live emails."
+        )
+        return redirect(f"/dashboard/emails/?id={email_id}")
+
     try:
         send_mail(
             subject=email_log.subject,
@@ -101,15 +114,27 @@ def resend_email_log_view(request, email_id):
             html_message=email_log.body_html,
             fail_silently=False
         )
-        email_log.status = 'SENT'
-        email_log.error_message = ''
+        if has_creds:
+            email_log.status = 'SENT'
+            email_log.error_message = ''
+            messages.success(request, f"Real email dispatched successfully to {email_log.recipient_email}!")
+        else:
+            email_log.status = 'SIMULATED'
+            email_log.error_message = 'Simulated delivery (console backend active)'
+            messages.info(request, f"Email logged and simulated in console for {email_log.recipient_email}.")
         email_log.save()
-        messages.success(request, f"Real email dispatched successfully to {email_log.recipient_email}!")
     except Exception as e:
+        err_str = str(e)
         email_log.status = 'FAILED'
-        email_log.error_message = str(e)
+        email_log.error_message = err_str
         email_log.save()
-        messages.error(request, f"Email delivery failed: {str(e)}")
+        if '530' in err_str or 'Authentication' in err_str or 'Username and Password not accepted' in err_str:
+            messages.error(
+                request,
+                "Gmail SMTP authentication failed. Please configure your EMAIL_HOST_USER and 16-character Google App Password in Vercel settings."
+            )
+        else:
+            messages.error(request, f"Email delivery failed: {err_str[:160]}")
         
     return redirect(f"/dashboard/emails/?id={email_id}")
 
