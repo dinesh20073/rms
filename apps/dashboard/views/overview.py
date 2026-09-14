@@ -160,6 +160,13 @@ def overview_dashboard_view(request):
         request.session['active_tenant_id'] = tenant.id
         request._current_tenant = tenant
 
+    from django.core.cache import cache
+    cache_key = f"dash_overview_ctx_{tenant.id}"
+    cached_ctx = cache.get(cache_key)
+    if cached_ctx:
+        cached_ctx['tenant'] = tenant
+        return render(request, 'dashboard/overview.html', cached_ctx)
+
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     week_start = today_start - timedelta(days=now.weekday())
@@ -235,5 +242,6 @@ def overview_dashboard_view(request):
         'pass_conversion_rate': pass_conversion_rate,
         'events': all_events,
     }
+    cache.set(cache_key, context, timeout=15)
     return render(request, 'dashboard/overview.html', context)
 

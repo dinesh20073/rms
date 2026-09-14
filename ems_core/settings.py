@@ -208,13 +208,14 @@ if db_url:
             u_port = 5432
 
         # Convert Supabase direct host to IPv4 Transaction Pooler (Port 6543)
-        if 'supabase.co' in u_host or 'pooler.supabase.com' in u_host:
+        if 'supabase.co' in u_host and 'pooler.supabase.com' not in u_host:
             proj_match = re.search(r'db\.([a-z0-9]+)\.supabase\.co', u_host)
-            proj_ref = proj_match.group(1) if proj_match else 'zldazpkryvrqddwvdeno'
-            u_host = 'aws-0-ap-south-1.pooler.supabase.com'
-            u_port = 6543
-            if not u_user.startswith('postgres.'):
-                u_user = f"postgres.{proj_ref}"
+            if proj_match:
+                proj_ref = proj_match.group(1)
+                u_host = 'aws-0-ap-south-1.pooler.supabase.com'
+                u_port = 6543
+                if not u_user.startswith('postgres.'):
+                    u_user = f"postgres.{proj_ref}"
 
         raw_pwd = urllib.parse.unquote_plus(u_pwd)
         clean_db = (path_query.split('?')[0] if path_query else 'postgres').strip() or 'postgres'
@@ -229,14 +230,14 @@ if db_url:
                 'PORT': u_port,
                 'OPTIONS': {
                     'sslmode': 'require',
-                    'connect_timeout': 10,
+                    'connect_timeout': 5,
                     'keepalives': 1,
                     'keepalives_idle': 30,
                     'keepalives_interval': 10,
                     'keepalives_count': 5,
                 },
-                'CONN_MAX_AGE': 60,
-                'CONN_HEALTH_CHECKS': True,
+                'CONN_MAX_AGE': get_env_int('CONN_MAX_AGE', 300),
+                'CONN_HEALTH_CHECKS': False,
             }
         }
     except Exception as e:
@@ -264,8 +265,22 @@ if DATABASES is None:
 
 
 # ==========================================================================
+# In-Memory Cache (Ultra-Fast RAM Caching for Database Aggregations)
+# ==========================================================================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'ems-cache',
+        'TIMEOUT': 60,
+    }
+}
+
+
+# ==========================================================================
 # Authentication
 # ==========================================================================
+
 
 AUTHENTICATION_BACKENDS = [
     'apps.dashboard.auth_backend.ServerlessAuthBackend',
@@ -357,7 +372,7 @@ EMAIL_HOST = get_env_str('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = get_env_int('EMAIL_PORT', 587)
 EMAIL_USE_TLS = get_env_bool('EMAIL_USE_TLS', True)
 EMAIL_USE_SSL = get_env_bool('EMAIL_USE_SSL', False)
-EMAIL_TIMEOUT = get_env_int('EMAIL_TIMEOUT', 15)
+EMAIL_TIMEOUT = get_env_int('EMAIL_TIMEOUT', 8)
 DEFAULT_FROM_EMAIL = get_env_str('DEFAULT_FROM_EMAIL', f'Nizhal Community <{EMAIL_HOST_USER}>' if EMAIL_HOST_USER else 'noreply@example.com')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 

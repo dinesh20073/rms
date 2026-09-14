@@ -19,6 +19,17 @@ urlpatterns = [
     
     # Root endpoint (renders login view or redirects to dashboard if authenticated)
     path('', auth_views.login_view, name='root-home'),
+
+    # Redirect bare register/pay/pass/status routes to Nizhal home page
+    path('register/', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('register', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('pay/', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('pay', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('pass/', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('pass', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('status/', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('status', lambda req: redirect('https://www.nizhalcommunity.in/')),
+
     # Custom AI Innovators registration page (bright theme)
     path('register/ai-innovators-2026/', reg_views.ai_innovators_register_view, name='ai-innovators-register'),
 
@@ -61,11 +72,16 @@ def custom_404_view(request, exception=None):
     """
     Handles 404s safely:
     - Returns JSON for API endpoints
-    - Any wrong page of admin redirects to the admin root URL (e.g. https://www.admin.nizhalcommunity.in/)
-    - Customer-facing public site (nizhalcommunity.in) renders registration_closed.html
+    - Any wrong public page (/register, /pay, etc.) or wrong customer page
+      automatically redirects to the official Nizhal home page (https://www.nizhalcommunity.in/)
+    - Admin-specific routes on admin host redirect to admin root
     """
     if request.path.startswith('/api/'):
         return JsonResponse({'error': 'Endpoint not found', 'status': 404}, status=404)
+
+    path = request.path_info or request.path
+    if not path.startswith(('/dashboard', '/admin', '/login')):
+        return redirect('https://www.nizhalcommunity.in/')
 
     host = request.get_host().lower()
     is_admin_host = (
@@ -77,8 +93,6 @@ def custom_404_view(request, exception=None):
     if is_admin_host:
         return redirect(f"{request.scheme}://{host}/")
 
-    return render(request, 'public/registration_closed.html', {
-        'closed_reason': 'The page you requested could not be found.',
-    }, status=404)
+    return redirect('https://www.nizhalcommunity.in/')
 
 handler404 = 'ems_core.urls.custom_404_view'

@@ -60,8 +60,14 @@ class RewriteHostPreserveMiddleware(MiddlewareMixin):
         # 1. Handle redirects
         if response.status_code in (301, 302, 303, 307, 308) and response.has_header('Location'):
             location = response['Location']
-            
-            if is_admin_host:
+
+            # For public registration/pay/pass/status paths, ensure no redirect to admin login
+            if any(path.startswith(prefix) for prefix in self.PUBLIC_PATH_PREFIXES):
+                if location in ('/', f"{request.scheme}://{host}/", 'https://admin.nizhalcommunity.in/', 'https://admin.nizhalcommunity.in'):
+                    response['Location'] = 'https://www.nizhalcommunity.in/'
+                elif 'admin.nizhalcommunity.in' in location or 'admin-nizhal-community' in location:
+                    response['Location'] = 'https://www.nizhalcommunity.in/'
+            elif is_admin_host:
                 # If visitor is on the admin domain (e.g. www.admin.nizhalcommunity.in),
                 # preserve their exact admin host in any redirect
                 if location.startswith(('http://', 'https://')):
@@ -74,25 +80,20 @@ class RewriteHostPreserveMiddleware(MiddlewareMixin):
                 if 'admin.nizhalcommunity.in' in location or 'admin-nizhal-community' in location:
                     new_location = re.sub(
                         r'^https?://(?:www\.admin\.nizhalcommunity\.in|admin\.nizhalcommunity\.in|admin-nizhal-community\.vercel\.app)',
-                        'https://nizhalcommunity.in',
+                        'https://www.nizhalcommunity.in',
                         location
                     )
                     response['Location'] = new_location
 
-                # For public registration/pay/pass/status paths, ensure no admin domain leak
-                if any(path.startswith(prefix) for prefix in self.PUBLIC_PATH_PREFIXES):
-                    if response['Location'].startswith(('http://', 'https://')):
-                        if 'admin.nizhalcommunity.in' in response['Location']:
-                            response['Location'] = re.sub(
-                                r'^https?://[a-zA-Z0-9.-]*admin\.nizhalcommunity\.in',
-                                'https://nizhalcommunity.in',
-                                response['Location']
-                            )
-
-        # 2. Redirect any 404 on admin host to admin root URL (e.g. https://www.admin.nizhalcommunity.in/)
-        if response.status_code == 404 and is_admin_host:
+        # 2. Redirect 404s safely:
+        # Public routes (/register, /pay, /pass, /status) or wrong public pages always redirect to main website home page
+        if response.status_code == 404:
             if not path.startswith(('/static/', '/media/', '/api/')):
-                return redirect(f"{request.scheme}://{host}/")
+                if any(path.startswith(prefix) for prefix in self.PUBLIC_PATH_PREFIXES):
+                    return redirect('https://www.nizhalcommunity.in/')
+                if is_admin_host and path.startswith(('/dashboard', '/admin', '/login')):
+                    return redirect(f"{request.scheme}://{host}/")
+                return redirect('https://www.nizhalcommunity.in/')
 
         # 3. Add CORS headers for static assets, media, and API
         if path.startswith(('/static/', '/media/', '/api/', '/register/static/')):

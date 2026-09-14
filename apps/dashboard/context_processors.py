@@ -31,9 +31,9 @@ def global_context(request):
         now = time.monotonic()
         global _TENANTS_CACHE, _REVIEW_COUNT_CACHE
 
-        # 1. Tenant lookup with 30s cache
+        # 1. Tenant lookup with 120s cache
         tenants_list, tenants_time = _TENANTS_CACHE
-        if now - tenants_time > 30 or not tenants_list:
+        if now - tenants_time > 120 or not tenants_list:
             tenants_list = list(Tenant.objects.filter(is_active=True))
             _TENANTS_CACHE = (tenants_list, now)
         all_tenants = tenants_list
@@ -50,12 +50,12 @@ def global_context(request):
                 current_tenant = all_tenants[0]
             request._current_tenant = current_tenant
 
-        # 2. Pending review count with 15s cache
+        # 2. Pending review count with 30s cache
         pending_reviews_count = 0
         if current_tenant:
             t_id = current_tenant.id
             cached_count, count_time = _REVIEW_COUNT_CACHE.get(t_id, (None, 0))
-            if cached_count is not None and (now - count_time < 15):
+            if cached_count is not None and (now - count_time < 30):
                 pending_reviews_count = cached_count
             else:
                 pending_reviews_count = Verification.objects.filter(
@@ -64,15 +64,17 @@ def global_context(request):
                 ).count()
                 _REVIEW_COUNT_CACHE[t_id] = (pending_reviews_count, now)
 
-        return {
+        base_ctx.update({
             'all_tenants': all_tenants,
             'current_tenant': current_tenant,
             'pending_reviews_count': pending_reviews_count,
-        }
+        })
+        return base_ctx
     except Exception:
-        return {
+        base_ctx.update({
             'all_tenants': [],
             'current_tenant': None,
             'pending_reviews_count': 0,
-        }
+        })
+        return base_ctx
 
