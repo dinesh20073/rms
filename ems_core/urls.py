@@ -17,8 +17,8 @@ urlpatterns = [
     path('login/', auth_views.login_view, name='login'),
     path('logout/', auth_views.logout_view, name='logout'),
     
-    # Root redirects to Dashboard
-    path('', lambda req: redirect('dashboard-overview'), name='root-home'),
+    # Root redirects to Dashboard (if authenticated) or Login
+    path('', lambda req: redirect('dashboard-overview' if getattr(req.user, 'is_authenticated', False) else 'login'), name='root-home'),
     # Custom AI Innovators registration page (bright theme)
     path('register/ai-innovators-2026/', reg_views.ai_innovators_register_view, name='ai-innovators-register'),
 
@@ -41,8 +41,22 @@ urlpatterns = [
 
 from django.urls import re_path
 from django.views.static import serve
+from django.http import JsonResponse
 
 urlpatterns += [
     re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0]}),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
+
+def custom_404_view(request, exception=None):
+    """
+    Redirects any unmapped customer URL (when prefixed with admin.)
+    automatically to the admin login page (or dashboard if already authenticated).
+    """
+    if request.path.startswith('/api/'):
+        return JsonResponse({'error': 'Endpoint not found', 'status': 404}, status=404)
+    if getattr(request, 'user', None) and request.user.is_authenticated:
+        return redirect('dashboard-overview')
+    return redirect('login')
+
+handler404 = 'ems_core.urls.custom_404_view'
