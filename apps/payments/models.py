@@ -60,7 +60,11 @@ class Order(models.Model):
     @property
     def proof_display_url(self):
         ev = self.latest_evidence
-        return ev.display_url if ev else ''
+        if ev:
+            if self.order_code:
+                return f'/dashboard/verification/proof/{self.order_code}/'
+            return ev.display_url
+        return ''
 
     def save(self, *args, **kwargs):
         if not self.order_code:

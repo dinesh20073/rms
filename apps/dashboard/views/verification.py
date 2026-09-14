@@ -16,7 +16,7 @@ def manual_verification_queue_view(request):
     
     queue = list(verifications_qs.filter(
         decision='MANUAL_REVIEW'
-    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence').order_by('-created_at'))
+    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'evidence').defer('evidence__image_base64').order_by('-created_at'))
 
     counts = verifications_qs.aggregate(
         manual_approved=Count('id', filter=Q(decision='MANUAL_APPROVED')),
@@ -29,7 +29,7 @@ def manual_verification_queue_view(request):
 
     recent_history = list(verifications_qs.exclude(
         decision='MANUAL_REVIEW'
-    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'reviewed_by', 'evidence').order_by('-reviewed_at', '-created_at')[:25])
+    ).select_related('order', 'order__registration', 'order__registration__customer', 'order__registration__event', 'reviewed_by', 'evidence').defer('evidence__image_base64').order_by('-reviewed_at', '-created_at')[:25])
 
     return render(request, 'dashboard/verification/queue.html', {
         'queue': queue,
@@ -205,15 +205,23 @@ def view_payment_proof_image(request, order_code):
     from django.http import HttpResponse, Http404
 
     tenant = get_current_tenant(request)
+    evidence = None
     verification = Verification.objects.filter(
         order__order_code=order_code,
         order__registration__event__tenant=tenant
     ).select_related('evidence', 'order').first()
 
-    if not verification or not verification.evidence:
+    if verification and verification.evidence:
+        evidence = verification.evidence
+    else:
+        from apps.payments.models import Order
+        order = Order.objects.filter(order_code=order_code, registration__event__tenant=tenant).first()
+        if order:
+            evidence = order.evidence_records.first()
+
+    if not evidence:
         raise Http404("Payment proof not found")
 
-    evidence = verification.evidence
     if evidence.image_base64:
         try:
             raw_val = evidence.image_base64
@@ -226,6 +234,7 @@ def view_payment_proof_image(request, order_code):
             raw_bytes = base64.b64decode(data)
             response = HttpResponse(raw_bytes, content_type=mime)
             response['Content-Disposition'] = f'inline; filename="receipt_{order_code}.png"'
+            response['Cache-Control'] = 'private, max-age=86400'
             return response
         except Exception:
             pass
@@ -233,7 +242,9 @@ def view_payment_proof_image(request, order_code):
     if evidence.screenshot:
         try:
             content_file = evidence.screenshot.open('rb')
-            return HttpResponse(content_file.read(), content_type='image/png')
+            response = HttpResponse(content_file.read(), content_type='image/png')
+            response['Cache-Control'] = 'private, max-age=86400'
+            return response
         except Exception:
             pass
 

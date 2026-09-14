@@ -109,7 +109,6 @@ ROOT_URLCONF = 'ems_core.urls'
 # Choose loaders based on DEBUG mode: cached in production for performance
 _template_loaders = [
     'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
 ]
 if not DEBUG:
     _template_loaders = [
@@ -121,7 +120,6 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             BASE_DIR / 'templates',
-            BASE_DIR / 'ems_core' / 'templates',
         ],
         'OPTIONS': {
             'loaders': _template_loaders,

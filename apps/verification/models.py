@@ -15,13 +15,15 @@ class PaymentEvidence(models.Model):
 
     @property
     def display_url(self):
-        if self.image_base64:
-            return self.image_base64
+        if hasattr(self, 'order') and self.order and getattr(self.order, 'order_code', None):
+            return f'/dashboard/verification/proof/{self.order.order_code}/'
         if self.screenshot:
             try:
                 return self.screenshot.url
             except Exception:
                 pass
+        if self.image_base64:
+            return self.image_base64
         return ''
 
     def save(self, *args, **kwargs):

@@ -13,9 +13,10 @@ from apps.dashboard.views.overview import get_current_tenant
 @login_required(login_url='login')
 def database_view(request):
     tenant = get_current_tenant(request)
-    # Automatically merge duplicate profiles sharing same mobile number or email ID
-    from apps.registrations.services import consolidate_tenant_customers
-    consolidate_tenant_customers(tenant)
+    # Automatically merge profiles only if requested with ?merge=1
+    if request.GET.get('merge') == '1':
+        from apps.registrations.services import consolidate_tenant_customers
+        consolidate_tenant_customers(tenant)
 
     search_query = request.GET.get('q', '').strip()
 
@@ -39,10 +40,14 @@ def database_view(request):
             Q(reg_id__icontains=search_query)
         )
 
-    # Core Metrics from real database
+    # Core Metrics from real database (single SQL aggregation)
     total_contacts = customers_qs.count()
-    total_registrations = Registration.objects.filter(event__tenant=tenant).count()
-    verified_attendees = Registration.objects.filter(event__tenant=tenant, status='COMPLETED').count()
+    reg_counts = Registration.objects.filter(event__tenant=tenant).aggregate(
+        total=Count('id'),
+        verified=Count('id', filter=Q(status='COMPLETED'))
+    )
+    total_registrations = reg_counts['total'] or 0
+    verified_attendees = reg_counts['verified'] or 0
 
     # Calculate Gender Breakdown for all bookings
     all_regs = Registration.objects.filter(event__tenant=tenant)

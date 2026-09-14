@@ -7,13 +7,23 @@ from django.utils import timezone
 
 from apps.events.models import Event
 from apps.registrations.models import Registration
+from django.db.models import Prefetch
+from apps.verification.models import PaymentEvidence
 from apps.dashboard.views.overview import get_current_tenant, filter_registrations_queryset
 
 
 @login_required(login_url='login')
 def registrations_list_view(request):
     tenant = get_current_tenant(request)
-    qs = Registration.objects.filter(event__tenant=tenant).select_related('customer', 'event', 'order', 'attendee_pass').order_by('-created_at')
+    qs = Registration.objects.filter(event__tenant=tenant).select_related(
+        'customer', 'event', 'order', 'attendee_pass',
+        'order__verification', 'order__verification__evidence'
+    ).prefetch_related(
+        Prefetch('order__evidence_records', queryset=PaymentEvidence.objects.defer('image_base64'))
+    ).defer(
+        'order__qr_code_base64',
+        'order__verification__evidence__image_base64'
+    ).order_by('-created_at')
     qs, filter_params, active_filters_count = filter_registrations_queryset(qs, request)
     events = Event.objects.filter(tenant=tenant)
     return render(request, 'dashboard/registrations/list.html', {

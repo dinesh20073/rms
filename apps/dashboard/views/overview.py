@@ -218,7 +218,7 @@ def overview_dashboard_view(request):
     events_breakdown = sorted(all_events, key=lambda e: e.total_collected or Decimal('0.00'), reverse=True)
 
     # 5. Filterable Registrations with full database details (capped at 50 for instant response)
-    table_qs = reg_qs.select_related('customer', 'event', 'order', 'attendee_pass').order_by('-created_at')
+    table_qs = reg_qs.select_related('customer', 'event', 'order', 'attendee_pass').defer('order__qr_code_base64').order_by('-created_at')
     table_qs, filter_params, active_filters_count = filter_registrations_queryset(table_qs, request)
     recent_registrations = table_qs[:50]
 
@@ -227,25 +227,31 @@ def overview_dashboard_view(request):
     chart_dates = [d.strftime('%b %d') for d in days_list]
 
     daily_regs_map = {d: 0 for d in days_list}
-    for r in reg_qs.filter(created_at__date__gte=days_list[0]):
-        d = r.created_at.date()
+    for item in reg_qs.filter(created_at__date__gte=days_list[0]).values('created_at__date').annotate(c=Count('id')):
+        d = item['created_at__date']
         if d in daily_regs_map:
-            daily_regs_map[d] += 1
+            daily_regs_map[d] = item['c']
 
     daily_revenue_map = {d: 0.0 for d in days_list}
-    for o in order_qs.filter(status='VERIFIED', created_at__date__gte=days_list[0]):
-        d = o.created_at.date()
+    for item in order_qs.filter(status='VERIFIED', created_at__date__gte=days_list[0]).values('created_at__date').annotate(s=Sum('amount')):
+        d = item['created_at__date']
         if d in daily_revenue_map:
-            daily_revenue_map[d] += float(o.amount)
+            daily_revenue_map[d] = float(item['s'] or 0)
 
     chart_regs_data = [daily_regs_map[d] for d in days_list]
     chart_revenue_data = [daily_revenue_map[d] for d in days_list]
 
-    # Donut 1: Registration Status Breakdown
-    completed_regs = reg_qs.filter(status='COMPLETED').count()
-    pending_regs = reg_qs.filter(status='PENDING').count()
-    manual_regs = reg_qs.filter(status='MANUAL_REVIEW').count()
-    failed_regs = reg_qs.filter(status__in=['FAILED', 'CANCELLED']).count()
+    # Donut 1: Registration Status Breakdown (Single aggregated query)
+    status_aggs = reg_qs.aggregate(
+        completed=Count('id', filter=Q(status='COMPLETED')),
+        pending=Count('id', filter=Q(status='PENDING')),
+        manual=Count('id', filter=Q(status='MANUAL_REVIEW')),
+        failed=Count('id', filter=Q(status__in=['FAILED', 'CANCELLED'])),
+    )
+    completed_regs = status_aggs['completed'] or 0
+    pending_regs = status_aggs['pending'] or 0
+    manual_regs = status_aggs['manual'] or 0
+    failed_regs = status_aggs['failed'] or 0
 
     donut_status_labels = ['Verified Pass', 'Pending Verification', 'Review Queue', 'Failed / Cancelled']
     donut_status_data = [completed_regs, pending_regs, manual_regs, failed_regs]

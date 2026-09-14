@@ -862,25 +862,35 @@
             }
         }
 
+        let lastSyncTimestamp = Date.now();
+
         function startGlobalSync() {
             if (globalSyncInterval) clearInterval(globalSyncInterval);
             globalSyncInterval = setInterval(() => {
                 if (!document.hidden) {
                     executeGlobalLiveSync(false);
+                    lastSyncTimestamp = Date.now();
                 }
-            }, 20000); // Passive live background sync every 20s
+            }, 25000); // Passive live background sync every 25s
         }
 
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
-                executeGlobalLiveSync(false);
+                // Throttle: only refetch on window focus if at least 15s elapsed since last sync
+                if (Date.now() - lastSyncTimestamp > 15000) {
+                    executeGlobalLiveSync(false);
+                    lastSyncTimestamp = Date.now();
+                }
             }
         });
 
         document.addEventListener('DOMContentLoaded', () => {
             startGlobalSync();
         });
-        window.triggerGlobalSync = () => executeGlobalLiveSync(true);
+        window.triggerGlobalSync = () => {
+            lastSyncTimestamp = Date.now();
+            return executeGlobalLiveSync(true);
+        };
     })();
 
     // Global Floating 3-Dots Action Dropdown Handler (Prevents Table Overflow Clipping)
