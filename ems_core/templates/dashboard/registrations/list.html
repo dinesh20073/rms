@@ -1,0 +1,725 @@
+{% extends 'dashboard_base.html' %}
+
+{% block header_title %}Registrations{% endblock %}
+
+{% block content %}
+<style>
+.filter-ctrl {
+    display: block !important;
+    width: 100% !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 6px 10px !important;
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+    color: #202124 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #dadce0 !important;
+    border-radius: 8px !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+.filter-ctrl:hover {
+    border-color: #5f6368 !important;
+}
+.filter-ctrl:focus {
+    border-color: #1a73e8 !important;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
+}
+select.filter-ctrl {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 8px center !important;
+    background-size: 14px !important;
+    padding-right: 28px !important;
+    cursor: pointer !important;
+}
+</style>
+
+<div class="p-3 sm:p-5 max-w-[1600px] w-full mx-auto flex-1 flex flex-col space-y-3.5 pb-20 lg:pb-6">
+
+    <!-- Compact Google Toolbar & Instant Search -->
+    <div class="google-card p-3 shrink-0 space-y-2.5">
+        <form method="GET" action="{% url 'dashboard-registrations-list' %}" id="regFilterForm" class="space-y-2.5">
+            
+            <!-- Compact Single-Row Toolbar -->
+            <div class="flex flex-wrap items-center justify-between gap-2.5">
+                
+                <!-- Search Input with Live Real-time Filtering -->
+                <div class="flex-1 min-w-[240px] max-w-md relative">
+                    <i data-lucide="search" class="w-4 h-4 text-[#5f6368] absolute left-3.5 top-2.5 pointer-events-none"></i>
+                    <input type="text" id="realtimeSearchInput" name="q" value="{{ filter_params.q }}" placeholder="Search name, email, booking code, pass..." autocomplete="off" class="google-search-pill text-xs">
+                    <button type="button" id="clearSearchBtn" onclick="clearLiveSearch()" class="{% if not filter_params.q %}hidden{% endif %} absolute right-3 top-2.5 text-[#5f6368] hover:text-[#202124] cursor-pointer" title="Clear search">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="document.getElementById('listColumnFilterGrid').classList.toggle('hidden')" class="google-btn-outlined text-xs flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                        <span>Filters</span>
+                        {% if active_filters_count > 0 %}
+                        <span class="bg-[#1a73e8] text-white text-[10px] font-semibold px-1 rounded">{{ active_filters_count }}</span>
+                        {% endif %}
+                    </button>
+
+                    {% if active_filters_count > 0 %}
+                    <a href="{% url 'dashboard-registrations-list' %}" class="google-btn-danger text-xs flex items-center gap-1" title="Reset All Filters">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        <span>Reset</span>
+                    </a>
+                    {% endif %}
+
+                    <span id="recordCountBadge" class="text-[#5f6368] font-mono text-xs px-2 py-1">
+                        {{ registrations|length }} records
+                    </span>
+                </div>
+            </div>
+
+            <!-- Collapsible Column Filters Grid -->
+            <div id="listColumnFilterGrid" class="{% if active_filters_count == 0 or active_filters_count == 1 and filter_params.q %}hidden{% endif %} bg-[#f8f9fa] p-3.5 border border-[#dadce0] rounded-xl space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+                    
+                    <!-- 1. Date / Time Filter -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                            <span>Date / Time</span>
+                        </label>
+                        <select name="date_preset" onchange="toggleDateCustom(this.value, 'list')" class="filter-ctrl">
+                            <option value="">All Dates</option>
+                            <option value="today" {% if filter_params.date_preset == 'today' %}selected{% endif %}>Today</option>
+                            <option value="7days" {% if filter_params.date_preset == '7days' %}selected{% endif %}>Last 7 Days</option>
+                            <option value="30days" {% if filter_params.date_preset == '30days' %}selected{% endif %}>Last 30 Days</option>
+                            <option value="custom" {% if filter_params.date_preset == 'custom' or filter_params.date_from or filter_params.date_to %}selected{% endif %}>Custom Range</option>
+                        </select>
+                        <div id="list_date_custom" class="{% if filter_params.date_preset != 'custom' and not filter_params.date_from and not filter_params.date_to %}hidden{% endif %} flex items-center gap-1 pt-1">
+                            <input type="date" name="date_from" value="{{ filter_params.date_from }}" class="filter-ctrl text-[11px] py-1 px-1.5 h-7 flex-1" title="From Date">
+                            <span class="text-[#5f6368] text-xs">-</span>
+                            <input type="date" name="date_to" value="{{ filter_params.date_to }}" class="filter-ctrl text-[11px] py-1 px-1.5 h-7 flex-1" title="To Date">
+                        </div>
+                    </div>
+
+                    <!-- 2. Status Filter -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#137333]"></i>
+                            <span>Status</span>
+                        </label>
+                        <select name="status" class="filter-ctrl">
+                            <option value="">All Statuses</option>
+                            <option value="COMPLETED" {% if filter_params.status == 'COMPLETED' %}selected{% endif %}>Verified & Active</option>
+                            <option value="PENDING" {% if filter_params.status == 'PENDING' %}selected{% endif %}>Payment Required</option>
+                            <option value="MANUAL_REVIEW" {% if filter_params.status == 'MANUAL_REVIEW' %}selected{% endif %}>Manual Review</option>
+                            <option value="FAILED" {% if filter_params.status == 'FAILED' %}selected{% endif %}>Failed</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. Reg Code Filter -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="hash" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                            <span>Reg Code</span>
+                        </label>
+                        <input type="text" name="reg_code" value="{{ filter_params.reg_code }}" placeholder="e.g. REG-000001" class="filter-ctrl font-mono">
+                    </div>
+
+                    <!-- 4. Customer Filter -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                            <span>Customer</span>
+                        </label>
+                        <input type="text" name="customer" value="{{ filter_params.customer }}" placeholder="Name, email, phone..." class="filter-ctrl">
+                    </div>
+
+                    <!-- 5. Event Filter -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                            <span>Event</span>
+                        </label>
+                        <select name="event_id" class="filter-ctrl">
+                            <option value="">All Events</option>
+                            {% for ev in events %}
+                            <option value="{{ ev.id }}" {% if filter_params.event_id == ev.id|stringformat:"s" %}selected{% endif %}>{{ ev.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- 6. Amount Filter -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="indian-rupee" class="w-3.5 h-3.5 text-[#137333]"></i>
+                            <span>Amount</span>
+                        </label>
+                        <select name="amount_type" class="filter-ctrl">
+                            <option value="">All Amounts</option>
+                            <option value="free" {% if filter_params.amount_type == 'free' %}selected{% endif %}>Free Entry (₹0)</option>
+                            <option value="paid" {% if filter_params.amount_type == 'paid' %}selected{% endif %}>Paid Entry (> ₹0)</option>
+                        </select>
+                    </div>
+
+                    <!-- 7. Pass Badge Filter -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] flex items-center gap-1">
+                            <i data-lucide="badge-check" class="w-3.5 h-3.5 text-[#b06000]"></i>
+                            <span>Pass Badge</span>
+                        </label>
+                        <select name="pass_filter" class="filter-ctrl">
+                            <option value="">All Passes</option>
+                            <option value="with_pass" {% if filter_params.pass_filter == 'with_pass' %}selected{% endif %}>Pass Issued</option>
+                            <option value="without_pass" {% if filter_params.pass_filter == 'without_pass' %}selected{% endif %}>No Pass</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Filter Actions Bar (Apply & Clear) -->
+                <div class="pt-2.5 flex flex-wrap items-center justify-between border-t border-[#dadce0] gap-2">
+                    <span class="text-[11px] text-[#5f6368]">
+                        Configure any filters above and click Apply to refine registration logs.
+                    </span>
+                    <div class="flex items-center gap-2">
+                        {% if active_filters_count > 0 %}
+                        <a href="{% url 'dashboard-registrations-list' %}" class="google-btn-outlined text-xs py-1.5 px-3">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-[#5f6368]"></i>
+                            <span>Clear All</span>
+                        </a>
+                        {% endif %}
+                        <button type="submit" class="google-btn-primary text-xs py-1.5 px-4 font-semibold flex items-center gap-1.5 cursor-pointer">
+                            <i data-lucide="filter" class="w-3.5 h-3.5"></i>
+                            <span>Apply Filters</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Filter Chips -->
+            {% if active_filters_count > 0 %}
+            <div class="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                <span class="text-[#5f6368] font-medium text-xs mr-1">Active Filters:</span>
+                
+                {% if filter_params.q %}
+                <span class="text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded text-xs">
+                    Search: <strong>{{ filter_params.q }}</strong>
+                </span>
+                {% endif %}
+
+                {% if filter_params.status %}
+                <span class="text-[#137333] bg-[#e6f4ea] px-2 py-0.5 rounded text-xs">
+                    Status: <strong>{{ filter_params.status }}</strong>
+                </span>
+                {% endif %}
+
+                {% if filter_params.reg_code %}
+                <span class="text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded text-xs font-mono">
+                    Code: <strong>{{ filter_params.reg_code }}</strong>
+                </span>
+                {% endif %}
+
+                {% if filter_params.customer %}
+                <span class="text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded text-xs">
+                    Customer: <strong>{{ filter_params.customer }}</strong>
+                </span>
+                {% endif %}
+
+                {% if filter_params.event_id %}
+                <span class="text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded text-xs">
+                    Event Filtered
+                </span>
+                {% endif %}
+
+                {% if filter_params.amount_type %}
+                <span class="text-[#b06000] bg-[#fef7e0] px-2 py-0.5 rounded text-xs">
+                    Amount: <strong>{% if filter_params.amount_type == 'free' %}Free (₹0){% else %}Paid (> ₹0){% endif %}</strong>
+                </span>
+                {% endif %}
+
+                {% if filter_params.pass_filter %}
+                <span class="text-[#137333] bg-[#e6f4ea] px-2 py-0.5 rounded text-xs">
+                    Pass: <strong>{% if filter_params.pass_filter == 'with_pass' %}Issued{% else %}No Pass{% endif %}</strong>
+                </span>
+                {% endif %}
+
+                <a href="{% url 'dashboard-registrations-list' %}" class="text-xs font-medium text-[#d93025] hover:underline ml-1">Clear All</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Google Sheets / Logs Style Table Container -->
+    <div class="google-card flex-1 min-h-[420px] lg:min-h-0 flex flex-col overflow-hidden">
+        <div class="table-scroll-container flex-1 min-h-0 overflow-auto">
+            <table class="w-full text-left text-xs border-collapse min-w-[700px] lg:min-w-full">
+                <thead class="bg-[#f8f9fa] border-b border-[#dadce0] text-[#5f6368] font-semibold text-xs uppercase tracking-wider sticky top-0 z-10">
+                    <tr>
+                        <th class="py-3 px-3.5 text-center w-10">
+                            <input type="checkbox" id="selectAllRegsCheckbox" onchange="toggleSelectAllRegs(this.checked)" class="rounded border-[#dadce0] text-[#1a73e8] focus:ring-0 cursor-pointer" title="Select All">
+                        </th>
+                        <th class="py-3 px-3.5 whitespace-nowrap">Date</th>
+                        <th class="py-3 px-3.5 whitespace-nowrap">Status</th>
+                        <th class="py-3 px-3.5 whitespace-nowrap">Reg Code</th>
+                        <th class="py-3 px-3.5">Customer</th>
+                        <th class="py-3 px-3.5">Event</th>
+                        <th class="py-3 px-3.5 whitespace-nowrap">Amount</th>
+                        <th class="py-3 px-3.5 text-center whitespace-nowrap">Pass</th>
+                        <th class="py-3 px-3.5 text-right whitespace-nowrap">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="registrationsTableBody" class="divide-y divide-[#dadce0] text-[#202124]">
+                    {% for reg in registrations %}
+                    <tr data-searchable="{{ reg.registration_code|lower }} {{ reg.customer.name|lower }} {{ reg.customer.email|lower }} {{ reg.customer.phone|lower }} {{ reg.event.title|lower }} {{ reg.attendee_pass.pass_code|default:''|lower }} {{ reg.status|lower }} {{ reg.amount }}" class="hover:bg-[#f8f9fa] transition duration-100 group">
+                        
+                        <!-- Checkbox -->
+                        <td class="py-2.5 px-3.5 text-center">
+                            <input type="checkbox" value="{{ reg.registration_code }}" data-code="{{ reg.registration_code }}" onchange="handleRegRowCheck()" class="reg-row-check rounded border-[#dadce0] text-[#1a73e8] focus:ring-0 cursor-pointer">
+                        </td>
+
+                        <!-- Date / Time -->
+                        <td class="py-2.5 px-3.5 whitespace-nowrap">
+                            <div class="font-medium text-[#202124] text-xs">{{ reg.created_at|date:"d M Y" }}</div>
+                            <div class="text-[11px] text-[#5f6368] font-mono mt-0.5">{{ reg.created_at|time:"H:i" }}</div>
+                        </td>
+
+                        <!-- Status Pill -->
+                        <td class="py-2.5 px-3.5 whitespace-nowrap">
+                            {% if reg.status == 'COMPLETED' %}
+                            <span class="pill-green">Verified</span>
+                            {% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}
+                            <span class="pill-orange">Review</span>
+                            {% elif reg.status == 'FAILED' %}
+                            <span class="pill-red">Failed</span>
+                            {% else %}
+                            <span class="pill-blue">Pending</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Reg Code -->
+                        <td class="py-2.5 px-3.5 font-mono font-medium text-[#1a73e8] whitespace-nowrap text-xs">
+                            <button onclick="navigator.clipboard.writeText('{{ reg.registration_code }}')" class="hover:underline flex items-center gap-1 cursor-pointer" title="Copy code">
+                                <span>{{ reg.registration_code }}</span>
+                                <i data-lucide="copy" class="w-3 h-3 opacity-40 group-hover:opacity-100 transition hidden sm:inline"></i>
+                            </button>
+                        </td>
+
+                        <!-- Customer -->
+                        <td class="py-2.5 px-3.5">
+                            <div class="truncate max-w-[150px] sm:max-w-[200px]">
+                                <div class="font-medium text-[#202124] truncate text-xs">{{ reg.customer.name }}</div>
+                                <div class="text-[11px] text-[#5f6368] truncate">{{ reg.customer.email }}</div>
+                                <div class="text-[10px] text-[#5f6368] font-mono flex items-center gap-1 mt-0.5" title="Device: {{ reg.client_device }} • IP: {{ reg.client_ip }}">
+                                    <i data-lucide="laptop" class="w-2.5 h-2.5 text-[#1a73e8] shrink-0"></i>
+                                    <span class="truncate">{{ reg.client_device }}</span>
+                                    <span class="text-[#dadce0]">•</span>
+                                    <span class="font-semibold text-[#3c4043]">{{ reg.client_ip }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Event -->
+                        <td class="py-2.5 px-3.5 font-medium text-[#3c4043]">
+                            <a href="{% url 'dashboard-event-detail' reg.event.id %}" class="hover:text-[#1a73e8] hover:underline block truncate max-w-[120px] sm:max-w-[180px] text-xs" title="{{ reg.event.title }}">
+                                {{ reg.event.title }}
+                            </a>
+                        </td>
+
+                        <!-- Amount -->
+                        <td class="py-2.5 px-3.5 font-mono font-semibold text-[#202124] whitespace-nowrap text-xs">
+                            ₹{{ reg.amount|floatformat:0 }}
+                        </td>
+
+                        <!-- Pass Code -->
+                        <td class="py-2.5 px-3.5 text-center whitespace-nowrap">
+                            {% if reg.status == 'COMPLETED' and reg.attendee_pass %}
+                            <button type="button" onclick="openPassModal('{{ reg.attendee_pass.pass_code }}', '{{ reg.customer.name|escapejs }}', '{{ reg.event.title|escapejs }}')" class="font-mono text-xs font-semibold text-[#1a73e8] hover:underline inline-flex items-center gap-1 cursor-pointer" title="Click to view & print pass">
+                                <i data-lucide="qr-code" class="w-3.5 h-3.5 text-[#5f6368]"></i>
+                                <span>{{ reg.attendee_pass.pass_code }}</span>
+                            </button>
+                            {% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}
+                            <span class="pill-orange text-xs">Review</span>
+                            {% else %}
+                            <span class="text-xs text-[#5f6368]">-</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions: 3-Dots Dropdown -->
+                        <td class="py-2.5 px-3.5 text-right whitespace-nowrap">
+                            <div class="relative inline-block text-left table-action-dropdown">
+                                <button type="button" onclick="toggleActionDropdown(this, event)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full inline-flex items-center justify-center text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] transition cursor-pointer" title="More Actions">
+                                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                                </button>
+                                <div class="dropdown-menu-content hidden fixed z-[99999] w-52 rounded-xl bg-white shadow-xl border border-[#dadce0] py-1 text-xs text-[#202124] animate-in fade-in zoom-in-95 duration-100 text-left">
+                                    {% if reg.attendee_pass %}
+                                    <a href="{% url 'attendee-badge' reg.attendee_pass.pass_code %}" target="_blank" class="flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#202124]">
+                                        <i data-lucide="qr-code" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                                        <span>View Entrance Pass</span>
+                                    </a>
+                                    {% endif %}
+                                    {% if reg.order.proof_display_url %}
+                                    <button type="button" onclick="openProofModal('{{ reg.order.proof_display_url }}', '{{ reg.order.order_code }}', '{{ reg.customer.name|escapejs }}', '{{ reg.registration_code }}', '{{ reg.status }}')" class="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#202124] text-left cursor-pointer">
+                                        <i data-lucide="image" class="w-3.5 h-3.5 text-[#1e8e3e]"></i>
+                                        <span>View Payment Proof</span>
+                                    </button>
+                                    {% endif %}
+                                    <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#202124]">
+                                        <i data-lucide="compass" class="w-3.5 h-3.5 text-[#5f6368]"></i>
+                                        <span>Track Status</span>
+                                    </a>
+                                    {% if reg.status == 'COMPLETED' %}
+                                    <a href="{% url 'dashboard-registration-send-email' reg.registration_code %}" class="flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#1a73e8] border-t border-[#f1f3f4]">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                                        <span>Resend Confirmation</span>
+                                    </a>
+                                    <!-- Change Status to Failed -->
+                                    <form method="POST" action="{% url 'dashboard-registration-status-change' reg.registration_code %}" onsubmit="return confirm('Change status of {{ reg.registration_code }} to FAILED?');" class="border-t border-[#f1f3f4]">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="target_status" value="FAIL">
+                                        <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#fce8e6] text-[#d93025] transition text-left cursor-pointer font-medium">
+                                            <i data-lucide="x-circle" class="w-3.5 h-3.5 text-[#d93025]"></i>
+                                            <span>Change to Failed</span>
+                                        </button>
+                                    </form>
+                                    {% elif reg.status == 'MANUAL_REVIEW' or reg.order.status == 'MANUAL_REVIEW' %}
+                                    <a href="{% url 'dashboard-verification-queue' %}" class="flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#b06000] border-t border-[#f1f3f4]">
+                                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#b06000]"></i>
+                                        <span>Review in Payments</span>
+                                    </a>
+                                    <!-- Accept Proof / Status -->
+                                    <form method="POST" action="{% url 'dashboard-registration-status-change' reg.registration_code %}" onsubmit="return confirm('Accept proof and mark {{ reg.registration_code }} as ACCEPTED (Verified)?');" class="border-t border-[#f1f3f4]">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="target_status" value="ACCEPT">
+                                        <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#e6f4ea] text-[#137333] transition text-left cursor-pointer font-medium">
+                                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#137333]"></i>
+                                            <span>Accept (Mark Verified)</span>
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <a href="{% url 'dashboard-registration-send-email' reg.registration_code %}?type=reminder" class="flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#b06000] border-t border-[#f1f3f4]">
+                                        <i data-lucide="send" class="w-3.5 h-3.5 text-[#b06000]"></i>
+                                        <span>Send Reminder Email</span>
+                                    </a>
+                                    <a href="{% url 'registration-status' reg.registration_code %}" target="_blank" class="flex items-center gap-2 px-3 py-2 hover:bg-[#f8f9fa] transition text-[#1a73e8] font-medium">
+                                        <i data-lucide="credit-card" class="w-3.5 h-3.5 text-[#1a73e8]"></i>
+                                        <span>Complete Payment</span>
+                                    </a>
+                                    <!-- Accept Proof / Status -->
+                                    <form method="POST" action="{% url 'dashboard-registration-status-change' reg.registration_code %}" onsubmit="return confirm('Accept proof and mark {{ reg.registration_code }} as ACCEPTED (Verified)?');" class="border-t border-[#f1f3f4]">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="target_status" value="ACCEPT">
+                                        <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#e6f4ea] text-[#137333] transition text-left cursor-pointer font-medium">
+                                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#137333]"></i>
+                                            <span>Accept (Mark Verified)</span>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr id="noRecordsRow">
+                        <td colspan="9" class="py-12 text-center text-[#5f6368]">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i data-lucide="inbox" class="w-8 h-8 text-[#5f6368]"></i>
+                                <span class="font-medium text-[#202124] text-sm">No registrations match your search filter</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                    <tr id="noRealtimeResultsRow" class="hidden">
+                        <td colspan="9" class="py-12 text-center text-[#5f6368]">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i data-lucide="search-x" class="w-8 h-8 text-[#5f6368]"></i>
+                                <span class="font-medium text-[#202124] text-sm">No matching registrations found for your search</span>
+                                <button type="button" onclick="clearLiveSearch()" class="text-xs font-semibold text-[#1a73e8] hover:underline cursor-pointer">Clear search</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Real-time Instant Search & Filter Script -->
+<script>
+    const searchInput = document.getElementById('realtimeSearchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const searchableRows = document.querySelectorAll('table tbody tr[data-searchable]');
+    const noResultsRow = document.getElementById('noRealtimeResultsRow');
+    const countBadge = document.getElementById('recordCountBadge');
+    const totalCount = {{ registrations|length }};
+
+    function filterTableRealtime() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const searchableRows = document.querySelectorAll('#registrationsTableBody tr[data-searchable]');
+        const totalCount = searchableRows.length;
+        
+        if (clearBtn) {
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        let visibleCount = 0;
+        searchableRows.forEach(row => {
+            const searchText = row.getAttribute('data-searchable') || '';
+            if (!query || searchText.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        if (noResultsRow) {
+            if (visibleCount === 0 && searchableRows.length > 0) {
+                noResultsRow.classList.remove('hidden');
+            } else {
+                noResultsRow.classList.add('hidden');
+            }
+        }
+
+        if (countBadge) {
+            if (query) {
+                countBadge.innerText = `${visibleCount} of ${totalCount} logs`;
+            } else {
+                countBadge.innerText = `${totalCount} records`;
+            }
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', filterTableRealtime);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Escape') {
+                clearLiveSearch();
+            }
+        });
+    }
+
+    function clearLiveSearch() {
+        if (searchInput) {
+            searchInput.value = '';
+            filterTableRealtime();
+            searchInput.focus();
+        }
+    }
+
+    function toggleDateCustom(preset, prefix) {
+        const wrap = document.getElementById(prefix + '_date_custom');
+        if (wrap) {
+            if (preset === 'custom') {
+                wrap.classList.remove('hidden');
+            } else {
+                wrap.classList.add('hidden');
+            }
+        }
+    }
+
+    // 1-Second Live Sync Hook for Registrations List
+    window.onAfterPageLiveSync = function() {
+        filterTableRealtime();
+    };
+
+    // Bulk Action Selection System
+    function getSelectedRegCheckboxes() {
+        return Array.from(document.querySelectorAll('.reg-row-check:checked'));
+    }
+
+    function handleRegRowCheck() {
+        const selected = getSelectedRegCheckboxes();
+        const count = selected.length;
+        const bar = document.getElementById('regBulkActionBar');
+        const countBadge = document.getElementById('bulkSelectedCount');
+        const selectAll = document.getElementById('selectAllRegsCheckbox');
+
+        if (countBadge) countBadge.innerText = count;
+
+        if (bar) {
+            if (count > 0) {
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        const visibleRows = Array.from(document.querySelectorAll('#registrationsTableBody tr[data-searchable]')).filter(r => r.style.display !== 'none');
+        const visibleChecks = visibleRows.map(r => r.querySelector('.reg-row-check')).filter(Boolean);
+        if (selectAll && visibleChecks.length > 0) {
+            selectAll.checked = visibleChecks.every(c => c.checked);
+        }
+    }
+
+    function toggleSelectAllRegs(checked) {
+        const visibleRows = Array.from(document.querySelectorAll('#registrationsTableBody tr[data-searchable]')).filter(r => r.style.display !== 'none');
+        visibleRows.forEach(r => {
+            const cb = r.querySelector('.reg-row-check');
+            if (cb) cb.checked = checked;
+        });
+        handleRegRowCheck();
+    }
+
+    function clearRegSelection() {
+        document.querySelectorAll('.reg-row-check').forEach(cb => cb.checked = false);
+        const selectAll = document.getElementById('selectAllRegsCheckbox');
+        if (selectAll) selectAll.checked = false;
+        handleRegRowCheck();
+    }
+
+    function closeActionConfirmModal() {
+        const modal = document.getElementById('actionConfirmModal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function openBulkActionModal(action) {
+        const selected = getSelectedRegCheckboxes();
+        if (selected.length === 0) return;
+
+        const codes = selected.map(cb => cb.value);
+        const displayCodes = selected.map(cb => cb.getAttribute('data-code') || cb.value);
+
+        const form = document.getElementById('actionConfirmForm');
+        document.getElementById('modalFormAction').value = action;
+        document.getElementById('modalFormSelectedCodes').value = codes.join(',');
+
+        const titleEl = document.getElementById('modalActionTitle');
+        const descEl = document.getElementById('modalActionDesc');
+        const summaryEl = document.getElementById('modalTargetSummary');
+        const iconBg = document.getElementById('modalActionIconBg');
+        const iconEl = document.getElementById('modalActionIcon');
+        const submitBtn = document.getElementById('modalSubmitBtn');
+        const submitText = document.getElementById('modalSubmitBtnText');
+        const noteGroup = document.getElementById('modalNoteGroup');
+
+        if (summaryEl) {
+            summaryEl.innerText = `Selected (${codes.length}): ${displayCodes.join(', ')}`;
+        }
+
+        submitBtn.className = "text-xs py-1.5 px-4 font-semibold flex items-center gap-1.5 cursor-pointer rounded transition ";
+
+        if (action === 'APPROVE') {
+            titleEl.innerText = `Mark ${codes.length} Registration(s) as Received`;
+            descEl.innerText = "This will confirm the payment, mark registrations as verified, and issue entrance passes to the attendee(s).";
+            iconBg.className = "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#e6f4ea] text-[#137333]";
+            iconEl.setAttribute('data-lucide', 'check-circle-2');
+            submitBtn.className += "bg-[#1e8e3e] hover:bg-[#137333] text-white";
+            submitText.innerText = "Confirm Received";
+            if (noteGroup) noteGroup.style.display = '';
+        } else if (action === 'REJECT') {
+            titleEl.innerText = `Mark ${codes.length} Registration(s) as Not Received`;
+            descEl.innerText = "This will mark the payment and registration as failed/unverified.";
+            iconBg.className = "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#fef3c7] text-[#b45309]";
+            iconEl.setAttribute('data-lucide', 'alert-triangle');
+            submitBtn.className += "bg-[#e37400] hover:bg-[#b06000] text-white";
+            submitText.innerText = "Confirm Not Received";
+            if (noteGroup) noteGroup.style.display = '';
+        } else if (action === 'DELETE_IMAGE') {
+            titleEl.innerText = `Purge Images for ${codes.length} Registration(s)`;
+            descEl.innerText = "This will permanently delete uploaded payment proof screenshots to reclaim storage, preserving customer and booking history.";
+            iconBg.className = "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#f1f3f4] text-[#5f6368]";
+            iconEl.setAttribute('data-lucide', 'image-minus');
+            submitBtn.className += "bg-[#5f6368] hover:bg-[#3c4043] text-white";
+            submitText.innerText = "Purge Images";
+            if (noteGroup) noteGroup.style.display = 'none';
+        } else if (action === 'DELETE') {
+            titleEl.innerText = `Delete ${codes.length} Registration Log(s)`;
+            descEl.innerText = "Are you sure you want to permanently delete these registration records and orders? This action cannot be undone.";
+            iconBg.className = "w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#fee2e2] text-[#d93025]";
+            iconEl.setAttribute('data-lucide', 'trash-2');
+            submitBtn.className += "bg-[#d93025] hover:bg-[#b31412] text-white";
+            submitText.innerText = "Delete Permanently";
+            if (noteGroup) noteGroup.style.display = 'none';
+        }
+
+        const modal = document.getElementById('actionConfirmModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons({ root: modal });
+        }
+    }
+</script>
+
+<!-- Sticky Floating Bulk Action Bar (Appears when rows are selected) -->
+<div id="regBulkActionBar" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#202124] text-white px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-3 border border-[#3c4043] animate-in fade-in slide-in-from-bottom-4 duration-200">
+    <div class="flex items-center gap-1.5 text-xs font-semibold select-none">
+        <span class="w-2 h-2 rounded-full bg-[#1a73e8]"></span>
+        <span id="bulkSelectedCount" class="font-mono">0</span>
+        <span class="text-[#bdc1c6] font-normal">selected</span>
+    </div>
+    
+    <div class="h-4 w-px bg-[#5f6368]"></div>
+
+    <div class="flex items-center gap-2">
+        <button type="button" onclick="openBulkActionModal('APPROVE')" class="bg-[#1e8e3e] hover:bg-[#137333] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition cursor-pointer shadow-xs">
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <span>Mark Received</span>
+        </button>
+        <button type="button" onclick="openBulkActionModal('REJECT')" class="bg-[#e37400] hover:bg-[#b06000] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition cursor-pointer shadow-xs">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            <span>Mark Not Received</span>
+        </button>
+        <button type="button" onclick="openBulkActionModal('DELETE_IMAGE')" class="bg-[#5f6368] hover:bg-[#3c4043] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition cursor-pointer shadow-xs" title="Delete payment proof images for orders">
+            <i data-lucide="image-minus" class="w-3.5 h-3.5"></i>
+            <span>Purge Images</span>
+        </button>
+        <button type="button" onclick="openBulkActionModal('DELETE')" class="bg-[#d93025] hover:bg-[#b31412] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 transition cursor-pointer shadow-xs">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Delete Log</span>
+        </button>
+        <button type="button" onclick="clearRegSelection()" class="text-[#bdc1c6] hover:text-white text-xs ml-1 transition cursor-pointer">
+            Clear
+        </button>
+    </div>
+</div>
+
+<!-- Universal Bulk Action Confirmation Popup Modal -->
+<div id="actionConfirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white rounded-lg shadow-2xl border border-[#dadce0] w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <form id="actionConfirmForm" method="POST" action="{% url 'dashboard-registration-bulk-action' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" id="modalFormAction" value="">
+            <input type="hidden" name="selected_codes" id="modalFormSelectedCodes" value="">
+
+            <div class="p-5">
+                <div class="flex items-start gap-3.5">
+                    <div id="modalActionIconBg" class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[#e8f0fe] text-[#1a73e8]">
+                        <i id="modalActionIcon" data-lucide="help-circle" class="w-5 h-5"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 id="modalActionTitle" class="text-sm sm:text-base font-bold text-[#202124] leading-snug">Confirm Action</h3>
+                        <p id="modalActionDesc" class="text-xs text-[#5f6368] mt-1 leading-relaxed"></p>
+                        
+                        <div id="modalTargetSummary" class="mt-2.5 p-2 bg-[#f8f9fa] rounded border border-[#dadce0] text-[11px] font-mono text-[#202124] max-h-20 overflow-y-auto break-all"></div>
+
+                        <div id="modalNoteGroup" class="mt-3">
+                            <label class="block text-xs font-medium text-[#202124] mb-1">Administrative Note (Optional):</label>
+                            <input type="text" name="notes" placeholder="e.g. Verified via manual bank check..." class="google-input text-xs py-1.5 px-2.5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 bg-[#f8f9fa] border-t border-[#dadce0] flex items-center justify-end gap-2">
+                <button type="button" onclick="closeActionConfirmModal()" class="google-btn-outlined text-xs py-1.5 px-3.5 cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit" id="modalSubmitBtn" class="text-xs py-1.5 px-4 font-semibold flex items-center gap-1.5 cursor-pointer rounded transition">
+                    <span id="modalSubmitBtnText">Confirm</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

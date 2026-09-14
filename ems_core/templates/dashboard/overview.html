@@ -1,0 +1,568 @@
+{% extends 'dashboard_base.html' %}
+
+{% block header_title %}Overview{% endblock %}
+
+{% block content %}
+<div class="p-3 sm:p-6 max-w-[1600px] w-full mx-auto flex flex-col space-y-3 sm:space-y-5 pb-8 sm:pb-12">
+
+    <!-- 1. Google Metric KPI Cards Grid -->
+    <div id="overviewMetricsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        
+        <!-- Metric 1: Active Events -->
+        <a href="{% url 'dashboard-events-list' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between hover:border-[#1a73e8] transition group">
+            <div class="flex items-center justify-between text-[#5f6368] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Active Events</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0 group-hover:bg-[#1a73e8] group-hover:text-white transition">
+                    <i class="bi bi-calendar-event text-sm sm:text-base"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display text-[#202124] tracking-tight">
+                    {{ total_events }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#dadce0] text-[#5f6368]">
+                    <span class="text-[#1a73e8] font-medium group-hover:underline">View all events</span>
+                    <i class="bi bi-arrow-right text-xs text-[#1a73e8]"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Metric 2: Registrations -->
+        <a href="{% url 'dashboard-registrations-list' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between hover:border-[#1a73e8] transition group">
+            <div class="flex items-center justify-between text-[#5f6368] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Registrations</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0 group-hover:bg-[#1a73e8] group-hover:text-white transition">
+                    <i class="bi bi-people text-sm sm:text-base"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display text-[#202124] tracking-tight">
+                    {{ total_registrations }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#dadce0] text-[#5f6368]">
+                    <span>{{ verified_reg_count }} cleared attendee{{ verified_reg_count|pluralize }}</span>
+                    <span class="text-[#1a73e8] font-medium group-hover:underline">View logs</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Metric 3: Passes -->
+        <a href="{% url 'dashboard-registrations-list' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between border-[#ceead6] bg-gradient-to-b from-[#f6fbf7] to-white hover:border-[#1e8e3e] transition group">
+            <div class="flex items-center justify-between text-[#137333] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Passes</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded bg-[#e6f4ea] text-[#137333] flex items-center justify-center shrink-0 group-hover:bg-[#1e8e3e] group-hover:text-white transition">
+                    <i class="bi bi-patch-check-fill text-sm sm:text-base"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display text-[#137333] tracking-tight">
+                    {{ total_passes }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#ceead6] text-[#137333]">
+                    <span class="font-medium flex items-center gap-1">
+                        <i class="bi bi-shield-check text-xs"></i>
+                        <span>{{ verified_reg_count }} Confirmed</span>
+                    </span>
+                    <span class="font-medium">Active</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Metric 4: Verification / Payments -->
+        <a href="{% url 'dashboard-verification-queue' %}" class="google-card p-3 sm:p-5 flex flex-col justify-between {% if review_queue_count > 0 %}border-[#feefc3] bg-gradient-to-b from-[#fefbf0] to-white hover:border-[#f9ab00]{% else %}hover:border-[#1a73e8]{% endif %} transition group">
+            <div class="flex items-center justify-between {% if review_queue_count > 0 %}text-[#b06000]{% else %}text-[#5f6368]{% endif %} text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1 sm:mb-2">
+                <span class="truncate">Payments</span>
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded {% if review_queue_count > 0 %}bg-[#fef7e0] text-[#b06000] group-hover:bg-[#f9ab00] group-hover:text-[#202124]{% else %}bg-[#f1f3f4] text-[#5f6368] group-hover:bg-[#1a73e8] group-hover:text-white{% endif %} flex items-center justify-center shrink-0 transition">
+                    <i class="bi bi-credit-card text-sm sm:text-base"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold font-display {% if review_queue_count > 0 %}text-[#b06000]{% else %}text-[#202124]{% endif %} tracking-tight">
+                    {{ review_queue_count }}
+                </div>
+                <div class="mt-2 pt-2 sm:mt-3 sm:pt-3 flex items-center justify-between text-[10px] sm:text-xs border-t border-[#dadce0]">
+                    {% if review_queue_count > 0 %}
+                    <span class="text-[#b06000] font-semibold flex items-center gap-0.5">
+                        <span>Review Payments</span>
+                        <i class="bi bi-arrow-right text-xs"></i>
+                    </span>
+                    <span class="text-[#b06000] font-mono">Pending</span>
+                    {% else %}
+                    <span class="text-[#137333] font-medium flex items-center gap-1">
+                        <i class="bi bi-check-lg text-xs"></i>
+                        <span>Payments Clear</span>
+                    </span>
+                    <span class="text-[#5f6368]">Audited</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- 2. Data Visualizations, Analytics & Operations: All 4 in Same Row -->
+    <div class="space-y-3 sm:space-y-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-[#1a73e8]"></div>
+                <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#202124]">Data Visualizations & Live Analytics</h2>
+            </div>
+            <span class="text-[11px] text-[#5f6368] font-medium hidden sm:inline-block">Real-time platform metrics & operations</span>
+        </div>
+
+        <!-- All Four in Same Row Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 items-stretch">
+            
+            <!-- 1. Activity & Revenue Trends -->
+            <div class="google-card p-3.5 sm:p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-[#dadce0] pb-2.5 mb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0">
+                                <i class="bi bi-graph-up-arrow text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-xs sm:text-sm font-bold text-[#202124] truncate">Activity & Revenue</h3>
+                                <p class="text-[10px] text-[#5f6368] truncate">Daily velocity & revenue (14 days)</p>
+                            </div>
+                        </div>
+
+                        <!-- Combined Single Graph Legend -->
+                        <div class="flex items-center gap-2 bg-[#f8f9fa] border border-[#dadce0] px-2 py-0.5 rounded text-[10px] shrink-0">
+                            <div class="flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-[#1a73e8]"></span>
+                                <span class="font-medium text-[#202124]">Signups</span>
+                            </div>
+                            <div class="w-px h-2.5 bg-[#dadce0]"></div>
+                            <div class="flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-[#137333]"></span>
+                                <span class="font-medium text-[#202124]">₹</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Line Chart Canvas Container -->
+                    <div class="relative w-full h-44 sm:h-48">
+                        <canvas id="trendLineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Footer Summary Pills -->
+                <div class="mt-2.5 pt-2 border-t border-[#dadce0] flex items-center justify-between text-[11px]">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1 text-[#1a73e8]">
+                            <span class="font-medium text-[#5f6368]">Regs:</span>
+                            <span class="font-bold text-[#202124] font-mono">{{ total_registrations }}</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-[#137333]">
+                            <span class="font-medium text-[#5f6368]">Rev:</span>
+                            <span class="font-bold text-[#137333] font-mono">₹{{ total_revenue|floatformat:0 }}</span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-[#5f6368] font-mono">14-Day Timeline</span>
+                </div>
+            </div>
+
+            <!-- 2. Registration Status Donut Chart -->
+            <div class="google-card p-3.5 sm:p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-[#dadce0] pb-2.5 mb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded bg-[#e6f4ea] text-[#137333] flex items-center justify-center shrink-0">
+                                <i class="bi bi-pie-chart-fill text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-xs sm:text-sm font-bold text-[#202124] truncate">Registration Status</h3>
+                                <p class="text-[10px] text-[#5f6368] truncate">Verification & pass distribution</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Donut Canvas Container -->
+                    <div class="relative w-full h-36 sm:h-40 flex items-center justify-center">
+                        <canvas id="statusDonutChart"></canvas>
+                    </div>
+
+                    <!-- Custom Clean Donut Legend -->
+                    <div id="statusLegendContainer" class="mt-2 space-y-1 text-xs">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <div class="mt-2.5 pt-2 border-t border-[#dadce0] flex items-center justify-between text-[11px] text-[#5f6368]">
+                    <span>Pass Conversion Rate</span>
+                    <span class="font-bold text-[#137333] font-mono">
+                        {% if total_registrations > 0 %}
+                        {{ verified_reg_count|floatformat:0 }}/{{ total_registrations }} ({{ pass_conversion_rate }}%)
+                        {% else %}0%{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- 3. Events -->
+            <div class="google-card p-3.5 sm:p-4 flex flex-col justify-between">
+                <div>
+                    <!-- Header -->
+                    <div class="flex items-center justify-between border-b border-[#dadce0] pb-2.5 mb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0">
+                                <i class="bi bi-calendar2-event text-sm"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h2 class="text-xs sm:text-sm font-bold text-[#202124] truncate">Events</h2>
+                                <p class="text-[10px] text-[#5f6368] truncate">Active registrations</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'dashboard-events-list' %}" class="google-btn-outlined py-0.5 px-2 text-[10px] sm:text-[11px]">
+                            <span>All Events</span>
+                        </a>
+                    </div>
+
+                    <!-- Clean Events List: Name & Registration Count Alone -->
+                    <div id="overviewEventsList" class="divide-y divide-[#dadce0] overflow-y-auto max-h-[190px] pr-0.5">
+                        {% for ev in events %}
+                        <a href="{% url 'dashboard-event-detail' ev.id %}" class="py-2 px-1 flex items-center justify-between hover:bg-[#f8f9fa] rounded transition group">
+                            <!-- Left: Event Name -->
+                            <div class="flex items-center gap-2 min-w-0 pr-2">
+                                <div class="w-1.5 h-1.5 rounded-full bg-[#1a73e8] shrink-0"></div>
+                                <span class="font-medium text-xs text-[#202124] group-hover:text-[#1a73e8] group-hover:underline truncate">
+                                    {{ ev.title }}
+                                </span>
+                            </div>
+
+                            <!-- Right: Registration Count Alone -->
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="text-xs font-semibold text-[#202124] font-mono">
+                                    {{ ev.registrations_count|default:ev.registrations.count }}
+                                </span>
+                                <span class="text-[10px] text-[#5f6368]">
+                                    registered
+                                </span>
+                                <i class="bi bi-chevron-right text-xs text-[#5f6368] group-hover:text-[#1a73e8] transition"></i>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="py-6 text-center text-[#5f6368] text-xs">
+                            No events found. <a href="{% url 'dashboard-event-create' %}" class="text-[#1a73e8] font-semibold underline">Create event</a>.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mt-2.5 pt-2 border-t border-[#dadce0] flex items-center justify-between text-xs">
+                    <span class="text-[#5f6368] text-[11px]">{{ total_events }} active event{% if total_events != 1 %}s{% endif %}</span>
+                    <a href="{% url 'dashboard-event-create' %}" class="text-[#1a73e8] font-semibold hover:underline flex items-center gap-1 text-[11px]">
+                        <i class="bi bi-plus-lg text-xs"></i>
+                        <span>New Event</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. Quick Actions -->
+            <div class="google-card p-3.5 sm:p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 border-b border-[#dadce0] pb-2.5 mb-2.5">
+                        <div class="w-7 h-7 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0">
+                            <i class="bi bi-lightning-charge-fill text-sm"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xs sm:text-sm font-bold text-[#202124]">Quick Actions</h2>
+                            <p class="text-[10px] text-[#5f6368]">System shortcuts</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <!-- Action 1: New Event -->
+                        <a href="{% url 'dashboard-event-create' %}" class="flex items-center justify-between p-2 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-6 h-6 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center group-hover:bg-[#1a73e8] group-hover:text-white transition shrink-0">
+                                    <i class="bi bi-plus-lg text-xs"></i>
+                                </div>
+                                <div class="text-left min-w-0">
+                                    <div class="text-xs font-semibold text-[#202124] truncate">New Event</div>
+                                    <div class="text-[9.5px] text-[#5f6368] truncate">Create event & form</div>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right text-xs text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0"></i>
+                        </a>
+
+                        <!-- Action 2: Verification / Payments -->
+                        <a href="{% url 'dashboard-verification-queue' %}" class="flex items-center justify-between p-2 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-6 h-6 rounded {% if review_queue_count > 0 %}bg-[#fef7e0] text-[#b06000] group-hover:bg-[#f9ab00] group-hover:text-[#202124]{% else %}bg-[#f1f3f4] text-[#5f6368] group-hover:bg-[#1a73e8] group-hover:text-white{% endif %} flex items-center justify-center transition shrink-0">
+                                    <i class="bi bi-credit-card text-xs"></i>
+                                </div>
+                                <div class="text-left min-w-0">
+                                    <div class="text-xs font-semibold text-[#202124] truncate">Payments</div>
+                                    <div class="text-[9.5px] text-[#5f6368] truncate">Review ({{ review_queue_count }})</div>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right text-xs text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0"></i>
+                        </a>
+
+                        <!-- Action 3: Registrations -->
+                        <a href="{% url 'dashboard-registrations-list' %}" class="flex items-center justify-between p-2 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-6 h-6 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center group-hover:bg-[#1a73e8] group-hover:text-white transition shrink-0">
+                                    <i class="bi bi-database text-xs"></i>
+                                </div>
+                                <div class="text-left min-w-0">
+                                    <div class="text-xs font-semibold text-[#202124] truncate">Registrations</div>
+                                    <div class="text-[9.5px] text-[#5f6368] truncate">Search & export</div>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right text-xs text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0"></i>
+                        </a>
+
+                        <!-- Action 4: Emails -->
+                        <a href="{% url 'dashboard-email-logs' %}" class="flex items-center justify-between p-2 rounded border border-[#dadce0] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition group">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-6 h-6 rounded bg-[#e6f4ea] text-[#137333] flex items-center justify-center group-hover:bg-[#1e8e3e] group-hover:text-white transition shrink-0">
+                                    <i class="bi bi-envelope text-xs"></i>
+                                </div>
+                                <div class="text-left min-w-0">
+                                    <div class="text-xs font-semibold text-[#202124] truncate">Emails</div>
+                                    <div class="text-[9.5px] text-[#5f6368] truncate">Delivery logs</div>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right text-xs text-[#5f6368] group-hover:text-[#1a73e8] transition shrink-0"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Operational System Status -->
+                <div class="mt-2.5 pt-2 border-t border-[#dadce0] flex items-center justify-between text-[11px] text-[#5f6368]">
+                    <span class="flex items-center gap-1.5 text-[#137333]">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#1e8e3e] animate-pulse"></span>
+                        <span class="font-medium">System Operational</span>
+                    </span>
+                    <span class="font-mono text-[10px] text-[#5f6368]">v2.0</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js CDN for interactive real graphs -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<script>
+    function initOverviewCharts() {
+        if (typeof Chart === 'undefined') {
+            return;
+        }
+
+        // 1. Data Injection from Django Context
+        const chartDates = {{ chart_dates_json|safe }};
+        const chartRegs = {{ chart_regs_json|safe }};
+        const chartRevenue = {{ chart_revenue_json|safe }};
+        const statusLabels = {{ donut_status_labels_json|safe }};
+        const statusData = {{ donut_status_data_json|safe }};
+
+        // Chart.js Global Defaults for Google Material 3 Styling
+        Chart.defaults.font.family = "'Plus Jakarta Sans', 'Roboto', sans-serif";
+        Chart.defaults.color = '#5f6368';
+
+        // ==========================================
+        // 1. TIMELINE LINE CHART (Registrations & Revenue)
+        // ==========================================
+        const ctxTrend = document.getElementById('trendLineChart');
+        let trendChart = null;
+
+        if (ctxTrend) {
+            const gradientBlue = ctxTrend.getContext('2d').createLinearGradient(0, 0, 0, 240);
+            gradientBlue.addColorStop(0, 'rgba(26, 115, 232, 0.25)');
+            gradientBlue.addColorStop(1, 'rgba(26, 115, 232, 0.00)');
+
+            const gradientGreen = ctxTrend.getContext('2d').createLinearGradient(0, 0, 0, 240);
+            gradientGreen.addColorStop(0, 'rgba(19, 115, 51, 0.22)');
+            gradientGreen.addColorStop(1, 'rgba(19, 115, 51, 0.00)');
+
+            trendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: chartDates,
+                    datasets: [
+                        {
+                            label: 'Registrations',
+                            data: chartRegs,
+                            borderColor: '#1a73e8',
+                            backgroundColor: gradientBlue,
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#1a73e8',
+                            pointBorderWidth: 2,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Revenue (₹)',
+                            data: chartRevenue,
+                            borderColor: '#137333',
+                            backgroundColor: gradientGreen,
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#137333',
+                            pointBorderWidth: 2,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#202124',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e8eaed',
+                            padding: 10,
+                            boxPadding: 4,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        return ` Revenue: ₹${context.parsed.y.toLocaleString('en-IN')}`;
+                                    }
+                                    return ` Signups: ${context.parsed.y} attendees`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 10 },
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 7
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f1f3f4',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 10 },
+                                precision: 0
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            beginAtZero: true,
+                            grid: {
+                                drawOnChartArea: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 10 },
+                                callback: function(val) { return '₹' + val; }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+
+        // ==========================================
+        // 2. REGISTRATION STATUS DONUT CHART
+        // ==========================================
+        const ctxStatus = document.getElementById('statusDonutChart');
+        const statusColors = ['#137333', '#f9ab00', '#e37400', '#d93025'];
+
+        if (ctxStatus) {
+            new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: statusData,
+                        backgroundColor: statusColors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#202124',
+                            cornerRadius: 8,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const val = context.parsed;
+                                    const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                                    return ` ${context.label}: ${val} (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Build Custom Clean HTML Legend
+            const statusLegEl = document.getElementById('statusLegendContainer');
+            if (statusLegEl) {
+                const total = statusData.reduce((a, b) => a + b, 0);
+                statusLegEl.innerHTML = statusLabels.map((lbl, idx) => {
+                    const cnt = statusData[idx];
+                    const pct = total > 0 ? Math.round((cnt / total) * 100) : 0;
+                    return `
+                        <div class="flex items-center justify-between text-xs py-0.5">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${statusColors[idx]}"></span>
+                                <span class="text-[#202124] font-medium truncate">${lbl}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 font-mono text-[11px]">
+                                <span class="font-bold text-[#202124]">${cnt}</span>
+                                <span class="text-[#5f6368]">(${pct}%)</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initOverviewCharts);
+    } else {
+        initOverviewCharts();
+    }
+</script>
+{% endblock %}

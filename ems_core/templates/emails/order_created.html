@@ -1,0 +1,100 @@
+{% extends 'emails/email_base.html' %}
+
+{% block email_title %}Payment Proof Received • {{ order.order_code }} | {{ event.title }}{% endblock %}
+
+{% block email_content %}
+<div style="text-align: left;">
+    
+    <!-- Status Header (Bulletproof Centered Table) -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="width: 100% !important; margin: 0 auto 24px auto; text-align: center;">
+        <tr>
+            <td align="center" style="text-align: center; border: 0 !important; padding: 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto 12px auto; display: inline-table;">
+                    <tr>
+                        <td align="center" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #b45309; background-color: #fef3c7; border: 1px solid #fde68a; padding: 6px 18px; border-radius: 16px; text-align: center; white-space: nowrap;">
+                            ⏳ Payment Proof Received • Under Review
+                        </td>
+                    </tr>
+                </table>
+                <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3; text-align: center;">
+                    {{ event.title }}
+                </h1>
+                <p style="margin: 0 auto; font-size: 14px; color: #475569; line-height: 1.6; max-width: 520px; text-align: center;">
+                    Hi <strong>{{ customer.name|title }}</strong>, we have received your payment proof for order <strong>{{ order.order_code }}</strong>. Our team is currently reviewing your transaction. Your official entrance pass and QR badge will be emailed to you as soon as verification is approved.
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Order Summary Details Box -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin: 18px 0; overflow: hidden;">
+        <tr>
+            <td style="padding: 14px 20px; background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">Order Information</td>
+                        <td style="font-size: 12px; font-weight: 700; color: #b45309; text-align: right; font-family: monospace;">{{ order.order_code }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 16px 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 13px; color: #334155;">
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Registration Code:</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #0f172a; font-family: monospace; text-align: right;">{{ registration.registration_code }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Primary Attendee:</td>
+                        <td style="padding: 6px 0; font-weight: 600; color: #0f172a; text-align: right;">{{ customer.name|title }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Email Address:</td>
+                        <td style="padding: 6px 0; font-weight: 600; font-family: monospace, sans-serif; color: #0f172a; text-align: right;">{{ customer.email }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Total Ticket(s):</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #0f172a; text-align: right;">{{ ticket_count }} Pass{{ ticket_count|pluralize:"es" }}</td>
+                    </tr>
+                    {% if event.venue %}
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Venue:</td>
+                        <td style="padding: 6px 0; font-weight: 600; color: #0f172a; text-align: right;">{{ event.venue }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Payment Status:</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #b45309; text-align: right;">Proof Submitted (Under Review)</td>
+                    </tr>
+                    <tr style="border-top: 1px dashed #cbd5e1;">
+                        <td style="padding: 12px 0 4px 0; font-weight: 700; color: #0f172a; font-size: 14px;">Total Amount:</td>
+                        <td style="padding: 12px 0 4px 0; font-weight: 900; color: #0f172a; font-size: 18px; font-family: monospace; text-align: right;">₹{{ registration.amount|floatformat:2 }} INR</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {% if attendee_list and attendee_list|length > 1 %}
+    <!-- Co-Attendees Overview -->
+    <div style="margin: 18px 0;">
+        <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 8px;">
+            Registered Attendees ({{ attendee_list|length }})
+        </div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; overflow: hidden;">
+            {% for att in attendee_list %}
+            <tr style="background-color: {% if forloop.counter|divisibleby:2 %}#f8fafc{% else %}#ffffff{% endif %}; border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 8px 12px; font-weight: 600; color: #0f172a;">{{ att.index }}. {{ att.name }}</td>
+                <td style="padding: 8px 12px; color: #64748b;">{{ att.type }}</td>
+                <td style="padding: 8px 12px; text-align: right; color: #64748b;">{{ att.age }} yrs / {{ att.gender }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block email_info_box %}{% endblock %}

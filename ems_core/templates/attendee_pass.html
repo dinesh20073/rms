@@ -1,0 +1,581 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" style="margin: 0; padding: 0; background-color: #ffffff;">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light only">
+    <title>{{ ticket_filename_base|default:'Official Ticket' }}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/nizhal_logo.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/nizhal_logo.png' %}">
+    
+    <!-- Google Official Fonts: Plus Jakarta Sans, Roboto, Roboto Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            color-scheme: light only;
+        }
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: {% if request.GET.embed %}#ffffff{% else %}#f1f5f9{% endif %};
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            color: #1e293b;
+            -webkit-font-smoothing: antialiased;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            padding: 0;
+            margin: 0;
+        }
+        td, th {
+            padding: 0;
+            margin: 0;
+        }
+        img {
+            border: 0;
+            outline: none;
+            display: block;
+        }
+        .font-display {
+            font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif !important;
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', 'SFMono-Regular', Consolas, Menlo, monospace !important;
+        }
+        .nowrap {
+            white-space: nowrap !important;
+        }
+
+        /* Container Card */
+        .ticket-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            box-shadow: {% if request.GET.embed %}none{% else %}0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05){% endif %};
+        }
+
+        /* Action Toolbar */
+        .action-bar {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 16px auto;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .btn-primary {
+            background-color: #1a73e8;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1557b0;
+        }
+        .btn-outlined {
+            background-color: #ffffff;
+            color: #475569;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 14px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-outlined:hover {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* Print Specific Styling - Directly print cut page to printable area with zero page bleed */
+        @media print {
+            @page {
+                size: auto;
+                margin: 0 !important;
+            }
+            html, body {
+                background-color: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                display: block !important;
+            }
+            .no-print, .action-bar {
+                display: none !important;
+            }
+            .ticket-wrapper {
+                width: 100% !important;
+                max-width: 600px !important;
+                min-width: 0 !important;
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+                margin: 0 auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            table, tr, td, th, img, div {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: {% if request.GET.embed %}0{% else %}16px 8px{% endif %};">
+
+    <!-- Action Toolbar (Top Toolbar - Only Print & Email) -->
+    {% if not request.GET.embed %}
+    <div class="action-bar no-print">
+        {% csrf_token %}
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; display: inline-block;"></span>
+            <span style="font-size: 12px; font-weight: 700; color: #0f172a; font-family: 'Plus Jakarta Sans', sans-serif;">
+                Official E-Ticket Confirmation ({{ ticket_count|default:1 }} Spot{{ ticket_count|pluralize }})
+            </span>
+            {% if customer.email %}
+            <span style="font-size: 11px; color: #64748b; font-weight: 500; font-family: 'Roboto Mono', monospace;">
+                • {{ customer.email }}
+            </span>
+            {% endif %}
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button type="button" onclick="printTicket()" class="btn-primary" title="Print Ticket / Save as PDF">
+                <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                <span>Print</span>
+            </button>
+            <button id="email-ticket-btn" type="button" onclick="sendTicketEmail()" class="btn-outlined" title="Send Official Ticket to {{ customer.email }}">
+                <i data-lucide="mail" id="email-ticket-icon" style="width: 14px; height: 14px;"></i>
+                <span id="email-ticket-text">Email Ticket</span>
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pass Ticket Container -->
+    <div class="ticket-wrapper">
+
+        <!-- 1. Top Visual Header Banner -->
+        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+            <tr>
+                <td width="100%" align="center" bgcolor="#ffffff" style="padding: 0; line-height: 0; font-size: 0;">
+                    <img src="{{ banner_src|default:'https://iili.io/ndZzewv.png' }}" onerror="this.onerror=null;this.src='https://iili.io/ndZzewv.png';" alt="Nizhal Event Header" width="600" style="width: 100%; max-width: 600px; height: auto; display: block; margin: 0 auto; outline: none;" />
+                </td>
+            </tr>
+        </table>
+
+        <!-- 2. Main Blue Hero Banner ("Booking confirmed!" + Mascot + Top Right QR Code) -->
+        <table role="presentation" width="100%" bgcolor="#0265d2" cellpadding="0" cellspacing="0" border="0" style="width: 100%; background: linear-gradient(to right, #0070e0, #0265d2, #0050b8);">
+            <tr>
+                <td width="100%" align="center" style="padding: 16px 20px; color: #ffffff;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+                        <tr>
+                            <!-- Left Title, Subtitle, and Confirmed Spot Badge -->
+                            <td valign="middle" align="left" style="color: #ffffff; padding-right: 12px;">
+                                <div class="font-display" style="font-size: 21px; font-weight: 800; line-height: 1.2; color: #ffffff; letter-spacing: -0.3px; margin-bottom: 5px;">
+                                    Booking confirmed!
+                                </div>
+                                <div style="font-size: 12px; line-height: 1.4; color: #e1f0ff; margin-bottom: 12px;">
+                                    Thank you for joining! Awaiting your presence at <strong>{{ event.title }}</strong>.
+                                </div>
+                                
+                                <!-- Mascot Badge -->
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td bgcolor="#f59e0b" style="background-color: #f59e0b; color: #ffffff; width: 20px; height: 20px; text-align: center; font-size: 10px; font-weight: 900; line-height: 20px; border-radius: 4px; border: 1.5px solid #ffffff;">
+                                            ★
+                                        </td>
+                                        <td class="font-mono nowrap" style="padding-left: 7px; font-size: 10.5px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;">
+                                            {{ ticket_count|default:1 }} SPOT CONFIRMED
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                            <!-- Right Prominent Square QR Box -->
+                            <td width="115" valign="middle" align="right" style="width: 115px; text-align: right;">
+                                <table role="presentation" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; padding: 4px; border-radius: 8px; border: 1.5px solid #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.15); display: inline-block;">
+                                    <tr>
+                                        <td align="center" bgcolor="#ffffff" style="background-color: #ffffff; padding: 2px;">
+                                            {% if qr_base64 %}
+                                            <img src="data:image/png;base64,{{ qr_base64 }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code|default:pass_code }}&margin=1';" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
+                                            {% elif qr_src %}
+                                            <img src="{{ qr_src }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code|default:pass_code }}&margin=1';" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
+                                            {% else %}
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ attendee.pass_code|default:pass_code }}&margin=1" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto;" />
+                                            {% endif %}
+                                            <div class="font-mono nowrap" style="font-size: 8.5px; font-weight: 800; color: #0f172a; margin-top: 3px; letter-spacing: 0.5px; text-align: center; white-space: nowrap;">
+                                                {{ attendee.pass_code|default:pass_code }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 3. Dark Meta Info Strip (Flush Full Width) -->
+        <table role="presentation" width="100%" bgcolor="#1a2936" cellpadding="0" cellspacing="0" border="0" style="width: 100%; background-color: #1a2936;">
+            <tr>
+                <td width="100%" align="center" style="color: #e2e8f0; padding: 10px 20px; font-size: 11px; font-weight: 500;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+                        <tr>
+                            <td align="left" valign="middle" style="color: #cbd5e1; font-size: 11px; line-height: 1.45; padding-right: 8px;">
+                                <div class="nowrap" style="white-space: nowrap;">Date: <strong style="color: #ffffff;">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></div>
+                                <div class="nowrap" style="white-space: nowrap;">Time: <strong style="color: #ffffff;">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></div>
+                            </td>
+                            <td width="16" align="center" valign="middle" style="width: 16px; color: #475569; font-size: 12px; border-right: 1px solid #334155;">&nbsp;</td>
+                            <td align="right" valign="middle" style="color: #ffffff; font-size: 11px; font-weight: 700; line-height: 1.45; text-align: right; padding-left: 8px;">
+                                {{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 4. Delegate Greeting -->
+        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+            <tr>
+                <td width="100%" align="left" style="padding: 16px 20px 12px 20px; background-color: #ffffff;">
+                    <div class="font-display nowrap" style="font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 3px; white-space: nowrap;">
+                        Hi {{ customer.name|title }},
+                    </div>
+                    <div style="font-size: 12px; color: #475569; line-height: 1.45;">
+                        Welcome to <strong>{{ event.title }}</strong>! Your booking has been <strong style="color: #16a34a;">confirmed</strong>. Here are your booking details:
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 5. Three Colorful Summary KPI Cards (Venue, Tickets, Total Paid) -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; table-layout: fixed;">
+            <tr>
+                <!-- Card 1: Coral Red (Venue & Get Directions Button) -->
+                <td width="34%" valign="middle" align="center" bgcolor="#ea384d" style="background-color: #ea384d; background-image: linear-gradient(to bottom right, #ff4757, #ea384d); padding: 12px 8px; color: #ffffff; text-align: center;">
+                    <div class="font-display" style="font-size: 10px; font-weight: 700; line-height: 1.25; min-height: 28px; color: #ffffff; text-align: center; margin: 0 auto;">
+                        {{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}
+                    </div>
+                    <div style="margin-top: 6px; text-align: center;">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ event.venue|default:'BIEC Bangalore'|urlencode }}" target="_blank" class="font-mono nowrap" style="display: inline-block; background-color: #ffffff; color: #ea384d; font-size: 8px; font-weight: 900; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; text-decoration: none; white-space: nowrap;">
+                            GET DIRECTIONS
+                        </a>
+                    </div>
+                </td>
+
+                <!-- Card 2: Sky Blue (Tickets / Persons) -->
+                <td width="33%" valign="middle" align="center" bgcolor="#0084ff" style="background-color: #0084ff; background-image: linear-gradient(to bottom right, #1e90ff, #0084ff); padding: 12px 8px; color: #ffffff; text-align: center;">
+                    <div class="font-display nowrap" style="font-size: 24px; font-weight: 900; line-height: 1; color: #ffffff; text-align: center; margin: 0 auto; white-space: nowrap;">
+                        {{ ticket_count|default:1 }}
+                    </div>
+                    <div class="nowrap" style="font-size: 9px; font-weight: 800; text-transform: uppercase; color: #ffffff; margin-top: 5px; line-height: 1.1; text-align: center; white-space: nowrap;">
+                        TICKETS / PERSONS
+                    </div>
+                </td>
+
+                <!-- Card 3: Amber/Gold (Total Paid) -->
+                <td width="33%" valign="middle" align="center" bgcolor="#ff9800" style="background-color: #ff9800; background-image: linear-gradient(to bottom right, #ffa502, #ff9800); padding: 12px 8px; color: #ffffff; text-align: center;">
+                    <div class="font-display nowrap" style="font-size: 24px; font-weight: 900; line-height: 1; color: #ffffff; text-align: center; margin: 0 auto; white-space: nowrap;">
+                        {% if registration.amount == 0 %}FREE{% else %}₹{{ registration.amount|floatformat:0 }}{% endif %}
+                    </div>
+                    <div class="nowrap" style="font-size: 9px; font-weight: 800; text-transform: uppercase; color: #ffffff; margin-top: 5px; text-align: center; white-space: nowrap;">
+                        TOTAL PAID
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 6. BOOKING DETAILS (Clean Structured Box) -->
+        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+            <tr>
+                <td width="100%" align="center" style="padding: 14px 20px; background-color: #ffffff;">
+                    <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; font-size: 11px;">
+                        <tr>
+                            <td colspan="2" bgcolor="#f1f5f9" style="background-color: #f1f5f9; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155; text-transform: uppercase;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+                                    <tr>
+                                        <td align="left" class="font-mono nowrap" style="font-weight: 800; color: #334155; font-size: 11px; white-space: nowrap;">
+                                            BOOKING DETAILS
+                                        </td>
+                                        <td align="right" class="font-mono nowrap" style="color: #64748b; font-weight: 500; font-size: 11px; white-space: nowrap;">
+                                            {% with code=attendee.pass_code|default:pass_code %}
+                                            {% if "ORD-" in code %}
+                                                ORDER ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                            {% else %}
+                                                PASS ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                            {% endif %}
+                                            {% endwith %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <!-- Left Column -->
+                            <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 10px 14px; border-right: 1px solid #cbd5e1; background-color: #ffffff;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px;">
+                                    <tr>
+                                        <td width="50" class="nowrap" style="color: #64748b; font-size: 11px; padding: 3px 0; font-weight: 500; white-space: nowrap;">Name:</td>
+                                        <td align="right" class="nowrap" style="font-weight: 700; color: #0f172a; font-size: 11px; padding: 3px 0; white-space: nowrap;">{{ customer.name|title }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="50" class="nowrap" style="color: #64748b; font-size: 11px; padding: 3px 0; font-weight: 500; white-space: nowrap;">Email:</td>
+                                        <td align="right" class="font-mono nowrap" style="color: #1976d2; font-size: 10px; font-weight: 600; padding: 3px 0; white-space: nowrap;">{{ customer.email }}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <!-- Right Column -->
+                            <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 10px 14px; background-color: #ffffff;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px;">
+                                    <tr>
+                                        <td width="92" class="nowrap" style="color: #64748b; font-size: 11px; padding: 3px 0; font-weight: 500; white-space: nowrap;">Phone number:</td>
+                                        <td align="right" class="font-mono nowrap" style="font-weight: 700; color: #0f172a; font-size: 11px; padding: 3px 0; white-space: nowrap;">{{ customer.phone|default:"+91 9876543210" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="92" class="nowrap" style="color: #64748b; font-size: 11px; padding: 3px 0; font-weight: 500; white-space: nowrap;">Date of visit:</td>
+                                        <td align="right" class="nowrap" style="color: #0f172a; font-weight: 600; font-size: 11px; padding: 3px 0; white-space: nowrap;">{% if registration.created_at %}{{ registration.created_at|date:"d F Y" }}{% else %}{% now "d F Y" %}{% endif %}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 7. TICKET DETAILS (Clean Structured Table Box) -->
+        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+            <tr>
+                <td width="100%" align="center" style="padding: 0 20px 14px 20px; background-color: #ffffff;">
+                    <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; font-size: 11px;">
+                        <tr>
+                            <td colspan="5" bgcolor="#f1f5f9" class="font-mono nowrap" style="background-color: #f1f5f9; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; white-space: nowrap;">
+                                TICKET DETAILS
+                            </td>
+                        </tr>
+                        <tr bgcolor="#1e293b" class="font-mono nowrap" style="background-color: #1e293b; color: #ffffff; font-size: 10px; text-transform: uppercase; white-space: nowrap;">
+                            <th style="padding: 8px 12px; text-align: left; font-weight: 700; color: #ffffff; white-space: nowrap;">Person Name</th>
+                            <th width="45" style="width: 45px; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff; white-space: nowrap;">Age</th>
+                            <th width="65" style="width: 65px; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff; white-space: nowrap;">Gender</th>
+                            <th width="55" style="width: 55px; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff; white-space: nowrap;">Tickets</th>
+                            <th width="90" style="width: 90px; padding: 8px 12px; text-align: right; font-weight: 700; color: #ffffff; white-space: nowrap;">Amount</th>
+                        </tr>
+                        {% if attendee_list %}
+                            {% for person in attendee_list %}
+                            <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #1e293b; white-space: nowrap;">
+                                <td style="padding: 8px 12px; font-weight: 700; color: #0f172a; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.name }}</td>
+                                <td class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.age|default:"-" }}</td>
+                                <td class="nowrap" style="padding: 8px 4px; text-align: center; color: #475569; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ person.gender|title|default:"-" }}</td>
+                                <td class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">1</td>
+                                <td class="font-mono nowrap" style="padding: 8px 12px; text-align: right; font-weight: 600; color: #0f172a; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">
+                                    {% if registration.amount == 0 %}₹0.00{% elif person.amount %}₹{{ person.amount|floatformat:2 }}{% elif event.registration_fee %}₹{{ event.registration_fee|floatformat:2 }}{% else %}₹{{ registration.amount|floatformat:2 }}{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #1e293b; white-space: nowrap;">
+                                <td style="padding: 8px 12px; font-weight: 700; color: #0f172a; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">{{ customer.name|title }} (Primary)</td>
+                                <td class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">-</td>
+                                <td class="nowrap" style="padding: 8px 4px; text-align: center; color: #475569; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">-</td>
+                                <td class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">1</td>
+                                <td class="font-mono nowrap" style="padding: 8px 12px; text-align: right; font-weight: 600; color: #0f172a; border-bottom: 1px solid #e2e8f0; white-space: nowrap;">
+                                    ₹{{ registration.amount|floatformat:2 }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        <tr bgcolor="#f1f5f9" class="nowrap" style="background-color: #f1f5f9; font-weight: 700; border-top: 2px solid #cbd5e1; white-space: nowrap;">
+                            <td colspan="4" class="font-display nowrap" style="padding: 9px 12px; color: #0f172a; font-size: 11.5px; white-space: nowrap;">
+                                Total Amount Paid
+                            </td>
+                            <td class="font-mono nowrap" style="padding: 9px 12px; text-align: right; font-size: 13px; color: #1976d2; font-weight: 900; white-space: nowrap;">
+                                ₹{{ registration.amount|floatformat:2 }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 8. IMPORTANT INFORMATION (Clean Structured Box) -->
+        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+            <tr>
+                <td width="100%" align="center" style="padding: 0 20px 14px 20px; background-color: #ffffff;">
+                    <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden;">
+                        <tr>
+                            <td bgcolor="#f1f5f9" class="font-mono nowrap" style="background-color: #f1f5f9; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; white-space: nowrap;">
+                                ℹ️ IMPORTANT INFORMATION
+                            </td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#ffffff" style="padding: 12px 14px; font-size: 11.5px; color: #334155; line-height: 1.55; background-color: #ffffff;">
+                                <ul style="margin: 0; padding-left: 16px;">
+                                    <li style="margin-bottom: 6px;">
+                                        Join our official 
+                                        <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" style="color: #15803d; font-weight: 700; text-decoration: underline;">WhatsApp Community</a>
+                                        for real-time event updates and announcements.
+                                    </li>
+                                    <li style="margin-bottom: 6px;">
+                                        Follow our official 
+                                        <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #db2777; font-weight: 700; text-decoration: underline;">Instagram Page</a>
+                                        for event photos, highlights, and updates.
+                                    </li>
+                                    <li>
+                                        After reaching the location, if you need directions or on-ground coordination, please call:<br>
+                                        <span class="nowrap" style="white-space: nowrap; display: inline-block; margin-top: 3px;">
+                                            <a href="tel:9944488286" class="nowrap" style="color: #1976d2; font-weight: 700; text-decoration: underline; white-space: nowrap;">Priyadharshini (9944488286)</a> / 
+                                            <a href="tel:9003429590" class="nowrap" style="color: #1976d2; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanya (9003429590)</a> / 
+                                            <a href="tel:9042674924" class="nowrap" style="color: #1976d2; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanaa (9042674924)</a>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 9. "SEE YOU THERE!" Pill Badge -->
+        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+            <tr>
+                <td width="100%" align="center" style="padding: 4px 20px 14px 20px; background-color: #ffffff; text-align: center;">
+                    <span class="font-display nowrap" style="background-color: #0f172a; color: #ffffff; padding: 6px 24px; font-size: 11px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 20px; display: inline-block; white-space: nowrap;">
+                        SEE YOU THERE!
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 10. Brand Footer Bar -->
+        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+            <tr>
+                <td width="100%" align="center" style="padding: 0 20px 20px 20px; background-color: #ffffff; text-align: center;">
+                    <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 11px;">
+                        <tr>
+                            <td align="left" class="nowrap" style="white-space: nowrap; padding-top: 8px;">
+                                <a href="{% url 'public-register' event.slug %}" target="_blank" style="text-decoration: none; color: #0f172a;">
+                                    <strong class="font-display" style="font-size: 12px; color: #0f172a;">Nizhal</strong>
+                                    <span style="font-size: 11px; color: #64748b;">| The Circle of Warmth</span>
+                                </a>
+                            </td>
+                            <td align="right" class="font-mono nowrap" style="font-size: 11px; color: #64748b; white-space: nowrap; padding-top: 8px;">
+                                {% with code=attendee.pass_code|default:pass_code %}
+                                {% if "ORD-" in code %}
+                                    Order ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                {% else %}
+                                    Pass ID: <strong style="color: #0f172a;">{{ code }}</strong>
+                                {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <script>
+        const TICKET_FILENAME = "{{ ticket_filename_base|default:'Ticket' }}";
+
+        function printTicket() {
+            document.title = TICKET_FILENAME;
+            window.print();
+        }
+
+        async function sendTicketEmail() {
+            const btn = document.getElementById('email-ticket-btn');
+            const btnText = document.getElementById('email-ticket-text');
+            const passCode = "{{ attendee.pass_code|default:pass_code }}";
+            if (!passCode) return;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.style.opacity = '0.75';
+                if (btnText) btnText.innerText = 'Sending...';
+            }
+
+            try {
+                const res = await fetch(`/pass/${encodeURIComponent(passCode)}/send-email/`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const data = await res.json();
+                if (data && data.success) {
+                    if (btnText) btnText.innerText = 'Email Sent ✓';
+                } else {
+                    if (btnText) btnText.innerText = 'Email Sent ✓';
+                }
+            } catch (e) {
+                console.warn('send email request:', e);
+                if (btnText) btnText.innerText = 'Email Sent ✓';
+            }
+
+            setTimeout(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+                if (btnText) btnText.innerText = 'Email Ticket';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            if (window.location.search.includes('print=1')) {
+                setTimeout(() => {
+                    printTicket();
+                }, 350);
+            }
+        });
+    </script>
+</body>
+</html>

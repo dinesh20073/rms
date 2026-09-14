@@ -1,0 +1,389 @@
+{% extends 'public_base.html' %}
+{% load static %}
+
+{% block title %}Payment Checkout • {{ order.order_code }} | Nizhal{% endblock %}
+
+{% block main_content %}
+<div class="w-full public-card shadow-2xl">
+
+    <!-- 1. Header Hero Banner with #F8F4F4 Warm Minimal Tone -->
+    <div class="p-6 sm:p-8 bg-[#F8F4F4] text-slate-900 border-b border-slate-200/80 relative overflow-hidden">
+        <div class="flex items-start justify-between gap-4 relative z-10">
+            <div class="space-y-2">
+                {% if is_completed or registration.status == 'COMPLETED' or attendee or order.status == 'VERIFIED' or order.status == 'SUCCESS' %}
+                <div class="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono font-bold bg-[#e6f4ea] text-[#137333] border border-[#ceead6] rounded-full shadow-2xs">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#137333]"></i>
+                    <span>Confirmed • Official Entrance Pass</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tracking-tight leading-tight">
+                    {{ event.title }}
+                </h1>
+                <p class="text-sm text-slate-600 font-medium leading-relaxed max-w-xl">
+                    Your registration and payment have been verified. Download or print your entrance pass below.
+                </p>
+                {% elif is_failed %}
+                <div class="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono font-bold bg-rose-50 text-rose-700 border border-rose-200 rounded-full shadow-2xs">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i>
+                    <span>Action Required • Order {{ order.order_code }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tracking-tight leading-tight">
+                    Upload New Verification Proof
+                </h1>
+                <p class="text-sm text-slate-600 font-medium leading-relaxed max-w-xl">
+                    Your previous payment receipt could not be verified. Please make the payment and upload your new verification screenshot below.
+                </p>
+                {% elif is_reupload %}
+                <div class="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-full shadow-2xs">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-blue-600"></i>
+                    <span>Re-Upload Proof • Order {{ order.order_code }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tracking-tight leading-tight">
+                    Upload New Verification Proof
+                </h1>
+                <p class="text-sm text-slate-600 font-medium leading-relaxed max-w-xl">
+                    Select a new screenshot below. This will automatically replace the old image for order <strong>{{ order.order_code }}</strong>.
+                </p>
+                {% else %}
+                <div class="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono font-bold bg-white text-blue-700 border border-blue-200/80 rounded-full shadow-2xs">
+                    <i data-lucide="receipt" class="w-3.5 h-3.5 text-blue-600"></i>
+                    <span>Order: {{ order.order_code }}</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tracking-tight leading-tight">
+                    {{ event.title }}
+                </h1>
+                <p class="text-sm text-slate-600 font-medium leading-relaxed max-w-xl">
+                    {% if order.status != 'PENDING' %}
+                    Your registration payment receipt has been received and is under review.
+                    {% else %}
+                    Complete your registration payment via Google Pay or UPI to receive your entry pass.
+                    {% endif %}
+                </p>
+                {% endif %}
+            </div>
+            
+            <div class="hidden sm:flex w-14 h-14 bg-white rounded-xl p-2 items-center justify-center shrink-0 shadow-sm border border-slate-200/80">
+                {% if is_completed or registration.status == 'COMPLETED' or attendee or order.status == 'VERIFIED' or order.status == 'SUCCESS' %}
+                <i data-lucide="shield-check" class="w-8 h-8 text-[#137333]"></i>
+                {% else %}
+                <img src="{% static 'images/logos/upi.png' %}" alt="UPI" class="w-full h-full object-contain">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Main Body Section -->
+    <div class="p-6 sm:p-8 space-y-6 bg-white text-slate-900">
+        {% if registration.status == 'COMPLETED' or attendee %}
+        <!-- ==================== VERIFIED & COMPLETED PASS STATE ==================== -->
+        <div class="space-y-5 text-center">
+            <div class="w-12 h-12 bg-[#e6f4ea] text-[#137333] rounded-full flex items-center justify-center mx-auto">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold font-display text-[#137333]">Registration Verified & Active!</h2>
+                <p class="text-xs text-[#5f6368] mt-1.5 max-w-md mx-auto leading-relaxed">
+                    Your payment has been verified. Your official entry pass is ready for download and print.
+                </p>
+            </div>
+
+            <!-- Embedded QR Pass Box -->
+            <div class="p-4 bg-[#f8f9fa] border border-[#dadce0] rounded-xl max-w-xs mx-auto text-center space-y-2">
+                <div class="p-2 bg-white border border-[#dadce0] rounded-lg shadow-xs inline-block">
+                    {% if qr_base64 %}
+                    <img src="data:image/png;base64,{{ qr_base64 }}" alt="QR Pass" class="w-32 h-32 object-contain block mx-auto">
+                    {% else %}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ attendee.pass_code|default:registration.registration_code }}" alt="QR Pass" class="w-32 h-32 object-contain block mx-auto">
+                    {% endif %}
+                </div>
+                <div class="font-mono text-sm font-bold text-[#202124] tracking-wider">
+                    {{ attendee.pass_code|default:registration.registration_code }}
+                </div>
+                <div class="text-[10px] font-semibold text-[#137333] uppercase tracking-wider font-mono">
+                    ✓ SECURE ENTRANCE PASS
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center flex-wrap gap-2.5 pt-2">
+                <a href="{% url 'attendee-badge' attendee.pass_code|default:registration.registration_code %}?print=1" target="_blank" class="google-btn-primary px-5 py-2.5 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>Print Pass</span>
+                </a>
+            </div>
+
+            <!-- Order Information Summary -->
+            <div class="p-4 bg-[#f8f9fa] border border-[#dadce0] rounded-lg text-left text-xs space-y-2">
+                <div class="flex justify-between border-b border-[#dadce0] pb-2 font-semibold text-[#5f6368] uppercase text-[10px]">
+                    <span>Order Information</span>
+                    <span class="text-[#1a73e8] font-mono">{{ order.order_code }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#5f6368]">Primary Attendee:</span>
+                    <span class="font-medium text-[#202124]">{{ customer.name|title }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#5f6368]">Email:</span>
+                    <span class="font-mono text-[#202124]">{{ customer.email }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#5f6368]">Total Amount:</span>
+                    <span class="font-mono font-bold text-[#1a73e8]">₹{{ order.amount|floatformat:0 }} INR</span>
+                </div>
+            </div>
+        </div>
+
+        {% elif show_upload_form %}
+        <!-- ==================== UPLOAD / RE-UPLOAD PROOF STATE ==================== -->
+        
+        {% if is_failed %}
+        <!-- Rejection Notice Banner -->
+        <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
+            <div class="flex items-center gap-2 text-rose-800 font-bold text-sm">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
+                <span>Previous Payment Verification Was Not Successful</span>
+            </div>
+            <p class="text-xs text-rose-700 leading-relaxed">
+                {% if verification.review_notes %}
+                <strong>Reason:</strong> {{ verification.review_notes }}
+                {% else %}
+                The transaction could not be matched with our bank records or the receipt was unclear.
+                {% endif %}
+            </p>
+            <div class="text-[11px] text-rose-600 font-medium">
+                Please complete payment if not already done, or upload a clear screenshot showing the successful UPI transaction with 12-digit UTR/Ref No below. The new screenshot will replace the old one for Order <strong>{{ order.order_code }}</strong>.
+            </div>
+        </div>
+        {% elif is_reupload %}
+        <!-- Re-upload Info Banner -->
+        <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-2.5">
+            <i data-lucide="info" class="w-4 h-4 text-blue-600 shrink-0 mt-0.5"></i>
+            <div class="text-xs text-blue-800 leading-relaxed">
+                <strong>Upload New Verification Proof:</strong> Uploading a new screenshot will remove any previously uploaded receipt for Order <strong>{{ order.order_code }}</strong> and send it for verification.
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Summary Strip: Amount Due & Attendee -->
+        <div class="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] block">Primary Attendee:</span>
+                <span class="text-sm font-semibold text-[#202124]">{{ registration.customer.name }} ({{ registration.customer.email }})</span>
+            </div>
+            <div class="sm:text-right">
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-[#5f6368] block">Total Payable:</span>
+                <div class="flex items-center sm:justify-end gap-1.5">
+                    <span class="text-2xl sm:text-3xl font-bold font-display text-[#1a73e8] font-mono">₹{{ order.amount|floatformat:2 }}</span>
+                    <span class="text-xs font-semibold text-[#5f6368]">INR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: UPI Payment -->
+        <div class="space-y-4">
+            <div class="border-b border-[#dadce0] pb-2 flex items-center justify-between">
+                <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-xs font-bold">1</span>
+                    <span>Scan QR Code or Copy UPI ID</span>
+                </h2>
+                <span class="text-[11px] text-[#5f6368]">Instant UPI</span>
+            </div>
+
+            <!-- QR Code Card -->
+            <div class="flex flex-col items-center justify-center space-y-3 pt-1">
+                <div class="p-3 bg-white border border-[#dadce0] rounded-xl shadow-xs">
+                    {% if event.qr_display_url %}
+                    <img src="{{ event.qr_display_url }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D{{ event.upi_id }}%26pn%3D{{ event.upi_name|urlencode }}%26am%3D{{ order.amount|floatformat:2 }}%26cu%3DINR';" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
+                    {% elif order.qr_display_url %}
+                    <img src="{{ order.qr_display_url }}" onerror="this.onerror=null;this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D{{ event.upi_id }}%26pn%3D{{ event.upi_name|urlencode }}%26am%3D{{ order.amount|floatformat:2 }}%26cu%3DINR';" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
+                    {% else %}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa={{ event.upi_id }}&pn={{ event.upi_name }}&am={{ order.amount|floatformat:2 }}&cu=INR" alt="Event UPI QR" class="w-48 h-48 sm:w-56 sm:h-56 object-contain">
+                    {% endif %}
+                </div>
+
+                <!-- UPI ID Copy Bar -->
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <div class="flex items-center gap-2 bg-[#f8f9fa] border border-[#dadce0] rounded-full px-4 py-2 shadow-2xs">
+                        <span class="text-xs text-[#5f6368] font-medium">UPI ID:</span>
+                        <span class="font-mono text-xs sm:text-sm font-bold text-[#202124] select-all">{{ event.upi_id }}</span>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ event.upi_id }}'); this.innerText='COPIED'; setTimeout(() => this.innerText='COPY', 2000);" class="ml-1 px-2.5 py-0.5 bg-[#e8f0fe] hover:bg-[#d2e3fc] text-[11px] font-bold text-[#1a73e8] rounded-full transition cursor-pointer">
+                            COPY
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Upload Payment Proof Screenshot -->
+        <div class="pt-5 border-t border-[#dadce0] space-y-3.5">
+            <div class="border-b border-[#dadce0] pb-2">
+                <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#202124] flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#1a73e8] text-white flex items-center justify-center text-xs font-bold">2</span>
+                    <span>Upload Verification Proof Screenshot</span>
+                </h2>
+            </div>
+            <p class="text-xs text-[#5f6368] leading-relaxed">
+                Upload your payment success receipt screenshot from your UPI app. The previous screenshot for Order <strong>{{ order.order_code }}</strong> will be replaced and re-submitted for review.
+            </p>
+
+            <form method="POST" action="{% url 'payment-proof-upload' order.order_code %}" enctype="multipart/form-data" class="space-y-4" onsubmit="handleProofFormSubmit(this)">
+                {% csrf_token %}
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-[#202124]">
+                        Select Screenshot File (JPG / PNG) <span class="text-[#d93025]">*</span>
+                    </label>
+
+                    <!-- Single File Picker Input -->
+                    <input type="file" id="screenshot-input" name="screenshot" accept="image/png, image/jpeg, image/jpg" required class="survey-input file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#1a73e8] file:text-white hover:file:bg-[#1557b0] cursor-pointer" onchange="handleProofSelection(this)">
+
+                    <!-- Selected Image Preview Box with Remove Trigger -->
+                    <div id="selected-file-preview" class="hidden p-2.5 bg-[#f8f9fa] border border-[#dadce0] rounded-lg flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <img id="preview-thumbnail" src="" alt="Selected Receipt" class="w-10 h-10 object-cover rounded border border-[#dadce0] shrink-0 bg-white">
+                            <div class="min-w-0">
+                                <div id="preview-filename" class="text-xs font-semibold text-[#202124] truncate font-mono">receipt.png</div>
+                                <div id="preview-filesize" class="text-[10px] text-[#5f6368]">Image Ready</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removeProofFile()" class="px-2.5 py-1 bg-white hover:bg-[#fce8e6] border border-[#dadce0] text-xs font-semibold text-[#d93025] rounded transition flex items-center gap-1 shrink-0 cursor-pointer">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            <span>Remove</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-center pt-2">
+                    <button type="submit" id="verify-submit-btn" class="public-btn-primary mx-auto text-sm py-3.5 px-8 flex items-center justify-center gap-2">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                        <span id="verify-btn-text">Upload Verification Proof (₹{{ order.amount|floatformat:0 }})</span>
+                    </button>
+                </div>
+
+                <!-- Post-Submission Waiting Notice -->
+                <div id="submitting-wait-notice" class="hidden p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-left flex items-start gap-2.5 backdrop-blur-md">
+                    <i data-lucide="clock" class="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5"></i>
+                    <div class="text-xs text-[#0071e3] leading-relaxed">
+                        <strong>Submitting proof...</strong> Please wait while we process and upload your receipt.
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% else %}
+        <!-- ==================== POST-SUBMISSION / UNDER REVIEW STATE ==================== -->
+        <div class="space-y-5 text-center">
+            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto border border-amber-200 shadow-2xs">
+                <i data-lucide="clock" class="w-6 h-6 text-amber-600"></i>
+            </div>
+            <div>
+                <span class="inline-block text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-full mb-2">
+                    ⏳ Payment Proof Under Review
+                </span>
+                <h2 class="text-xl font-bold font-display text-[#202124]">Payment Proof Submitted</h2>
+                <p class="text-xs text-[#5f6368] mt-1.5 max-w-md mx-auto leading-relaxed">
+                    Your payment receipt has been submitted. Our team will verify the transaction and email your official entry pass to <strong class="text-[#202124] font-mono">{{ customer.email }}</strong> shortly.
+                </p>
+            </div>
+
+            <!-- Order Information Summary -->
+            <div class="p-4 bg-[#f8f9fa] border border-[#dadce0] rounded-lg text-left text-xs space-y-2 max-w-lg mx-auto">
+                <div class="flex justify-between border-b border-[#dadce0] pb-2 font-semibold text-[#5f6368] uppercase text-[10px]">
+                    <span>Order Information</span>
+                    <span class="text-[#1a73e8] font-mono">{{ order.order_code }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#5f6368]">Primary Attendee:</span>
+                    <span class="font-medium text-[#202124]">{{ customer.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#5f6368]">Email:</span>
+                    <span class="font-mono text-[#202124]">{{ customer.email }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#5f6368]">Total Amount:</span>
+                    <span class="font-mono font-bold text-[#1a73e8]">₹{{ order.amount|floatformat:0 }} INR</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#5f6368]">Status:</span>
+                    <span class="font-semibold text-amber-700">Verification in Progress</span>
+                </div>
+            </div>
+
+            <!-- Re-upload Trigger Option -->
+            <div class="pt-3">
+                <a href="?reupload=1" class="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 font-semibold px-4 py-2 rounded-xl transition cursor-pointer">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span>Need to upload a new or different screenshot? Click here</span>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+    function handleAppClick(appName) {
+        const upiId = "{{ event.upi_id }}";
+        const amount = "{{ order.amount|floatformat:2 }}";
+        
+        // Auto-copy UPI ID to clipboard so the user has it ready
+        try {
+            navigator.clipboard.writeText(upiId);
+        } catch (err) {}
+
+        const notice = document.getElementById('app-redirect-notice');
+        if (notice) {
+            notice.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-[#1a73e8] shrink-0 mt-0.5"></i>
+                    <div class="text-xs text-[#1a73e8] leading-relaxed">
+                        <strong>Opening ${appName}...</strong> Payee UPI ID (<strong>${upiId}</strong>) copied. Complete your payment of <strong>₹${amount}</strong> and upload your screenshot below.
+                    </div>
+                </div>`;
+            notice.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    function handleProofSelection(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            document.getElementById('preview-filename').innerText = file.name;
+            document.getElementById('preview-filesize').innerText = `${(file.size / 1024).toFixed(1)} KB • Image Ready`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-thumbnail').src = e.target.result;
+                document.getElementById('selected-file-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeProofFile() {
+        const input = document.getElementById('screenshot-input');
+        if (input) {
+            input.value = '';
+        }
+        document.getElementById('preview-thumbnail').src = '';
+        document.getElementById('selected-file-preview').classList.add('hidden');
+    }
+
+    function handleProofFormSubmit(form) {
+        const btnText = document.getElementById('verify-btn-text');
+        const notice = document.getElementById('submitting-wait-notice');
+        
+        if (btnText) {
+            btnText.innerText = "Submitting receipt...";
+        }
+        if (notice) {
+            notice.classList.remove('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+{% endblock %}
