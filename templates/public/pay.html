@@ -3,6 +3,11 @@
 
 {% block title %}Payment Checkout • {{ order.order_code }} | Nizhal{% endblock %}
 
+{% block extra_head %}
+    <link rel="canonical" href="https://nizhalcommunity.in/pay/{{ order.order_code }}/">
+    <meta property="og:url" content="https://nizhalcommunity.in/pay/{{ order.order_code }}/">
+{% endblock %}
+
 {% block main_content %}
 <div class="w-full public-card shadow-2xl">
 

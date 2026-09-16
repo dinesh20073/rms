@@ -1,6 +1,11 @@
 {% extends 'public_base.html' %}
 
-{% block title %}Registration Status • {{ event.title }} | EMS{% endblock %}
+{% block title %}Registration Status • {{ event.title }} | Nizhal{% endblock %}
+
+{% block extra_head %}
+    <link rel="canonical" href="https://nizhalcommunity.in/status/{{ registration.registration_code }}/">
+    <meta property="og:url" content="https://nizhalcommunity.in/status/{{ registration.registration_code }}/">
+{% endblock %}
 
 {% block main_content %}
 <div class="w-full max-w-xl mx-auto survey-card-container bg-white">

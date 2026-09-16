@@ -21,14 +21,14 @@ urlpatterns = [
     path('', auth_views.login_view, name='root-home'),
 
     # Redirect bare register/pay/pass/status routes to Nizhal home page
-    path('register/', lambda req: redirect('https://www.nizhalcommunity.in/')),
-    path('register', lambda req: redirect('https://www.nizhalcommunity.in/')),
-    path('pay/', lambda req: redirect('https://www.nizhalcommunity.in/')),
-    path('pay', lambda req: redirect('https://www.nizhalcommunity.in/')),
-    path('pass/', lambda req: redirect('https://www.nizhalcommunity.in/')),
-    path('pass', lambda req: redirect('https://www.nizhalcommunity.in/')),
-    path('status/', lambda req: redirect('https://www.nizhalcommunity.in/')),
-    path('status', lambda req: redirect('https://www.nizhalcommunity.in/')),
+    path('register/', lambda req: redirect('https://nizhalcommunity.in/')),
+    path('register', lambda req: redirect('https://nizhalcommunity.in/')),
+    path('pay/', lambda req: redirect('https://nizhalcommunity.in/')),
+    path('pay', lambda req: redirect('https://nizhalcommunity.in/')),
+    path('pass/', lambda req: redirect('https://nizhalcommunity.in/')),
+    path('pass', lambda req: redirect('https://nizhalcommunity.in/')),
+    path('status/', lambda req: redirect('https://nizhalcommunity.in/')),
+    path('status', lambda req: redirect('https://nizhalcommunity.in/')),
 
     # Custom AI Innovators registration page (bright theme)
     path('register/ai-innovators-2026/', reg_views.ai_innovators_register_view, name='ai-innovators-register'),
@@ -63,8 +63,10 @@ from django.views.static import serve
 from django.http import JsonResponse
 from django.shortcuts import render
 
+_static_root = settings.STATIC_ROOT if (hasattr(settings, 'STATIC_ROOT') and settings.STATIC_ROOT and settings.STATIC_ROOT.exists()) else settings.STATICFILES_DIRS[0]
+
 urlpatterns += [
-    re_path(r'^(?:register/)?static/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0]}),
+    re_path(r'^(?:register/)?static/(?P<path>.*)$', serve, {'document_root': _static_root}),
     re_path(r'^(?:register/)?media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
@@ -73,7 +75,7 @@ def custom_404_view(request, exception=None):
     Handles 404s safely:
     - Returns JSON for API endpoints
     - Any wrong public page (/register, /pay, etc.) or wrong customer page
-      automatically redirects to the official Nizhal home page (https://www.nizhalcommunity.in/)
+      automatically redirects to the official Nizhal home page (https://nizhalcommunity.in/)
     - Admin-specific routes on admin host redirect to admin root
     """
     if request.path.startswith('/api/'):
@@ -81,7 +83,7 @@ def custom_404_view(request, exception=None):
 
     path = request.path_info or request.path
     if not path.startswith(('/dashboard', '/admin', '/login')):
-        return redirect('https://www.nizhalcommunity.in/')
+        return redirect('https://nizhalcommunity.in/')
 
     host = request.get_host().lower()
     is_admin_host = (
@@ -93,6 +95,7 @@ def custom_404_view(request, exception=None):
     if is_admin_host:
         return redirect(f"{request.scheme}://{host}/")
 
-    return redirect('https://www.nizhalcommunity.in/')
+    return redirect('https://nizhalcommunity.in/')
 
 handler404 = 'ems_core.urls.custom_404_view'
+

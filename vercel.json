@@ -42,6 +42,24 @@
       "dest": "ems_core/wsgi.py"
     },
     {
+      "src": "/media/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=86400",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS, HEAD"
+      },
+      "dest": "ems_core/wsgi.py"
+    },
+    {
+      "src": "/register/media/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=86400",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS, HEAD"
+      },
+      "dest": "ems_core/wsgi.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "ems_core/wsgi.py"
     }

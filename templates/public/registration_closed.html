@@ -3,6 +3,11 @@
 
 {% block title %}Registrations Closed • {{ event.title }} | Nizhal{% endblock %}
 
+{% block extra_head %}
+    <link rel="canonical" href="https://nizhalcommunity.in/register/{{ event.slug }}/">
+    <meta property="og:url" content="https://nizhalcommunity.in/register/{{ event.slug }}/">
+{% endblock %}
+
 {% block main_content %}
 <div class="w-full public-card shadow-2xl overflow-hidden">
 

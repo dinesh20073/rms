@@ -18,9 +18,13 @@ class BankSessionSecurityMiddleware(MiddlewareMixin):
         '/static/',
         '/media/',
         '/register/',
+        '/register',
         '/pay/',
+        '/pay',
         '/pass/',
+        '/pass',
         '/status/',
+        '/status',
         '/favicon.ico',
     )
 
