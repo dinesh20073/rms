@@ -199,13 +199,24 @@
                             <div style="font-family: 'Roboto', sans-serif; font-size: 14.5px; line-height: 1.5; color: #d1fae5 !important; max-width: 480px; margin: 0 auto; text-align: center;">
                                 Thank you for your participation! Welcome to <strong style="color: #ffffff !important;">{{ event.title }}</strong>.
                             </div>
-
                         </td>
                     </tr>
 
-                    <!-- 3. VERIFIED CHECK-IN DETAILS (Clean Structured Box) -->
+                    <!-- 3. Personal Greeting & Welcome Message -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 20px 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
+                        <td width="100%" align="left" bgcolor="#ffffff" class="content-side-pad" style="padding: 24px 24px 8px 24px; background-color: #ffffff !important; border: 0 !important; font-family: 'Roboto', sans-serif;">
+                            <div style="font-size: 15px; font-weight: 700; color: #0f172a !important; margin-bottom: 6px;">
+                                Hi {{ customer.name|title }},
+                            </div>
+                            <div style="font-size: 13px; line-height: 1.6; color: #334155 !important;">
+                                Thank you for your participation in the <strong style="color: #0f172a !important;">{{ event.title }}</strong>! Your presence has been verified at the entry gate. We are delighted to have you with us today. Here are your verified check-in details:
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- 4. VERIFIED CHECK-IN DETAILS (Clean Structured Box) -->
+                    <tr>
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 12px 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
                             <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
                                 <tr>
                                     <td colspan="2" bgcolor="#f8fafc" style="background-color: #f8fafc !important; padding: 10px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155 !important; text-transform: uppercase;">
@@ -255,83 +266,6 @@
                                         </table>
                                     </td>
                                 </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- 4. PARTICIPANTS LIST & GENDER BREAKDOWN (Elevated Table Box) -->
-                    <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
-                                <tr>
-                                    <td colspan="5" bgcolor="#f8fafc" style="background-color: #f8fafc !important; padding: 10px 14px; border-bottom: 1px solid #cbd5e1;">
-                                        <table role="presentation" width="100%" bgcolor="#f8fafc" cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td align="left" class="font-mono nowrap" style="font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #0f172a !important; text-transform: uppercase; white-space: nowrap;">
-                                                    👥 PARTICIPANTS ROSTER ({{ ticket_count|default:1 }} SPOT{{ ticket_count|pluralize }})
-                                                </td>
-                                                <td align="right" class="nowrap" style="text-align: right; white-space: nowrap;">
-                                                    {% if male_count %}
-                                                    <span style="display: inline-block; background-color: #dbeafe; color: #1e40af; font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; margin-right: 4px;">
-                                                        ♂ {{ male_count }} Male
-                                                    </span>
-                                                    {% endif %}
-                                                    {% if female_count %}
-                                                    <span style="display: inline-block; background-color: #fce7f3; color: #9d174d; font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px;">
-                                                        ♀ {{ female_count }} Female
-                                                    </span>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr bgcolor="#0f172a" class="font-mono nowrap" style="background-color: #0f172a !important; color: #ffffff !important; font-size: 10px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
-                                    <th style="padding: 9px 12px; text-align: left; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Participant Name</th>
-                                    <th width="45" style="width: 45px !important; padding: 9px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Age</th>
-                                    <th width="70" style="width: 70px !important; padding: 9px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Gender</th>
-                                    <th width="50" style="width: 50px !important; padding: 9px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Spots</th>
-                                    <th width="90" style="width: 90px !important; padding: 9px 12px; text-align: right; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Entry</th>
-                                </tr>
-                                {% if attendee_list %}
-                                    {% for person in attendee_list %}
-                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #f1f5f9; font-size: 11px; color: #1e293b !important; white-space: nowrap;">
-                                        <td bgcolor="#ffffff" style="padding: 9px 12px; font-weight: 700; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">
-                                            {{ person.name }}
-                                        </td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                            {{ person.age|default:"-" }}
-                                        </td>
-                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 9px 4px; text-align: center; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">
-                                            {% if "male" in person.gender|lower and "female" not in person.gender|lower %}
-                                                <span style="display: inline-block; background-color: #eff6ff; color: #2563eb; font-weight: 700; font-size: 10px; padding: 1px 6px; border-radius: 4px;">Male</span>
-                                            {% elif "female" in person.gender|lower %}
-                                                <span style="display: inline-block; background-color: #fdf2f8; color: #db2777; font-weight: 700; font-size: 10px; padding: 1px 6px; border-radius: 4px;">Female</span>
-                                            {% else %}
-                                                <span style="color: #64748b;">{{ person.gender|title|default:"-" }}</span>
-                                            {% endif %}
-                                        </td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                            1
-                                        </td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 12px; text-align: right; font-weight: 800; color: #059669 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                            ADMITTED ✓
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #f1f5f9; font-size: 11px; color: #1e293b !important; white-space: nowrap;">
-                                        <td bgcolor="#ffffff" style="padding: 9px 12px; font-weight: 700; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">
-                                            {{ customer.name|title }} (Primary)
-                                        </td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">-</td>
-                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 9px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">-</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">1</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 12px; text-align: right; font-weight: 800; color: #059669 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                            ADMITTED ✓
-                                        </td>
-                                    </tr>
-                                {% endif %}
                             </table>
                         </td>
                     </tr>
