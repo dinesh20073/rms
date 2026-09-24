@@ -278,6 +278,12 @@
 
             <!-- Right Topbar Controls: NO LOGOUT (Logout only in sidebar) -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <!-- QR Scanner Quick Shortcut -->
+                <a href="{% url 'dashboard-scanner' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#0f9d58] text-white hover:bg-[#0b8043] transition shadow-2xs cursor-pointer select-none" style="border-radius: 0px !important;" title="Open Ticket QR Scanner">
+                    <i class="bi bi-qr-code-scan text-xs"></i>
+                    <span>Scanner</span>
+                </a>
+
                 <!-- Quick New Event Shortcut (Desktop) - Sharp Rectangle -->
                 <a href="{% url 'dashboard-event-create' %}" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#1a73e8] text-white hover:bg-[#1557b0] transition shadow-2xs cursor-pointer" style="border-radius: 0px !important;">
                     <i class="bi bi-plus-lg text-xs"></i>
@@ -315,12 +321,17 @@
                     <i class="bi bi-credit-card"></i>
                 </a>
 
-                <!-- 5. Emails -->
+                <!-- 5. Scanner & Check-in -->
+                <a href="{% url 'dashboard-scanner' %}" class="pc-sidebar-link {% if 'scanner' in request.resolver_match.url_name %}active{% endif %}" title="Ticket QR Scanner & Check-in">
+                    <i class="bi bi-qr-code-scan"></i>
+                </a>
+
+                <!-- 6. Emails -->
                 <a href="{% url 'dashboard-email-logs' %}" class="pc-sidebar-link {% if 'email' in request.resolver_match.url_name %}active{% endif %}" title="Email Notifications">
                     <i class="bi bi-envelope"></i>
                 </a>
 
-                <!-- 6. Attendee Database (Placed at last) -->
+                <!-- 7. Attendee Database (Placed at last) -->
                 <a href="{% url 'dashboard-database' %}" class="pc-sidebar-link {% if 'database' in request.resolver_match.url_name %}active{% endif %}" title="Attendee Database">
                     <i class="bi bi-database"></i>
                 </a>
@@ -382,6 +393,13 @@
                 </span>
                 {% endif %}
             </a>
+            <a href="{% url 'dashboard-scanner' %}" class="mobile-drawer-link {% if 'scanner' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-qr-code-scan text-[#0f9d58]"></i>
+                <span class="flex-1 font-bold">Ticket QR Scanner</span>
+                <span class="px-1.5 py-0.5 text-[10px] font-bold bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
+                    Live
+                </span>
+            </a>
             <a href="{% url 'dashboard-email-logs' %}" class="mobile-drawer-link {% if 'email' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-envelope"></i>
                 <span>Email Logs</span>
@@ -422,10 +440,10 @@
                 <span>Logs</span>
             </a>
 
-            <!-- 3. Forms & Events -->
-            <a href="{% url 'dashboard-events-list' %}" class="mobile-bottom-link flex-1 {% if 'event' in request.resolver_match.url_name or 'form' in request.resolver_match.url_name %}active{% endif %}">
-                <i class="bi bi-calendar2-event"></i>
-                <span>Forms</span>
+            <!-- 3. Scanner (Center Quick Action) -->
+            <a href="{% url 'dashboard-scanner' %}" class="mobile-bottom-link flex-1 {% if 'scanner' in request.resolver_match.url_name %}active{% endif %}" style="color: {% if 'scanner' in request.resolver_match.url_name %}#0f9d58{% else %}#0f9d58{% endif %}; font-weight: 700;">
+                <i class="bi bi-qr-code-scan text-lg"></i>
+                <span>Scanner</span>
             </a>
 
             <!-- 4. Payments -->

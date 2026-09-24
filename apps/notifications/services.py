@@ -508,3 +508,143 @@ def send_order_created_email(registration):
     )
     return email_log
 
+
+def send_checkin_success_email(attendee):
+    """
+    Sends check-in confirmation & participation gratitude email when an attendee pass
+    is successfully scanned and admitted at the event.
+    """
+    registration = attendee.registration
+    customer = registration.customer
+    event = registration.event
+    order = getattr(registration, 'order', None)
+    pass_code = attendee.pass_code
+
+    banner_url = BANNER_WEB_URL
+    qr_url = get_attendee_qr_web_url(pass_code)
+
+    responses = registration.form_responses or {}
+    def to_proper_case(val):
+        if not val or str(val).strip() in ('-', '', 'None'):
+            return '-'
+        return str(val).strip().title()
+
+    raw_tc = responses.get('Ticket Count') or responses.get('ticket_count') or 1
+    try:
+        ticket_count = int(raw_tc)
+    except (ValueError, TypeError):
+        ticket_count = 1
+
+    if event and event.registration_fee is not None:
+        unit_fee = float(event.registration_fee)
+    elif ticket_count > 0:
+        unit_fee = float(registration.amount) / ticket_count
+    else:
+        unit_fee = float(registration.amount)
+
+    attendee_list = []
+    p1_age = responses.get('Age') or responses.get('age') or responses.get('Age Category') or responses.get('age_category') or '-'
+    p1_gender = to_proper_case(responses.get('Gender') or responses.get('gender') or '-')
+    p1_name = f"{to_proper_case(customer.name)} (Primary)"
+    attendee_list.append({
+        'index': 1,
+        'name': p1_name,
+        'age': p1_age,
+        'gender': p1_gender,
+        'type': 'Primary Attendee',
+        'email': customer.email,
+        'phone': customer.phone,
+        'amount': unit_fee,
+    })
+
+    co_list = (
+        responses.get('Co-Attendees (Person 2 to N)')
+        or responses.get('co_attendees')
+        or responses.get('co_attendee_list')
+        or []
+    )
+    if isinstance(co_list, list):
+        for idx, item in enumerate(co_list, start=2):
+            if isinstance(item, dict):
+                c_name = to_proper_case(item.get('name') or item.get('full_name') or f"Attendee #{idx}")
+                c_age = item.get('age') or item.get('age_category') or item.get('Age') or '-'
+                c_gender = to_proper_case(item.get('gender') or item.get('Gender') or '-')
+                attendee_list.append({
+                    'index': idx,
+                    'name': c_name,
+                    'age': c_age,
+                    'gender': c_gender,
+                    'type': f'Co-Attendee #{idx}',
+                    'email': '-',
+                    'phone': '-',
+                    'amount': unit_fee,
+                })
+
+    for idx in range(len(attendee_list) + 1, ticket_count + 1):
+        raw_name = responses.get(f'person_{idx}_name') or f"Attendee #{idx}"
+        c_name = to_proper_case(raw_name)
+        c_age = responses.get(f'person_{idx}_age') or '-'
+        c_gender = to_proper_case(responses.get(f'person_{idx}_gender') or '-')
+        attendee_list.append({
+            'index': idx,
+            'name': c_name,
+            'age': c_age,
+            'gender': c_gender,
+            'type': f'Co-Attendee #{idx}',
+            'email': '-',
+            'phone': '-',
+            'amount': unit_fee,
+        })
+
+    # Count male and female
+    male_count = sum(1 for a in attendee_list if 'male' in str(a.get('gender', '')).lower() and 'fe' not in str(a.get('gender', '')).lower())
+    female_count = sum(1 for a in attendee_list if 'female' in str(a.get('gender', '')).lower())
+
+    subject = f"Entry Confirmed: Welcome to {event.title}! (Thank you for your participation) • {pass_code}"
+    
+    email_context = {
+        'registration': registration,
+        'customer': customer,
+        'event': event,
+        'order': order,
+        'attendee': attendee,
+        'pass_code': pass_code,
+        'banner_src': banner_url,
+        'qr_src': qr_url,
+        'attendee_list': attendee_list,
+        'ticket_count': max(ticket_count, len(attendee_list)),
+        'unit_fee': unit_fee,
+        'male_count': male_count,
+        'female_count': female_count,
+    }
+    email_html = render_to_string('emails/checkin_confirmed.html', email_context)
+
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=f"Hi {customer.name}, Thank you for your participation in {event.title}! Your check-in is confirmed for {max(ticket_count, len(attendee_list))} spot(s). We are thrilled to have you with us.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[customer.email]
+    )
+    msg.attach_alternative(email_html, "text/html")
+    status, error_msg = dispatch_email_message(msg)
+
+    email_log = EmailLog.objects.create(
+        tenant=event.tenant,
+        recipient_email=customer.email,
+        recipient_name=customer.name,
+        subject=subject,
+        body_html=email_html,
+        event_type='CHECKIN_COMPLETED',
+        status=status,
+        error_message=error_msg
+    )
+
+    log_audit_event(
+        action='EMAIL_SENT',
+        reference_id=pass_code,
+        details={'recipient': customer.email, 'subject': subject, 'email_log_id': email_log.id, 'status': status, 'type': 'CHECKIN_COMPLETED'},
+        tenant=event.tenant,
+        actor='Nizhal Scanner'
+    )
+    return email_log
+

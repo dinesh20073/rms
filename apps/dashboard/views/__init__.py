@@ -59,3 +59,10 @@ from apps.dashboard.views.database import (
     database_view,
     export_customers_csv,
 )
+
+from apps.dashboard.views.scanner import (
+    scanner_page_view,
+    scanner_verify_api,
+    scanner_stats_api,
+    scanner_resend_email_api,
+)
