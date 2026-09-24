@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
     /* =========================================================================
-       Nizhal Minimalist Camera Scanner - Clean Consent & On/Off Controls
+       Nizhal Camera Scanner - Centered Controls & Blurred Black Mask
        ========================================================================= */
     .scanner-page {
         position: relative;
@@ -21,7 +21,7 @@
         justify-content: center;
     }
 
-    /* Seamlessly fit between dashboard top navbar (56px) and bottom navbar (72px) */
+    /* Fit between dashboard top navbar (56px) and bottom navbar (72px) */
     @media (max-width: 1023px) {
         .scanner-page {
             height: calc(100dvh - 128px);
@@ -36,12 +36,12 @@
             height: 640px;
             margin: 20px auto;
             border-radius: 28px;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
             border: 1px solid #e5e7eb;
         }
     }
 
-    /* Live Video Feed spanning background */
+    /* Live Video Stream spanning background */
     .scanner-bg-video {
         position: absolute;
         inset: 0;
@@ -52,43 +52,29 @@
         z-index: 1;
     }
 
-    /* Top Switch Camera Button (Top Right) */
-    .scanner-switch-btn {
+    /* Surrounding Black Blurred Mask (Cuts out only the center focused box) */
+    .scanner-blur-mask {
         position: absolute;
-        top: 14px;
-        right: 16px;
-        z-index: 25;
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background-color: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        cursor: pointer;
-        transition: transform 0.2s ease, background-color 0.15s ease;
-        outline: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .scanner-switch-btn:active {
-        transform: rotate(180deg) scale(0.92);
-        background-color: rgba(255, 255, 255, 0.25);
+        inset: 0;
+        z-index: 6;
+        background-color: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        pointer-events: none;
+        transition: opacity 0.25s ease;
     }
 
-    /* Viewfinder Center Container */
-    .scanner-viewfinder-wrapper {
+    /* Center Content Container */
+    .scanner-center-content {
         position: relative;
-        z-index: 10;
+        z-index: 12;
+        width: 100%;
+        max-width: 360px;
+        padding: 0 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin: auto;
     }
 
     /* Fixed-Dimension 240px Google Pay Target Box */
@@ -103,6 +89,8 @@
         margin: 0 auto !important;
         flex-shrink: 0 !important;
         box-sizing: border-box !important;
+        border-radius: 24px !important;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
     }
 
     /* 4 Google Colored Corners */
@@ -118,28 +106,28 @@
         left: 0 !important;
         border-top: 5px solid #ea4335 !important; /* Google Red */
         border-left: 5px solid #ea4335 !important;
-        border-top-left-radius: 22px !important;
+        border-top-left-radius: 24px !important;
     }
     .corner-tr {
         top: 0 !important;
         right: 0 !important;
         border-top: 5px solid #fbbc04 !important; /* Google Yellow */
         border-right: 5px solid #fbbc04 !important;
-        border-top-right-radius: 22px !important;
+        border-top-right-radius: 24px !important;
     }
     .corner-bl {
         bottom: 0 !important;
         left: 0 !important;
         border-bottom: 5px solid #4285f4 !important; /* Google Blue */
         border-left: 5px solid #4285f4 !important;
-        border-bottom-left-radius: 22px !important;
+        border-bottom-left-radius: 24px !important;
     }
     .corner-br {
         bottom: 0 !important;
         right: 0 !important;
         border-bottom: 5px solid #34a853 !important; /* Google Green */
         border-right: 5px solid #34a853 !important;
-        border-bottom-right-radius: 22px !important;
+        border-bottom-right-radius: 24px !important;
     }
 
     /* Animated Laser Line */
@@ -153,10 +141,73 @@
         pointer-events: none !important;
     }
 
-    /* Big Camera Consent / Start Screen */
+    /* Centered Action Controls Row (Right Below Viewfinder) */
+    .center-controls-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+        z-index: 15;
+    }
+
+    /* Centered Pill Button Styles */
+    .center-pill-btn {
+        border: none;
+        border-radius: 9999px;
+        padding: 11px 22px;
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        outline: none;
+        transition: transform 0.15s ease, background-color 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .center-pill-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Turn Off Camera (Red Pill) */
+    .btn-turn-off {
+        background-color: rgba(239, 68, 68, 0.95);
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45);
+    }
+    .btn-turn-off:active {
+        background-color: #dc2626;
+    }
+
+    /* Turn On Camera (Emerald Green Pill) */
+    .btn-turn-on {
+        background-color: #059669;
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.45);
+    }
+    .btn-turn-on:active {
+        background-color: #047857;
+    }
+
+    /* Switch Camera (Glass Pill) */
+    .btn-switch {
+        background-color: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .btn-switch:active {
+        background-color: rgba(255, 255, 255, 0.35);
+        transform: scale(0.95);
+    }
+
+    /* Big Camera Consent / Start Screen (Centered) */
     .scanner-consent-card {
         position: relative;
-        z-index: 15;
+        z-index: 20;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -168,23 +219,23 @@
     }
 
     .camera-big-icon-wrap {
-        width: 100px;
-        height: 100px;
+        width: 104px;
+        height: 104px;
         border-radius: 50%;
         background: rgba(16, 185, 129, 0.12);
         border: 2px solid rgba(16, 185, 129, 0.35);
         color: #10b981;
-        font-size: 46px;
+        font-size: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 20px;
-        box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+        margin-bottom: 22px;
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
     }
 
     .consent-title {
         color: #ffffff;
-        font-size: 20px;
+        font-size: 21px;
         font-weight: 700;
         margin-bottom: 8px;
     }
@@ -193,78 +244,7 @@
         color: #9ca3af;
         font-size: 13px;
         line-height: 1.45;
-        margin-bottom: 24px;
-    }
-
-    .consent-start-btn {
-        background: #059669;
-        color: #ffffff;
-        border: none;
-        border-radius: 9999px;
-        padding: 13px 32px;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4);
-        transition: transform 0.15s ease, background-color 0.15s ease;
-    }
-    .consent-start-btn:active {
-        transform: scale(0.96);
-        background: #047857;
-    }
-
-    /* Bottom Control Bar: Turn On / Turn Off Button */
-    .scanner-bottom-bar {
-        position: absolute;
-        bottom: 20px;
-        left: 0;
-        right: 0;
-        z-index: 25;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 20px;
-    }
-
-    .camera-power-btn {
-        border: none;
-        border-radius: 9999px;
-        padding: 11px 24px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        outline: none;
-        transition: transform 0.15s ease, background-color 0.15s ease;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .camera-power-btn:active {
-        transform: scale(0.95);
-    }
-
-    /* Turn Off Style (Red / Dark Pill) */
-    .camera-power-btn.power-off {
-        background-color: rgba(239, 68, 68, 0.9);
-        color: #ffffff;
-        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-    }
-    .camera-power-btn.power-off:active {
-        background-color: #dc2626;
-    }
-
-    /* Turn On Style (Green Pill) */
-    .camera-power-btn.power-on {
-        background-color: #059669;
-        color: #ffffff;
-        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
-    }
-    .camera-power-btn.power-on:active {
-        background-color: #047857;
+        margin-bottom: 26px;
     }
 
     /* Slide-Up Bottom Sheet Animation */
@@ -281,7 +261,7 @@
 {% block content %}
 
 <!-- ========================================================================= -->
-<!-- MINIMALIST SCANNER (BIG CAMERA CONSENT & DEDICATED ON/OFF CONTROL)        -->
+<!-- SCANNER CONTAINER (CENTERED CONTROLS & SURROUNDING BLACK BLUR MASK)       -->
 <!-- ========================================================================= -->
 <div class="scanner-page">
 
@@ -289,43 +269,49 @@
     <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="scanner-bg-video"></video>
     <canvas id="gpayCanvas" style="display:none;"></canvas>
 
-    <!-- Switch Camera Button (Front / Rear) -->
-    <button type="button" onclick="flipCamera()" id="btnSwitchCamera" class="scanner-switch-btn" title="Switch Camera" style="display: none;">
-        <i class="bi bi-camera-reverse"></i>
-    </button>
+    <!-- Surrounding Black Blur Mask (Cuts out only the center 240px focused box) -->
+    <div id="scannerBlurMask" class="scanner-blur-mask" style="display: none;"></div>
 
-    <!-- 1. Initial Consent / Camera Off Screen (Big Camera Icon) -->
+    <!-- 1. Big Camera Logo Consent Screen (Centered on initial load / camera off) -->
     <div id="consentCard" class="scanner-consent-card">
         <div class="camera-big-icon-wrap">
             <i class="bi bi-camera"></i>
         </div>
         <h2 class="consent-title">Camera Permission</h2>
         <p class="consent-subtitle">Tap below to allow camera access and begin scanning ticket QR codes.</p>
-        <button type="button" onclick="turnOnCamera()" class="consent-start-btn">
+        <button type="button" onclick="turnOnCamera()" class="center-pill-btn btn-turn-on" style="padding: 13px 32px; font-size: 14.5px;">
             <i class="bi bi-camera-video"></i>
             <span>Allow & Start Camera</span>
         </button>
     </div>
 
-    <!-- 2. Active Viewfinder (Shown ONLY when camera is streaming) -->
-    <div id="viewfinderWrapper" class="scanner-viewfinder-wrapper" style="display: none;">
+    <!-- 2. Active Center Content (Viewfinder + Center Action Buttons) -->
+    <div id="scannerCenterStack" class="scanner-center-content" style="display: none;">
+        
+        <!-- Focused Target Box (Clear from blur) -->
         <div id="targetBox" class="gpay-box">
-            <!-- 4 Distinct Google Brand Color Corners -->
             <div class="corner corner-tl"></div>
             <div class="corner corner-tr"></div>
             <div class="corner corner-bl"></div>
             <div class="corner corner-br"></div>
-            <!-- Laser Scan Line -->
             <div id="scanLaser" class="gpay-laser"></div>
         </div>
-    </div>
 
-    <!-- 3. Bottom Control Bar: Dedicated Turn On / Turn Off Camera Button -->
-    <div class="scanner-bottom-bar">
-        <button type="button" id="btnToggleCamera" onclick="toggleCameraPower()" class="camera-power-btn power-off" style="display: none;">
-            <i class="bi bi-camera-video-off" id="powerBtnIcon"></i>
-            <span id="powerBtnText">Turn Off Camera</span>
-        </button>
+        <!-- All Camera Buttons Directly in Center -->
+        <div class="center-controls-row">
+            <!-- Turn Off Camera Button -->
+            <button type="button" onclick="turnOffCamera()" class="center-pill-btn btn-turn-off">
+                <i class="bi bi-camera-video-off"></i>
+                <span>Turn Off Camera</span>
+            </button>
+
+            <!-- Switch Camera Button -->
+            <button type="button" onclick="flipCamera()" class="center-pill-btn btn-switch" title="Switch Camera">
+                <i class="bi bi-camera-reverse"></i>
+                <span>Switch</span>
+            </button>
+        </div>
+
     </div>
 
 </div>
@@ -489,6 +475,10 @@
         await enumerateCameras();
     });
 
+    window.addEventListener('resize', () => {
+        if (isCameraActive) updateBlurMaskPosition();
+    });
+
     async function enumerateCameras() {
         try {
             if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
@@ -500,15 +490,38 @@
         }
     }
 
-    // Turn ON Camera
+    // Dynamic blur mask calculation: Cut out the focused box from the surrounding dark blur
+    function updateBlurMaskPosition() {
+        const box = document.getElementById('targetBox');
+        const mask = document.getElementById('scannerBlurMask');
+        const page = document.querySelector('.scanner-page');
+        if (!box || !mask || !page) return;
+
+        const boxRect = box.getBoundingClientRect();
+        const pageRect = page.getBoundingClientRect();
+
+        const top = Math.round(boxRect.top - pageRect.top);
+        const left = Math.round(boxRect.left - pageRect.left);
+        const right = Math.round(left + boxRect.width);
+        const bottom = Math.round(top + boxRect.height);
+
+        // Clip-path with evenodd polygon cutout
+        mask.style.clipPath = `polygon(
+            0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
+            ${left}px ${top}px,
+            ${left}px ${bottom}px,
+            ${right}px ${bottom}px,
+            ${right}px ${top}px,
+            ${left}px ${top}px
+        )`;
+    }
+
+    // Turn ON Camera (Triggered by centered "Allow & Start Camera" or "Turn On Camera")
     async function turnOnCamera() {
         const video = document.getElementById('gpayVideo');
         const consentCard = document.getElementById('consentCard');
-        const viewfinder = document.getElementById('viewfinderWrapper');
-        const switchBtn = document.getElementById('btnSwitchCamera');
-        const powerBtn = document.getElementById('btnToggleCamera');
-        const powerText = document.getElementById('powerBtnText');
-        const powerIcon = document.getElementById('powerBtnIcon');
+        const centerStack = document.getElementById('scannerCenterStack');
+        const blurMask = document.getElementById('scannerBlurMask');
 
         stopCamera();
 
@@ -544,7 +557,7 @@
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 } catch (e3) {
-                    alert('Camera access denied or unavailable. Please enable camera permission in your browser.');
+                    alert('Camera access denied or unavailable. Please enable camera permission in your browser settings.');
                     return;
                 }
             }
@@ -558,7 +571,7 @@
             try {
                 await video.play();
             } catch (playErr) {
-                console.warn('Video play catch:', playErr);
+                console.warn('Video play caught:', playErr);
             }
 
             isCameraActive = true;
@@ -566,21 +579,18 @@
 
             // Reveal camera UI and hide consent screen
             consentCard.style.display = 'none';
-            viewfinder.style.display = 'flex';
-            powerBtn.style.display = 'inline-flex';
-            powerBtn.className = 'camera-power-btn power-off';
-            powerIcon.className = 'bi bi-camera-video-off';
-            powerText.innerText = 'Turn Off Camera';
+            centerStack.style.display = 'flex';
+            blurMask.style.display = 'block';
 
-            // Show Switch Camera button on mobile or multiple devices
-            switchBtn.style.display = 'flex';
+            // Calculate exact cutout for blur mask
+            requestAnimationFrame(updateBlurMaskPosition);
 
             startScanningLoop();
             startLaserAnimation();
         }
     }
 
-    // Turn OFF Camera
+    // Turn OFF Camera (Triggered by centered "Turn Off Camera")
     function turnOffCamera() {
         stopCamera();
         isCameraActive = false;
@@ -589,30 +599,18 @@
         if (video) video.srcObject = null;
 
         const consentCard = document.getElementById('consentCard');
-        const viewfinder = document.getElementById('viewfinderWrapper');
-        const switchBtn = document.getElementById('btnSwitchCamera');
-        const powerBtn = document.getElementById('btnToggleCamera');
-        const powerText = document.getElementById('powerBtnText');
-        const powerIcon = document.getElementById('powerBtnIcon');
+        const centerStack = document.getElementById('scannerCenterStack');
+        const blurMask = document.getElementById('scannerBlurMask');
 
-        if (viewfinder) viewfinder.style.display = 'none';
-        if (switchBtn) switchBtn.style.display = 'none';
-        if (consentCard) consentCard.style.display = 'flex';
-
-        if (powerBtn) {
-            powerBtn.style.display = 'inline-flex';
-            powerBtn.className = 'camera-power-btn power-on';
-            powerIcon.className = 'bi bi-camera-video';
-            powerText.innerText = 'Turn On Camera';
-        }
-    }
-
-    // Toggle Camera Power
-    function toggleCameraPower() {
-        if (isCameraActive) {
-            turnOffCamera();
-        } else {
-            turnOnCamera();
+        if (centerStack) centerStack.style.display = 'none';
+        if (blurMask) blurMask.style.display = 'none';
+        if (consentCard) {
+            consentCard.style.display = 'flex';
+            // Update button label to Turn On Camera when paused
+            const btn = consentCard.querySelector('button');
+            if (btn) {
+                btn.innerHTML = '<i class="bi bi-camera-video"></i><span>Turn On Camera</span>';
+            }
         }
     }
 
