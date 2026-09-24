@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light only">
-    <title>Entry Confirmed • Thank you for participating | {{ event.title }}</title>
+    <title>Entry Confirmed • Thank You for Your Participation | {{ event.title }}</title>
     
     <!-- Google Official Fonts: Plus Jakarta Sans, Roboto, Roboto Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,6 +94,17 @@
                 padding-left: 14px !important;
                 padding-right: 14px !important;
             }
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+                border-right: 0 !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+            }
+            .mobile-hide {
+                display: none !important;
+            }
         }
 
         /* Universal Light Mode Lock */
@@ -126,7 +137,7 @@
 </head>
 <body class="body force-white-bg" bgcolor="#ffffff" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; width: 100% !important; background-color: #ffffff !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
 
-    <!-- Outer Canvas Table (Pure White Background) -->
+    <!-- Outer Canvas Table (Pure White Background, Zero Letterboxing) -->
     <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; padding: 0 !important; border: 0 !important; background-color: #ffffff !important;">
         <tr>
             <td align="center" valign="top" bgcolor="#ffffff" style="padding: 12px 8px !important; margin: 0 !important; border: 0 !important; background-color: #ffffff !important;">
@@ -137,8 +148,8 @@
                 <td align="center" valign="top" width="600">
                 <![endif]-->
 
-                <!-- Responsive Ticket Card with Crisp Border -->
-                <table role="presentation" class="ticket-card force-white-bg" width="600" align="center" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; max-width: 600px !important; margin: 0 auto !important; padding: 0 !important; border: 1px solid #cbd5e1 !important; border-radius: 8px !important; overflow: hidden !important; background-color: #ffffff !important;">
+                <!-- Responsive Ticket Card with Crisp Black Outer Border -->
+                <table role="presentation" class="ticket-card force-white-bg" width="600" align="center" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; max-width: 600px !important; margin: 0 auto !important; padding: 0 !important; border: 1px solid #000000 !important; border-radius: 0 !important; overflow: hidden !important; background-color: #ffffff !important;">
 
                     <!-- 1. Top Visual Header Banner -->
                     <tr>
@@ -147,40 +158,55 @@
                         </td>
                     </tr>
 
-                    <!-- 2. Main Hero Banner ("Entry Confirmed! 🎉" + Mascot + Top Right QR Code) -->
+                    <!-- 2. Main Emerald Hero Banner ("Entry Confirmed! 🎉" + Security Badge + Top Right QR Box) -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#059669" style="background-color: #059669 !important; background-image: linear-gradient(to right, #10b981, #059669, #047857) !important; padding: 18px 20px; color: #ffffff; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#059669" cellpadding="0" cellspacing="0" border="0" class="hero-inner-table" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
+                        <td width="100%" align="center" bgcolor="#047857" style="background-color: #047857 !important; background-image: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%) !important; padding: 20px 22px; color: #ffffff; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#047857" cellpadding="0" cellspacing="0" border="0" class="hero-inner-table" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
                                 <tr>
                                     <!-- Left Title, Subtitle, and Confirmed Spot Badge -->
-                                    <td valign="middle" align="left" style="color: #ffffff; padding-right: 12px; border: 0 !important;">
-                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 21px; font-weight: 800; line-height: 1.2; color: #ffffff !important; letter-spacing: -0.3px; margin-bottom: 5px;">
+                                    <td valign="middle" align="left" style="color: #ffffff; padding-right: 14px; border: 0 !important;">
+                                        
+                                        <!-- Top Golden VIP Badge -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border: 0 !important; margin-bottom: 7px;">
+                                            <tr>
+                                                <td bgcolor="#f59e0b" style="background-color: #f59e0b !important; color: #ffffff !important; padding: 3px 8px; border-radius: 3px; font-family: 'Roboto Mono', monospace; font-size: 9.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;">
+                                                    ★ OFFICIAL ENTRY ADMITTED
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 23px; font-weight: 900; line-height: 1.15; color: #ffffff !important; letter-spacing: -0.4px; margin-bottom: 5px;">
                                             Entry Confirmed! 🎉
                                         </div>
-                                        <div style="font-family: 'Roboto', sans-serif; font-size: 12px; line-height: 1.4; color: #d1fae5 !important; margin-bottom: 12px;">
+                                        <div style="font-family: 'Roboto', sans-serif; font-size: 12px; line-height: 1.45; color: #d1fae5 !important; margin-bottom: 12px;">
                                             Thank you for your participation! Welcome to <strong>{{ event.title }}</strong>.
                                         </div>
                                         
-                                        <!-- Mascot Badge -->
+                                        <!-- Verified Spot Counter with Male/Female breakdown chip -->
                                         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border: 0 !important;">
                                             <tr>
-                                                <td bgcolor="#f59e0b" style="background-color: #f59e0b !important; color: #ffffff !important; width: 20px; height: 20px; text-align: center; font-size: 10px; font-weight: 900; line-height: 20px; border-radius: 4px; border: 1.5px solid #ffffff; font-family: 'Roboto', sans-serif;">
-                                                    ★
+                                                <td bgcolor="#10b981" style="background-color: #10b981 !important; color: #ffffff !important; width: 22px; height: 22px; text-align: center; font-size: 11px; font-weight: 900; line-height: 22px; border-radius: 4px; border: 1.5px solid #ffffff; font-family: 'Roboto', sans-serif;">
+                                                    ✓
                                                 </td>
-                                                <td class="font-mono nowrap" style="padding-left: 7px; font-size: 10.5px; font-weight: 700; color: #ffffff !important; letter-spacing: 0.5px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
-                                                    {{ ticket_count|default:1 }} SPOT{{ ticket_count|pluralize }} VERIFIED & ADMITTED
+                                                <td class="font-mono nowrap" style="padding-left: 8px; font-size: 11px; font-weight: 800; color: #ffffff !important; letter-spacing: 0.5px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
+                                                    {{ ticket_count|default:1 }} SPOT{{ ticket_count|pluralize }} VERIFIED
                                                 </td>
+                                                {% if male_count or female_count %}
+                                                <td class="font-mono nowrap" style="padding-left: 8px; font-size: 10px; font-weight: 700; color: #fef08a !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
+                                                    ({% if male_count %}{{ male_count }}M{% endif %}{% if male_count and female_count %} • {% endif %}{% if female_count %}{{ female_count }}F{% endif %})
+                                                </td>
+                                                {% endif %}
                                             </tr>
                                         </table>
                                     </td>
 
-                                    <!-- Right Prominent Square QR Box -->
-                                    <td width="115" valign="middle" align="right" style="width: 115px !important; text-align: right; border: 0 !important;">
-                                        <table role="presentation" bgcolor="#ffffff" class="email-white-box" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff !important; padding: 4px; border-radius: 8px; border: 1.5px solid #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.15); display: inline-block;">
+                                    <!-- Right Prominent Square QR Box with Gold Border -->
+                                    <td width="120" valign="middle" align="right" style="width: 120px !important; text-align: right; border: 0 !important;">
+                                        <table role="presentation" bgcolor="#ffffff" class="email-white-box" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff !important; padding: 5px; border-radius: 8px; border: 2px solid #fef08a; box-shadow: 0 4px 12px rgba(0,0,0,0.22); display: inline-block;">
                                             <tr>
-                                                <td align="center" bgcolor="#ffffff" style="background-color: #ffffff !important; padding: 2px;">
-                                                    <img src="{{ qr_src|default:'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PASS-CONFIRMED&margin=1' }}" alt="QR Ticket" width="88" height="88" style="width: 88px; height: 88px; display: block; margin: 0 auto; background-color: #ffffff !important;" />
-                                                    <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8.5px; font-weight: 800; color: #0f172a !important; margin-top: 3px; letter-spacing: 0.5px; text-align: center; white-space: nowrap;">
+                                                <td align="center" bgcolor="#ffffff" style="background-color: #ffffff !important; padding: 3px;">
+                                                    <img src="{{ qr_src|default:'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PASS-CONFIRMED&margin=1' }}" alt="Verified QR Ticket" width="90" height="90" style="width: 90px; height: 90px; display: block; margin: 0 auto; background-color: #ffffff !important;" />
+                                                    <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8.5px; font-weight: 800; color: #0f172a !important; margin-top: 4px; letter-spacing: 0.5px; text-align: center; white-space: nowrap;">
                                                         {{ attendee.pass_code|default:pass_code }}
                                                     </div>
                                                 </td>
@@ -194,35 +220,37 @@
 
                     <!-- 3. Dark Meta Info Strip (Flush Full Width) -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#1a2936" style="background-color: #1a2936 !important; background-image: linear-gradient(#1a2936, #1a2936) !important; color: #e2e8f0; padding: 10px 20px; font-size: 11px; font-weight: 500; font-family: 'Roboto', sans-serif; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#1a2936" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
+                        <td width="100%" align="center" bgcolor="#0f172a" style="background-color: #0f172a !important; background-image: linear-gradient(#0f172a, #0f172a) !important; color: #e2e8f0; padding: 11px 20px; font-size: 11px; font-weight: 500; font-family: 'Roboto', sans-serif; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#0f172a" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
                                 <tr>
                                     <td align="left" valign="middle" style="color: #cbd5e1 !important; font-size: 11px; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; padding-right: 8px;">
                                         <div class="nowrap" style="white-space: nowrap;">Date: <strong style="color: #ffffff !important;">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></div>
                                         <div class="nowrap" style="white-space: nowrap;">Time: <strong style="color: #ffffff !important;">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></div>
                                     </td>
                                     <td width="16" align="center" valign="middle" style="width: 16px !important; color: #475569 !important; font-size: 12px; border: 0; border-right: 1px solid #334155 !important;">&nbsp;</td>
-                                    <td align="right" valign="middle" style="color: #ffffff !important; font-size: 11px; font-weight: 700; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; text-align: right; padding-left: 8px;">{{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}</td>
+                                    <td align="right" valign="middle" style="color: #ffffff !important; font-size: 11px; font-weight: 700; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; text-align: right; padding-left: 8px;">
+                                        📍 {{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}
+                                    </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- 4. Delegate Greeting -->
+                    <!-- 4. Heartfelt Gratitude & Welcome Note -->
                     <tr>
-                        <td width="100%" align="left" bgcolor="#ffffff" class="content-side-pad" style="padding: 18px 20px 14px 20px; background-color: #ffffff !important; border: 0 !important;">
-                            <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 15px; font-weight: 800; color: #0f172a !important; margin-bottom: 3px; white-space: nowrap;">
+                        <td width="100%" align="left" bgcolor="#ffffff" class="content-side-pad" style="padding: 20px 22px 14px 22px; background-color: #ffffff !important; border: 0 !important;">
+                            <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 16px; font-weight: 800; color: #0f172a !important; margin-bottom: 5px; white-space: nowrap;">
                                 Hi {{ customer.name|title }},
                             </div>
-                            <div style="font-family: 'Roboto', sans-serif; font-size: 12.5px; color: #475569 !important; line-height: 1.5;">
-                                Thank you for your participation in the <strong>{{ event.title }}</strong>! Your presence has been verified at the entry gate. We are delighted to have you with us today. Here are your verified check-in details:
+                            <div style="font-family: 'Roboto', sans-serif; font-size: 12.5px; color: #334155 !important; line-height: 1.6;">
+                                Thank you for your valuable participation in <strong>{{ event.title }}</strong>! Your presence has been verified at the entry gate, and you and your co-attendees are officially admitted. We are truly delighted to have you with us today in the Nizhal family.
                             </div>
                         </td>
                     </tr>
 
-                    <!-- 5. Three Colorful Summary KPI Cards -->
+                    <!-- 5. Three Colorful Summary KPI Cards (Exact Brand Aesthetics) -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 0 0 16px 0 !important; margin: 0 !important; border: 0 !important;">
+                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 0 0 18px 0 !important; margin: 0 !important; border: 0 !important;">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; border: 0 !important; table-layout: fixed !important;">
                                 <tr>
                                     <!-- Card 1: Coral Red (Venue & Get Directions Button) -->
@@ -237,23 +265,31 @@
                                         </div>
                                     </td>
 
-                                    <!-- Card 2: Sky Blue (Tickets / Persons) -->
+                                    <!-- Card 2: Sky Blue (Tickets / Persons with Gender Chips) -->
                                     <td width="33%" valign="middle" align="center" bgcolor="#0084ff" style="background-color: #0084ff !important; background-image: linear-gradient(to bottom right, #1e90ff, #0084ff) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
                                         <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 26px; font-weight: 900; line-height: 1; color: #ffffff !important; text-align: center; margin: 0 auto; white-space: nowrap;">
                                             {{ ticket_count|default:1 }}
                                         </div>
-                                        <div class="nowrap" style="font-family: 'Roboto', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #ffffff !important; margin-top: 5px; line-height: 1.1; text-align: center; white-space: nowrap;">
+                                        <div class="nowrap" style="font-family: 'Roboto', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #ffffff !important; margin-top: 4px; line-height: 1.1; text-align: center; white-space: nowrap;">
                                             TICKETS / PERSONS
                                         </div>
+                                        {% if male_count or female_count %}
+                                        <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8.5px; font-weight: 700; color: #e0f2fe !important; margin-top: 3px; text-align: center; white-space: nowrap;">
+                                            {% if male_count %}{{ male_count }}M{% endif %}{% if male_count and female_count %} • {% endif %}{% if female_count %}{{ female_count }}F{% endif %}
+                                        </div>
+                                        {% endif %}
                                     </td>
 
-                                    <!-- Card 3: Emerald Green (Check-in Status) -->
+                                    <!-- Card 3: Emerald Green (Check-in Status & Admitted Badge) -->
                                     <td width="33%" valign="middle" align="center" bgcolor="#059669" style="background-color: #059669 !important; background-image: linear-gradient(to bottom right, #10b981, #059669) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
-                                        <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 22px; font-weight: 900; line-height: 1; color: #ffffff !important; text-align: center; margin: 0 auto; white-space: nowrap;">
-                                            CHECKED IN
+                                        <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 20px; font-weight: 900; line-height: 1; color: #ffffff !important; text-align: center; margin: 0 auto; white-space: nowrap;">
+                                            ADMITTED ✓
                                         </div>
                                         <div class="nowrap" style="font-family: 'Roboto', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #ffffff !important; margin-top: 5px; text-align: center; white-space: nowrap;">
-                                            ENTRY VERIFIED ✓
+                                            ENTRY VERIFIED
+                                        </div>
+                                        <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8px; font-weight: 600; color: #d1fae5 !important; margin-top: 3px; text-align: center; white-space: nowrap;">
+                                            NIZHAL GATEWAY
                                         </div>
                                     </td>
                                 </tr>
@@ -261,23 +297,23 @@
                         </td>
                     </tr>
 
-                    <!-- 6. BOOKING DETAILS (Clean Structured Box) -->
+                    <!-- 6. VERIFIED CHECK-IN DETAILS (Clean Structured Box) -->
                     <tr>
                         <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
                                 <tr>
-                                    <td colspan="2" bgcolor="#f1f5f9" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155 !important; text-transform: uppercase;">
-                                        <table role="presentation" width="100%" bgcolor="#f1f5f9" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important;">
+                                    <td colspan="2" bgcolor="#f8fafc" style="background-color: #f8fafc !important; padding: 10px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155 !important; text-transform: uppercase;">
+                                        <table role="presentation" width="100%" bgcolor="#f8fafc" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important;">
                                             <tr>
-                                                <td align="left" class="font-mono nowrap" style="font-weight: 800; color: #334155 !important; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
-                                                    VERIFIED CHECK-IN DETAILS
+                                                <td align="left" class="font-mono nowrap" style="font-weight: 800; color: #0f172a !important; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
+                                                    🛡️ VERIFIED CHECK-IN DETAILS
                                                 </td>
-                                                <td align="right" class="font-mono nowrap" style="color: #64748b !important; font-weight: 500; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
+                                                <td align="right" class="font-mono nowrap" style="color: #059669 !important; font-weight: 700; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
                                                     {% with code=attendee.pass_code|default:pass_code %}
                                                     {% if "ORD-" in code %}
-                                                        ORDER ID: <strong style="color: #0f172a !important;">{{ code }}</strong>
+                                                        ORDER: <strong style="color: #0f172a !important;">{{ code }}</strong>
                                                     {% else %}
-                                                        PASS ID: <strong style="color: #0f172a !important;">{{ code }}</strong>
+                                                        PASS: <strong style="color: #0f172a !important;">{{ code }}</strong>
                                                     {% endif %}
                                                     {% endwith %}
                                                 </td>
@@ -287,28 +323,28 @@
                                 </tr>
                                 <tr>
                                     <!-- Left Column -->
-                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 10px 14px; border-right: 1px solid #cbd5e1; background-color: #ffffff !important;">
+                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 12px 14px; border-right: 1px solid #cbd5e1; background-color: #ffffff !important;">
                                         <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px; font-family: 'Roboto', sans-serif;">
                                             <tr>
-                                                <td width="50" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Name:</td>
+                                                <td width="55" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Name:</td>
                                                 <td align="right" class="nowrap" bgcolor="#ffffff" style="font-weight: 700; color: #0f172a !important; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.name|title }}</td>
                                             </tr>
                                             <tr>
-                                                <td width="50" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Email:</td>
-                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; color: #1976d2 !important; font-size: 10px; font-weight: 600; padding: 3px 0; border: 0 !important; white-space: nowrap; text-decoration: underline;">{{ customer.email }}</td>
+                                                <td width="55" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Email:</td>
+                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; color: #0284c7 !important; font-size: 10px; font-weight: 600; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.email }}</td>
                                             </tr>
                                         </table>
                                     </td>
                                     <!-- Right Column -->
-                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 10px 14px; background-color: #ffffff !important;">
+                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 12px 14px; background-color: #ffffff !important;">
                                         <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px; font-family: 'Roboto', sans-serif;">
                                             <tr>
-                                                <td width="92" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Phone number:</td>
+                                                <td width="85" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Phone:</td>
                                                 <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; font-weight: 700; color: #0f172a !important; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.phone|default:"+91 9876543210" }}</td>
                                             </tr>
                                             <tr>
-                                                <td width="92" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Check-in time:</td>
-                                                <td align="right" class="nowrap" bgcolor="#ffffff" style="color: #059669 !important; font-weight: 700; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{% now "d F Y, h:i A" %} IST</td>
+                                                <td width="85" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Verified at:</td>
+                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="color: #059669 !important; font-weight: 800; font-size: 10.5px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{% now "d M Y, h:i A" %} IST</td>
                                             </tr>
                                         </table>
                                     </td>
@@ -317,116 +353,178 @@
                         </td>
                     </tr>
 
-                    <!-- 7. TICKET DETAILS (Clean Structured Table Box) -->
+                    <!-- 7. PARTICIPANTS LIST & GENDER BREAKDOWN (Elevated Table Box) -->
                     <tr>
                         <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
                                 <tr>
-                                    <td colspan="5" bgcolor="#f1f5f9" class="font-mono nowrap" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase; white-space: nowrap;">
-                                        PARTICIPANTS LIST ({{ ticket_count|default:1 }} SPOT{{ ticket_count|pluralize }})
-                                        {% if male_count or female_count %}
-                                        <span style="font-weight: 500; color: #64748b; font-size: 10px; margin-left: 8px;">
-                                            • {% if male_count %}{{ male_count }} Male{% endif %}{% if male_count and female_count %}, {% endif %}{% if female_count %}{{ female_count }} Female{% endif %}
-                                        </span>
-                                        {% endif %}
+                                    <td colspan="5" bgcolor="#f8fafc" style="background-color: #f8fafc !important; padding: 10px 14px; border-bottom: 1px solid #cbd5e1;">
+                                        <table role="presentation" width="100%" bgcolor="#f8fafc" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td align="left" class="font-mono nowrap" style="font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #0f172a !important; text-transform: uppercase; white-space: nowrap;">
+                                                    👥 PARTICIPANTS ROSTER ({{ ticket_count|default:1 }} SPOT{{ ticket_count|pluralize }})
+                                                </td>
+                                                <td align="right" class="nowrap" style="text-align: right; white-space: nowrap;">
+                                                    {% if male_count %}
+                                                    <span style="display: inline-block; background-color: #dbeafe; color: #1e40af; font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px; margin-right: 4px;">
+                                                        ♂ {{ male_count }} Male
+                                                    </span>
+                                                    {% endif %}
+                                                    {% if female_count %}
+                                                    <span style="display: inline-block; background-color: #fce7f3; color: #9d174d; font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 10px;">
+                                                        ♀ {{ female_count }} Female
+                                                    </span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
-                                <tr bgcolor="#1e293b" class="font-mono nowrap" style="background-color: #1e293b !important; color: #ffffff !important; font-size: 10px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
-                                    <th style="padding: 8px 12px; text-align: left; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Person Name</th>
-                                    <th width="45" style="width: 45px !important; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Age</th>
-                                    <th width="65" style="width: 65px !important; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Gender</th>
-                                    <th width="55" style="width: 55px !important; padding: 8px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Tickets</th>
-                                    <th width="90" style="width: 90px !important; padding: 8px 12px; text-align: right; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Status</th>
+                                <tr bgcolor="#0f172a" class="font-mono nowrap" style="background-color: #0f172a !important; color: #ffffff !important; font-size: 10px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
+                                    <th style="padding: 9px 12px; text-align: left; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Participant Name</th>
+                                    <th width="45" style="width: 45px !important; padding: 9px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Age</th>
+                                    <th width="70" style="width: 70px !important; padding: 9px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Gender</th>
+                                    <th width="50" style="width: 50px !important; padding: 9px 4px; text-align: center; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Spots</th>
+                                    <th width="90" style="width: 90px !important; padding: 9px 12px; text-align: right; font-weight: 700; color: #ffffff !important; border: 0 !important; white-space: nowrap;">Entry</th>
                                 </tr>
                                 {% if attendee_list %}
                                     {% for person in attendee_list %}
-                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #1e293b !important; white-space: nowrap;">
-                                        <td bgcolor="#ffffff" style="padding: 8px 12px; font-weight: 700; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; white-space: nowrap;">{{ person.name }}</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">{{ person.age|default:"-" }}</td>
-                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 8px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; white-space: nowrap;">{{ person.gender|title|default:"-" }}</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">1</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 12px; text-align: right; font-weight: 700; color: #059669 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
+                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #f1f5f9; font-size: 11px; color: #1e293b !important; white-space: nowrap;">
+                                        <td bgcolor="#ffffff" style="padding: 9px 12px; font-weight: 700; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">
+                                            {{ person.name }}
+                                        </td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
+                                            {{ person.age|default:"-" }}
+                                        </td>
+                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 9px 4px; text-align: center; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">
+                                            {% if "male" in person.gender|lower and "female" not in person.gender|lower %}
+                                                <span style="display: inline-block; background-color: #eff6ff; color: #2563eb; font-weight: 700; font-size: 10px; padding: 1px 6px; border-radius: 4px;">Male</span>
+                                            {% elif "female" in person.gender|lower %}
+                                                <span style="display: inline-block; background-color: #fdf2f8; color: #db2777; font-weight: 700; font-size: 10px; padding: 1px 6px; border-radius: 4px;">Female</span>
+                                            {% else %}
+                                                <span style="color: #64748b;">{{ person.gender|title|default:"-" }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
+                                            1
+                                        </td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 12px; text-align: right; font-weight: 800; color: #059669 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
                                             ADMITTED ✓
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #e2e8f0; font-size: 11px; color: #1e293b !important; white-space: nowrap;">
-                                        <td bgcolor="#ffffff" style="padding: 8px 12px; font-weight: 700; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; white-space: nowrap;">{{ customer.name|title }} (Primary)</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">-</td>
-                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 8px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; white-space: nowrap;">-</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">1</td>
-                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 8px 12px; text-align: right; font-weight: 700; color: #059669 !important; border: 0 !important; border-bottom: 1px solid #e2e8f0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
+                                    <tr bgcolor="#ffffff" class="nowrap" style="border-bottom: 1px solid #f1f5f9; font-size: 11px; color: #1e293b !important; white-space: nowrap;">
+                                        <td bgcolor="#ffffff" style="padding: 9px 12px; font-weight: 700; color: #0f172a !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">
+                                            {{ customer.name|title }} (Primary)
+                                        </td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">-</td>
+                                        <td bgcolor="#ffffff" class="nowrap" style="padding: 9px 4px; text-align: center; color: #475569 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; white-space: nowrap;">-</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 4px; text-align: center; color: #334155 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">1</td>
+                                        <td bgcolor="#ffffff" class="font-mono nowrap" style="padding: 9px 12px; text-align: right; font-weight: 800; color: #059669 !important; border: 0 !important; border-bottom: 1px solid #f1f5f9 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
                                             ADMITTED ✓
                                         </td>
                                     </tr>
                                 {% endif %}
-                                <tr bgcolor="#f1f5f9" class="nowrap" style="background-color: #f1f5f9 !important; font-weight: 700; border-top: 2px solid #cbd5e1 !important; white-space: nowrap;">
-                                    <td colspan="4" class="font-display nowrap" style="padding: 9px 12px; color: #0f172a !important; font-size: 11.5px; border: 0 !important; font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;">
-                                        Total Spots Checked In
+                                <tr bgcolor="#f8fafc" class="nowrap" style="background-color: #f8fafc !important; font-weight: 700; border-top: 2px solid #cbd5e1 !important; white-space: nowrap;">
+                                    <td colspan="3" class="font-display nowrap" style="padding: 10px 12px; color: #0f172a !important; font-size: 12px; border: 0 !important; font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;">
+                                        Total Confirmed Attendance
                                     </td>
-                                    <td class="font-mono nowrap" style="padding: 9px 12px; text-align: right; font-size: 13px; color: #059669 !important; font-weight: 900; border: 0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                        {{ ticket_count|default:1 }} Spot{{ ticket_count|pluralize }}
+                                    <td class="font-mono nowrap" style="padding: 10px 4px; text-align: center; font-size: 12px; color: #0f172a !important; font-weight: 800; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
+                                        {{ ticket_count|default:1 }}
+                                    </td>
+                                    <td class="font-mono nowrap" style="padding: 10px 12px; text-align: right; font-size: 12px; color: #059669 !important; font-weight: 900; border: 0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
+                                        VERIFIED ✓
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- 8. IMPORTANT INFORMATION (Clean Structured Box) -->
+                    <!-- 8. VALUABLE COMMUNITY & SOUVENIR NOTE (Warmth & Gratitude Card) -->
                     <tr>
                         <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background-color: #ffffff !important;">
+                            <table role="presentation" width="100%" bgcolor="#f0fdf4" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1.5px solid #86efac; border-radius: 6px; overflow: hidden; background-color: #f0fdf4 !important;">
                                 <tr>
-                                    <td bgcolor="#f1f5f9" class="font-mono nowrap" style="background-color: #f1f5f9 !important; padding: 8px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase; white-space: nowrap;">
+                                    <td style="padding: 14px 16px; font-family: 'Roboto', sans-serif; font-size: 12px; color: #166534 !important; line-height: 1.55;">
+                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 13px; color: #14532d !important; margin-bottom: 4px;">
+                                            🌟 A Heartfelt Thank You from Nizhal
+                                        </div>
+                                        <div>
+                                            Every member like you makes our circle warmer and more vibrant. We hope this session brings you valuable connections, inspiring learnings, and unforgettable memories. Welcome to the Nizhal experience!
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- 9. IMPORTANT INFORMATION & CONCIERGE (Clean Structured Box) -->
+                    <tr>
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 18px 20px; background-color: #ffffff !important; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important;">
+                                <tr>
+                                    <td bgcolor="#f8fafc" class="font-mono nowrap" style="background-color: #f8fafc !important; padding: 10px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #1e293b !important; text-transform: uppercase; white-space: nowrap;">
                                         ℹ️ EVENT COORDINATORS & UPDATES
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td bgcolor="#ffffff" style="padding: 12px 14px; font-size: 11.5px; color: #334155 !important; line-height: 1.55; background-color: #ffffff !important; border: 0 !important; font-family: 'Roboto', sans-serif;">
-                                        <ul style="margin: 0; padding-left: 16px;">
-                                            <li style="margin-bottom: 6px;">
-                                                Join our official 
-                                                <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" style="color: #15803d !important; font-weight: 700; text-decoration: underline;">WhatsApp Community</a>
-                                                for real-time event updates and announcements.
-                                            </li>
-                                            <li style="margin-bottom: 6px;">
-                                                Follow our official 
-                                                <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #db2777 !important; font-weight: 700; text-decoration: underline;">Instagram Page</a>
-                                                for event photos, highlights, and updates.
-                                            </li>
-                                            <li>
-                                                On-ground event coordinators:
-                                                <span class="nowrap" style="white-space: nowrap; display: inline-block; margin-top: 3px;">
-                                                    <a href="tel:9944488286" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Priyadharshini (9944488286)</a> / 
-                                                    <a href="tel:9003429590" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanya (9003429590)</a> / 
-                                                    <a href="tel:9042674924" class="nowrap" style="color: #1976d2 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanaa (9042674924)</a>
-                                                </span>
-                                            </li>
-                                        </ul>
+                                    <td bgcolor="#ffffff" style="padding: 14px 16px; font-size: 11.5px; color: #334155 !important; line-height: 1.6; background-color: #ffffff !important; border: 0 !important; font-family: 'Roboto', sans-serif;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important;">
+                                            <!-- WhatsApp Group -->
+                                            <tr>
+                                                <td width="22" valign="top" style="padding-bottom: 10px; font-size: 14px; border: 0 !important;">💬</td>
+                                                <td valign="top" style="padding-bottom: 10px; border: 0 !important;">
+                                                    Join our official 
+                                                    <a href="https://chat.whatsapp.com/DjwhofsCU4M0WAXNTLBzLl" target="_blank" style="color: #15803d !important; font-weight: 700; text-decoration: underline;">WhatsApp Community</a>
+                                                    for live schedule updates, announcements, and delegate networking.
+                                                </td>
+                                            </tr>
+                                            <!-- Instagram Page -->
+                                            <tr>
+                                                <td width="22" valign="top" style="padding-bottom: 10px; font-size: 14px; border: 0 !important;">📸</td>
+                                                <td valign="top" style="padding-bottom: 10px; border: 0 !important;">
+                                                    Follow our official 
+                                                    <a href="https://www.instagram.com/nizhal.community/" target="_blank" style="color: #db2777 !important; font-weight: 700; text-decoration: underline;">Instagram (@nizhal.community)</a>
+                                                    for event photos, reels, and speaker spotlights.
+                                                </td>
+                                            </tr>
+                                            <!-- Coordinators -->
+                                            <tr>
+                                                <td width="22" valign="top" style="font-size: 14px; border: 0 !important;">📞</td>
+                                                <td valign="top" style="border: 0 !important;">
+                                                    On-ground event coordinators:
+                                                    <div style="margin-top: 4px;">
+                                                        <a href="tel:9944488286" class="nowrap" style="color: #0284c7 !important; font-weight: 700; text-decoration: underline; white-space: nowrap; margin-right: 8px;">Priyadharshini (9944488286)</a>
+                                                        <a href="tel:9003429590" class="nowrap" style="color: #0284c7 !important; font-weight: 700; text-decoration: underline; white-space: nowrap; margin-right: 8px;">Lakshanya (9003429590)</a>
+                                                        <a href="tel:9042674924" class="nowrap" style="color: #0284c7 !important; font-weight: 700; text-decoration: underline; white-space: nowrap;">Lakshanaa (9042674924)</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- 9. "ENJOY THE EVENT!" Pill Badge -->
+                    <!-- 10. "ENJOY THE EVENT!" Pill Badge -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 4px 20px 16px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
-                            <span class="font-display nowrap" style="background-color: #059669 !important; color: #ffffff !important; padding: 7px 28px; font-size: 11.5px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 20px; display: inline-block; font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;">
-                                ENJOY THE EVENT!
+                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 4px 20px 20px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
+                            <span class="font-display nowrap" style="background-color: #047857 !important; background-image: linear-gradient(to right, #059669, #047857) !important; color: #ffffff !important; padding: 9px 32px; font-size: 12px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-radius: 24px; display: inline-block; font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap; box-shadow: 0 2px 6px rgba(4,120,87,0.3);">
+                                ✨ ENJOY THE EVENT! ✨
                             </span>
                         </td>
                     </tr>
 
-                    <!-- 10. Brand Footer Bar -->
+                    <!-- 11. Brand Footer Bar -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 20px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important;">
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 22px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
+                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important;">
                                 <tr>
                                     <td align="left" class="nowrap" bgcolor="#ffffff" style="white-space: nowrap; padding-top: 8px; border: 0 !important;">
                                         <a href="https://nizhalcommunity.in/register/{{ event.slug }}/" target="_blank" style="text-decoration: none; color: #0f172a !important;">
-                                            <strong class="font-display" style="font-size: 12px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', sans-serif;">Nizhal</strong>
+                                            <strong class="font-display" style="font-size: 12.5px; color: #0f172a !important; font-family: 'Plus Jakarta Sans', sans-serif;">Nizhal</strong>
                                             <span style="font-size: 11px; color: #64748b !important;">| The Circle of Warmth</span>
                                         </a>
                                     </td>
