@@ -48,6 +48,11 @@ class Event(models.Model):
         return f"{self.title} ({self.event_code})"
 
     @property
+    def start_time(self):
+        """Compatibility property returning event_start_date."""
+        return self.event_start_date
+
+    @property
     def public_register_url(self):
         """Returns the customer-side registration URL (https://nizhalcommunity.in/register/<slug>/)."""
         from django.conf import settings

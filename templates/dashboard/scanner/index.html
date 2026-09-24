@@ -25,7 +25,7 @@
                 <option value="">All Events (Auto-Detect)</option>
                 {% for ev in events %}
                 <option value="{{ ev.id }}" {% if selected_event and selected_event.id == ev.id %}selected{% endif %}>
-                    {{ ev.title }} ({{ ev.start_time|date:"d M Y"|default:"Upcoming" }})
+                    {{ ev.title }} ({{ ev.event_start_date|default:ev.start_time|date:"d M Y"|default:"Upcoming" }})
                 </option>
                 {% endfor %}
             </select>

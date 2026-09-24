@@ -137,7 +137,7 @@ def scanner_page_view(request):
     Renders the dedicated QR Scanner & Check-in Verification console.
     """
     tenant = get_current_tenant(request)
-    events = Event.objects.filter(tenant=tenant).order_by('-start_time')
+    events = Event.objects.filter(tenant=tenant).order_by('-event_start_date', '-created_at')
     
     selected_event_id = request.GET.get('event_id')
     selected_event = None
@@ -277,7 +277,7 @@ def scanner_verify_api(request):
             'checked_in_at': checkin_timestamp_str,
             'code': attendee.pass_code,
             'event_title': event.title,
-            'event_date': event.start_time.strftime('%d %b %Y, %I:%M %p') if event.start_time else 'TBD',
+            'event_date': event.event_start_date.strftime('%d %b %Y, %I:%M %p') if event.event_start_date else 'TBD',
             'event_venue': event.venue or 'TBD',
             'customer_name': customer.name,
             'customer_email': customer.email,
@@ -335,7 +335,7 @@ def scanner_verify_api(request):
         'checked_in_at': local_now_str,
         'code': attendee.pass_code,
         'event_title': event.title,
-        'event_date': event.start_time.strftime('%d %b %Y, %I:%M %p') if event.start_time else 'TBD',
+        'event_date': event.event_start_date.strftime('%d %b %Y, %I:%M %p') if event.event_start_date else 'TBD',
         'event_venue': event.venue or 'TBD',
         'customer_name': customer.name,
         'customer_email': customer.email,
