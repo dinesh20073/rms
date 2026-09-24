@@ -278,8 +278,8 @@
 
             <!-- Right Topbar Controls: NO LOGOUT (Logout only in sidebar) -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                <!-- QR Scanner Quick Shortcut -->
-                <a href="{% url 'dashboard-scanner' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#0f9d58] text-white hover:bg-[#0b8043] transition shadow-2xs cursor-pointer select-none" style="border-radius: 0px !important;" title="Open Ticket QR Scanner">
+                <!-- QR Scanner Quick Shortcut (Mobile Only) -->
+                <a href="{% url 'dashboard-scanner' %}" class="inline-flex lg:hidden items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-[#0f9d58] text-white hover:bg-[#0b8043] transition shadow-2xs cursor-pointer select-none" style="border-radius: 0px !important;" title="Open Ticket QR Scanner">
                     <i class="bi bi-qr-code-scan text-xs"></i>
                     <span>Scanner</span>
                 </a>
@@ -319,11 +319,6 @@
                 <!-- 4. Payments -->
                 <a href="{% url 'dashboard-verification-queue' %}" class="pc-sidebar-link {% if 'verification' in request.resolver_match.url_name %}active{% endif %}" title="Payments & Verification">
                     <i class="bi bi-credit-card"></i>
-                </a>
-
-                <!-- 5. Scanner & Check-in -->
-                <a href="{% url 'dashboard-scanner' %}" class="pc-sidebar-link {% if 'scanner' in request.resolver_match.url_name %}active{% endif %}" title="Ticket QR Scanner & Check-in">
-                    <i class="bi bi-qr-code-scan"></i>
                 </a>
 
                 <!-- 6. Emails -->

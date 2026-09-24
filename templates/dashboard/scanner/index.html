@@ -4,357 +4,340 @@
 {% block header_title %}Ticket Scanner{% endblock %}
 
 {% block extra_head %}
-<!-- HTML5-QRCode: High-reliability QR scanning engine -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<!-- High-reliability QR scanning library -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
-    /* Styling adjustments for html5-qrcode video viewport */
-    #qrReader video {
-        width: 100% !important;
-        height: auto !important;
-        max-height: 380px !important;
-        object-fit: cover !important;
-        border-radius: 12px !important;
+    /* Google Pay 4-Color Corner Brackets */
+    .gpay-corner {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        border-style: solid;
+        pointer-events: none;
     }
-    #qrReader {
-        border: none !important;
+    .gpay-corner-tl {
+        top: 0;
+        left: 0;
+        border-width: 5px 0 0 5px;
+        border-color: #ea4335; /* Google Red */
+        border-top-left-radius: 24px;
     }
-    #qrReader__scan_region {
-        border-radius: 12px;
-        overflow: hidden;
+    .gpay-corner-tr {
+        top: 0;
+        right: 0;
+        border-width: 5px 5px 0 0;
+        border-color: #fbbc04; /* Google Yellow */
+        border-top-right-radius: 24px;
     }
-    #qrReader__dashboard {
-        display: none !important;
+    .gpay-corner-bl {
+        bottom: 0;
+        left: 0;
+        border-width: 0 0 5px 5px;
+        border-color: #4285f4; /* Google Blue */
+        border-bottom-left-radius: 24px;
+    }
+    .gpay-corner-br {
+        bottom: 0;
+        right: 0;
+        border-width: 0 5px 0 0; /* Wait: bottom and right! */
+        border-width: 0 5px 5px 0;
+        border-color: #34a853; /* Google Green */
+        border-bottom-right-radius: 24px;
+    }
+
+    /* Slide-up bottom sheet animation */
+    @keyframes slideUpSheet {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+    .animate-sheet-up {
+        animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="p-3 sm:p-6 max-w-[1400px] w-full mx-auto flex flex-col space-y-4">
 
-    <!-- 1. Header Bar: Title & Event Selector -->
-    <div class="bg-white border border-[#dadce0] rounded-xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0">
-                <i class="bi bi-qr-code-scan text-xl"></i>
-            </div>
-            <div>
-                <h1 class="text-lg sm:text-xl font-display font-bold text-[#202124] flex items-center gap-2">
-                    <span>Ticket Scanner & Check-in</span>
-                    <span id="cameraStatusBadge" class="text-xs px-2 py-0.5 rounded-full font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                        Live Scanner
-                    </span>
-                </h1>
-                <p class="text-xs text-[#5f6368]">Scan attendee ticket QR code or enter Pass ID to admit entry</p>
-            </div>
+<!-- ========================================================================= -->
+<!-- 1. PC / DESKTOP VIEW (Visible ONLY on Desktop screens >= 768px / md:flex) -->
+<!-- ========================================================================= -->
+<div id="pcOnlyWrapper" class="hidden md:flex flex-col items-center justify-center py-10 px-4 min-h-[calc(100vh-140px)]">
+    <div class="bg-white border border-[#dadce0] rounded-2xl p-8 max-w-md w-full text-center shadow-sm">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4 border border-emerald-100">
+            <i class="bi bi-phone"></i>
+        </div>
+        <h2 class="text-xl font-display font-extrabold text-[#202124] mb-2">Mobile Scanner Only</h2>
+        <p class="text-xs text-[#5f6368] mb-6 leading-relaxed">
+            The Ticket Scanner is optimized exclusively for mobile devices with a camera. Scan the QR code below with your phone to open the scanner immediately.
+        </p>
+
+        <!-- QR Code Linking Directly to Scanner on Mobile -->
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 inline-block mb-6">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.admin.nizhalcommunity.in/dashboard/scanner/" 
+                 alt="Scan with phone" 
+                 class="w-40 h-40 rounded-lg mx-auto bg-white p-1" />
+            <div class="text-[11px] font-mono text-gray-500 mt-2 font-semibold">Point phone camera to open</div>
         </div>
 
-        <!-- Event Filter Dropdown -->
-        <div class="w-full sm:w-auto flex items-center gap-2">
-            <label for="eventSelector" class="text-xs font-medium text-[#5f6368] whitespace-nowrap">Filter Event:</label>
-            <select id="eventSelector" onchange="onEventChange()" class="w-full sm:w-auto py-2 px-3 bg-white border border-[#dadce0] text-xs font-semibold text-[#202124] rounded-lg focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600">
-                <option value="">All Events (Auto-Detect)</option>
-                {% for ev in events %}
-                <option value="{{ ev.id }}" {% if selected_event and selected_event.id == ev.id %}selected{% endif %}>
-                    {{ ev.title }} ({{ ev.event_start_date|default:ev.start_time|date:"d M Y"|default:"Upcoming" }})
-                </option>
-                {% endfor %}
-            </select>
+        <div class="flex flex-col gap-2">
+            <a href="{% url 'dashboard-overview' %}" class="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-[#3c4043] font-bold text-xs rounded-xl transition">
+                Return to Overview
+            </a>
+            <!-- Optional override to test webcam on desktop -->
+            <button type="button" onclick="enablePcScannerOverride()" class="text-[11px] text-emerald-700 hover:underline pt-2">
+                Continue anyway on PC (using webcam)
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- 2. MOBILE VIEW (Full-Screen Google Pay Style Scanner UI)                   -->
+<!-- ========================================================================= -->
+<div id="mobileScannerWrapper" class="fixed inset-0 z-50 bg-black text-white flex flex-col justify-between overflow-hidden select-none">
+
+    <!-- Background Camera Video Feed -->
+    <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="absolute inset-0 w-full h-full object-cover"></video>
+    <canvas id="gpayCanvas" class="hidden"></canvas>
+
+    <!-- Top Navigation HUD Bar (Exact Google Pay Header) -->
+    <div class="relative z-20 pt-safe px-4 pt-3 pb-2 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+        <!-- Close Button (X) -->
+        <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-2xl" title="Close Scanner">
+            <i class="bi bi-x-lg"></i>
+        </a>
+
+        <!-- Right Quick Actions: Torch, QR / Event, Three-Dots Menu -->
+        <div class="flex items-center gap-2">
+            <!-- Flashlight / Torch Toggle -->
+            <button type="button" onclick="toggleTorch()" id="btnTorch" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-xl" title="Flashlight">
+                <i class="bi bi-lightning-charge" id="torchIcon"></i>
+            </button>
+
+            <!-- Event Selector Modal Button -->
+            <button type="button" onclick="openEventPickerModal()" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-xl" title="Filter Event">
+                <i class="bi bi-qr-code"></i>
+            </button>
+
+            <!-- Three-Dots Menu (Live Stats & Options) -->
+            <button type="button" onclick="toggleOptionsMenu()" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-2xl" title="Options">
+                <i class="bi bi-three-dots-vertical"></i>
+            </button>
         </div>
     </div>
 
-    <!-- 2. KPI Metrics Grid (Google-Style) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-        <!-- Checked In -->
-        <div class="bg-white border border-[#dadce0] rounded-xl p-3 sm:p-4 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-[#5f6368] text-[11px] font-semibold uppercase tracking-wider mb-1">
-                <span>Checked In</span>
-                <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <i class="bi bi-check-circle-fill text-sm"></i>
-                </div>
-            </div>
-            <div>
-                <div class="text-2xl sm:text-3xl font-bold font-display text-emerald-700" id="statCheckedIn">0</div>
-                <div class="text-[11px] text-[#5f6368] mt-1" id="statRegistered">of 0 registered</div>
-            </div>
+    <!-- Center Viewfinder: Google Pay 4-Colored Corner Brackets -->
+    <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
+        
+        <!-- Target Scanner Box -->
+        <div id="targetBox" class="relative w-[270px] h-[270px] max-w-[76vw] max-h-[76vw] aspect-square flex items-center justify-center">
+            
+            <!-- 4 Distinct Google Brand Color Rounded Corners -->
+            <!-- 1. Top-Left: Red -->
+            <div class="gpay-corner gpay-corner-tl"></div>
+            <!-- 2. Top-Right: Yellow -->
+            <div class="gpay-corner gpay-corner-tr"></div>
+            <!-- 3. Bottom-Left: Blue -->
+            <div class="gpay-corner gpay-corner-bl"></div>
+            <!-- 4. Bottom-Right: Green -->
+            <div class="gpay-corner gpay-corner-br"></div>
+
+            <!-- Subtle Scanning Laser / Pulse Line -->
+            <div id="scanLaser" class="absolute inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-[#4285f4] to-transparent opacity-75"></div>
         </div>
 
-        <!-- Total Spots -->
-        <div class="bg-white border border-[#dadce0] rounded-xl p-3 sm:p-4 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-[#5f6368] text-[11px] font-semibold uppercase tracking-wider mb-1">
-                <span>Total Spots</span>
-                <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <i class="bi bi-ticket-perforated-fill text-sm"></i>
-                </div>
+        <!-- "Upload from gallery" White Pill Button (Exact GPay Placement) -->
+        <button type="button" onclick="document.getElementById('galleryFileInput').click()" class="mt-8 px-6 py-3 bg-white text-[#1f2937] font-semibold text-xs sm:text-sm rounded-full shadow-2xl flex items-center gap-2.5 active:scale-95 transition cursor-pointer hover:bg-gray-100">
+            <i class="bi bi-image text-base text-gray-700"></i>
+            <span>Upload from gallery</span>
+        </button>
+        <input type="file" id="galleryFileInput" accept="image/*" class="hidden" onchange="handleGalleryScan(event)">
+
+        <!-- Tap to Start Permission Overlay (Appears only if browser blocked auto-start) -->
+        <div id="startCameraPrompt" class="hidden absolute inset-0 z-30 bg-black/90 flex flex-col items-center justify-center p-6 text-center">
+            <div class="w-16 h-16 rounded-full bg-emerald-600 text-white flex items-center justify-center text-3xl mb-4 shadow-xl">
+                <i class="bi bi-camera"></i>
             </div>
-            <div>
-                <div class="text-2xl sm:text-3xl font-bold font-display text-blue-700" id="statTickets">0</div>
-                <div class="text-[11px] text-[#5f6368] mt-1">Total attendee spots verified</div>
-            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Camera Permission</h3>
+            <p class="text-xs text-gray-300 max-w-xs mb-6">Tap below to grant camera access and begin scanning ticket QR codes.</p>
+            <button type="button" onclick="startCameraDirectly()" class="py-3 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-full shadow-lg transition active:scale-95">
+                Tap to Start Camera
+            </button>
         </div>
 
-        <!-- Male -->
-        <div class="bg-white border border-[#dadce0] rounded-xl p-3 sm:p-4 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-[#5f6368] text-[11px] font-semibold uppercase tracking-wider mb-1">
-                <span>Male</span>
-                <div class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
-                    <i class="bi bi-gender-male text-sm"></i>
-                </div>
-            </div>
-            <div>
-                <div class="text-2xl sm:text-3xl font-bold font-display text-sky-700" id="statMale">0</div>
-                <div class="text-[11px] text-[#5f6368] mt-1">Male attendees admitted</div>
-            </div>
-        </div>
-
-        <!-- Female -->
-        <div class="bg-white border border-[#dadce0] rounded-xl p-3 sm:p-4 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-[#5f6368] text-[11px] font-semibold uppercase tracking-wider mb-1">
-                <span>Female</span>
-                <div class="w-7 h-7 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
-                    <i class="bi bi-gender-female text-sm"></i>
-                </div>
-            </div>
-            <div>
-                <div class="text-2xl sm:text-3xl font-bold font-display text-pink-700" id="statFemale">0</div>
-                <div class="text-[11px] text-[#5f6368] mt-1">Female attendees admitted</div>
-            </div>
-        </div>
     </div>
 
-    <!-- 3. Main Scanner & Result Section (2 Columns on Desktop) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-
-        <!-- Left Column: Camera Viewfinder & Manual Input (7 Cols) -->
-        <div class="lg:col-span-6 flex flex-col space-y-4">
-            
-            <!-- Camera Card -->
-            <div class="bg-white border border-[#dadce0] rounded-xl shadow-sm p-4 sm:p-5 flex flex-col">
-                <div class="flex items-center justify-between pb-3 mb-3 border-b border-[#f1f3f4]">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <h2 class="text-sm font-bold text-[#202124]">Camera Viewport</h2>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <!-- Switch Camera Button -->
-                        <button type="button" onclick="flipCamera()" class="py-1 px-2.5 bg-gray-100 hover:bg-gray-200 text-[#3c4043] rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="Switch Camera">
-                            <i class="bi bi-camera-reverse"></i>
-                            <span class="hidden sm:inline">Flip</span>
-                        </button>
-                        <!-- Upload QR from Gallery -->
-                        <button type="button" onclick="document.getElementById('galleryInput').click()" class="py-1 px-2.5 bg-gray-100 hover:bg-gray-200 text-[#3c4043] rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="Upload QR Image">
-                            <i class="bi bi-image"></i>
-                            <span class="hidden sm:inline">Upload Image</span>
-                        </button>
-                        <input type="file" id="galleryInput" accept="image/*" class="hidden" onchange="handleFileScan(event)">
-                    </div>
-                </div>
-
-                <!-- Video / QR Reader Container -->
-                <div class="relative w-full rounded-xl overflow-hidden bg-gray-900 border border-gray-200 min-h-[300px] flex items-center justify-center">
-                    <div id="qrReader" class="w-full"></div>
-
-                    <!-- Tap to Start Overlay (if browser blocks auto-start) -->
-                    <div id="startOverlay" class="hidden absolute inset-0 bg-gray-900/90 flex flex-col items-center justify-center p-6 text-center z-10">
-                        <div class="w-14 h-14 rounded-full bg-emerald-600 text-white flex items-center justify-center text-2xl mb-3 shadow-lg">
-                            <i class="bi bi-camera-video"></i>
-                        </div>
-                        <h3 class="text-base font-bold text-white mb-1">Camera Permission Required</h3>
-                        <p class="text-xs text-gray-300 max-w-xs mb-4">Tap the button below to activate your camera for ticket scanning.</p>
-                        <button type="button" onclick="initScanner()" class="py-2.5 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-md flex items-center gap-2">
-                            <i class="bi bi-camera"></i>
-                            <span>Start Camera</span>
-                        </button>
-                    </div>
-
-                    <!-- Scanning Guide Border Line -->
-                    <div id="scanningGuide" class="pointer-events-none absolute inset-x-8 inset-y-12 border-2 border-emerald-400/60 rounded-xl flex items-center justify-center">
-                        <div class="text-[11px] font-semibold text-white/80 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
-                            Align Ticket QR Code Here
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Manual Pass Code Input Box -->
-                <div class="mt-4 pt-4 border-t border-[#f1f3f4]">
-                    <label class="block text-xs font-bold text-[#3c4043] mb-1.5">Manual Entry (Pass ID or Order Code):</label>
-                    <form onsubmit="handleManualSubmit(event)" class="flex gap-2">
-                        <div class="relative flex-1">
-                            <i class="bi bi-ticket-perforated absolute left-3 top-2.5 text-gray-400"></i>
-                            <input type="text" id="manualCodeInput" placeholder="e.g. PASS-34FF1F4036 or ORD-BC5253ED" class="w-full pl-9 pr-3 py-2 bg-gray-50 border border-[#dadce0] rounded-lg text-xs font-mono font-semibold text-[#202124] focus:outline-none focus:border-emerald-600 focus:bg-white uppercase">
-                        </div>
-                        <button type="submit" id="btnManualVerify" class="py-2 px-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-                            <span>Verify Ticket</span>
-                            <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-
+    <!-- Bottom Spacing / Status -->
+    <div class="relative z-20 pb-safe px-6 pb-6 text-center">
+        <div id="activeEventIndicator" class="text-[11px] font-medium text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full inline-block">
+            Scanning for: <strong class="text-white">All Events (Auto-Detect)</strong>
         </div>
-
-        <!-- Right Column: Verification Result & Recent Activity (5 Cols) -->
-        <div class="lg:col-span-6 flex flex-col space-y-4">
-            
-            <!-- Live Verification Status Card -->
-            <div id="resultCard" class="bg-white border border-[#dadce0] rounded-xl shadow-sm p-5 transition-all">
-                
-                <!-- State 1: Ready / Idle (Default) -->
-                <div id="stateIdle" class="py-12 flex flex-col items-center justify-center text-center">
-                    <div class="w-16 h-16 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center text-3xl mb-3">
-                        <i class="bi bi-qr-code-scan"></i>
-                    </div>
-                    <h3 class="text-base font-bold text-[#202124] mb-1">Ready to Verify</h3>
-                    <p class="text-xs text-[#5f6368] max-w-sm">Point the camera at an attendee's QR pass or type their Pass ID on the left to verify entry.</p>
-                </div>
-
-                <!-- State 2: Valid Ticket Admitted (Success) -->
-                <div id="stateSuccess" class="hidden">
-                    <div class="flex items-center justify-between pb-3 border-b border-emerald-200 mb-4">
-                        <div class="flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">✓</span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-800">ENTRY ADMITTED</span>
-                        </div>
-                        <span id="resPassCode" class="text-xs font-mono font-bold text-emerald-900 bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-300">PASS-XXXX</span>
-                    </div>
-
-                    <!-- Attendee Name & Event -->
-                    <div class="mb-4">
-                        <h2 id="resAttendeeName" class="text-2xl font-display font-extrabold text-[#202124]">Attendee Name</h2>
-                        <p id="resEventTitle" class="text-xs font-semibold text-emerald-700 mt-0.5">Event Title</p>
-                    </div>
-
-                    <!-- Spot Count & Gender Pills -->
-                    <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 mb-4 flex flex-wrap items-center gap-2">
-                        <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5 mr-2">
-                            <i class="bi bi-people-fill text-emerald-700"></i>
-                            <span id="resTicketCount">1 Spot Verified</span>
-                        </div>
-                        <span id="resMalePill" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
-                            ♂ 1 Male
-                        </span>
-                        <span id="resFemalePill" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-pink-100 text-pink-800 border border-pink-200">
-                            ♀ 0 Female
-                        </span>
-                    </div>
-
-                    <!-- Contact Details -->
-                    <div class="grid grid-cols-2 gap-2 text-xs text-[#3c4043] mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        <div>
-                            <span class="text-[#5f6368] block text-[10px]">Email:</span>
-                            <span id="resEmail" class="font-medium truncate block">-</span>
-                        </div>
-                        <div>
-                            <span class="text-[#5f6368] block text-[10px]">Phone:</span>
-                            <span id="resPhone" class="font-medium block">-</span>
-                        </div>
-                        <div class="col-span-2 pt-1 border-t border-gray-200 flex items-center justify-between text-[11px]">
-                            <span class="text-[#5f6368]">Checked in at:</span>
-                            <span id="resTimestamp" class="font-bold text-emerald-800">Just Now</span>
-                        </div>
-                    </div>
-
-                    <!-- Email Dispatch Banner -->
-                    <div id="emailConfirmationBanner" class="mb-5 p-2 bg-emerald-100/60 border border-emerald-300 rounded-lg text-xs text-emerald-900 flex items-center justify-between">
-                        <span class="flex items-center gap-1.5">
-                            <i class="bi bi-envelope-check text-emerald-700"></i>
-                            <span>Thank-you email sent to attendee</span>
-                        </span>
-                        <button type="button" onclick="resendEmail()" class="text-[11px] text-emerald-800 font-bold underline hover:text-emerald-950">Resend</button>
-                    </div>
-
-                    <!-- Prominent Next Button -->
-                    <button type="button" onclick="resetScanState()" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
-                        <span>Scan Next Ticket</span>
-                        <span class="text-xs opacity-75 font-normal">(Space / Enter)</span>
-                    </button>
-                </div>
-
-                <!-- State 3: Duplicate Scan (Warning) -->
-                <div id="stateDuplicate" class="hidden">
-                    <div class="flex items-center justify-between pb-3 border-b border-amber-200 mb-4">
-                        <div class="flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-sm font-bold">!</span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-800">ALREADY CHECKED IN</span>
-                        </div>
-                        <span id="dupPassCode" class="text-xs font-mono font-bold text-amber-900 bg-amber-100 px-2.5 py-1 rounded-md border border-amber-300">PASS-XXXX</span>
-                    </div>
-
-                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4 text-xs text-amber-900">
-                        <div class="font-bold text-sm mb-1" id="dupAttendeeName">Attendee Name</div>
-                        <div id="dupMessage">This ticket was already admitted previously.</div>
-                        <div class="mt-2 pt-2 border-t border-amber-200 text-[11px] flex justify-between">
-                            <span>Prior Check-in:</span>
-                            <strong id="dupPriorTime">-</strong>
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="resetScanState()" class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
-                        <span>Scan Next Ticket</span>
-                    </button>
-                </div>
-
-                <!-- State 4: Invalid Pass (Error) -->
-                <div id="stateError" class="hidden">
-                    <div class="flex items-center justify-between pb-3 border-b border-red-200 mb-4">
-                        <div class="flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-bold">✕</span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-red-800">INVALID TICKET</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 bg-red-50 border border-red-200 rounded-xl mb-5 text-center">
-                        <div class="text-sm font-bold text-red-900 mb-1" id="errTitle">Ticket Not Found</div>
-                        <p class="text-xs text-red-700" id="errMessage">This pass code is invalid or does not belong to your organization.</p>
-                    </div>
-
-                    <button type="button" onclick="resetScanState()" class="w-full py-3 px-4 bg-gray-800 hover:bg-gray-900 text-white font-bold text-sm rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
-                        <span>Try Another Ticket</span>
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- Recent Check-ins Table Card -->
-            <div class="bg-white border border-[#dadce0] rounded-xl shadow-sm p-4 flex flex-col">
-                <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#f1f3f4]">
-                    <div class="flex items-center gap-2">
-                        <i class="bi bi-clock-history text-gray-500"></i>
-                        <h3 class="text-xs font-bold text-[#202124] uppercase tracking-wider">Session Check-ins</h3>
-                    </div>
-                    <span id="sessionScanCount" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">0 verified</span>
-                </div>
-
-                <div class="overflow-x-auto max-h-[220px]">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="text-[10px] uppercase font-bold text-[#5f6368] border-b border-gray-100">
-                                <th class="pb-1.5">Time</th>
-                                <th class="pb-1.5">Attendee</th>
-                                <th class="pb-1.5">Pass Code</th>
-                                <th class="pb-1.5 text-right">Spots</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sessionLogsBody" class="divide-y divide-gray-50 font-medium">
-                            <tr id="noLogsRow">
-                                <td colspan="4" class="py-4 text-center text-gray-400 text-xs">No tickets scanned in this session yet.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
     </div>
 
 </div>
 
-<!-- Audio Chime (Clean Web Audio Tone) -->
+
+<!-- ========================================================================= -->
+<!-- 3. SLIDE-UP VERIFICATION BOTTOM SHEET (Google Pay Result Dialog)          -->
+<!-- ========================================================================= -->
+<div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end">
+    <div class="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 text-[#1f2937] shadow-2xl animate-sheet-up">
+        
+        <!-- Drag Handle Indicator -->
+        <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+
+        <!-- Result Status Banner -->
+        <div id="sheetSuccessBlock">
+            <div class="flex items-center gap-2 mb-2 text-emerald-600">
+                <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-lg font-bold">✓</div>
+                <span class="text-xs font-bold uppercase tracking-wider">ENTRY ADMITTED</span>
+            </div>
+
+            <!-- Attendee Name & Pass Code -->
+            <div class="mb-3">
+                <h3 id="sheetAttendeeName" class="text-2xl font-display font-extrabold text-gray-900 leading-tight">Attendee Name</h3>
+                <p id="sheetEventTitle" class="text-xs font-semibold text-emerald-700 mt-0.5">Event Title</p>
+                <div class="text-[11px] font-mono font-bold text-gray-500 mt-1" id="sheetPassCode">PASS-XXXXX</div>
+            </div>
+
+            <!-- Spot Count & Gender Pills -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4 flex flex-wrap items-center gap-2">
+                <div class="text-xs font-bold text-gray-800 flex items-center gap-1.5 mr-2">
+                    <i class="bi bi-people-fill text-emerald-600"></i>
+                    <span id="sheetSpotCount">1 Spot Verified</span>
+                </div>
+                <span id="sheetMalePill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                    ♂ 1 Male
+                </span>
+                <span id="sheetFemalePill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-800">
+                    ♀ 0 Female
+                </span>
+            </div>
+
+            <div class="text-[11px] text-gray-500 mb-5 flex items-center justify-between">
+                <span>Verified: <strong id="sheetTime" class="text-gray-700">Just now</strong></span>
+                <span class="text-emerald-700 font-semibold">✓ Gratitude email sent</span>
+            </div>
+
+            <button type="button" onclick="closeResultSheet()" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                <span>Scan Next Ticket</span>
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Duplicate Warning Block -->
+        <div id="sheetDuplicateBlock" class="hidden">
+            <div class="flex items-center gap-2 mb-2 text-amber-600">
+                <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-lg font-bold">!</div>
+                <span class="text-xs font-bold uppercase tracking-wider">ALREADY CHECKED IN</span>
+            </div>
+
+            <h3 id="dupName" class="text-xl font-bold text-gray-900 mb-1">Attendee Name</h3>
+            <p id="dupCode" class="text-xs font-mono text-gray-500 mb-3">PASS-XXXXX</p>
+
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 mb-5">
+                <p>This ticket was already checked in earlier.</p>
+                <p class="mt-1 font-bold">Time: <span id="dupTime">-</span></p>
+            </div>
+
+            <button type="button" onclick="closeResultSheet()" class="w-full py-3.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl transition shadow-lg cursor-pointer">
+                <span>Close & Scan Next</span>
+            </button>
+        </div>
+
+        <!-- Invalid Error Block -->
+        <div id="sheetErrorBlock" class="hidden">
+            <div class="flex items-center gap-2 mb-2 text-red-600">
+                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-lg font-bold">✕</div>
+                <span class="text-xs font-bold uppercase tracking-wider">INVALID TICKET</span>
+            </div>
+
+            <div class="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-900 mb-5 text-center">
+                <p class="font-bold text-sm mb-1" id="errTitle">Ticket Not Found</p>
+                <p id="errDesc">This pass code is invalid or does not exist in your database.</p>
+            </div>
+
+            <button type="button" onclick="closeResultSheet()" class="w-full py-3.5 px-4 bg-gray-900 hover:bg-black text-white font-bold text-sm rounded-xl transition shadow-lg cursor-pointer">
+                <span>Try Again</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- 4. MODAL: Event Selector Picker                                           -->
+<!-- ========================================================================= -->
+<div id="eventPickerModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white rounded-2xl p-5 text-gray-900 shadow-2xl">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+            <h3 class="text-sm font-bold text-gray-900">Select Event to Scan</h3>
+            <button type="button" onclick="closeEventPickerModal()" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
+        </div>
+        <div class="space-y-1.5 max-h-60 overflow-y-auto">
+            <button type="button" onclick="selectEventFilter('', 'All Events (Auto-Detect)')" class="w-full text-left p-2.5 rounded-lg text-xs font-semibold hover:bg-emerald-50 hover:text-emerald-800 transition">
+                All Events (Auto-Detect)
+            </button>
+            {% for ev in events %}
+            <button type="button" onclick="selectEventFilter('{{ ev.id }}', '{{ ev.title|escapejs }}')" class="w-full text-left p-2.5 rounded-lg text-xs font-semibold hover:bg-emerald-50 hover:text-emerald-800 transition">
+                {{ ev.title }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- 5. MODAL: Scanner Options Menu (Flip Camera / Manual Entry / Live Stats)   -->
+<!-- ========================================================================= -->
+<div id="optionsModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md bg-white rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 shadow-2xl">
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-gray-100">
+            <h3 class="text-base font-bold text-gray-900">Scanner Options</h3>
+            <button type="button" onclick="toggleOptionsMenu()" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <!-- Flip Camera -->
+            <button type="button" onclick="flipCamera(); toggleOptionsMenu();" class="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold flex items-center justify-between transition">
+                <span class="flex items-center gap-2">
+                    <i class="bi bi-camera-reverse text-base"></i>
+                    <span>Switch Front / Rear Camera</span>
+                </span>
+                <i class="bi bi-chevron-right text-gray-400"></i>
+            </button>
+
+            <!-- Manual Input Form -->
+            <div class="pt-2">
+                <label class="block font-bold text-gray-700 mb-1">Enter Pass ID Manually:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="manualPassInput" placeholder="e.g. PASS-34FF1F4036" class="flex-1 py-2 px-3 border border-gray-300 rounded-lg uppercase font-mono text-xs font-bold focus:outline-none focus:border-emerald-600">
+                    <button type="button" onclick="submitManualPass()" class="py-2 px-4 bg-emerald-600 text-white rounded-lg font-bold text-xs">
+                        Verify
+                    </button>
+                </div>
+            </div>
+
+            <!-- Close Options -->
+            <div class="pt-3">
+                <button type="button" onclick="toggleOptionsMenu()" class="w-full py-2.5 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold text-gray-700 text-xs">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Audio Chime (Google Pay 2-Tone Melodic Chime) -->
 <script>
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
-    function playBeep(isSuccess) {
+    function playGPayBeep(isSuccess) {
         try {
             if (!audioCtx) audioCtx = new AudioCtx();
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -366,174 +349,258 @@
             gain.connect(audioCtx.destination);
 
             if (isSuccess) {
-                // Pleasant high 2-tone chime
+                // Iconic GPay 2-Tone Melodic Chime (D5 -> A5)
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(659.25, now);       // E5
-                osc.frequency.setValueAtTime(880.00, now + 0.08); // A5
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
-                if (navigator.vibrate) navigator.vibrate(80);
-            } else {
-                // Low warning buzz
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.setValueAtTime(200, now + 0.1);
+                osc.frequency.setValueAtTime(587.33, now);
+                osc.frequency.setValueAtTime(880.00, now + 0.08);
                 gain.gain.setValueAtTime(0.35, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
                 osc.start(now);
-                osc.stop(now + 0.3);
-                if (navigator.vibrate) navigator.vibrate([150, 50, 150]);
+                osc.stop(now + 0.35);
+                if (navigator.vibrate) navigator.vibrate([70, 30, 70]);
+            } else {
+                // Warning low tone buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.setValueAtTime(220, now + 0.12);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
             }
         } catch (e) {
-            console.warn('Audio not available:', e);
+            console.warn('Audio chime error:', e);
         }
     }
 </script>
 
-<!-- QR Scanner Controller -->
+<!-- Camera & Scan Controller Script -->
 <script>
-    let html5QrCode = null;
-    let isScanning = false;
+    let videoStream = null;
     let currentFacingMode = "environment";
+    let isTorchOn = false;
     let isVerifying = false;
-    let lastScanTime = 0;
+    let scanAnimationId = null;
+    let barcodeDetector = null;
     let lastScannedCode = null;
-    let currentPassCode = null;
-    let sessionLogs = [];
+    let lastScanTime = 0;
+    let selectedEventId = "";
 
-    // On Load
     document.addEventListener('DOMContentLoaded', () => {
-        initScanner();
-        loadStats();
-        // Keyboard shortcut: Space or Enter to scan next
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'Enter') {
-                const successVisible = !document.getElementById('stateSuccess').classList.contains('hidden');
-                const dupVisible = !document.getElementById('stateDuplicate').classList.contains('hidden');
-                const errVisible = !document.getElementById('stateError').classList.contains('hidden');
-                if (successVisible || dupVisible || errVisible) {
-                    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
-                    e.preventDefault();
-                    resetScanState();
-                }
-            }
-        });
-    });
-
-    // Initialize or re-initialize Html5Qrcode
-    function initScanner() {
-        const overlay = document.getElementById('startOverlay');
-        overlay.classList.add('hidden');
-
-        if (html5QrCode) {
+        // Native BarcodeDetector check
+        if ('BarcodeDetector' in window) {
             try {
-                html5QrCode.stop().then(() => startQrCode()).catch(() => startQrCode());
-                return;
+                barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
             } catch (e) {
-                // proceed
+                barcodeDetector = null;
             }
         }
 
-        startQrCode();
+        // Auto-start camera if on mobile view
+        if (window.innerWidth < 768 || document.getElementById('mobileScannerWrapper').offsetParent !== null) {
+            startCameraDirectly();
+        }
+
+        // Laser beam animation
+        animateLaser();
+    });
+
+    function animateLaser() {
+        const laser = document.getElementById('scanLaser');
+        if (!laser) return;
+        let pos = 10;
+        let dir = 1;
+        setInterval(() => {
+            pos += dir * 1.5;
+            if (pos > 250) dir = -1;
+            if (pos < 10) dir = 1;
+            laser.style.top = pos + 'px';
+        }, 16);
     }
 
-    function startQrCode() {
-        html5QrCode = new Html5Qrcode("qrReader");
+    // Start Camera Video Stream
+    async function startCameraDirectly() {
+        const prompt = document.getElementById('startCameraPrompt');
+        const video = document.getElementById('gpayVideo');
 
-        const config = {
-            fps: 15,
-            qrbox: function(viewfinderWidth, viewfinderHeight) {
-                const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-                const qrboxSize = Math.floor(minEdge * 0.72);
-                return { width: qrboxSize, height: qrboxSize };
-            },
-            aspectRatio: 1.0
-        };
+        if (videoStream) {
+            stopCamera();
+        }
 
-        html5QrCode.start(
-            { facingMode: currentFacingMode },
-            config,
-            onScanSuccess,
-            onScanFailure
-        ).then(() => {
-            isScanning = true;
-            document.getElementById('cameraStatusBadge').innerText = (currentFacingMode === 'environment' ? 'Rear Camera' : 'Front Camera');
-            document.getElementById('cameraStatusBadge').className = 'text-xs px-2 py-0.5 rounded-full font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300';
-        }).catch((err) => {
-            console.warn('Camera auto-start failed:', err);
-            isScanning = false;
-            document.getElementById('startOverlay').classList.remove('hidden');
-            document.getElementById('cameraStatusBadge').innerText = 'Camera Paused';
-            document.getElementById('cameraStatusBadge').className = 'text-xs px-2 py-0.5 rounded-full font-semibold bg-amber-100 text-amber-800 border border-amber-300';
-        });
+        try {
+            prompt.classList.add('hidden');
+            const constraints = {
+                audio: false,
+                video: {
+                    facingMode: { ideal: currentFacingMode },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+
+            videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = videoStream;
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('webkit-playsinline', 'true');
+            await video.play();
+
+            // Start Scanning Frame Loop
+            startScanningLoop();
+        } catch (err) {
+            console.warn('Camera stream error:', err);
+            prompt.classList.remove('hidden');
+        }
     }
 
-    function flipCamera() {
-        currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
-        initScanner();
+    function stopCamera() {
+        if (scanAnimationId) {
+            cancelAnimationFrame(scanAnimationId);
+            scanAnimationId = null;
+        }
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
     }
 
-    // Handles scanned QR text
-    function onScanSuccess(decodedText, decodedResult) {
+    // Switch Front / Rear Camera
+    async function flipCamera() {
+        currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
+        await startCameraDirectly();
+    }
+
+    // Flashlight / Torch Toggle
+    async function toggleTorch() {
+        if (!videoStream) return;
+        const track = videoStream.getVideoTracks()[0];
+        const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+        if (!capabilities.torch) {
+            alert('Flashlight not supported on this camera/browser.');
+            return;
+        }
+        isTorchOn = !isTorchOn;
+        try {
+            await track.applyConstraints({ advanced: [{ torch: isTorchOn }] });
+            const icon = document.getElementById('torchIcon');
+            if (isTorchOn) {
+                icon.className = 'bi bi-lightning-fill text-yellow-400';
+            } else {
+                icon.className = 'bi bi-lightning-charge text-white';
+            }
+        } catch (e) {
+            console.warn('Torch toggle failed:', e);
+        }
+    }
+
+    // Continuous Frame Scanning Loop
+    function startScanningLoop() {
+        const video = document.getElementById('gpayVideo');
+        const canvas = document.getElementById('gpayCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        async function scanFrame() {
+            if (!videoStream || video.readyState !== video.HAVE_ENOUGH_DATA || isVerifying) {
+                scanAnimationId = requestAnimationFrame(scanFrame);
+                return;
+            }
+
+            try {
+                // 1. Try Hardware-Accelerated Native BarcodeDetector (0ms GPU)
+                if (barcodeDetector) {
+                    const barcodes = await barcodeDetector.detect(video);
+                    if (barcodes && barcodes.length > 0) {
+                        const rawCode = barcodes[0].rawValue;
+                        handleScannedText(rawCode);
+                        scanAnimationId = requestAnimationFrame(scanFrame);
+                        return;
+                    }
+                }
+
+                // 2. Fallback to jsQR Canvas scanning
+                if (window.jsQR) {
+                    canvas.width = Math.min(video.videoWidth, 640);
+                    canvas.height = Math.min(video.videoHeight, 480);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imgData.data, imgData.width, imgData.height, {
+                        inversionAttempts: 'dontInvert'
+                    });
+                    if (code && code.data) {
+                        handleScannedText(code.data);
+                    }
+                }
+            } catch (e) {
+                // Frame processing error
+            }
+
+            scanAnimationId = requestAnimationFrame(scanFrame);
+        }
+
+        scanAnimationId = requestAnimationFrame(scanFrame);
+    }
+
+    // Debounce and process scanned text
+    function handleScannedText(text) {
         const now = Date.now();
-        // Debounce scan
         if (isVerifying) return;
-        if (decodedText === lastScannedCode && (now - lastScanTime) < 3000) return;
+        if (text === lastScannedCode && (now - lastScanTime) < 3000) return;
 
         lastScanTime = now;
-        lastScannedCode = decodedText;
-        verifyCode(decodedText);
+        lastScannedCode = text;
+        verifyPassCode(text);
     }
 
-    function onScanFailure(error) {
-        // Continuous scanning frame failures are normal
-    }
-
-    // Handle Image upload from gallery
-    function handleFileScan(e) {
+    // Gallery File Upload Scan
+    function handleGalleryScan(e) {
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!html5QrCode) {
-            html5QrCode = new Html5Qrcode("qrReader");
-        }
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const img = new Image();
+            img.onload = async function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
 
-        html5QrCode.scanFile(file, true)
-            .then(decodedText => {
-                verifyCode(decodedText);
-                e.target.value = '';
-            })
-            .catch(err => {
+                // BarcodeDetector first
+                if (barcodeDetector) {
+                    try {
+                        const barcodes = await barcodeDetector.detect(img);
+                        if (barcodes && barcodes.length > 0) {
+                            verifyPassCode(barcodes[0].rawValue);
+                            e.target.value = '';
+                            return;
+                        }
+                    } catch (err) {}
+                }
+
+                // jsQR fallback
+                if (window.jsQR) {
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imgData.data, imgData.width, imgData.height);
+                    if (code && code.data) {
+                        verifyPassCode(code.data);
+                        e.target.value = '';
+                        return;
+                    }
+                }
+
                 alert('No QR code detected in the selected image. Please try another photo.');
                 e.target.value = '';
-            });
+            };
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 
-    // Handle Manual Input Submit
-    function handleManualSubmit(e) {
-        e.preventDefault();
-        const input = document.getElementById('manualCodeInput');
-        const code = input.value.trim();
-        if (!code) return;
-        verifyCode(code);
-    }
-
-    // Send code to backend verification API
-    async function verifyCode(code) {
+    // Verify Pass Code via Backend API
+    async function verifyPassCode(code) {
         if (isVerifying) return;
         isVerifying = true;
-
-        const eventSelector = document.getElementById('eventSelector');
-        const eventId = eventSelector ? eventSelector.value : '';
-
-        // Show loading state
-        const verifyBtn = document.getElementById('btnManualVerify');
-        if (verifyBtn) {
-            verifyBtn.disabled = true;
-            verifyBtn.innerHTML = '<span class="animate-spin inline-block mr-1">↻</span> Verifying...';
-        }
 
         try {
             const resp = await fetch('{% url "dashboard-scanner-verify-api" %}', {
@@ -544,54 +611,45 @@
                 },
                 body: JSON.stringify({
                     code: code,
-                    event_id: eventId
+                    event_id: selectedEventId
                 })
             });
 
             const data = await resp.json();
 
             if (data.success && data.status === 'VERIFIED') {
-                showSuccess(data);
-                playBeep(true);
-                addSessionLog(data);
-                loadStats();
+                playGPayBeep(true);
+                showSuccessSheet(data);
             } else if (data.status === 'ALREADY_CHECKED_IN') {
-                showDuplicate(data);
-                playBeep(false);
+                playGPayBeep(false);
+                showDuplicateSheet(data);
             } else {
-                showError(data);
-                playBeep(false);
+                playGPayBeep(false);
+                showErrorSheet(data);
             }
         } catch (err) {
-            console.error('Verify error:', err);
-            showError({ message: 'Network or server error verifying ticket. Please check connection.' });
-            playBeep(false);
+            playGPayBeep(false);
+            showErrorSheet({ message: 'Network or connection error. Please try again.' });
         } finally {
             isVerifying = false;
-            if (verifyBtn) {
-                verifyBtn.disabled = false;
-                verifyBtn.innerHTML = '<span>Verify Ticket</span> <i class="bi bi-arrow-right"></i>';
-            }
         }
     }
 
-    // UI State Switchers
-    function showSuccess(data) {
-        hideAllStates();
-        const state = document.getElementById('stateSuccess');
-        state.classList.remove('hidden');
+    // Bottom Sheet Display Functions
+    function showSuccessSheet(data) {
+        document.getElementById('sheetSuccessBlock').classList.remove('hidden');
+        document.getElementById('sheetDuplicateBlock').classList.add('hidden');
+        document.getElementById('sheetErrorBlock').classList.add('hidden');
 
-        currentPassCode = data.attendee.pass_code;
-        document.getElementById('resPassCode').innerText = data.attendee.pass_code;
-        document.getElementById('resAttendeeName').innerText = data.customer.name;
-        document.getElementById('resEventTitle').innerText = data.event.title;
-        
+        document.getElementById('sheetAttendeeName').innerText = data.customer.name;
+        document.getElementById('sheetEventTitle').innerText = data.event.title;
+        document.getElementById('sheetPassCode').innerText = data.attendee.pass_code;
+
         const count = data.attendee.ticket_count || 1;
-        document.getElementById('resTicketCount').innerText = count + ' ' + (count > 1 ? 'Spots Verified' : 'Spot Verified');
+        document.getElementById('sheetSpotCount').innerText = count + ' ' + (count > 1 ? 'Spots Verified' : 'Spot Verified');
 
-        // Male / Female pills
-        const malePill = document.getElementById('resMalePill');
-        const femalePill = document.getElementById('resFemalePill');
+        const malePill = document.getElementById('sheetMalePill');
+        const femalePill = document.getElementById('sheetFemalePill');
         if (data.male_count) {
             malePill.innerText = '♂ ' + data.male_count + ' Male';
             malePill.classList.remove('hidden');
@@ -605,139 +663,74 @@
             femalePill.classList.add('hidden');
         }
 
-        document.getElementById('resEmail').innerText = data.customer.email || '-';
-        document.getElementById('resPhone').innerText = data.customer.phone || '-';
-        document.getElementById('resTimestamp').innerText = data.checked_in_at_formatted || 'Just now';
-
-        // Clear manual input
-        document.getElementById('manualCodeInput').value = '';
+        document.getElementById('sheetTime').innerText = data.checked_in_at_formatted || 'Just now';
+        document.getElementById('resultModal').classList.remove('hidden');
     }
 
-    function showDuplicate(data) {
-        hideAllStates();
-        const state = document.getElementById('stateDuplicate');
-        state.classList.remove('hidden');
+    function showDuplicateSheet(data) {
+        document.getElementById('sheetSuccessBlock').classList.add('hidden');
+        document.getElementById('sheetDuplicateBlock').classList.remove('hidden');
+        document.getElementById('sheetErrorBlock').classList.add('hidden');
 
-        document.getElementById('dupPassCode').innerText = data.attendee ? data.attendee.pass_code : (data.code || '');
-        document.getElementById('dupAttendeeName').innerText = data.customer ? data.customer.name : 'Registered Attendee';
-        document.getElementById('dupMessage').innerText = data.message || 'Ticket was already checked in.';
-        document.getElementById('dupPriorTime').innerText = data.checked_in_at_formatted || 'Earlier today';
+        document.getElementById('dupName').innerText = data.customer ? data.customer.name : 'Registered Attendee';
+        document.getElementById('dupCode').innerText = data.attendee ? data.attendee.pass_code : (data.code || '');
+        document.getElementById('dupTime').innerText = data.checked_in_at_formatted || 'Earlier today';
+
+        document.getElementById('resultModal').classList.remove('hidden');
     }
 
-    function showError(data) {
-        hideAllStates();
-        const state = document.getElementById('stateError');
-        state.classList.remove('hidden');
+    function showErrorSheet(data) {
+        document.getElementById('sheetSuccessBlock').classList.add('hidden');
+        document.getElementById('sheetDuplicateBlock').classList.add('hidden');
+        document.getElementById('sheetErrorBlock').classList.remove('hidden');
 
         document.getElementById('errTitle').innerText = (data.status === 'WRONG_TENANT') ? 'Unauthorized Account' : 'Invalid Ticket';
-        document.getElementById('errMessage').innerText = data.message || 'Ticket not found in database.';
+        document.getElementById('errDesc').innerText = data.message || 'Ticket not found in database.';
+
+        document.getElementById('resultModal').classList.remove('hidden');
     }
 
-    function resetScanState() {
-        hideAllStates();
-        document.getElementById('stateIdle').classList.remove('hidden');
+    function closeResultSheet() {
+        document.getElementById('resultModal').classList.add('hidden');
         lastScannedCode = null;
         isVerifying = false;
-        document.getElementById('manualCodeInput').value = '';
-        document.getElementById('manualCodeInput').focus();
     }
 
-    function hideAllStates() {
-        document.getElementById('stateIdle').classList.add('hidden');
-        document.getElementById('stateSuccess').classList.add('hidden');
-        document.getElementById('stateDuplicate').classList.add('hidden');
-        document.getElementById('stateError').classList.add('hidden');
+    // Event Picker Modal Controls
+    function openEventPickerModal() {
+        document.getElementById('eventPickerModal').classList.remove('hidden');
+    }
+    function closeEventPickerModal() {
+        document.getElementById('eventPickerModal').classList.add('hidden');
+    }
+    function selectEventFilter(eventId, eventTitle) {
+        selectedEventId = eventId;
+        document.getElementById('activeEventIndicator').innerHTML = `Scanning for: <strong class="text-white">${eventTitle}</strong>`;
+        closeEventPickerModal();
     }
 
-    // Add row to recent check-in session table
-    function addSessionLog(data) {
-        const tbody = document.getElementById('sessionLogsBody');
-        const noLogs = document.getElementById('noLogsRow');
-        if (noLogs) noLogs.remove();
-
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-50 transition border-b border-gray-50';
-        
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        const genderStr = (data.male_count ? data.male_count + 'M ' : '') + (data.female_count ? data.female_count + 'F' : '');
-        
-        tr.innerHTML = `
-            <td class="py-2 text-gray-500 font-mono text-[11px]">${timeStr}</td>
-            <td class="py-2 font-bold text-gray-900">${escapeHtml(data.customer.name)}</td>
-            <td class="py-2 font-mono text-gray-600 text-[11px]">${escapeHtml(data.attendee.pass_code)}</td>
-            <td class="py-2 text-right">
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    ${data.attendee.ticket_count || 1} ${genderStr ? '(' + genderStr.trim() + ')' : ''}
-                </span>
-            </td>
-        `;
-
-        tbody.insertBefore(tr, tbody.firstChild);
-
-        // Update count badge
-        sessionLogs.unshift(data);
-        document.getElementById('sessionScanCount').innerText = sessionLogs.length + ' verified';
+    // Options Menu Modal Controls
+    function toggleOptionsMenu() {
+        const modal = document.getElementById('optionsModal');
+        modal.classList.toggle('hidden');
+    }
+    function submitManualPass() {
+        const input = document.getElementById('manualPassInput');
+        const code = input.value.trim();
+        if (!code) return;
+        toggleOptionsMenu();
+        verifyPassCode(code);
+        input.value = '';
     }
 
-    // Resend email
-    async function resendEmail() {
-        if (!currentPassCode) return;
-        try {
-            const resp = await fetch('{% url "dashboard-scanner-resend-email-api" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ pass_code: currentPassCode })
-            });
-            const d = await resp.json();
-            if (d.success) {
-                alert('Participation email re-sent successfully to attendee.');
-            } else {
-                alert('Error re-sending email: ' + (d.message || 'Unknown error'));
-            }
-        } catch (e) {
-            alert('Failed to resend email: ' + e);
-        }
+    // PC Screen Override (if testing on laptop webcam)
+    function enablePcScannerOverride() {
+        document.getElementById('pcOnlyWrapper').classList.add('hidden');
+        document.getElementById('mobileScannerWrapper').classList.remove('md:hidden');
+        startCameraDirectly();
     }
 
-    // Load Live KPI Stats
-    async function loadStats() {
-        const eventSelector = document.getElementById('eventSelector');
-        const eventId = eventSelector ? eventSelector.value : '';
-
-        try {
-            const url = '{% url "dashboard-scanner-stats-api" %}' + (eventId ? '?event_id=' + eventId : '');
-            const resp = await fetch(url);
-            const data = await resp.json();
-
-            if (data.success) {
-                document.getElementById('statCheckedIn').innerText = data.checked_in_count || 0;
-                document.getElementById('statRegistered').innerText = 'of ' + (data.total_registered || 0) + ' registered';
-                document.getElementById('statTickets').innerText = data.total_spots_admitted || 0;
-                document.getElementById('statMale').innerText = data.male_count || 0;
-                document.getElementById('statFemale').innerText = data.female_count || 0;
-            }
-        } catch (e) {
-            console.warn('Failed to load stats:', e);
-        }
-    }
-
-    function onEventChange() {
-        loadStats();
-        resetScanState();
-    }
-
-    // Utility
-    function escapeHtml(text) {
-        if (!text) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
-
+    // Cookie CSRF Token
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -753,4 +746,5 @@
         return cookieValue;
     }
 </script>
+
 {% endblock %}
