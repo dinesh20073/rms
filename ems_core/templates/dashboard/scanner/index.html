@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
     /* =========================================================================
-       Nizhal Camera Scanner - Crystal Clear Center & Blurred Black Surround
+       Nizhal Camera Scanner - Ultra-Clean Viewfinder & Crystal Clear Center
        ========================================================================= */
     .scanner-page {
         position: relative;
@@ -52,10 +52,8 @@
         z-index: 1;
     }
 
-    /* =========================================================================
-       4 Surrounding Blur Panels (Top, Bottom, Left, Right)
-       Leaves the CENTER completely clear - NO blur element ever touches the center!
-       ========================================================================= */
+    /* 4 Surrounding Blur Panels: Blurs TOP, BOTTOM, LEFT, RIGHT
+       Center viewfinder is 100% physically clear and unblurred */
     .scanner-blur-surround {
         position: absolute;
         inset: 0;
@@ -65,7 +63,7 @@
 
     .blur-section {
         position: absolute;
-        background-color: rgba(0, 0, 0, 0.72);
+        background-color: rgba(0, 0, 0, 0.68);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         pointer-events: none;
@@ -84,23 +82,23 @@
         justify-content: center;
     }
 
-    /* Fixed-Dimension 240px Google Pay Target Box - COMPLETELY CLEAR INSIDE */
+    /* Fixed-Dimension 250px Google Pay Target Box - CLEAN TRANSPARENT WINDOW */
     .gpay-box {
         position: relative !important;
-        width: 240px !important;
-        height: 240px !important;
-        min-width: 240px !important;
-        min-height: 240px !important;
-        max-width: 68vw !important;
-        max-height: 68vw !important;
+        width: 250px !important;
+        height: 250px !important;
+        min-width: 250px !important;
+        min-height: 250px !important;
+        max-width: 72vw !important;
+        max-height: 72vw !important;
         margin: 0 auto !important;
         flex-shrink: 0 !important;
         box-sizing: border-box !important;
         background: transparent !important;
     }
 
-    /* SVG with corner brackets and corner-nook rounding fills */
-    .gpay-box-svg {
+    /* Clean Floating Corner Brackets SVG */
+    .gpay-corners-svg {
         position: absolute;
         inset: 0;
         width: 100%;
@@ -111,9 +109,9 @@
     /* Animated Laser Scan Line */
     .gpay-laser {
         position: absolute !important;
-        left: 14px !important;
-        right: 14px !important;
-        height: 2.5px !important;
+        left: 16px !important;
+        right: 16px !important;
+        height: 2px !important;
         background: linear-gradient(90deg, transparent, #4285f4 20%, #34a853 80%, transparent) !important;
         box-shadow: 0 0 12px rgba(66, 133, 244, 0.9) !important;
         pointer-events: none !important;
@@ -226,6 +224,75 @@
         margin-bottom: 26px;
     }
 
+    /* =========================================================================
+       Result Bottom Sheet Action Buttons (100% Explicit High-Contrast Styling)
+       ========================================================================= */
+    .sheet-btn-success {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        background-color: #059669 !important;
+        color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        border-radius: 14px !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4) !important;
+        transition: transform 0.1s ease, background-color 0.15s ease !important;
+    }
+    .sheet-btn-success:active {
+        background-color: #047857 !important;
+        transform: scale(0.98) !important;
+    }
+
+    .sheet-btn-warning {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        background-color: #d97706 !important;
+        color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        border-radius: 14px !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4) !important;
+        transition: transform 0.1s ease, background-color 0.15s ease !important;
+    }
+    .sheet-btn-warning:active {
+        background-color: #b45309 !important;
+        transform: scale(0.98) !important;
+    }
+
+    .sheet-btn-danger {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        background-color: #1f2937 !important;
+        color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        border-radius: 14px !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+        transition: transform 0.1s ease, background-color 0.15s ease !important;
+    }
+    .sheet-btn-danger:active {
+        background-color: #111827 !important;
+        transform: scale(0.98) !important;
+    }
+
     /* Slide-Up Bottom Sheet Animation */
     @keyframes slideUpSheet {
         from { transform: translateY(100%); }
@@ -273,24 +340,18 @@
     <!-- 2. Active Center Content (Viewfinder + Center Action Buttons) -->
     <div id="scannerCenterStack" class="scanner-center-content" style="display: none;">
         
-        <!-- Focused Target Box (100% CLEAR - NO BLUR EVER OVER IT) -->
+        <!-- Focused Target Box (100% CLEAR - NO BLUR OVER IT) -->
         <div id="targetBox" class="gpay-box">
-            <svg class="gpay-box-svg" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- 4 Corner Nooks to smooth out the transition into the 4 blur panels -->
-                <path d="M 0 0 L 26 0 A 26 26 0 0 0 0 26 Z" fill="rgba(0, 0, 0, 0.72)"/>
-                <path d="M 240 0 L 214 0 A 26 26 0 0 1 240 26 Z" fill="rgba(0, 0, 0, 0.72)"/>
-                <path d="M 0 240 L 0 214 A 26 26 0 0 1 26 240 Z" fill="rgba(0, 0, 0, 0.72)"/>
-                <path d="M 240 240 L 214 240 A 26 26 0 0 1 240 214 Z" fill="rgba(0, 0, 0, 0.72)"/>
-
-                <!-- Iconic Google Pay Rounded Corner Brackets (Smooth Round Caps) -->
+            <!-- Iconic Google Pay Rounded Corner Brackets (Sleek 4.5px Round Caps) -->
+            <svg class="gpay-corners-svg" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <!-- Top-Left: Red -->
-                <path d="M 8 50 L 8 32 A 24 24 0 0 1 32 8 L 50 8" stroke="#ea4335" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 10 52 L 10 32 A 22 22 0 0 1 32 10 L 52 10" stroke="#ea4335" stroke-width="4.5" stroke-linecap="round"/>
                 <!-- Top-Right: Yellow -->
-                <path d="M 190 8 L 208 8 A 24 24 0 0 1 232 32 L 232 50" stroke="#fbbc04" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 198 10 L 218 10 A 22 22 0 0 1 240 32 L 240 52" stroke="#fbbc04" stroke-width="4.5" stroke-linecap="round"/>
                 <!-- Bottom-Left: Blue -->
-                <path d="M 8 190 L 8 208 A 24 24 0 0 0 32 232 L 50 232" stroke="#4285f4" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 10 198 L 10 218 A 22 22 0 0 0 32 240 L 52 240" stroke="#4285f4" stroke-width="4.5" stroke-linecap="round"/>
                 <!-- Bottom-Right: Green -->
-                <path d="M 190 232 L 208 232 A 24 24 0 0 0 232 208 L 232 190" stroke="#34a853" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 198 240 L 218 240 A 22 22 0 0 0 240 218 L 240 198" stroke="#34a853" stroke-width="4.5" stroke-linecap="round"/>
             </svg>
 
             <!-- Animated Laser Scan Line -->
@@ -359,7 +420,7 @@
                 <span class="text-emerald-700 font-semibold">✓ Gratitude email sent</span>
             </div>
 
-            <button type="button" onclick="closeResultSheet()" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-2">
+            <button type="button" onclick="closeResultSheet()" class="sheet-btn-success">
                 <span>Scan Next Ticket</span>
                 <i class="bi bi-arrow-right"></i>
             </button>
@@ -372,15 +433,15 @@
                 <span class="text-xs font-bold uppercase tracking-wider">ALREADY CHECKED IN</span>
             </div>
 
-            <h3 id="dupName" class="text-xl font-bold text-gray-900 mb-1">Attendee Name</h3>
-            <p id="dupCode" class="text-xs font-mono text-gray-500 mb-3">PASS-XXXXX</p>
+            <h3 id="dupName" class="text-xl font-bold text-gray-900 mb-1 leading-tight">Attendee Name</h3>
+            <p id="dupCode" class="text-xs font-mono font-bold text-gray-500 mb-3">PASS-XXXXX</p>
 
-            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 mb-5">
-                <p>This ticket was already checked in earlier.</p>
-                <p class="mt-1 font-bold">Time: <span id="dupTime">-</span></p>
+            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 mb-5">
+                <p class="font-medium">This ticket was already checked in earlier.</p>
+                <p class="mt-1 font-bold">Verified at: <span id="dupTime" class="text-amber-800">-</span></p>
             </div>
 
-            <button type="button" onclick="closeResultSheet()" class="w-full py-3.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl transition shadow-lg cursor-pointer">
+            <button type="button" onclick="closeResultSheet()" class="sheet-btn-warning">
                 <span>Close & Scan Next</span>
             </button>
         </div>
@@ -397,7 +458,7 @@
                 <p id="errDesc">This pass code is invalid or does not exist in your database.</p>
             </div>
 
-            <button type="button" onclick="closeResultSheet()" class="w-full py-3.5 px-4 bg-gray-900 hover:bg-black text-white font-bold text-sm rounded-xl transition shadow-lg cursor-pointer">
+            <button type="button" onclick="closeResultSheet()" class="sheet-btn-danger">
                 <span>Try Again</span>
             </button>
         </div>
@@ -520,7 +581,7 @@
         bTop.style.top = '0px';
         bTop.style.left = '0px';
         bTop.style.width = '100%';
-        bTop.style.height = top + 'px';
+        bTop.style.height = Math.max(0, top) + 'px';
 
         // Bottom section
         bBottom.style.top = bottom + 'px';
@@ -531,7 +592,7 @@
         // Left section
         bLeft.style.top = top + 'px';
         bLeft.style.left = '0px';
-        bLeft.style.width = left + 'px';
+        bLeft.style.width = Math.max(0, left) + 'px';
         bLeft.style.height = boxH + 'px';
 
         // Right section
@@ -681,7 +742,7 @@
         let pos = 14;
         let dir = 1;
         laserIntervalId = setInterval(() => {
-            const h = box.offsetHeight || 240;
+            const h = box.offsetHeight || 250;
             pos += dir * 2;
             if (pos > h - 18) dir = -1;
             if (pos < 14) dir = 1;
