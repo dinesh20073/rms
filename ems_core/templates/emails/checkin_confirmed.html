@@ -170,71 +170,15 @@
                         </td>
                     </tr>
 
-                    <!-- 3. Personal Greeting & Welcome Message -->
+                    <!-- 3. Personal Greeting & Big Welcoming Message -->
                     <tr>
-                        <td width="100%" align="left" bgcolor="#ffffff" class="content-side-pad" style="padding: 24px 24px 8px 24px; background-color: #ffffff !important; border: 0 !important; font-family: 'Roboto', sans-serif;">
-                            <div style="font-size: 15px; font-weight: 700; color: #0f172a !important; margin-bottom: 6px;">
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 32px 24px 26px 24px; background-color: #ffffff !important; border: 0 !important; font-family: 'Roboto', sans-serif; text-align: center;">
+                            <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 22px; font-weight: 800; color: #0f172a !important; margin-bottom: 12px; letter-spacing: -0.3px;">
                                 Hi {{ customer.name|title }},
                             </div>
-                            <div style="font-size: 13px; line-height: 1.6; color: #334155 !important;">
-                                Thank you for your participation in the <strong style="color: #0f172a !important;">{{ event.title }}</strong>! Your presence has been verified at the entry gate. We are delighted to have you with us today. Here are your verified check-in details:
+                            <div style="font-size: 16px; line-height: 1.7; color: #334155 !important; max-width: 500px; margin: 0 auto;">
+                                Thank you for your participation in <strong style="color: #047857 !important;">{{ event.title }}</strong>! Your presence has been verified at the entry gate. We are delighted to have you with us today!
                             </div>
-                        </td>
-                    </tr>
-
-                    <!-- 4. VERIFIED CHECK-IN DETAILS (Clean Structured Box) -->
-                    <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 12px 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
-                                <tr>
-                                    <td colspan="2" bgcolor="#f8fafc" style="background-color: #f8fafc !important; padding: 10px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155 !important; text-transform: uppercase;">
-                                        <table role="presentation" width="100%" bgcolor="#f8fafc" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important;">
-                                            <tr>
-                                                <td align="left" class="font-mono nowrap" style="font-weight: 800; color: #0f172a !important; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
-                                                    🛡️ VERIFIED CHECK-IN DETAILS
-                                                </td>
-                                                <td align="right" class="font-mono nowrap" style="color: #059669 !important; font-weight: 700; font-family: 'Roboto Mono', monospace; border: 0 !important; font-size: 11px; white-space: nowrap;">
-                                                    {% with code=attendee.pass_code|default:pass_code %}
-                                                    {% if "ORD-" in code %}
-                                                        ORDER: <strong style="color: #0f172a !important;">{{ code }}</strong>
-                                                    {% else %}
-                                                        PASS: <strong style="color: #0f172a !important;">{{ code }}</strong>
-                                                    {% endif %}
-                                                    {% endwith %}
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <!-- Left Column -->
-                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 12px 14px; border-right: 1px solid #cbd5e1; background-color: #ffffff !important;">
-                                        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px; font-family: 'Roboto', sans-serif;">
-                                            <tr>
-                                                <td width="55" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Name:</td>
-                                                <td align="right" class="nowrap" bgcolor="#ffffff" style="font-weight: 700; color: #0f172a !important; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.name|title }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td width="55" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Email:</td>
-                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; color: #0284c7 !important; font-size: 10px; font-weight: 600; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.email }}</td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                    <!-- Right Column -->
-                                    <td width="50%" valign="top" bgcolor="#ffffff" style="padding: 12px 14px; background-color: #ffffff !important;">
-                                        <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="font-size: 11px; font-family: 'Roboto', sans-serif;">
-                                            <tr>
-                                                <td width="85" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Phone:</td>
-                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="font-family: 'Roboto Mono', monospace; font-weight: 700; color: #0f172a !important; font-size: 11px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{{ customer.phone|default:"+91 9876543210" }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td width="85" class="nowrap" bgcolor="#ffffff" style="color: #64748b !important; font-size: 11px; padding: 3px 0; border: 0 !important; font-weight: 500; white-space: nowrap;">Verified at:</td>
-                                                <td align="right" class="font-mono nowrap" bgcolor="#ffffff" style="color: #059669 !important; font-weight: 800; font-size: 10.5px; padding: 3px 0; border: 0 !important; white-space: nowrap;">{% now "d M Y, h:i A" %} IST</td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
                         </td>
                     </tr>
 
