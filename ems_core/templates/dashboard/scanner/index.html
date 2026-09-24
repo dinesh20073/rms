@@ -7,104 +7,223 @@
 <!-- High-reliability QR scanning library -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
-    /* Google Pay Target Viewfinder Box & Corner Brackets */
-    .gpay-target-box {
+    /* =========================================================================
+       Nizhal Console - Direct Camera Scanner (Integrated with Dashboard Layout)
+       ========================================================================= */
+    .scanner-outer-container {
+        position: relative;
+        width: 100%;
+        background-color: #000000;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* On mobile, fill the exact height between top navbar (56px) and bottom navbar (72px) */
+    @media (max-width: 1023px) {
+        .scanner-outer-container {
+            height: calc(100dvh - 128px);
+            min-height: 480px;
+        }
+    }
+
+    /* On desktop, center as a sleek modern device card */
+    @media (min-width: 1024px) {
+        .scanner-outer-container {
+            max-width: 520px;
+            height: 640px;
+            margin: 20px auto;
+            border-radius: 28px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            border: 1px solid #e5e7eb;
+        }
+    }
+
+    /* Camera Viewport */
+    .scanner-viewport {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-color: #000000;
+        overflow: hidden;
+    }
+
+    /* Live Video Feed */
+    .scanner-video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background-color: #000000;
+    }
+
+    /* Top Controls HUD Bar */
+    .scanner-hud-top {
+        position: relative;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    .hud-circle-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        cursor: pointer;
+        transition: transform 0.15s ease, background-color 0.15s ease;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .hud-circle-btn:active {
+        transform: scale(0.92);
+        background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .hud-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .hud-status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #22c55e;
+        box-shadow: 0 0 8px #22c55e;
+        animation: pulseStatus 2s infinite ease-in-out;
+    }
+    @keyframes pulseStatus {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Center Viewfinder Container */
+    .scanner-hud-center {
+        position: relative;
+        z-index: 10;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    /* Fixed-Dimension Non-Collapsing Google Pay Target Box */
+    .gpay-box {
         position: relative !important;
-        width: 270px !important;
-        height: 270px !important;
-        max-width: 76vw !important;
-        max-height: 76vw !important;
+        width: 250px !important;
+        height: 250px !important;
+        min-width: 250px !important;
+        min-height: 250px !important;
+        max-width: 72vw !important;
+        max-height: 72vw !important;
         margin: 0 auto !important;
         flex-shrink: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
         box-sizing: border-box !important;
     }
 
-    .gpay-corner {
+    /* Google Colored 4 Rounded Corners */
+    .corner {
         position: absolute !important;
-        width: 48px !important;
-        height: 48px !important;
-        border-style: solid !important;
+        width: 44px !important;
+        height: 44px !important;
+        box-sizing: border-box !important;
         pointer-events: none !important;
-        box-sizing: border-box !important;
     }
-    .gpay-corner-tl {
+    .corner-tl {
         top: 0 !important;
         left: 0 !important;
-        border-width: 5px 0 0 5px !important;
-        border-color: #ea4335 !important; /* Google Red */
-        border-top-left-radius: 24px !important;
+        border-top: 5px solid #ea4335 !important; /* Google Red */
+        border-left: 5px solid #ea4335 !important;
+        border-top-left-radius: 22px !important;
     }
-    .gpay-corner-tr {
+    .corner-tr {
         top: 0 !important;
         right: 0 !important;
-        border-width: 5px 5px 0 0 !important;
-        border-color: #fbbc04 !important; /* Google Yellow */
-        border-top-right-radius: 24px !important;
+        border-top: 5px solid #fbbc04 !important; /* Google Yellow */
+        border-right: 5px solid #fbbc04 !important;
+        border-top-right-radius: 22px !important;
     }
-    .gpay-corner-bl {
+    .corner-bl {
         bottom: 0 !important;
         left: 0 !important;
-        border-width: 0 0 5px 5px !important;
-        border-color: #4285f4 !important; /* Google Blue */
-        border-bottom-left-radius: 24px !important;
+        border-bottom: 5px solid #4285f4 !important; /* Google Blue */
+        border-left: 5px solid #4285f4 !important;
+        border-bottom-left-radius: 22px !important;
     }
-    .gpay-corner-br {
+    .corner-br {
         bottom: 0 !important;
         right: 0 !important;
-        border-width: 0 5px 5px 0 !important;
-        border-color: #34a853 !important; /* Google Green */
-        border-bottom-right-radius: 24px !important;
+        border-bottom: 5px solid #34a853 !important; /* Google Green */
+        border-right: 5px solid #34a853 !important;
+        border-bottom-right-radius: 22px !important;
     }
 
-    /* Google Pay Upload from Gallery Pill Button */
-    .gpay-gallery-btn {
-        margin-top: 36px !important;
-        padding: 12px 26px !important;
-        background-color: #ffffff !important;
-        color: #1f2937 !important;
-        font-family: inherit !important;
-        font-size: 14px !important;
-        font-weight: 600 !important;
-        border-radius: 9999px !important;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
-        border: none !important;
-        cursor: pointer !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-        outline: none !important;
-        transition: transform 0.15s ease, background-color 0.15s ease !important;
-        -webkit-tap-highlight-color: transparent !important;
-    }
-    .gpay-gallery-btn:active {
-        transform: scale(0.96) !important;
-        background-color: #f3f4f6 !important;
-    }
-    .gpay-gallery-btn span {
-        color: #1f2937 !important;
-        font-size: 14px !important;
-        font-weight: 600 !important;
-    }
-    .gpay-gallery-btn i {
-        color: #4b5563 !important;
-        font-size: 16px !important;
-    }
-
-    /* Laser scan line */
-    .gpay-laser-line {
+    /* Animated Laser Scan Line */
+    .gpay-laser {
         position: absolute !important;
-        left: 14px !important;
-        right: 14px !important;
-        height: 2px !important;
+        left: 10px !important;
+        right: 10px !important;
+        height: 2.5px !important;
         background: linear-gradient(90deg, transparent, #4285f4, #34a853, transparent) !important;
-        box-shadow: 0 0 10px rgba(66, 133, 244, 0.8) !important;
+        box-shadow: 0 0 12px rgba(66, 133, 244, 0.9) !important;
         pointer-events: none !important;
     }
 
-    /* Slide-up bottom sheet animation */
+    /* Bottom HUD Instruction Pill */
+    .scanner-hud-bottom {
+        position: relative;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 20px 22px;
+        background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+    }
+
+    .hud-helper-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        border-radius: 9999px;
+        background-color: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+    }
+
+    /* Slide-Up Bottom Sheet Animation */
     @keyframes slideUpSheet {
         from { transform: translateY(100%); }
         to { transform: translateY(0); }
@@ -112,159 +231,76 @@
     .animate-sheet-up {
         animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-
-    /* Responsive View Switcher */
-    @media (min-width: 768px) {
-        #pcOnlyWrapper {
-            display: flex !important;
-        }
-        #mobileScannerWrapper.pc-hidden {
-            display: none !important;
-        }
-    }
-    @media (max-width: 767px) {
-        #pcOnlyWrapper {
-            display: none !important;
-        }
-        #mobileScannerWrapper {
-            display: flex !important;
-        }
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- ========================================================================= -->
-<!-- 1. PC / DESKTOP VIEW (Visible ONLY on Desktop screens >= 768px)          -->
+<!-- LIVE CAMERA SCANNER (Integrated in Dashboard with Top and Bottom Navbars) -->
 <!-- ========================================================================= -->
-<div id="pcOnlyWrapper" class="flex flex-col items-center justify-center py-10 px-4 min-h-[calc(100vh-140px)]">
-    <div class="bg-white border border-[#dadce0] rounded-2xl p-8 max-w-md w-full text-center shadow-sm">
-        <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4 border border-emerald-100">
-            <i class="bi bi-phone"></i>
-        </div>
-        <h2 class="text-xl font-display font-extrabold text-[#202124] mb-2">Mobile Scanner Only</h2>
-        <p class="text-xs text-[#5f6368] mb-6 leading-relaxed">
-            The Ticket Scanner is optimized exclusively for mobile devices with a camera. Scan the QR code below with your phone to open the scanner immediately.
-        </p>
+<div class="scanner-outer-container">
+    <div class="scanner-viewport">
 
-        <!-- QR Code Linking Directly to Scanner on Mobile -->
-        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 inline-block mb-6">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.admin.nizhalcommunity.in/dashboard/scanner/" 
-                 alt="Scan with phone" 
-                 class="w-40 h-40 rounded-lg mx-auto bg-white p-1" />
-            <div class="text-xs font-mono text-gray-500 mt-2 font-semibold">Point phone camera to open</div>
-        </div>
+        <!-- Live Camera Video Element -->
+        <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="scanner-video"></video>
+        <canvas id="gpayCanvas" style="display:none;"></canvas>
 
-        <div class="flex flex-col gap-2">
-            <a href="{% url 'dashboard-overview' %}" class="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-[#3c4043] font-bold text-xs rounded-xl transition">
-                Return to Overview
-            </a>
-            <!-- Optional override to test webcam on desktop -->
-            <button type="button" onclick="enablePcScannerOverride()" class="text-xs text-emerald-700 hover:underline pt-2">
-                Continue anyway on PC (using webcam)
+        <!-- Top HUD Controls (Flip Camera, Live Indicator, Flashlight) -->
+        <div class="scanner-hud-top">
+            <!-- Flip Camera (Front / Rear) -->
+            <button type="button" onclick="flipCamera()" class="hud-circle-btn" title="Flip Camera">
+                <i class="bi bi-camera-reverse"></i>
             </button>
-        </div>
-    </div>
-</div>
 
+            <!-- Status Indicator -->
+            <div class="hud-status-badge">
+                <span class="hud-status-dot"></span>
+                <span>Camera Live</span>
+            </div>
 
-<!-- ========================================================================= -->
-<!-- 2. MOBILE VIEW (Full-Screen Google Pay Style Scanner UI)                   -->
-<!-- ========================================================================= -->
-<div id="mobileScannerWrapper" class="pc-hidden fixed inset-0 z-50 bg-black text-white flex flex-col justify-between overflow-hidden select-none">
-
-    <!-- Background Camera Video Feed -->
-    <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="absolute inset-0 w-full h-full object-cover"></video>
-    <canvas id="gpayCanvas" class="hidden"></canvas>
-
-    <!-- Top Navigation HUD Bar (Exact Google Pay Header) -->
-    <div class="relative z-20 px-4 pt-3 pb-2 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent">
-        <!-- Close Button (X) -->
-        <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-2xl" title="Close Scanner">
-            <i class="bi bi-x-lg"></i>
-        </a>
-
-        <!-- Right Quick Actions: Torch, QR / Event, Three-Dots Menu -->
-        <div class="flex items-center gap-2">
             <!-- Flashlight / Torch Toggle -->
-            <button type="button" onclick="toggleTorch()" id="btnTorch" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-xl" title="Flashlight">
+            <button type="button" onclick="toggleTorch()" id="btnTorch" class="hud-circle-btn" title="Flashlight">
                 <i class="bi bi-lightning-charge" id="torchIcon"></i>
             </button>
-
-            <!-- Event Selector Modal Button -->
-            <button type="button" onclick="openEventPickerModal()" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-xl" title="Filter Event">
-                <i class="bi bi-qr-code"></i>
-            </button>
-
-            <!-- Three-Dots Menu (Live Stats & Options) -->
-            <button type="button" onclick="toggleOptionsMenu()" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-2xl" title="Options">
-                <i class="bi bi-three-dots-vertical"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Center Viewfinder: Google Pay 4-Colored Corner Brackets -->
-    <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
-        
-        <!-- Target Scanner Box (Fixed non-collapsible 270x270px) -->
-        <div id="targetBox" class="gpay-target-box">
-            
-            <!-- 4 Distinct Google Brand Color Rounded Corners -->
-            <!-- 1. Top-Left: Red -->
-            <div class="gpay-corner gpay-corner-tl"></div>
-            <!-- 2. Top-Right: Yellow -->
-            <div class="gpay-corner gpay-corner-tr"></div>
-            <!-- 3. Bottom-Left: Blue -->
-            <div class="gpay-corner gpay-corner-bl"></div>
-            <!-- 4. Bottom-Right: Green -->
-            <div class="gpay-corner gpay-corner-br"></div>
-
-            <!-- Scanning Laser Line -->
-            <div id="scanLaser" class="gpay-laser-line"></div>
         </div>
 
-        <!-- "Upload from gallery" White Pill Button (GPay Styled & Visible Dark Text) -->
-        <button type="button" onclick="document.getElementById('galleryFileInput').click()" class="gpay-gallery-btn">
-            <i class="bi bi-image"></i>
-            <span>Upload from gallery</span>
-        </button>
-        <input type="file" id="galleryFileInput" accept="image/*" style="display:none;" onchange="handleGalleryScan(event)">
+        <!-- Center Viewfinder Target Box -->
+        <div class="scanner-hud-center">
+            <div id="targetBox" class="gpay-box">
+                <!-- 4 Google Colored Corners -->
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
 
-        <!-- Tap to Start Permission Overlay (Appears only if browser blocked auto-start) -->
-        <div id="startCameraPrompt" class="hidden absolute inset-0 z-30 bg-black/90 flex flex-col items-center justify-center p-6 text-center">
-            <div class="w-16 h-16 rounded-full bg-emerald-600 text-white flex items-center justify-center text-3xl mb-4 shadow-xl">
-                <i class="bi bi-camera"></i>
+                <!-- Animated Laser Line -->
+                <div id="scanLaser" class="gpay-laser"></div>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2">Camera Permission</h3>
-            <p class="text-xs text-gray-300 max-w-xs mb-6">Tap below to grant camera access and begin scanning ticket QR codes.</p>
-            <button type="button" onclick="startCameraDirectly()" class="py-3 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-full shadow-lg transition active:scale-95">
-                Tap to Start Camera
-            </button>
+        </div>
+
+        <!-- Bottom HUD Instruction Pill -->
+        <div class="scanner-hud-bottom">
+            <div class="hud-helper-pill">
+                <i class="bi bi-qr-code-scan text-emerald-400"></i>
+                <span>Point camera at ticket QR code</span>
+            </div>
         </div>
 
     </div>
-
-    <!-- Bottom Spacing / Status -->
-    <div class="relative z-20 px-6 pb-6 text-center">
-        <div id="activeEventIndicator" class="text-xs font-medium text-white/80 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-full inline-block border border-white/10">
-            Scanning for: <strong class="text-white">All Events (Auto-Detect)</strong>
-        </div>
-    </div>
-
 </div>
 
 
 <!-- ========================================================================= -->
-<!-- 3. SLIDE-UP VERIFICATION BOTTOM SHEET (Google Pay Result Dialog)          -->
+<!-- SLIDE-UP VERIFICATION BOTTOM SHEET (Instant Result Confirmation)          -->
 <!-- ========================================================================= -->
-<div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end">
-    <div class="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 text-[#1f2937] shadow-2xl animate-sheet-up">
+<div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end" onclick="handleBackdropClick(event)">
+    <div class="w-full max-w-lg mx-auto bg-white rounded-t-3xl p-6 text-[#1f2937] shadow-2xl animate-sheet-up" onclick="event.stopPropagation()">
         
         <!-- Drag Handle Indicator -->
         <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
 
-        <!-- Result Status Banner -->
+        <!-- 1. Verified Entry Success Block -->
         <div id="sheetSuccessBlock">
             <div class="flex items-center gap-2 mb-2 text-emerald-600">
                 <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-lg font-bold">✓</div>
@@ -275,7 +311,7 @@
             <div class="mb-3">
                 <h3 id="sheetAttendeeName" class="text-2xl font-display font-extrabold text-gray-900 leading-tight">Attendee Name</h3>
                 <p id="sheetEventTitle" class="text-xs font-semibold text-emerald-700 mt-0.5">Event Title</p>
-                <div class="text-[11px] font-mono font-bold text-gray-500 mt-1" id="sheetPassCode">PASS-XXXXX</div>
+                <div class="text-xs font-mono font-bold text-gray-500 mt-1" id="sheetPassCode">PASS-XXXXX</div>
             </div>
 
             <!-- Spot Count & Gender Pills -->
@@ -284,15 +320,15 @@
                     <i class="bi bi-people-fill text-emerald-600"></i>
                     <span id="sheetSpotCount">1 Spot Verified</span>
                 </div>
-                <span id="sheetMalePill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                <span id="sheetMalePill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
                     ♂ 1 Male
                 </span>
-                <span id="sheetFemalePill" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-800">
+                <span id="sheetFemalePill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-800">
                     ♀ 0 Female
                 </span>
             </div>
 
-            <div class="text-[11px] text-gray-500 mb-5 flex items-center justify-between">
+            <div class="text-xs text-gray-500 mb-5 flex items-center justify-between">
                 <span>Verified: <strong id="sheetTime" class="text-gray-700">Just now</strong></span>
                 <span class="text-emerald-700 font-semibold">✓ Gratitude email sent</span>
             </div>
@@ -303,7 +339,7 @@
             </button>
         </div>
 
-        <!-- Duplicate Warning Block -->
+        <!-- 2. Already Checked In Warning Block -->
         <div id="sheetDuplicateBlock" class="hidden">
             <div class="flex items-center gap-2 mb-2 text-amber-600">
                 <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-lg font-bold">!</div>
@@ -323,7 +359,7 @@
             </button>
         </div>
 
-        <!-- Invalid Error Block -->
+        <!-- 3. Invalid Ticket Error Block -->
         <div id="sheetErrorBlock" class="hidden">
             <div class="flex items-center gap-2 mb-2 text-red-600">
                 <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-lg font-bold">✕</div>
@@ -344,86 +380,19 @@
 </div>
 
 
-<!-- ========================================================================= -->
-<!-- 4. MODAL: Event Selector Picker                                           -->
-<!-- ========================================================================= -->
-<div id="eventPickerModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="w-full max-w-sm bg-white rounded-2xl p-5 text-gray-900 shadow-2xl">
-        <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
-            <h3 class="text-sm font-bold text-gray-900">Select Event to Scan</h3>
-            <button type="button" onclick="closeEventPickerModal()" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
-        </div>
-        <div class="space-y-1.5 max-h-60 overflow-y-auto">
-            <button type="button" onclick="selectEventFilter('', 'All Events (Auto-Detect)')" class="w-full text-left p-2.5 rounded-lg text-xs font-semibold hover:bg-emerald-50 hover:text-emerald-800 transition">
-                All Events (Auto-Detect)
-            </button>
-            {% for ev in events %}
-            <button type="button" onclick="selectEventFilter('{{ ev.id }}', '{{ ev.title|escapejs }}')" class="w-full text-left p-2.5 rounded-lg text-xs font-semibold hover:bg-emerald-50 hover:text-emerald-800 transition">
-                {{ ev.title }}
-            </button>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-
-<!-- ========================================================================= -->
-<!-- 5. MODAL: Scanner Options Menu (Flip Camera / Manual Entry / Live Stats)   -->
-<!-- ========================================================================= -->
-<div id="optionsModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="w-full max-w-md bg-white rounded-t-3xl sm:rounded-2xl p-6 text-gray-900 shadow-2xl">
-        <div class="flex items-center justify-between pb-3 mb-4 border-b border-gray-100">
-            <h3 class="text-base font-bold text-gray-900">Scanner Options</h3>
-            <button type="button" onclick="toggleOptionsMenu()" class="text-gray-400 hover:text-gray-700 text-lg">✕</button>
-        </div>
-
-        <div class="space-y-3 text-xs">
-            <!-- Flip Camera -->
-            <button type="button" onclick="flipCamera(); toggleOptionsMenu();" class="w-full py-2.5 px-4 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold flex items-center justify-between transition">
-                <span class="flex items-center gap-2">
-                    <i class="bi bi-camera-reverse text-base"></i>
-                    <span>Switch Front / Rear Camera</span>
-                </span>
-                <i class="bi bi-chevron-right text-gray-400"></i>
-            </button>
-
-            <!-- Manual Input Form -->
-            <div class="pt-2">
-                <label class="block font-bold text-gray-700 mb-1">Enter Pass ID Manually:</label>
-                <div class="flex gap-2">
-                    <input type="text" id="manualPassInput" placeholder="e.g. PASS-34FF1F4036" class="flex-1 py-2 px-3 border border-gray-300 rounded-lg uppercase font-mono text-xs font-bold focus:outline-none focus:border-emerald-600">
-                    <button type="button" onclick="submitManualPass()" class="py-2 px-4 bg-emerald-600 text-white rounded-lg font-bold text-xs">
-                        Verify
-                    </button>
-                </div>
-            </div>
-
-            <!-- Close Options -->
-            <div class="pt-3">
-                <button type="button" onclick="toggleOptionsMenu()" class="w-full py-2.5 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold text-gray-700 text-xs">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Audio Chime (Google Pay 2-Tone Melodic Chime) -->
+<!-- Audio Beep / Chime Synthesizer -->
 <script>
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
-
     function playGPayBeep(isSuccess) {
         try {
-            if (!audioCtx) audioCtx = new AudioCtx();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(ctx.destination);
 
             if (isSuccess) {
                 // Iconic GPay 2-Tone Melodic Chime (D5 -> A5)
@@ -462,7 +431,6 @@
     let barcodeDetector = null;
     let lastScannedCode = null;
     let lastScanTime = 0;
-    let selectedEventId = "";
 
     document.addEventListener('DOMContentLoaded', () => {
         // Native BarcodeDetector check
@@ -474,14 +442,23 @@
             }
         }
 
-        // Auto-start camera if on mobile view
-        if (window.innerWidth < 768 || document.getElementById('mobileScannerWrapper').offsetParent !== null) {
-            startCameraDirectly();
-        }
+        // Automatically start camera immediately without asking or waiting
+        startCameraDirectly();
 
         // Laser beam animation
         animateLaser();
     });
+
+    // Touch/click fallback in case mobile browser autoplay requires a user gesture
+    document.addEventListener('touchstart', resumeVideoIfPaused, { passive: true });
+    document.addEventListener('click', resumeVideoIfPaused, { passive: true });
+
+    function resumeVideoIfPaused() {
+        const video = document.getElementById('gpayVideo');
+        if (video && video.paused && videoStream) {
+            video.play().catch(e => console.warn('Play attempt on user gesture:', e));
+        }
+    }
 
     function animateLaser() {
         const laser = document.getElementById('scanLaser');
@@ -490,7 +467,7 @@
         let pos = 14;
         let dir = 1;
         setInterval(() => {
-            const h = box.offsetHeight || 270;
+            const h = box.offsetHeight || 250;
             pos += dir * 2;
             if (pos > h - 18) dir = -1;
             if (pos < 14) dir = 1;
@@ -500,53 +477,58 @@
 
     // Start Camera Video Stream with Multi-Tier Fallback
     async function startCameraDirectly() {
-        const prompt = document.getElementById('startCameraPrompt');
         const video = document.getElementById('gpayVideo');
+        if (!video) return;
 
         if (videoStream) {
             stopCamera();
         }
 
-        try {
-            prompt.classList.add('hidden');
-            let stream = null;
+        let stream = null;
 
-            // Strategy 1: Ideal facingMode and 720p resolution
+        // Strategy 1: Ideal facingMode and 720p resolution
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                    facingMode: { ideal: currentFacingMode },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+        } catch (e1) {
+            console.warn('Strategy 1 camera failed:', e1);
+            // Strategy 2: Simple facingMode
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
                     audio: false,
-                    video: {
-                        facingMode: { ideal: currentFacingMode },
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    }
+                    video: { facingMode: currentFacingMode }
                 });
-            } catch (e1) {
-                console.warn('Strategy 1 camera failed:', e1);
-                // Strategy 2: Simple facingMode
+            } catch (e2) {
+                console.warn('Strategy 2 camera failed:', e2);
+                // Strategy 3: Any available video device
                 try {
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        audio: false,
-                        video: { facingMode: currentFacingMode }
-                    });
-                } catch (e2) {
-                    console.warn('Strategy 2 camera failed:', e2);
-                    // Strategy 3: Any available video device
                     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                } catch (e3) {
+                    console.error('All camera attempts failed:', e3);
+                    return;
                 }
             }
+        }
 
+        if (stream) {
             videoStream = stream;
             video.srcObject = videoStream;
             video.setAttribute('playsinline', 'true');
             video.setAttribute('webkit-playsinline', 'true');
-            await video.play();
+            try {
+                await video.play();
+            } catch (playErr) {
+                console.warn('Video play caught:', playErr);
+            }
 
             // Start Scanning Frame Loop
             startScanningLoop();
-        } catch (err) {
-            console.warn('Camera stream error:', err);
-            prompt.classList.remove('hidden');
         }
     }
 
@@ -594,6 +576,7 @@
     function startScanningLoop() {
         const video = document.getElementById('gpayVideo');
         const canvas = document.getElementById('gpayCanvas');
+        if (!video || !canvas) return;
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
         async function scanFrame() {
@@ -628,7 +611,7 @@
                     }
                 }
             } catch (e) {
-                // Frame processing error
+                // Frame processing catch
             }
 
             scanAnimationId = requestAnimationFrame(scanFrame);
@@ -648,52 +631,6 @@
         verifyPassCode(text);
     }
 
-    // Gallery File Upload Scan
-    function handleGalleryScan(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            const img = new Image();
-            img.onload = async function() {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-
-                // BarcodeDetector first
-                if (barcodeDetector) {
-                    try {
-                        const barcodes = await barcodeDetector.detect(img);
-                        if (barcodes && barcodes.length > 0) {
-                            verifyPassCode(barcodes[0].rawValue);
-                            e.target.value = '';
-                            return;
-                        }
-                    } catch (err) {}
-                }
-
-                // jsQR fallback
-                if (window.jsQR) {
-                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const code = jsQR(imgData.data, imgData.width, imgData.height);
-                    if (code && code.data) {
-                        verifyPassCode(code.data);
-                        e.target.value = '';
-                        return;
-                    }
-                }
-
-                alert('No QR code detected in the selected image. Please try another photo.');
-                e.target.value = '';
-            };
-            img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
     // Verify Pass Code via Backend API
     async function verifyPassCode(code) {
         if (isVerifying) return;
@@ -707,8 +644,7 @@
                     'X-CSRFToken': getCookie('csrftoken')
                 },
                 body: JSON.stringify({
-                    code: code,
-                    event_id: selectedEventId
+                    code: code
                 })
             });
 
@@ -724,43 +660,45 @@
                 playGPayBeep(false);
                 showErrorSheet(data);
             }
-        } catch (err) {
+        } catch (e) {
+            console.error('Verify request error:', e);
             playGPayBeep(false);
-            showErrorSheet({ message: 'Network or connection error. Please try again.' });
-        } finally {
-            isVerifying = false;
+            showErrorSheet({
+                status: 'NETWORK_ERROR',
+                message: 'Network error or server unavailable. Please try again.'
+            });
         }
     }
 
-    // Bottom Sheet Display Functions
+    // Slide-up bottom sheet display helpers
     function showSuccessSheet(data) {
         document.getElementById('sheetSuccessBlock').classList.remove('hidden');
         document.getElementById('sheetDuplicateBlock').classList.add('hidden');
         document.getElementById('sheetErrorBlock').classList.add('hidden');
 
-        document.getElementById('sheetAttendeeName').innerText = data.customer.name;
-        document.getElementById('sheetEventTitle').innerText = data.event.title;
-        document.getElementById('sheetPassCode').innerText = data.attendee.pass_code;
-
-        const count = data.attendee.ticket_count || 1;
-        document.getElementById('sheetSpotCount').innerText = count + ' ' + (count > 1 ? 'Spots Verified' : 'Spot Verified');
+        document.getElementById('sheetAttendeeName').innerText = data.customer ? data.customer.name : 'Attendee';
+        document.getElementById('sheetEventTitle').innerText = data.event ? data.event.title : 'Event';
+        document.getElementById('sheetPassCode').innerText = data.pass_code || data.code || '';
+        document.getElementById('sheetSpotCount').innerText = `${data.ticket_count || 1} Spot${(data.ticket_count || 1) > 1 ? 's' : ''} Verified`;
 
         const malePill = document.getElementById('sheetMalePill');
         const femalePill = document.getElementById('sheetFemalePill');
-        if (data.male_count) {
-            malePill.innerText = '♂ ' + data.male_count + ' Male';
-            malePill.classList.remove('hidden');
+
+        if (data.male_count && data.male_count > 0) {
+            malePill.innerText = `♂ ${data.male_count} Male`;
+            malePill.style.display = 'inline-block';
         } else {
-            malePill.classList.add('hidden');
-        }
-        if (data.female_count) {
-            femalePill.innerText = '♀ ' + data.female_count + ' Female';
-            femalePill.classList.remove('hidden');
-        } else {
-            femalePill.classList.add('hidden');
+            malePill.style.display = 'none';
         }
 
-        document.getElementById('sheetTime').innerText = data.checked_in_at_formatted || 'Just now';
+        if (data.female_count && data.female_count > 0) {
+            femalePill.innerText = `♀ ${data.female_count} Female`;
+            femalePill.style.display = 'inline-block';
+        } else {
+            femalePill.style.display = 'none';
+        }
+
+        document.getElementById('sheetTime').innerText = data.check_in_time || 'Just now';
         document.getElementById('resultModal').classList.remove('hidden');
     }
 
@@ -769,9 +707,9 @@
         document.getElementById('sheetDuplicateBlock').classList.remove('hidden');
         document.getElementById('sheetErrorBlock').classList.add('hidden');
 
-        document.getElementById('dupName').innerText = data.customer ? data.customer.name : 'Registered Attendee';
-        document.getElementById('dupCode').innerText = data.attendee ? data.attendee.pass_code : (data.code || '');
-        document.getElementById('dupTime').innerText = data.checked_in_at_formatted || 'Earlier today';
+        document.getElementById('dupName').innerText = data.customer ? data.customer.name : 'Attendee';
+        document.getElementById('dupCode').innerText = data.pass_code || data.code || '';
+        document.getElementById('dupTime').innerText = data.already_checked_in_at || 'Earlier';
 
         document.getElementById('resultModal').classList.remove('hidden');
     }
@@ -793,40 +731,8 @@
         isVerifying = false;
     }
 
-    // Event Picker Modal Controls
-    function openEventPickerModal() {
-        document.getElementById('eventPickerModal').classList.remove('hidden');
-    }
-    function closeEventPickerModal() {
-        document.getElementById('eventPickerModal').classList.add('hidden');
-    }
-    function selectEventFilter(eventId, eventTitle) {
-        selectedEventId = eventId;
-        document.getElementById('activeEventIndicator').innerHTML = `Scanning for: <strong class="text-white">${eventTitle}</strong>`;
-        closeEventPickerModal();
-    }
-
-    // Options Menu Modal Controls
-    function toggleOptionsMenu() {
-        const modal = document.getElementById('optionsModal');
-        modal.classList.toggle('hidden');
-    }
-    function submitManualPass() {
-        const input = document.getElementById('manualPassInput');
-        const code = input.value.trim();
-        if (!code) return;
-        toggleOptionsMenu();
-        verifyPassCode(code);
-        input.value = '';
-    }
-
-    // PC Screen Override (if testing on laptop webcam)
-    function enablePcScannerOverride() {
-        document.getElementById('pcOnlyWrapper').style.display = 'none';
-        const wrapper = document.getElementById('mobileScannerWrapper');
-        wrapper.classList.remove('pc-hidden');
-        wrapper.style.display = 'flex';
-        startCameraDirectly();
+    function handleBackdropClick(event) {
+        closeResultSheet();
     }
 
     // Cookie CSRF Token
