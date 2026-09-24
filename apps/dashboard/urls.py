@@ -38,6 +38,10 @@ urlpatterns = [
     path('audit/', views.audit_logs_view, name='dashboard-audit-logs'),
     path('scanner/', views.scanner_page_view, name='dashboard-scanner'),
     path('scanner/verify/', views.scanner_verify_api, name='dashboard-scanner-verify'),
+    path('scanner/verify-api/', views.scanner_verify_api, name='dashboard-scanner-verify-api'),
     path('scanner/stats/', views.scanner_stats_api, name='dashboard-scanner-stats'),
-    path('scanner/resend-email/<str:pass_code>/', views.scanner_resend_email_api, name='dashboard-scanner-resend-email'),
+    path('scanner/stats-api/', views.scanner_stats_api, name='dashboard-scanner-stats-api'),
+    path('scanner/resend-email/', views.scanner_resend_email_api, name='dashboard-scanner-resend-email'),
+    path('scanner/resend-email-api/', views.scanner_resend_email_api, name='dashboard-scanner-resend-email-api'),
+    path('scanner/resend-email/<str:pass_code>/', views.scanner_resend_email_api, name='dashboard-scanner-resend-email-code'),
 ]

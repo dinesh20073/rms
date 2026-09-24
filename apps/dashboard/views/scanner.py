@@ -396,11 +396,21 @@ def scanner_stats_api(request):
 
 @login_required(login_url='login')
 @require_http_methods(['POST', 'GET'])
-def scanner_resend_email_api(request, pass_code):
+def scanner_resend_email_api(request, pass_code=None):
     """
     Allows staff to manually resend participation confirmation email from the scanner page.
     """
     tenant = get_current_tenant(request)
+    if not pass_code:
+        try:
+            body = json.loads(request.body.decode('utf-8'))
+            pass_code = body.get('pass_code') or body.get('code')
+        except Exception:
+            pass_code = request.POST.get('pass_code') or request.GET.get('pass_code')
+
+    if not pass_code:
+        return JsonResponse({'success': False, 'message': 'Missing pass code.'}, status=400)
+
     attendee = Attendee.objects.filter(pass_code=pass_code, registration__event__tenant=tenant).first()
     if not attendee:
         return JsonResponse({'success': False, 'message': 'Attendee not found.'}, status=404)
