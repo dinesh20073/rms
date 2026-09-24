@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
     /* =========================================================================
-       Nizhal Camera Scanner - Iconic Google Pay Viewfinder & Smooth Mask
+       Nizhal Camera Scanner - Crystal Clear Center & Blurred Black Surround
        ========================================================================= */
     .scanner-page {
         position: relative;
@@ -52,18 +52,23 @@
         z-index: 1;
     }
 
-    /* Surrounding Black Blurred Mask (SVG Mask with Rounded Cutout) */
-    .scanner-mask-svg {
+    /* =========================================================================
+       4 Surrounding Blur Panels (Top, Bottom, Left, Right)
+       Leaves the CENTER completely clear - NO blur element ever touches the center!
+       ========================================================================= */
+    .scanner-blur-surround {
         position: absolute;
         inset: 0;
-        width: 100%;
-        height: 100%;
         z-index: 6;
         pointer-events: none;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        -webkit-mask: url(#scannerHole);
-        mask: url(#scannerHole);
+    }
+
+    .blur-section {
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        pointer-events: none;
     }
 
     /* Center Content Container */
@@ -79,7 +84,7 @@
         justify-content: center;
     }
 
-    /* Fixed-Dimension 240px Google Pay Target Box */
+    /* Fixed-Dimension 240px Google Pay Target Box - COMPLETELY CLEAR INSIDE */
     .gpay-box {
         position: relative !important;
         width: 240px !important;
@@ -91,10 +96,11 @@
         margin: 0 auto !important;
         flex-shrink: 0 !important;
         box-sizing: border-box !important;
+        background: transparent !important;
     }
 
-    /* Iconic Google Pay SVG Corner Brackets with Rounded End-Caps */
-    .gpay-corners-svg {
+    /* SVG with corner brackets and corner-nook rounding fills */
+    .gpay-box-svg {
         position: absolute;
         inset: 0;
         width: 100%;
@@ -102,7 +108,7 @@
         pointer-events: none;
     }
 
-    /* Animated Laser Line */
+    /* Animated Laser Scan Line */
     .gpay-laser {
         position: absolute !important;
         left: 14px !important;
@@ -234,7 +240,7 @@
 {% block content %}
 
 <!-- ========================================================================= -->
-<!-- SCANNER CONTAINER (CENTERED CONTROLS & ROUNDED BLURRED CUTOUT)            -->
+<!-- SCANNER CONTAINER (CENTERED CONTROLS & CLEAR CENTER WITH BLUR SURROUND)   -->
 <!-- ========================================================================= -->
 <div class="scanner-page">
 
@@ -242,18 +248,14 @@
     <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="scanner-bg-video"></video>
     <canvas id="gpayCanvas" style="display:none;"></canvas>
 
-    <!-- Surrounding Black Blur Mask with Rounded Corner Cutout -->
-    <svg id="scannerMaskSvg" class="scanner-mask-svg" width="100%" height="100%" style="display: none;">
-        <defs>
-            <mask id="scannerHole">
-                <!-- White covers everything: renders blur + dark shade -->
-                <rect width="100%" height="100%" fill="white" />
-                <!-- Black rounded cutout: reveals clear unblurred camera feed -->
-                <rect id="maskHoleRect" x="0" y="0" width="240" height="240" rx="28" ry="28" fill="black" />
-            </mask>
-        </defs>
-        <rect width="100%" height="100%" fill="rgba(0, 0, 0, 0.72)" mask="url(#scannerHole)" />
-    </svg>
+    <!-- 4 Surrounding Blur Panels: Blurs TOP, BOTTOM, LEFT, RIGHT of the screen -->
+    <!-- The center box is completely OPEN and CLEAR with ZERO blur! -->
+    <div id="scannerBlurSurround" class="scanner-blur-surround" style="display: none;">
+        <div id="blurTop" class="blur-section"></div>
+        <div id="blurBottom" class="blur-section"></div>
+        <div id="blurLeft" class="blur-section"></div>
+        <div id="blurRight" class="blur-section"></div>
+    </div>
 
     <!-- 1. Big Camera Logo Consent Screen (Centered on initial load / camera off) -->
     <div id="consentCard" class="scanner-consent-card">
@@ -271,10 +273,16 @@
     <!-- 2. Active Center Content (Viewfinder + Center Action Buttons) -->
     <div id="scannerCenterStack" class="scanner-center-content" style="display: none;">
         
-        <!-- Focused Target Box -->
+        <!-- Focused Target Box (100% CLEAR - NO BLUR EVER OVER IT) -->
         <div id="targetBox" class="gpay-box">
-            <!-- Iconic Google Pay Rounded Corner Brackets (Smooth Round Caps) -->
-            <svg class="gpay-corners-svg" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="gpay-box-svg" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- 4 Corner Nooks to smooth out the transition into the 4 blur panels -->
+                <path d="M 0 0 L 26 0 A 26 26 0 0 0 0 26 Z" fill="rgba(0, 0, 0, 0.72)"/>
+                <path d="M 240 0 L 214 0 A 26 26 0 0 1 240 26 Z" fill="rgba(0, 0, 0, 0.72)"/>
+                <path d="M 0 240 L 0 214 A 26 26 0 0 1 26 240 Z" fill="rgba(0, 0, 0, 0.72)"/>
+                <path d="M 240 240 L 214 240 A 26 26 0 0 1 240 214 Z" fill="rgba(0, 0, 0, 0.72)"/>
+
+                <!-- Iconic Google Pay Rounded Corner Brackets (Smooth Round Caps) -->
                 <!-- Top-Left: Red -->
                 <path d="M 8 50 L 8 32 A 24 24 0 0 1 32 8 L 50 8" stroke="#ea4335" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
                 <!-- Top-Right: Yellow -->
@@ -468,7 +476,10 @@
     });
 
     window.addEventListener('resize', () => {
-        if (isCameraActive) updateBlurMaskPosition();
+        if (isCameraActive) updateBlurPanels();
+    });
+    window.addEventListener('orientationchange', () => {
+        if (isCameraActive) setTimeout(updateBlurPanels, 150);
     });
 
     async function enumerateCameras() {
@@ -482,27 +493,52 @@
         }
     }
 
-    // Dynamic blur mask calculation: Cut out the focused box with rounded corners
-    function updateBlurMaskPosition() {
+    // Update 4 surrounding blur panels: TOP, BOTTOM, LEFT, RIGHT
+    // The center target box is completely UNCOVERED and 100% CLEAR!
+    function updateBlurPanels() {
         const box = document.getElementById('targetBox');
-        const hole = document.getElementById('maskHoleRect');
         const page = document.querySelector('.scanner-page');
-        if (!box || !hole || !page) return;
+        const bTop = document.getElementById('blurTop');
+        const bBottom = document.getElementById('blurBottom');
+        const bLeft = document.getElementById('blurLeft');
+        const bRight = document.getElementById('blurRight');
+        if (!box || !page || !bTop || !bBottom || !bLeft || !bRight) return;
 
         const boxRect = box.getBoundingClientRect();
         const pageRect = page.getBoundingClientRect();
 
         const top = Math.round(boxRect.top - pageRect.top);
         const left = Math.round(boxRect.left - pageRect.left);
-        const w = Math.round(boxRect.width);
-        const h = Math.round(boxRect.height);
+        const boxW = Math.round(boxRect.width);
+        const boxH = Math.round(boxRect.height);
+        const right = left + boxW;
+        const bottom = top + boxH;
+        const pageW = Math.round(pageRect.width);
+        const pageH = Math.round(pageRect.height);
 
-        hole.setAttribute('x', left);
-        hole.setAttribute('y', top);
-        hole.setAttribute('width', w);
-        hole.setAttribute('height', h);
-        hole.setAttribute('rx', '28');
-        hole.setAttribute('ry', '28');
+        // Top section
+        bTop.style.top = '0px';
+        bTop.style.left = '0px';
+        bTop.style.width = '100%';
+        bTop.style.height = top + 'px';
+
+        // Bottom section
+        bBottom.style.top = bottom + 'px';
+        bBottom.style.left = '0px';
+        bBottom.style.width = '100%';
+        bBottom.style.height = Math.max(0, pageH - bottom) + 'px';
+
+        // Left section
+        bLeft.style.top = top + 'px';
+        bLeft.style.left = '0px';
+        bLeft.style.width = left + 'px';
+        bLeft.style.height = boxH + 'px';
+
+        // Right section
+        bRight.style.top = top + 'px';
+        bRight.style.left = right + 'px';
+        bRight.style.width = Math.max(0, pageW - right) + 'px';
+        bRight.style.height = boxH + 'px';
     }
 
     // Turn ON Camera
@@ -510,7 +546,7 @@
         const video = document.getElementById('gpayVideo');
         const consentCard = document.getElementById('consentCard');
         const centerStack = document.getElementById('scannerCenterStack');
-        const maskSvg = document.getElementById('scannerMaskSvg');
+        const blurSurround = document.getElementById('scannerBlurSurround');
 
         stopCamera();
 
@@ -569,10 +605,13 @@
             // Reveal camera UI and hide consent screen
             consentCard.style.display = 'none';
             centerStack.style.display = 'flex';
-            maskSvg.style.display = 'block';
+            blurSurround.style.display = 'block';
 
-            // Calculate rounded cutout for blur mask
-            requestAnimationFrame(updateBlurMaskPosition);
+            // Calculate surrounding blur panels (leaving center 100% clear)
+            requestAnimationFrame(() => {
+                updateBlurPanels();
+                setTimeout(updateBlurPanels, 60);
+            });
 
             startScanningLoop();
             startLaserAnimation();
@@ -589,10 +628,10 @@
 
         const consentCard = document.getElementById('consentCard');
         const centerStack = document.getElementById('scannerCenterStack');
-        const maskSvg = document.getElementById('scannerMaskSvg');
+        const blurSurround = document.getElementById('scannerBlurSurround');
 
         if (centerStack) centerStack.style.display = 'none';
-        if (maskSvg) maskSvg.style.display = 'none';
+        if (blurSurround) blurSurround.style.display = 'none';
         if (consentCard) {
             consentCard.style.display = 'flex';
             const btn = consentCard.querySelector('button');
