@@ -96,38 +96,6 @@
             }
         }
 
-        /* Celebration Animation for modern email clients & webmail */
-        @keyframes pulseGlow {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
-            }
-            50% {
-                transform: scale(1.03);
-                box-shadow: 0 6px 25px rgba(16, 185, 129, 0.7);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
-            }
-        }
-        @keyframes sparkleSpin {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(15deg) scale(1.25); }
-            50% { transform: rotate(0deg); }
-            75% { transform: rotate(-15deg) scale(1.25); }
-            100% { transform: rotate(0deg); }
-        }
-
-        .animated-celebrate-pill {
-            animation: pulseGlow 2.5s infinite ease-in-out !important;
-            display: inline-block !important;
-        }
-        .animated-sparkle {
-            display: inline-block !important;
-            animation: sparkleSpin 2s infinite ease-in-out !important;
-        }
-
         /* Universal Light Mode Lock */
         @media (prefers-color-scheme: dark) {
             html, body, .force-white-bg, .ticket-card {
@@ -337,16 +305,13 @@
                         </td>
                     </tr>
 
-                    <!-- 7. ANIMATED CELEBRATION BADGE (At the end) -->
+                    <!-- 7. EVENT CELEBRATION BADGE (Clean Static Pill) -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 8px 20px 22px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
-                            <div class="animated-celebrate-pill" style="display: inline-block; background-color: #047857 !important; background-image: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%) !important; color: #ffffff !important; padding: 12px 34px; font-size: 13px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-radius: 30px; border: 2px solid #86efac; box-shadow: 0 4px 18px rgba(5, 150, 105, 0.45); font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;">
-                                <span class="animated-sparkle" style="display: inline-block; margin-right: 6px; font-size: 16px;">✨</span>
+                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 10px 20px 24px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
+                            <div style="display: inline-block; background-color: #047857 !important; background-image: linear-gradient(135deg, #059669 0%, #047857 100%) !important; color: #ffffff !important; padding: 12px 32px; font-size: 13px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 28px; border: 1.5px solid #86efac; font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;">
+                                <span style="display: inline-block; margin-right: 6px; font-size: 15px;">✨</span>
                                 <span>ENJOY THE NIZHAL EVENT!</span>
-                                <span class="animated-sparkle" style="display: inline-block; margin-left: 6px; font-size: 16px;">🎉</span>
-                            </div>
-                            <div style="margin-top: 10px; font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: #059669 !important; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;">
-                                ★ OFFICIALLY ADMITTED • ENTRY VERIFIED ★
+                                <span style="display: inline-block; margin-left: 6px; font-size: 15px;">🎉</span>
                             </div>
                         </td>
                     </tr>
