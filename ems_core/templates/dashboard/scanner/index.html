@@ -13,7 +13,7 @@
                 <span class="text-[#202124]">Ticket Scanner</span>
             </div>
             <h1 class="text-xl sm:text-2xl font-display font-bold text-[#202124] tracking-tight flex items-center gap-2">
-                <i class="bi bi-qr-code-scan text-[#0f9d58]"></i>
+                <i class="bi bi-qr-code-scan text-[#1a73e8]"></i>
                 <span>Gate Pass Scanner & Check-in</span>
             </h1>
         </div>
@@ -83,55 +83,107 @@
         </div>
     </div>
 
-    <!-- Main Scanner Layout: Left Column (Camera + Manual Input) & Right Column (Verification Result Card) -->
+    <!-- Main Scanner Layout: Left Column (GPay Camera + Manual) & Right Column (Verification Result Card) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-        <!-- Left Column: Camera Scanner & Manual Input (lg: 5 cols) -->
+        <!-- Left Column: Google Pay Style Scanner & Manual Input (lg: 5 cols) -->
         <div class="lg:col-span-5 flex flex-col gap-3">
 
-            <!-- Camera Scanner Box -->
-            <div class="bg-white border border-[#dadce0] p-3 shadow-2xs" style="border-radius: 0px !important;">
-                <div class="flex items-center justify-between border-b border-[#dadce0] pb-2 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#202124] flex items-center gap-1.5">
-                        <i class="bi bi-camera-video text-[#0f9d58]"></i>
-                        <span>Live QR Camera</span>
-                    </span>
+            <!-- Google Pay Authentic Camera Scanner Box -->
+            <div class="bg-[#111827] border border-[#1f2937] shadow-lg overflow-hidden text-white" style="border-radius: 8px !important;">
+                
+                <!-- GPay Top Bar with Status & Quick Controls -->
+                <div class="px-3.5 py-2.5 bg-[#1f2937]/90 backdrop-blur-md flex items-center justify-between border-b border-[#374151]">
+                    <div class="flex items-center gap-2">
+                        <span id="camStatusDot" class="w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse inline-block"></span>
+                        <span id="camStatusText" class="text-xs font-semibold tracking-wide text-gray-200">GPay Scanner</span>
+                    </div>
                     <div class="flex items-center gap-1.5">
-                        <!-- Camera Switch Button -->
-                        <button type="button" onclick="switchCamera()" id="btnSwitchCamera" class="p-1.5 text-xs text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] cursor-pointer" style="border-radius: 0px !important;" title="Switch Camera">
-                            <i class="bi bi-arrow-repeat"></i>
-                        </button>
                         <!-- Torch / Flashlight Toggle Button -->
-                        <button type="button" onclick="toggleTorch()" id="btnTorch" class="p-1.5 text-xs text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] cursor-pointer" style="border-radius: 0px !important;" title="Toggle Flashlight">
-                            <i class="bi bi-lightbulb"></i>
+                        <button type="button" onclick="toggleTorch()" id="btnTorch" class="px-2.5 py-1 text-xs bg-[#374151] hover:bg-[#4b5563] text-gray-200 rounded flex items-center gap-1 transition cursor-pointer" title="Toggle Flashlight">
+                            <i class="bi bi-lightning-charge"></i>
+                            <span class="hidden sm:inline">Torch</span>
                         </button>
-                        <!-- Scanner Pause/Resume Button -->
-                        <button type="button" onclick="toggleScanner()" id="btnToggleScan" class="px-2.5 py-1 text-xs font-bold text-white bg-[#1a73e8] hover:bg-[#1557b0] cursor-pointer" style="border-radius: 0px !important;">
-                            Pause
+                        <!-- Flip Camera Button -->
+                        <button type="button" onclick="flipCamera()" id="btnFlipCamera" class="px-2.5 py-1 text-xs bg-[#374151] hover:bg-[#4b5563] text-gray-200 rounded flex items-center gap-1 transition cursor-pointer" title="Switch Camera">
+                            <i class="bi bi-camera-reverse"></i>
+                            <span class="hidden sm:inline">Flip</span>
                         </button>
+                        <!-- Upload from Gallery Button (GPay style) -->
+                        <button type="button" onclick="triggerGalleryUpload()" class="px-2.5 py-1 text-xs bg-[#374151] hover:bg-[#4b5563] text-gray-200 rounded flex items-center gap-1 transition cursor-pointer" title="Scan Image from Gallery">
+                            <i class="bi bi-image"></i>
+                            <span class="hidden sm:inline">Gallery</span>
+                        </button>
+                        <input type="file" id="galleryFileInput" accept="image/*" class="hidden" onchange="handleGalleryScan(event)">
                     </div>
                 </div>
 
-                <!-- Video Viewport Container -->
-                <div class="relative bg-[#000000] w-full aspect-square max-h-[360px] overflow-hidden flex items-center justify-center border border-[#dadce0]" style="border-radius: 0px !important;">
-                    <div id="qr-reader" class="w-full h-full"></div>
+                <!-- GPay Viewfinder Viewport -->
+                <div class="relative bg-black w-full aspect-square max-h-[380px] overflow-hidden flex items-center justify-center">
                     
-                    <!-- Scanner Viewfinder Overlay with Reticle -->
-                    <div id="scannerOverlay" class="absolute inset-0 pointer-events-none flex items-center justify-center">
-                        <div class="w-56 h-56 border-2 border-[#10b981]/80 relative shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
-                            <!-- Reticle Corners -->
-                            <div class="absolute -top-1 -left-1 w-4 h-4 border-t-4 border-l-4 border-[#10b981]"></div>
-                            <div class="absolute -top-1 -right-1 w-4 h-4 border-t-4 border-r-4 border-[#10b981]"></div>
-                            <div class="absolute -bottom-1 -left-1 w-4 h-4 border-b-4 border-l-4 border-[#10b981]"></div>
-                            <div class="absolute -bottom-1 -right-1 w-4 h-4 border-b-4 border-r-4 border-[#10b981]"></div>
-                            <!-- Laser scan line animation -->
-                            <div class="w-full h-0.5 bg-[#10b981] shadow-[0_0_8px_#10b981] animate-bounce mt-28"></div>
+                    <!-- Direct Hardware-Accelerated Video Feed -->
+                    <video id="scannerVideo" playsinline autoplay muted class="w-full h-full object-cover"></video>
+                    
+                    <!-- Hidden processing canvas -->
+                    <canvas id="scannerCanvas" class="hidden"></canvas>
+
+                    <!-- Google Pay Target Box Overlay -->
+                    <div id="gpayOverlay" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
+                        
+                        <!-- Semi-transparent Vignette around target box -->
+                        <div class="relative w-[230px] h-[230px] sm:w-[250px] sm:h-[250px]">
+                            
+                            <!-- 4 Distinct GPay Rounded Brackets -->
+                            <!-- Top Left -->
+                            <div class="absolute -top-0.5 -left-0.5 w-10 h-10 border-t-4 border-l-4 border-[#38bdf8] rounded-tl-2xl shadow-[0_0_12px_rgba(56,189,248,0.6)]"></div>
+                            <!-- Top Right -->
+                            <div class="absolute -top-0.5 -right-0.5 w-10 h-10 border-t-4 border-r-4 border-[#38bdf8] rounded-tr-2xl shadow-[0_0_12px_rgba(56,189,248,0.6)]"></div>
+                            <!-- Bottom Left -->
+                            <div class="absolute -bottom-0.5 -left-0.5 w-10 h-10 border-b-4 border-l-4 border-[#38bdf8] rounded-bl-2xl shadow-[0_0_12px_rgba(56,189,248,0.6)]"></div>
+                            <!-- Bottom Right -->
+                            <div class="absolute -bottom-0.5 -right-0.5 w-10 h-10 border-b-4 border-r-4 border-[#38bdf8] rounded-br-2xl shadow-[0_0_12px_rgba(56,189,248,0.6)]"></div>
+
+                            <!-- Animated GPay Sweeping Laser Beam -->
+                            <div id="gpayLaser" class="gpay-laser-beam"></div>
+
+                            <!-- Center Reticle Indicator -->
+                            <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                                <div class="w-8 h-8 border border-white/40 rounded-full flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GPay Prompt Pill -->
+                        <div class="mt-4 px-3.5 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 text-[11px] font-medium text-gray-200 shadow-sm flex items-center gap-1.5">
+                            <i class="bi bi-qr-code text-[#38bdf8]"></i>
+                            <span>Align event QR within frame</span>
                         </div>
                     </div>
+
+                    <!-- Permission / Start Camera Fallback Modal -->
+                    <div id="cameraPromptOverlay" class="absolute inset-0 bg-[#111827]/95 flex flex-col items-center justify-center p-6 text-center z-10 hidden">
+                        <div class="w-16 h-16 rounded-full bg-[#1e40af]/30 border border-[#3b82f6]/40 flex items-center justify-center text-3xl mb-3 text-[#60a5fa]">
+                            <i class="bi bi-camera"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-white mb-1">Camera Access Required</h4>
+                        <p class="text-xs text-gray-400 mb-4 max-w-xs" id="camErrorMessage">
+                            Allow camera access to scan attendee QR passes automatically, just like Google Pay.
+                        </p>
+                        <button type="button" onclick="startGPayCamera()" class="px-5 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold uppercase tracking-wider rounded shadow-md transition cursor-pointer flex items-center gap-2">
+                            <i class="bi bi-play-circle-fill"></i>
+                            <span>Enable Camera</span>
+                        </button>
+                    </div>
+
                 </div>
 
-                <div class="text-[11px] text-[#5f6368] text-center mt-2">
-                    Point camera directly at the attendee's ticket QR code. Auto-detects instantly.
+                <!-- Footer Hint -->
+                <div class="px-3.5 py-2 bg-[#1f2937] text-[11px] text-gray-400 flex items-center justify-between border-t border-[#374151]">
+                    <span>Ultra-fast auto detection</span>
+                    <button type="button" onclick="togglePauseScanner()" id="btnPauseScanner" class="text-xs text-[#60a5fa] hover:underline cursor-pointer">
+                        Pause
+                    </button>
                 </div>
             </div>
 
@@ -139,16 +191,16 @@
             <div class="bg-white border border-[#dadce0] p-3 shadow-2xs" style="border-radius: 0px !important;">
                 <div class="text-xs font-bold uppercase tracking-wider text-[#202124] mb-2 flex items-center gap-1.5">
                     <i class="bi bi-keyboard text-[#1a73e8]"></i>
-                    <span>Manual Code / Barcode Gun Input</span>
+                    <span>Manual Pass ID / Barcode Gun Input</span>
                 </div>
                 <form id="manualVerifyForm" onsubmit="handleManualSubmit(event)" class="flex gap-2">
-                    <input type="text" id="manualCodeInput" placeholder="Enter PASS ID / Order ID (e.g. PASS-34FF1F4036)" class="flex-1 px-3 py-2 text-xs border border-[#dadce0] font-mono focus:outline-none focus:border-[#1a73e8]" style="border-radius: 0px !important;" autocomplete="off" autofocus>
+                    <input type="text" id="manualCodeInput" placeholder="PASS ID or Order ID (e.g. PASS-34FF1F4036)" class="flex-1 px-3 py-2 text-xs border border-[#dadce0] font-mono focus:outline-none focus:border-[#1a73e8]" style="border-radius: 0px !important;" autocomplete="off" autofocus>
                     <button type="submit" id="btnManualVerify" class="px-4 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-bold uppercase tracking-wider cursor-pointer shadow-2xs transition shrink-0" style="border-radius: 0px !important;">
                         Verify
                     </button>
                 </form>
                 <div class="text-[10px] text-[#5f6368] mt-1.5">
-                    Works with manual typing, USB 2D barcode scanner gun, or pasted ticket link.
+                    Supports typing, USB barcode scanner guns, and pasted pass URLs.
                 </div>
             </div>
 
@@ -167,7 +219,7 @@
                     </div>
                     <h3 class="text-base font-bold font-display text-[#202124]">Ready to Scan Passes</h3>
                     <p class="text-xs text-[#5f6368] max-w-sm mx-auto mt-1">
-                        Use the camera scanner on the left or type a Pass Code to verify attendee credentials and count male/female tickets.
+                        Point the camera at an event ticket QR or enter the Pass ID to verify admission, count Male/Female tickets, and dispatch participation gratitude emails.
                     </p>
                 </div>
 
@@ -179,122 +231,120 @@
                         <div class="flex items-center gap-2">
                             <span id="statusIcon" class="text-xl">✅</span>
                             <div>
-                                <div id="statusTitle" class="text-sm font-extrabold uppercase tracking-wide">
-                                    VALID TICKET - ENTRY CONFIRMED
-                                </div>
-                                <div id="statusSub" class="text-xs opacity-90">
-                                    Admitted at 09:30 AM
-                                </div>
+                                <h3 id="statusTitle" class="text-sm font-bold tracking-tight">VALID TICKET - ENTRY CONFIRMED</h3>
+                                <p id="statusSub" class="text-xs opacity-90">Checked in successfully</p>
                             </div>
                         </div>
-                        <div id="statusBadge" class="px-2.5 py-1 text-xs font-mono font-bold tracking-wider uppercase border">
-                            PASS-34FF1F4036
+                        <div class="flex items-center gap-2">
+                            <span id="statusBadge" class="px-2.5 py-1 text-xs font-mono font-bold tracking-wider uppercase border">
+                                PASS-34FF1F4036
+                            </span>
                         </div>
                     </div>
 
-                    <!-- 2. Gender & Ticket Count Metric Pills (Highlighted prominently as requested) -->
-                    <div class="grid grid-cols-3 gap-2 mb-4">
+                    <!-- 2. Gender & Spot Breakdown Metric Pills -->
+                    <div class="grid grid-cols-3 gap-2.5 mb-4">
                         <!-- Total Spots -->
-                        <div class="p-2.5 bg-[#f8f9fa] border border-[#dadce0] text-center" style="border-radius: 0px !important;">
+                        <div class="bg-[#f8f9fa] border border-[#dadce0] p-2.5 text-center">
                             <div class="text-[10px] font-bold uppercase tracking-wider text-[#5f6368]">Total Spots</div>
-                            <div class="text-xl sm:text-2xl font-extrabold font-display text-[#202124] mt-0.5" id="resTotalSpots">1</div>
-                            <div class="text-[10px] text-[#5f6368]">Ticket(s)</div>
+                            <div class="text-xl font-black font-display text-[#202124] mt-0.5" id="resTotalSpots">1</div>
+                            <div class="text-[10px] font-medium text-[#137333]">Admitted ✓</div>
                         </div>
-
                         <!-- Male Count -->
-                        <div class="p-2.5 bg-[#f0f9ff] border border-[#bae6fd] text-center" style="border-radius: 0px !important;">
+                        <div class="bg-[#f0f9ff] border border-[#bae6fd] p-2.5 text-center">
                             <div class="text-[10px] font-bold uppercase tracking-wider text-[#0369a1] flex items-center justify-center gap-1">
                                 <i class="bi bi-gender-male"></i>
                                 <span>Male</span>
                             </div>
-                            <div class="text-xl sm:text-2xl font-extrabold font-display text-[#0284c7] mt-0.5" id="resMaleCount">0</div>
-                            <div class="text-[10px] text-[#0369a1]">Attendee(s)</div>
+                            <div class="text-xl font-black font-display text-[#0284c7] mt-0.5" id="resMaleCount">0</div>
+                            <div class="text-[10px] font-medium text-[#0369a1]">Tickets</div>
                         </div>
-
                         <!-- Female Count -->
-                        <div class="p-2.5 bg-[#fdf2f8] border border-[#fbcfe8] text-center" style="border-radius: 0px !important;">
-                            <div class="text-[10px] font-bold uppercase tracking-wider text-[#be185d] flex items-center justify-center gap-1">
+                        <div class="bg-[#fdf2f8] border border-[#fbcfe8] p-2.5 text-center">
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-[#9d174d] flex items-center justify-center gap-1">
                                 <i class="bi bi-gender-female"></i>
                                 <span>Female</span>
                             </div>
-                            <div class="text-xl sm:text-2xl font-extrabold font-display text-[#db2777] mt-0.5" id="resFemaleCount">0</div>
-                            <div class="text-[10px] text-[#be185d]">Attendee(s)</div>
+                            <div class="text-xl font-black font-display text-[#db2777] mt-0.5" id="resFemaleCount">0</div>
+                            <div class="text-[10px] font-medium text-[#9d174d]">Tickets</div>
                         </div>
                     </div>
 
-                    <!-- 3. Primary Delegate Information Card -->
-                    <div class="bg-[#ffffff] border border-[#dadce0] p-3 mb-3.5" style="border-radius: 0px !important;">
-                        <div class="text-xs font-bold uppercase tracking-wider text-[#5f6368] mb-2 flex items-center justify-between border-b border-[#dadce0] pb-1.5">
-                            <span>Primary Attendee Details</span>
-                            <span id="resAmountPaid" class="font-mono text-[#1a73e8] font-bold">FREE</span>
+                    <!-- 3. Primary Registrant & Event Details -->
+                    <div class="border border-[#dadce0] mb-4 text-xs">
+                        <div class="bg-[#f8f9fa] px-3 py-2 border-b border-[#dadce0] font-mono font-bold text-[#202124] flex items-center justify-between">
+                            <span>PRIMARY REGISTRANT INFO</span>
+                            <span id="emailStatusBadge" class="text-[11px] font-sans font-bold text-[#137333] flex items-center gap-1">
+                                <i class="bi bi-envelope-check"></i>
+                                <span>Participation email sent ✓</span>
+                            </span>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="p-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
                             <div>
-                                <span class="text-[#5f6368]">Name:</span>
-                                <strong id="resCustomerName" class="text-[#202124] ml-1 block sm:inline">Dinesh Kumar</strong>
+                                <span class="text-[#5f6368] font-medium">Name:</span>
+                                <strong class="text-[#202124] ml-1" id="resCustomerName">-</strong>
                             </div>
                             <div>
-                                <span class="text-[#5f6368]">Phone:</span>
-                                <strong id="resCustomerPhone" class="text-[#202124] font-mono ml-1">+91 9876543210</strong>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <span class="text-[#5f6368]">Email:</span>
-                                <span id="resCustomerEmail" class="font-mono text-[#1a73e8] ml-1">dinesh@gmail.com</span>
+                                <span class="text-[#5f6368] font-medium">Phone:</span>
+                                <span class="text-[#202124] ml-1 font-mono font-semibold" id="resCustomerPhone">-</span>
                             </div>
                             <div>
-                                <span class="text-[#5f6368]">Event:</span>
-                                <strong id="resEventTitle" class="text-[#202124] ml-1">Nizhal Conclave</strong>
+                                <span class="text-[#5f6368] font-medium">Email:</span>
+                                <span class="text-[#1a73e8] ml-1 font-mono" id="resCustomerEmail">-</span>
                             </div>
                             <div>
-                                <span class="text-[#5f6368]">Venue:</span>
-                                <span id="resEventVenue" class="text-[#202124] ml-1">BIEC Bengaluru</span>
+                                <span class="text-[#5f6368] font-medium">Event:</span>
+                                <strong class="text-[#202124] ml-1" id="resEventTitle">-</strong>
+                            </div>
+                            <div>
+                                <span class="text-[#5f6368] font-medium">Venue:</span>
+                                <span class="text-[#202124] ml-1" id="resEventVenue">-</span>
+                            </div>
+                            <div>
+                                <span class="text-[#5f6368] font-medium">Amount Paid:</span>
+                                <span class="text-[#137333] ml-1 font-bold font-mono" id="resAmountPaid">-</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 4. Breakdown Table of All Attendees -->
-                    <div class="border border-[#dadce0] overflow-hidden mb-3.5" style="border-radius: 0px !important;">
-                        <div class="bg-[#f1f3f4] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#202124] border-b border-[#dadce0]">
-                            Admitted Ticket Holders
+                    <!-- 4. Attendee Breakdown Table (Co-Attendees) -->
+                    <div class="border border-[#dadce0] mb-4">
+                        <div class="bg-[#f8f9fa] px-3 py-2 border-b border-[#dadce0] font-mono font-bold text-xs text-[#202124] flex items-center justify-between">
+                            <span>PARTICIPANTS LIST</span>
+                            <span class="text-[10px] text-[#5f6368] font-normal">All admitted spots</span>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-xs text-left">
-                                <thead class="bg-[#f8f9fa] border-b border-[#dadce0] text-[11px] text-[#5f6368] uppercase font-mono">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-[#f1f3f4] text-[#5f6368] uppercase font-mono text-[10px]">
                                     <tr>
-                                        <th class="py-2 px-3">Name</th>
-                                        <th class="py-2 px-2 text-center">Age</th>
-                                        <th class="py-2 px-2 text-center">Gender</th>
-                                        <th class="py-2 px-2 text-right">Status</th>
+                                        <th class="py-1.5 px-3">Attendee Name</th>
+                                        <th class="py-1.5 px-2 text-center">Age</th>
+                                        <th class="py-1.5 px-2 text-center">Gender</th>
+                                        <th class="py-1.5 px-2 text-right">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="resAttendeesTableBody" class="divide-y divide-[#dadce0]">
-                                    <!-- Populated via JS -->
+                                    <!-- Populated dynamically via JS -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- 5. Email Notification Badge & Action Buttons -->
+                    <!-- 5. Action Footer Buttons -->
                     <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#dadce0]">
-                        <div class="flex items-center gap-1.5 text-xs">
-                            <span id="emailStatusBadge" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
-                                <i class="bi bi-envelope-check"></i>
-                                <span>Participation email sent ✓</span>
-                            </span>
-                            <button type="button" onclick="resendParticipationEmail()" id="btnResendEmail" class="text-xs text-[#1a73e8] hover:underline font-semibold cursor-pointer ml-1">
-                                Resend
-                            </button>
-                        </div>
-
                         <div class="flex items-center gap-2">
-                            <a id="btnViewPass" href="#" target="_blank" class="px-3 py-1.5 text-xs font-semibold text-[#5f6368] hover:text-[#202124] bg-white hover:bg-[#f1f3f4] border border-[#dadce0] inline-flex items-center gap-1.5 cursor-pointer" style="border-radius: 0px !important;">
-                                <i class="bi bi-box-arrow-up-right text-xs"></i>
-                                <span>View Pass</span>
+                            <a id="btnViewPass" href="#" target="_blank" class="px-3 py-1.5 bg-[#f1f3f4] hover:bg-[#e8eaed] text-[#202124] border border-[#dadce0] text-xs font-semibold inline-flex items-center gap-1.5 transition">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                <span>Open Full Pass</span>
                             </a>
-                            <button type="button" onclick="resetForNextScan()" class="px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white bg-[#0f9d58] hover:bg-[#0b8043] cursor-pointer shadow-2xs transition" style="border-radius: 0px !important;">
-                                Next Scan
+                            <button type="button" id="btnResendEmail" onclick="resendParticipationEmail()" class="px-3 py-1.5 bg-white hover:bg-[#f8f9fa] text-[#1a73e8] border border-[#dadce0] text-xs font-semibold inline-flex items-center gap-1.5 transition cursor-pointer">
+                                <i class="bi bi-envelope"></i>
+                                <span>Resend Gratitude Email</span>
                             </button>
                         </div>
+                        <button type="button" onclick="resetForNextScan()" class="px-4 py-1.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-bold uppercase tracking-wider shadow-2xs transition cursor-pointer">
+                            Next Scan ➔
+                        </button>
                     </div>
 
                 </div>
@@ -325,25 +375,55 @@
 
 </div>
 
-<!-- HTML5-QRCode Library via CDN -->
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<!-- Google Pay Scanner CSS Animation -->
+<style>
+    @keyframes gpayLaserSweep {
+        0% {
+            top: 0%;
+            opacity: 0.9;
+        }
+        50% {
+            top: 96%;
+            opacity: 1;
+        }
+        100% {
+            top: 0%;
+            opacity: 0.9;
+        }
+    }
+
+    .gpay-laser-beam {
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        height: 2.5px;
+        background: linear-gradient(90deg, transparent, #38bdf8, #60a5fa, #38bdf8, transparent);
+        box-shadow: 0 0 14px #38bdf8, 0 0 6px #60a5fa;
+        animation: gpayLaserSweep 2.2s ease-in-out infinite;
+        border-radius: 2px;
+    }
+</style>
+
+<!-- Fast jsQR Library for Guaranteed Universal Fallback -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
 <script>
-    let html5QrCode = null;
-    let isScannerRunning = false;
-    let currentCameraId = null;
-    let cameraList = [];
-    let currentCameraIndex = 0;
+    // State management
+    let videoStream = null;
+    let isScannerActive = true;
+    let currentFacingMode = "environment"; // default to rear camera like GPay
     let isTorchOn = false;
+    let barcodeDetector = null;
+    let scanAnimationId = null;
     let lastScannedCode = null;
     let lastScanTime = 0;
     let currentPassCode = null;
 
-    // Web Audio API Sound Synthesizer (Zero external audio file dependencies)
+    // Web Audio Synthesizer (Authentic GPay Success Chime)
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
 
-    function playBeep(isSuccess) {
+    function playGPayBeep(isSuccess) {
         try {
             if (!audioCtx) audioCtx = new AudioContextClass();
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -355,158 +435,282 @@
             gain.connect(audioCtx.destination);
 
             if (isSuccess) {
-                // Happy high 2-tone melodic chime
+                // Iconic GPay 2-Tone Melodic Chime (D5 -> A5)
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, now);
-                osc.frequency.exponentialRampToValueAtTime(1320, now + 0.12);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                osc.start(now);
-                osc.stop(now + 0.25);
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            } else {
-                // Low warning buzz tone
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(320, now);
-                osc.frequency.setValueAtTime(240, now + 0.15);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.frequency.setValueAtTime(587.33, now); // D5
+                osc.frequency.setValueAtTime(880.00, now + 0.08); // A5
+
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
                 osc.start(now);
                 osc.stop(now + 0.35);
-                if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+                if (navigator.vibrate) navigator.vibrate([70, 30, 70]);
+            } else {
+                // Warning low tone buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.setValueAtTime(220, now + 0.12);
+
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                osc.start(now);
+                osc.stop(now + 0.35);
+                if (navigator.vibrate) navigator.vibrate([250, 100, 250]);
             }
         } catch (e) {
-            console.warn('Audio feedback failed:', e);
+            console.warn('Audio chime unsupported:', e);
         }
     }
 
-    // Initialize Camera Scanner
-    async function initCameraScanner() {
+    // Initialize BarcodeDetector if available natively in browser
+    function initDetector() {
+        if ('BarcodeDetector' in window) {
+            try {
+                barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
+            } catch (e) {
+                console.warn('Native BarcodeDetector format error, using jsQR fallback');
+                barcodeDetector = null;
+            }
+        }
+    }
+
+    // Start GPay Video Stream
+    async function startGPayCamera() {
+        const overlay = document.getElementById('cameraPromptOverlay');
+        const video = document.getElementById('scannerVideo');
+        const statusDot = document.getElementById('camStatusDot');
+        const statusText = document.getElementById('camStatusText');
+
+        if (videoStream) {
+            stopGPayCamera();
+        }
+
         try {
-            cameraList = await Html5Qrcode.getCameras();
-            if (cameraList && cameraList.length > 0) {
-                // Prefer back camera ("environment")
-                let preferredIndex = cameraList.findIndex(c => c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('environment'));
-                if (preferredIndex === -1) preferredIndex = cameraList.length - 1; // Often back camera is last
-                currentCameraIndex = preferredIndex;
-                currentCameraId = cameraList[currentCameraIndex].id;
-                startScannerWithCamera(currentCameraId);
+            overlay.classList.add('hidden');
+            statusDot.className = 'w-2.5 h-2.5 rounded-full bg-[#f59e0b] animate-pulse inline-block';
+            statusText.innerText = 'Connecting...';
+
+            const constraints = {
+                audio: false,
+                video: {
+                    facingMode: { ideal: currentFacingMode },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+
+            videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = videoStream;
+            await video.play();
+
+            isScannerActive = true;
+            statusDot.className = 'w-2.5 h-2.5 rounded-full bg-[#10b981] animate-pulse inline-block';
+            statusText.innerText = currentFacingMode === 'environment' ? 'GPay Camera (Rear)' : 'GPay Camera (Front)';
+            document.getElementById('btnPauseScanner').innerText = 'Pause';
+
+            // Start scanning frame loop
+            startScanningLoop();
+        } catch (err) {
+            console.error('Camera stream error:', err);
+            statusDot.className = 'w-2.5 h-2.5 rounded-full bg-[#ef4444] inline-block';
+            statusText.innerText = 'Camera Error';
+            
+            overlay.classList.remove('hidden');
+            const errElem = document.getElementById('camErrorMessage');
+            if (err.name === 'NotAllowedError') {
+                errElem.innerText = 'Camera permission was denied. Please tap "Enable Camera" and click Allow in your browser address bar.';
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                errElem.innerText = 'No camera device detected on this device. You can use the Gallery upload or Manual entry below.';
             } else {
-                console.warn('No cameras detected, using environment facing mode fallback');
-                startScannerWithFacingMode();
+                errElem.innerText = 'Could not access camera (' + (err.message || err.name) + '). Tap Enable Camera to retry.';
+            }
+        }
+    }
+
+    function stopGPayCamera() {
+        if (scanAnimationId) {
+            cancelAnimationFrame(scanAnimationId);
+            scanAnimationId = null;
+        }
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
+    }
+
+    // Toggle Camera Pause/Resume
+    function togglePauseScanner() {
+        const btn = document.getElementById('btnPauseScanner');
+        const laser = document.getElementById('gpayLaser');
+        if (isScannerActive) {
+            isScannerActive = false;
+            btn.innerText = 'Resume';
+            laser.style.display = 'none';
+        } else {
+            isScannerActive = true;
+            btn.innerText = 'Pause';
+            laser.style.display = 'block';
+            startScanningLoop();
+        }
+    }
+
+    // Flip Front / Rear Camera
+    async function flipCamera() {
+        currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
+        await startGPayCamera();
+    }
+
+    // Toggle Flashlight / Torch
+    async function toggleTorch() {
+        if (!videoStream) return;
+        const track = videoStream.getVideoTracks()[0];
+        if (!track) return;
+
+        try {
+            const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+            if (!capabilities.torch) {
+                alert('Torch/Flashlight is not supported by your device or current camera.');
+                return;
+            }
+
+            isTorchOn = !isTorchOn;
+            await track.applyConstraints({
+                advanced: [{ torch: isTorchOn }]
+            });
+
+            const btn = document.getElementById('btnTorch');
+            if (isTorchOn) {
+                btn.classList.add('bg-[#f59e0b]', 'text-black');
+                btn.classList.remove('bg-[#374151]', 'text-gray-200');
+            } else {
+                btn.classList.remove('bg-[#f59e0b]', 'text-black');
+                btn.classList.add('bg-[#374151]', 'text-gray-200');
             }
         } catch (err) {
-            console.warn('Camera detection error, fallback to facingMode:', err);
-            startScannerWithFacingMode();
+            console.warn('Torch constraint error:', err);
         }
     }
 
-    function startScannerWithCamera(cameraId) {
-        if (!html5QrCode) {
-            html5QrCode = new Html5Qrcode("qr-reader");
-        }
-        const config = {
-            fps: 15,
-            qrbox: function(viewfinderWidth, viewfinderHeight) {
-                const edge = Math.min(viewfinderWidth, viewfinderHeight);
-                return { width: Math.floor(edge * 0.75), height: Math.floor(edge * 0.75) };
-            }
-        };
+    // Main 60fps / 100ms Scanning Loop
+    function startScanningLoop() {
+        const video = document.getElementById('scannerVideo');
+        const canvas = document.getElementById('scannerCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-        html5QrCode.start(
-            cameraId,
-            config,
-            (decodedText) => onQrCodeDetected(decodedText),
-            (error) => { /* scanning search frame */ }
-        ).then(() => {
-            isScannerRunning = true;
-            document.getElementById('btnToggleScan').innerText = 'Pause';
-        }).catch(err => {
-            console.warn('Failed to start camera scanner:', err);
-        });
-    }
+        async function tick() {
+            if (!isScannerActive) return;
 
-    function startScannerWithFacingMode() {
-        if (!html5QrCode) {
-            html5QrCode = new Html5Qrcode("qr-reader");
-        }
-        const config = {
-            fps: 15,
-            qrbox: { width: 250, height: 250 }
-        };
-        html5QrCode.start(
-            { facingMode: "environment" },
-            config,
-            (decodedText) => onQrCodeDetected(decodedText),
-            (error) => {}
-        ).then(() => {
-            isScannerRunning = true;
-            document.getElementById('btnToggleScan').innerText = 'Pause';
-        }).catch(err => {
-            console.error('Camera start failed:', err);
-        });
-    }
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    function toggleScanner() {
-        if (!html5QrCode) return;
-        const btn = document.getElementById('btnToggleScan');
-        if (isScannerRunning) {
-            html5QrCode.stop().then(() => {
-                isScannerRunning = false;
-                btn.innerText = 'Resume';
-                btn.className = btn.className.replace('bg-[#1a73e8]', 'bg-[#0f9d58]');
-            });
-        } else {
-            if (currentCameraId) {
-                startScannerWithCamera(currentCameraId);
-            } else {
-                startScannerWithFacingMode();
-            }
-            btn.className = btn.className.replace('bg-[#0f9d58]', 'bg-[#1a73e8]');
-        }
-    }
+                let detectedText = null;
 
-    async function switchCamera() {
-        if (cameraList.length <= 1) return;
-        if (isScannerRunning && html5QrCode) {
-            await html5QrCode.stop();
-            currentCameraIndex = (currentCameraIndex + 1) % cameraList.length;
-            currentCameraId = cameraList[currentCameraIndex].id;
-            startScannerWithCamera(currentCameraId);
-        }
-    }
+                // 1. Try Native BarcodeDetector (instant hardware decoding)
+                if (barcodeDetector) {
+                    try {
+                        const barcodes = await barcodeDetector.detect(video);
+                        if (barcodes && barcodes.length > 0) {
+                            detectedText = barcodes[0].rawValue;
+                        }
+                    } catch (e) {
+                        // fallback to jsQR
+                    }
+                }
 
-    async function toggleTorch() {
-        try {
-            if (html5QrCode && isScannerRunning) {
-                isTorchOn = !isTorchOn;
-                await html5QrCode.applyVideoConstraints({
-                    advanced: [{ torch: isTorchOn }]
-                });
-                const btn = document.getElementById('btnTorch');
-                if (isTorchOn) {
-                    btn.classList.add('bg-[#fef7e0]', 'text-[#b06000]');
-                } else {
-                    btn.classList.remove('bg-[#fef7e0]', 'text-[#b06000]');
+                // 2. Fallback to jsQR on canvas
+                if (!detectedText && window.jsQR) {
+                    try {
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: "dontInvert"
+                        });
+                        if (code && code.data) {
+                            detectedText = code.data;
+                        }
+                    } catch (e) {
+                        // ignore frame error
+                    }
+                }
+
+                // If QR code found, process it!
+                if (detectedText) {
+                    handleScannedCode(detectedText);
                 }
             }
-        } catch (e) {
-            console.warn('Torch unsupported on this device', e);
+
+            scanAnimationId = requestAnimationFrame(tick);
         }
+
+        scanAnimationId = requestAnimationFrame(tick);
     }
 
-    // Debounced scan detection to prevent rapid double-hits
-    function onQrCodeDetected(decodedText) {
+    // Debounced scan handler to prevent rapid double-hits
+    function handleScannedCode(code) {
         const now = Date.now();
-        if (decodedText === lastScannedCode && (now - lastScanTime < 3000)) {
-            return; // ignore within 3s for identical code
+        if (code === lastScannedCode && (now - lastScanTime < 3500)) {
+            return; // ignore identical code within 3.5s
         }
-        lastScannedCode = decodedText;
+        lastScannedCode = code;
         lastScanTime = now;
 
-        verifyPassCode(decodedText, false);
+        // Visual flash in GPay viewfinder
+        const overlay = document.getElementById('gpayOverlay');
+        overlay.classList.add('scale-105', 'transition-transform');
+        setTimeout(() => overlay.classList.remove('scale-105'), 200);
+
+        verifyPassCode(code, false);
     }
 
+    // Gallery Upload Feature (GPay style)
+    function triggerGalleryUpload() {
+        document.getElementById('galleryFileInput').click();
+    }
+
+    async function handleGalleryScan(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async function(evt) {
+            const img = new Image();
+            img.onload = async function() {
+                const canvas = document.getElementById('scannerCanvas');
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                let decoded = null;
+
+                if (barcodeDetector) {
+                    try {
+                        const barcodes = await barcodeDetector.detect(img);
+                        if (barcodes.length > 0) decoded = barcodes[0].rawValue;
+                    } catch (err) {}
+                }
+
+                if (!decoded && window.jsQR) {
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const res = jsQR(imageData.data, imageData.width, imageData.height);
+                    if (res && res.data) decoded = res.data;
+                }
+
+                if (decoded) {
+                    handleScannedCode(decoded);
+                } else {
+                    alert('Could not find a valid QR code in this image. Please try another photo.');
+                }
+            };
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Manual Input Submit
     function handleManualSubmit(e) {
         e.preventDefault();
         const input = document.getElementById('manualCodeInput');
@@ -563,7 +767,7 @@
         document.getElementById('btnViewPass').href = `/pass/${encodeURIComponent(data.code || '')}/`;
 
         if (data.status === 'VERIFIED') {
-            playBeep(true);
+            playGPayBeep(true);
             banner.className = 'p-3 mb-3.5 border border-[#ceead6] bg-[#e6f4ea] text-[#137333] flex items-center justify-between flex-wrap gap-2';
             badge.className = 'px-2.5 py-1 text-xs font-mono font-bold tracking-wider uppercase border border-[#137333] bg-white text-[#137333]';
             icon.innerText = '✅';
@@ -577,7 +781,7 @@
                 document.getElementById('emailStatusBadge').innerHTML = '<i class="bi bi-envelope"></i> <span>Check-in confirmed</span>';
             }
         } else if (data.status === 'ALREADY_CHECKED_IN') {
-            playBeep(false);
+            playGPayBeep(false);
             banner.className = 'p-3 mb-3.5 border border-[#f9ab00] bg-[#fef7e0] text-[#b06000] flex items-center justify-between flex-wrap gap-2';
             badge.className = 'px-2.5 py-1 text-xs font-mono font-bold tracking-wider uppercase border border-[#b06000] bg-white text-[#b06000]';
             icon.innerText = '⚠️';
@@ -587,7 +791,7 @@
             document.getElementById('emailStatusBadge').classList.remove('hidden');
             document.getElementById('emailStatusBadge').innerHTML = '<i class="bi bi-info-circle"></i> <span>Already Admitted</span>';
         } else if (data.status === 'PAYMENT_PENDING') {
-            playBeep(false);
+            playGPayBeep(false);
             banner.className = 'p-3 mb-3.5 border border-[#fad2cf] bg-[#fce8e6] text-[#c5221f] flex items-center justify-between flex-wrap gap-2';
             badge.className = 'px-2.5 py-1 text-xs font-mono font-bold tracking-wider uppercase border border-[#c5221f] bg-white text-[#c5221f]';
             icon.innerText = '⏳';
@@ -596,7 +800,7 @@
             document.getElementById('emailStatusBadge').classList.add('hidden');
         } else {
             // INVALID or WRONG_TENANT
-            playBeep(false);
+            playGPayBeep(false);
             banner.className = 'p-3 mb-3.5 border border-[#fad2cf] bg-[#fce8e6] text-[#c5221f] flex items-center justify-between flex-wrap gap-2';
             badge.className = 'px-2.5 py-1 text-xs font-mono font-bold tracking-wider uppercase border border-[#c5221f] bg-white text-[#c5221f]';
             icon.innerText = '❌';
@@ -650,17 +854,24 @@
     }
 
     function renderErrorResult(code, message) {
-        playBeep(false);
+        playGPayBeep(false);
         document.getElementById('placeholderState').classList.add('hidden');
         document.getElementById('verifiedState').classList.remove('hidden');
 
         const banner = document.getElementById('statusBanner');
-        banner.className = 'p-3 mb-3.5 border border-[#fad2cf] bg-[#fce8e6] text-[#c5221f] flex items-center justify-between flex-wrap gap-2';
-        document.getElementById('statusIcon').innerText = '❌';
-        document.getElementById('statusTitle').innerText = 'SCAN ERROR';
-        document.getElementById('statusSub').innerText = message;
-        document.getElementById('statusBadge').innerText = code || 'ERROR';
+        const icon = document.getElementById('statusIcon');
+        const title = document.getElementById('statusTitle');
+        const sub = document.getElementById('statusSub');
+        const badge = document.getElementById('statusBadge');
 
+        banner.className = 'p-3 mb-3.5 border border-[#fad2cf] bg-[#fce8e6] text-[#c5221f] flex items-center justify-between flex-wrap gap-2';
+        badge.className = 'px-2.5 py-1 text-xs font-mono font-bold tracking-wider uppercase border border-[#c5221f] bg-white text-[#c5221f]';
+        badge.innerText = code || 'ERROR';
+        icon.innerText = '❌';
+        title.innerText = 'VERIFICATION ERROR';
+        sub.innerText = message;
+
+        document.getElementById('emailStatusBadge').classList.add('hidden');
         document.getElementById('resTotalSpots').innerText = '0';
         document.getElementById('resMaleCount').innerText = '0';
         document.getElementById('resFemaleCount').innerText = '0';
@@ -670,52 +881,47 @@
         document.getElementById('resEventTitle').innerText = '-';
         document.getElementById('resEventVenue').innerText = '-';
         document.getElementById('resAmountPaid').innerText = '-';
-        document.getElementById('resAttendeesTableBody').innerHTML = '<tr><td colspan="4" class="py-2 px-3 text-center text-[#c5221f]">Scan failed or invalid code.</td></tr>';
+        document.getElementById('resAttendeesTableBody').innerHTML = '<tr><td colspan="4" class="py-2 px-3 text-center text-[#c5221f]">Scan failed. Try again.</td></tr>';
     }
 
     function resetForNextScan() {
-        document.getElementById('placeholderState').classList.remove('hidden');
         document.getElementById('verifiedState').classList.add('hidden');
-        currentPassCode = null;
+        document.getElementById('placeholderState').classList.remove('hidden');
         lastScannedCode = null;
-        document.getElementById('manualCodeInput').focus();
+        lastScanTime = 0;
+        currentPassCode = null;
+        const input = document.getElementById('manualCodeInput');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
     }
 
-    // Add entry to Recent Scans Feed
     function addScanToHistory(data) {
         const feed = document.getElementById('sessionHistoryList');
-        const emptyMsg = document.getElementById('historyEmptyMsg');
-        if (emptyMsg) emptyMsg.remove();
+        const empty = document.getElementById('historyEmptyMsg');
+        if (empty) empty.remove();
 
         const item = document.createElement('div');
         item.className = 'py-2 flex items-center justify-between gap-2';
 
-        let badgeHtml = '';
-        if (data.status === 'VERIFIED') {
-            badgeHtml = '<span class="px-2 py-0.5 text-[10px] font-bold uppercase bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">Admitted</span>';
-        } else if (data.status === 'ALREADY_CHECKED_IN') {
-            badgeHtml = '<span class="px-2 py-0.5 text-[10px] font-bold uppercase bg-[#fef7e0] text-[#b06000] border border-[#f9ab00]/50">Duplicate</span>';
-        } else {
-            badgeHtml = '<span class="px-2 py-0.5 text-[10px] font-bold uppercase bg-[#fce8e6] text-[#c5221f] border border-[#fad2cf]">Invalid</span>';
-        }
-
-        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const isOk = data.status === 'VERIFIED';
+        const isDup = data.status === 'ALREADY_CHECKED_IN';
+        const icon = isOk ? '✅' : (isDup ? '⚠️' : '❌');
+        const colorClass = isOk ? 'text-[#137333]' : (isDup ? 'text-[#b06000]' : 'text-[#c5221f]');
 
         item.innerHTML = `
-            <div class="min-w-0">
-                <div class="font-bold text-[#202124] truncate">${data.customer_name || data.code}</div>
-                <div class="text-[11px] text-[#5f6368] font-mono flex items-center gap-2">
-                    <span>${data.code}</span>
-                    <span>•</span>
-                    <span class="text-[#0284c7] font-semibold">${data.male_count || 0}M</span>
-                    <span>/</span>
-                    <span class="text-[#db2777] font-semibold">${data.female_count || 0}F</span>
-                    <span>(${data.total_spots || 1} spot)</span>
+            <div class="flex items-center gap-2 truncate">
+                <span>${icon}</span>
+                <div class="truncate">
+                    <span class="font-mono font-bold text-[#202124]">${data.code}</span>
+                    <span class="text-[#5f6368] ml-1.5">${data.customer_name || 'Attendee'}</span>
+                    <span class="text-[10px] text-[#5f6368] ml-1">(${data.total_spots || 1} sp: ${data.male_count || 0}M/${data.female_count || 0}F)</span>
                 </div>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
-                ${badgeHtml}
-                <span class="text-[10px] text-[#5f6368] font-mono">${timeStr}</span>
+            <div class="text-right shrink-0">
+                <span class="font-bold text-[11px] ${colorClass}">${data.status}</span>
+                <div class="text-[10px] text-[#5f6368]">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
             </div>
         `;
 
@@ -767,17 +973,23 @@
             btn.innerText = 'Error';
         }
         setTimeout(() => {
-            btn.innerText = 'Resend';
+            btn.innerText = 'Resend Gratitude Email';
             btn.disabled = false;
         }, 3000);
     }
 
     // Startup on page load
     document.addEventListener('DOMContentLoaded', function() {
-        initCameraScanner();
+        initDetector();
+        startGPayCamera();
         refreshLiveStats();
         const input = document.getElementById('manualCodeInput');
         if (input) input.focus();
+    });
+
+    // Cleanup when leaving page
+    window.addEventListener('beforeunload', function() {
+        stopGPayCamera();
     });
 </script>
 {% endblock %}
