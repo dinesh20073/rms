@@ -8,28 +8,30 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
     /* =========================================================================
-       Nizhal Console - Direct Camera Scanner (Integrated with Dashboard Layout)
+       Nizhal Direct Camera & Centered Manual Pass Entry Scanner
        ========================================================================= */
-    .scanner-outer-container {
+    .scanner-page {
         position: relative;
         width: 100%;
-        background-color: #000000;
+        background-color: #050505;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        align-items: center;
+        justify-content: center;
     }
 
-    /* On mobile, fill the exact height between top navbar (56px) and bottom navbar (72px) */
+    /* Seamlessly fit between dashboard top navbar (56px) and bottom navbar (72px) */
     @media (max-width: 1023px) {
-        .scanner-outer-container {
+        .scanner-page {
             height: calc(100dvh - 128px);
             min-height: 480px;
         }
     }
 
-    /* On desktop, center as a sleek modern device card */
+    /* Desktop View: Centered rounded scanner card */
     @media (min-width: 1024px) {
-        .scanner-outer-container {
+        .scanner-page {
             max-width: 520px;
             height: 640px;
             margin: 20px auto;
@@ -39,44 +41,27 @@
         }
     }
 
-    /* Camera Viewport */
-    .scanner-viewport {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        background-color: #000000;
-        overflow: hidden;
-    }
-
-    /* Live Video Feed */
-    .scanner-video {
+    /* Full Background Video Feed */
+    .scanner-bg-video {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
         background-color: #000000;
+        z-index: 1;
     }
 
-    /* Top Controls HUD Bar */
-    .scanner-hud-top {
-        position: relative;
+    /* Flip Camera Toggle Button (Top Right Corner) */
+    .scanner-flip-btn {
+        position: absolute;
+        top: 14px;
+        right: 16px;
         z-index: 20;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 18px;
-        background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
-    }
-
-    .hud-circle-btn {
         width: 42px;
         height: 42px;
         border-radius: 50%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.55);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -90,65 +75,39 @@
         outline: none;
         -webkit-tap-highlight-color: transparent;
     }
-    .hud-circle-btn:active {
+    .scanner-flip-btn:active {
         transform: scale(0.92);
         background-color: rgba(255, 255, 255, 0.25);
     }
 
-    .hud-status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 6px 14px;
-        border-radius: 9999px;
-        background-color: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #ffffff;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .hud-status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: #22c55e;
-        box-shadow: 0 0 8px #22c55e;
-        animation: pulseStatus 2s infinite ease-in-out;
-    }
-    @keyframes pulseStatus {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    /* Center Viewfinder Container */
-    .scanner-hud-center {
+    /* Center Content Container */
+    .scanner-center-content {
         position: relative;
         z-index: 10;
-        flex: 1;
+        width: 100%;
+        max-width: 360px;
+        padding: 0 20px;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        padding: 16px;
+        gap: 26px;
     }
 
-    /* Fixed-Dimension Non-Collapsing Google Pay Target Box */
+    /* Fixed-Dimension Google Pay Target Box */
     .gpay-box {
         position: relative !important;
-        width: 250px !important;
-        height: 250px !important;
-        min-width: 250px !important;
-        min-height: 250px !important;
-        max-width: 72vw !important;
-        max-height: 72vw !important;
+        width: 240px !important;
+        height: 240px !important;
+        min-width: 240px !important;
+        min-height: 240px !important;
+        max-width: 68vw !important;
+        max-height: 68vw !important;
         margin: 0 auto !important;
         flex-shrink: 0 !important;
         box-sizing: border-box !important;
     }
 
-    /* Google Colored 4 Rounded Corners */
+    /* 4 Google Colored Corners */
     .corner {
         position: absolute !important;
         width: 44px !important;
@@ -185,7 +144,7 @@
         border-bottom-right-radius: 22px !important;
     }
 
-    /* Animated Laser Scan Line */
+    /* Smooth Laser Scan Beam */
     .gpay-laser {
         position: absolute !important;
         left: 10px !important;
@@ -196,31 +155,70 @@
         pointer-events: none !important;
     }
 
-    /* Bottom HUD Instruction Pill */
-    .scanner-hud-bottom {
-        position: relative;
-        z-index: 20;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px 20px 22px;
-        background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+    /* Center Manual Pass Entry Form */
+    .manual-entry-box {
+        width: 100%;
     }
 
-    .hud-helper-pill {
+    .manual-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 9999px;
+        padding: 5px 6px 5px 16px;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        gap: 8px;
+    }
+
+    .manual-icon {
+        font-size: 18px;
+        color: #059669;
+        flex-shrink: 0;
+    }
+
+    .manual-input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #111827;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    .manual-input::placeholder {
+        text-transform: none;
+        color: #9ca3af;
+        font-weight: 500;
+        letter-spacing: normal;
+        font-size: 12.5px;
+    }
+
+    .manual-submit-btn {
+        background: #059669;
+        color: #ffffff;
+        border: none;
+        border-radius: 9999px;
+        padding: 10px 18px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 20px;
-        border-radius: 9999px;
-        background-color: rgba(0, 0, 0, 0.55);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: rgba(255, 255, 255, 0.95);
-        font-size: 13px;
-        font-weight: 500;
-        letter-spacing: 0.1px;
+        gap: 6px;
+        transition: background-color 0.15s, transform 0.1s;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+    }
+    .manual-submit-btn:active {
+        background: #047857;
+        transform: scale(0.96);
     }
 
     /* Slide-Up Bottom Sheet Animation */
@@ -237,57 +235,51 @@
 {% block content %}
 
 <!-- ========================================================================= -->
-<!-- LIVE CAMERA SCANNER (Integrated in Dashboard with Top and Bottom Navbars) -->
+<!-- LIVE CAMERA SCANNER + CENTER MANUAL PASS ENTRY                            -->
 <!-- ========================================================================= -->
-<div class="scanner-outer-container">
-    <div class="scanner-viewport">
+<div class="scanner-page">
 
-        <!-- Live Camera Video Element -->
-        <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="scanner-video"></video>
-        <canvas id="gpayCanvas" style="display:none;"></canvas>
+    <!-- Live Camera Feed (Spans Full Background) -->
+    <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="scanner-bg-video"></video>
+    <canvas id="gpayCanvas" style="display:none;"></canvas>
 
-        <!-- Top HUD Controls (Flip Camera, Live Indicator, Flashlight) -->
-        <div class="scanner-hud-top">
-            <!-- Flip Camera (Front / Rear) -->
-            <button type="button" onclick="flipCamera()" class="hud-circle-btn" title="Flip Camera">
-                <i class="bi bi-camera-reverse"></i>
-            </button>
+    <!-- Flip Camera Button (Top Right) -->
+    <button type="button" onclick="flipCamera()" class="scanner-flip-btn" title="Flip Camera">
+        <i class="bi bi-camera-reverse"></i>
+    </button>
 
-            <!-- Status Indicator -->
-            <div class="hud-status-badge">
-                <span class="hud-status-dot"></span>
-                <span>Camera Live</span>
-            </div>
+    <!-- Center Stack: Viewfinder Box + Centered Manual Entry -->
+    <div class="scanner-center-content">
 
-            <!-- Flashlight / Torch Toggle -->
-            <button type="button" onclick="toggleTorch()" id="btnTorch" class="hud-circle-btn" title="Flashlight">
-                <i class="bi bi-lightning-charge" id="torchIcon"></i>
-            </button>
+        <!-- Google Pay Style 4-Colored Corner Box -->
+        <div id="targetBox" class="gpay-box">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div id="scanLaser" class="gpay-laser"></div>
         </div>
 
-        <!-- Center Viewfinder Target Box -->
-        <div class="scanner-hud-center">
-            <div id="targetBox" class="gpay-box">
-                <!-- 4 Google Colored Corners -->
-                <div class="corner corner-tl"></div>
-                <div class="corner corner-tr"></div>
-                <div class="corner corner-bl"></div>
-                <div class="corner corner-br"></div>
-
-                <!-- Animated Laser Line -->
-                <div id="scanLaser" class="gpay-laser"></div>
+        <!-- Centered Manual Pass Code Entry Form -->
+        <form onsubmit="handleManualSubmit(event)" class="manual-entry-box">
+            <div class="manual-input-wrapper">
+                <i class="bi bi-ticket-perforated manual-icon"></i>
+                <input type="text" 
+                       id="manualPassInput" 
+                       placeholder="Enter Pass (e.g. PASS-1234)" 
+                       autocomplete="off" 
+                       autocapitalize="characters" 
+                       spellcheck="false" 
+                       class="manual-input" />
+                <button type="submit" class="manual-submit-btn">
+                    <span>Verify</span>
+                    <i class="bi bi-arrow-right"></i>
+                </button>
             </div>
-        </div>
-
-        <!-- Bottom HUD Instruction Pill -->
-        <div class="scanner-hud-bottom">
-            <div class="hud-helper-pill">
-                <i class="bi bi-qr-code-scan text-emerald-400"></i>
-                <span>Point camera at ticket QR code</span>
-            </div>
-        </div>
+        </form>
 
     </div>
+
 </div>
 
 
@@ -380,7 +372,7 @@
 </div>
 
 
-<!-- Audio Beep / Chime Synthesizer -->
+<!-- Audio Beep Synthesizer -->
 <script>
     function playGPayBeep(isSuccess) {
         try {
@@ -395,7 +387,7 @@
             gain.connect(ctx.destination);
 
             if (isSuccess) {
-                // Iconic GPay 2-Tone Melodic Chime (D5 -> A5)
+                // Melodic Chime (D5 -> A5)
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(587.33, now);
                 osc.frequency.setValueAtTime(880.00, now + 0.08);
@@ -405,7 +397,7 @@
                 osc.stop(now + 0.35);
                 if (navigator.vibrate) navigator.vibrate([70, 30, 70]);
             } else {
-                // Warning low tone buzz
+                // Low buzz
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(320, now);
                 osc.frequency.setValueAtTime(220, now + 0.12);
@@ -425,7 +417,6 @@
 <script>
     let videoStream = null;
     let currentFacingMode = "environment";
-    let isTorchOn = false;
     let isVerifying = false;
     let scanAnimationId = null;
     let barcodeDetector = null;
@@ -467,7 +458,7 @@
         let pos = 14;
         let dir = 1;
         setInterval(() => {
-            const h = box.offsetHeight || 250;
+            const h = box.offsetHeight || 240;
             pos += dir * 2;
             if (pos > h - 18) dir = -1;
             if (pos < 14) dir = 1;
@@ -549,29 +540,6 @@
         await startCameraDirectly();
     }
 
-    // Flashlight / Torch Toggle
-    async function toggleTorch() {
-        if (!videoStream) return;
-        const track = videoStream.getVideoTracks()[0];
-        const capabilities = track.getCapabilities ? track.getCapabilities() : {};
-        if (!capabilities.torch) {
-            alert('Flashlight not supported on this camera/browser.');
-            return;
-        }
-        isTorchOn = !isTorchOn;
-        try {
-            await track.applyConstraints({ advanced: [{ torch: isTorchOn }] });
-            const icon = document.getElementById('torchIcon');
-            if (isTorchOn) {
-                icon.className = 'bi bi-lightning-fill text-yellow-400';
-            } else {
-                icon.className = 'bi bi-lightning-charge text-white';
-            }
-        } catch (e) {
-            console.warn('Torch toggle failed:', e);
-        }
-    }
-
     // Continuous Frame Scanning Loop
     function startScanningLoop() {
         const video = document.getElementById('gpayVideo');
@@ -629,6 +597,18 @@
         lastScanTime = now;
         lastScannedCode = text;
         verifyPassCode(text);
+    }
+
+    // Centered Manual Pass Code Submission
+    function handleManualSubmit(e) {
+        e.preventDefault();
+        const input = document.getElementById('manualPassInput');
+        if (!input) return;
+        const code = input.value.trim();
+        if (!code) return;
+        verifyPassCode(code);
+        input.value = '';
+        input.blur();
     }
 
     // Verify Pass Code via Backend API
@@ -729,6 +709,8 @@
         document.getElementById('resultModal').classList.add('hidden');
         lastScannedCode = null;
         isVerifying = false;
+        const input = document.getElementById('manualPassInput');
+        if (input) input.value = '';
     }
 
     function handleBackdropClick(event) {
