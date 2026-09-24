@@ -7,42 +7,101 @@
 <!-- High-reliability QR scanning library -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
-    /* Google Pay 4-Color Corner Brackets */
+    /* Google Pay Target Viewfinder Box & Corner Brackets */
+    .gpay-target-box {
+        position: relative !important;
+        width: 270px !important;
+        height: 270px !important;
+        max-width: 76vw !important;
+        max-height: 76vw !important;
+        margin: 0 auto !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
     .gpay-corner {
-        position: absolute;
-        width: 48px;
-        height: 48px;
-        border-style: solid;
-        pointer-events: none;
+        position: absolute !important;
+        width: 48px !important;
+        height: 48px !important;
+        border-style: solid !important;
+        pointer-events: none !important;
+        box-sizing: border-box !important;
     }
     .gpay-corner-tl {
-        top: 0;
-        left: 0;
-        border-width: 5px 0 0 5px;
-        border-color: #ea4335; /* Google Red */
-        border-top-left-radius: 24px;
+        top: 0 !important;
+        left: 0 !important;
+        border-width: 5px 0 0 5px !important;
+        border-color: #ea4335 !important; /* Google Red */
+        border-top-left-radius: 24px !important;
     }
     .gpay-corner-tr {
-        top: 0;
-        right: 0;
-        border-width: 5px 5px 0 0;
-        border-color: #fbbc04; /* Google Yellow */
-        border-top-right-radius: 24px;
+        top: 0 !important;
+        right: 0 !important;
+        border-width: 5px 5px 0 0 !important;
+        border-color: #fbbc04 !important; /* Google Yellow */
+        border-top-right-radius: 24px !important;
     }
     .gpay-corner-bl {
-        bottom: 0;
-        left: 0;
-        border-width: 0 0 5px 5px;
-        border-color: #4285f4; /* Google Blue */
-        border-bottom-left-radius: 24px;
+        bottom: 0 !important;
+        left: 0 !important;
+        border-width: 0 0 5px 5px !important;
+        border-color: #4285f4 !important; /* Google Blue */
+        border-bottom-left-radius: 24px !important;
     }
     .gpay-corner-br {
-        bottom: 0;
-        right: 0;
-        border-width: 0 5px 0 0; /* Wait: bottom and right! */
-        border-width: 0 5px 5px 0;
-        border-color: #34a853; /* Google Green */
-        border-bottom-right-radius: 24px;
+        bottom: 0 !important;
+        right: 0 !important;
+        border-width: 0 5px 5px 0 !important;
+        border-color: #34a853 !important; /* Google Green */
+        border-bottom-right-radius: 24px !important;
+    }
+
+    /* Google Pay Upload from Gallery Pill Button */
+    .gpay-gallery-btn {
+        margin-top: 36px !important;
+        padding: 12px 26px !important;
+        background-color: #ffffff !important;
+        color: #1f2937 !important;
+        font-family: inherit !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        border-radius: 9999px !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+        border: none !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        outline: none !important;
+        transition: transform 0.15s ease, background-color 0.15s ease !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    .gpay-gallery-btn:active {
+        transform: scale(0.96) !important;
+        background-color: #f3f4f6 !important;
+    }
+    .gpay-gallery-btn span {
+        color: #1f2937 !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+    }
+    .gpay-gallery-btn i {
+        color: #4b5563 !important;
+        font-size: 16px !important;
+    }
+
+    /* Laser scan line */
+    .gpay-laser-line {
+        position: absolute !important;
+        left: 14px !important;
+        right: 14px !important;
+        height: 2px !important;
+        background: linear-gradient(90deg, transparent, #4285f4, #34a853, transparent) !important;
+        box-shadow: 0 0 10px rgba(66, 133, 244, 0.8) !important;
+        pointer-events: none !important;
     }
 
     /* Slide-up bottom sheet animation */
@@ -53,15 +112,33 @@
     .animate-sheet-up {
         animation: slideUpSheet 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
+    /* Responsive View Switcher */
+    @media (min-width: 768px) {
+        #pcOnlyWrapper {
+            display: flex !important;
+        }
+        #mobileScannerWrapper.pc-hidden {
+            display: none !important;
+        }
+    }
+    @media (max-width: 767px) {
+        #pcOnlyWrapper {
+            display: none !important;
+        }
+        #mobileScannerWrapper {
+            display: flex !important;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- ========================================================================= -->
-<!-- 1. PC / DESKTOP VIEW (Visible ONLY on Desktop screens >= 768px / md:flex) -->
+<!-- 1. PC / DESKTOP VIEW (Visible ONLY on Desktop screens >= 768px)          -->
 <!-- ========================================================================= -->
-<div id="pcOnlyWrapper" class="hidden md:flex flex-col items-center justify-center py-10 px-4 min-h-[calc(100vh-140px)]">
+<div id="pcOnlyWrapper" class="flex flex-col items-center justify-center py-10 px-4 min-h-[calc(100vh-140px)]">
     <div class="bg-white border border-[#dadce0] rounded-2xl p-8 max-w-md w-full text-center shadow-sm">
         <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4 border border-emerald-100">
             <i class="bi bi-phone"></i>
@@ -76,7 +153,7 @@
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.admin.nizhalcommunity.in/dashboard/scanner/" 
                  alt="Scan with phone" 
                  class="w-40 h-40 rounded-lg mx-auto bg-white p-1" />
-            <div class="text-[11px] font-mono text-gray-500 mt-2 font-semibold">Point phone camera to open</div>
+            <div class="text-xs font-mono text-gray-500 mt-2 font-semibold">Point phone camera to open</div>
         </div>
 
         <div class="flex flex-col gap-2">
@@ -84,7 +161,7 @@
                 Return to Overview
             </a>
             <!-- Optional override to test webcam on desktop -->
-            <button type="button" onclick="enablePcScannerOverride()" class="text-[11px] text-emerald-700 hover:underline pt-2">
+            <button type="button" onclick="enablePcScannerOverride()" class="text-xs text-emerald-700 hover:underline pt-2">
                 Continue anyway on PC (using webcam)
             </button>
         </div>
@@ -95,14 +172,14 @@
 <!-- ========================================================================= -->
 <!-- 2. MOBILE VIEW (Full-Screen Google Pay Style Scanner UI)                   -->
 <!-- ========================================================================= -->
-<div id="mobileScannerWrapper" class="fixed inset-0 z-50 bg-black text-white flex flex-col justify-between overflow-hidden select-none">
+<div id="mobileScannerWrapper" class="pc-hidden fixed inset-0 z-50 bg-black text-white flex flex-col justify-between overflow-hidden select-none">
 
     <!-- Background Camera Video Feed -->
     <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="absolute inset-0 w-full h-full object-cover"></video>
     <canvas id="gpayCanvas" class="hidden"></canvas>
 
     <!-- Top Navigation HUD Bar (Exact Google Pay Header) -->
-    <div class="relative z-20 pt-safe px-4 pt-3 pb-2 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+    <div class="relative z-20 px-4 pt-3 pb-2 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/40 to-transparent">
         <!-- Close Button (X) -->
         <a href="{% url 'dashboard-overview' %}" class="w-10 h-10 rounded-full flex items-center justify-center text-white/90 active:scale-90 transition text-2xl" title="Close Scanner">
             <i class="bi bi-x-lg"></i>
@@ -130,8 +207,8 @@
     <!-- Center Viewfinder: Google Pay 4-Colored Corner Brackets -->
     <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
         
-        <!-- Target Scanner Box -->
-        <div id="targetBox" class="relative w-[270px] h-[270px] max-w-[76vw] max-h-[76vw] aspect-square flex items-center justify-center">
+        <!-- Target Scanner Box (Fixed non-collapsible 270x270px) -->
+        <div id="targetBox" class="gpay-target-box">
             
             <!-- 4 Distinct Google Brand Color Rounded Corners -->
             <!-- 1. Top-Left: Red -->
@@ -143,16 +220,16 @@
             <!-- 4. Bottom-Right: Green -->
             <div class="gpay-corner gpay-corner-br"></div>
 
-            <!-- Subtle Scanning Laser / Pulse Line -->
-            <div id="scanLaser" class="absolute inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-[#4285f4] to-transparent opacity-75"></div>
+            <!-- Scanning Laser Line -->
+            <div id="scanLaser" class="gpay-laser-line"></div>
         </div>
 
-        <!-- "Upload from gallery" White Pill Button (Exact GPay Placement) -->
-        <button type="button" onclick="document.getElementById('galleryFileInput').click()" class="mt-8 px-6 py-3 bg-white text-[#1f2937] font-semibold text-xs sm:text-sm rounded-full shadow-2xl flex items-center gap-2.5 active:scale-95 transition cursor-pointer hover:bg-gray-100">
-            <i class="bi bi-image text-base text-gray-700"></i>
+        <!-- "Upload from gallery" White Pill Button (GPay Styled & Visible Dark Text) -->
+        <button type="button" onclick="document.getElementById('galleryFileInput').click()" class="gpay-gallery-btn">
+            <i class="bi bi-image"></i>
             <span>Upload from gallery</span>
         </button>
-        <input type="file" id="galleryFileInput" accept="image/*" class="hidden" onchange="handleGalleryScan(event)">
+        <input type="file" id="galleryFileInput" accept="image/*" style="display:none;" onchange="handleGalleryScan(event)">
 
         <!-- Tap to Start Permission Overlay (Appears only if browser blocked auto-start) -->
         <div id="startCameraPrompt" class="hidden absolute inset-0 z-30 bg-black/90 flex flex-col items-center justify-center p-6 text-center">
@@ -169,8 +246,8 @@
     </div>
 
     <!-- Bottom Spacing / Status -->
-    <div class="relative z-20 pb-safe px-6 pb-6 text-center">
-        <div id="activeEventIndicator" class="text-[11px] font-medium text-white/70 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full inline-block">
+    <div class="relative z-20 px-6 pb-6 text-center">
+        <div id="activeEventIndicator" class="text-xs font-medium text-white/80 bg-black/50 backdrop-blur-md px-3.5 py-1.5 rounded-full inline-block border border-white/10">
             Scanning for: <strong class="text-white">All Events (Auto-Detect)</strong>
         </div>
     </div>
@@ -408,18 +485,20 @@
 
     function animateLaser() {
         const laser = document.getElementById('scanLaser');
-        if (!laser) return;
-        let pos = 10;
+        const box = document.getElementById('targetBox');
+        if (!laser || !box) return;
+        let pos = 14;
         let dir = 1;
         setInterval(() => {
-            pos += dir * 1.5;
-            if (pos > 250) dir = -1;
-            if (pos < 10) dir = 1;
+            const h = box.offsetHeight || 270;
+            pos += dir * 2;
+            if (pos > h - 18) dir = -1;
+            if (pos < 14) dir = 1;
             laser.style.top = pos + 'px';
-        }, 16);
+        }, 18);
     }
 
-    // Start Camera Video Stream
+    // Start Camera Video Stream with Multi-Tier Fallback
     async function startCameraDirectly() {
         const prompt = document.getElementById('startCameraPrompt');
         const video = document.getElementById('gpayVideo');
@@ -430,16 +509,34 @@
 
         try {
             prompt.classList.add('hidden');
-            const constraints = {
-                audio: false,
-                video: {
-                    facingMode: { ideal: currentFacingMode },
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            };
+            let stream = null;
 
-            videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+            // Strategy 1: Ideal facingMode and 720p resolution
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        facingMode: { ideal: currentFacingMode },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+            } catch (e1) {
+                console.warn('Strategy 1 camera failed:', e1);
+                // Strategy 2: Simple facingMode
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        audio: false,
+                        video: { facingMode: currentFacingMode }
+                    });
+                } catch (e2) {
+                    console.warn('Strategy 2 camera failed:', e2);
+                    // Strategy 3: Any available video device
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                }
+            }
+
+            videoStream = stream;
             video.srcObject = videoStream;
             video.setAttribute('playsinline', 'true');
             video.setAttribute('webkit-playsinline', 'true');
@@ -725,8 +822,10 @@
 
     // PC Screen Override (if testing on laptop webcam)
     function enablePcScannerOverride() {
-        document.getElementById('pcOnlyWrapper').classList.add('hidden');
-        document.getElementById('mobileScannerWrapper').classList.remove('md:hidden');
+        document.getElementById('pcOnlyWrapper').style.display = 'none';
+        const wrapper = document.getElementById('mobileScannerWrapper');
+        wrapper.classList.remove('pc-hidden');
+        wrapper.style.display = 'flex';
         startCameraDirectly();
     }
 
