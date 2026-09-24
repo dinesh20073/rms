@@ -87,29 +87,50 @@
                 max-width: 100% !important;
                 height: auto !important;
             }
-            .hero-inner-table {
-                width: 100% !important;
-            }
             .content-side-pad {
                 padding-left: 14px !important;
                 padding-right: 14px !important;
             }
-            .mobile-stack {
-                display: block !important;
-                width: 100% !important;
-                padding-right: 0 !important;
-                padding-left: 0 !important;
-                border-right: 0 !important;
-                border-bottom: 1px solid #e2e8f0 !important;
+            .hero-title-responsive {
+                font-size: 24px !important;
             }
-            .mobile-hide {
-                display: none !important;
+        }
+
+        /* Celebration Animation for modern email clients & webmail */
+        @keyframes pulseGlow {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
             }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 6px 25px rgba(16, 185, 129, 0.7);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
+            }
+        }
+        @keyframes sparkleSpin {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(15deg) scale(1.25); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-15deg) scale(1.25); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .animated-celebrate-pill {
+            animation: pulseGlow 2.5s infinite ease-in-out !important;
+            display: inline-block !important;
+        }
+        .animated-sparkle {
+            display: inline-block !important;
+            animation: sparkleSpin 2s infinite ease-in-out !important;
         }
 
         /* Universal Light Mode Lock */
         @media (prefers-color-scheme: dark) {
-            html, body, .force-white-bg, .ticket-card, .email-white-box {
+            html, body, .force-white-bg, .ticket-card {
                 background-color: #ffffff !important;
                 background-image: linear-gradient(#ffffff, #ffffff) !important;
                 background: #ffffff !important;
@@ -117,15 +138,13 @@
             }
         }
         u + .body .force-white-bg,
-        u + .body .ticket-card,
-        u + .body .email-white-box {
+        u + .body .ticket-card {
             background-color: #ffffff !important;
             background-image: linear-gradient(#ffffff, #ffffff) !important;
             background: #ffffff !important;
         }
         [data-ogsb] .force-white-bg,
-        [data-ogsb] .ticket-card,
-        [data-ogsb] .email-white-box {
+        [data-ogsb] .ticket-card {
             background-color: #ffffff !important;
             background-image: linear-gradient(#ffffff, #ffffff) !important;
             background: #ffffff !important;
@@ -137,7 +156,7 @@
 </head>
 <body class="body force-white-bg" bgcolor="#ffffff" style="margin: 0 !important; padding: 0 !important; border: 0 !important; outline: 0 !important; width: 100% !important; background-color: #ffffff !important; font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #1e293b; -webkit-font-smoothing: antialiased;">
 
-    <!-- Outer Canvas Table (Pure White Background, Zero Letterboxing) -->
+    <!-- Outer Canvas Table (Pure White Background) -->
     <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; padding: 0 !important; border: 0 !important; background-color: #ffffff !important;">
         <tr>
             <td align="center" valign="top" bgcolor="#ffffff" style="padding: 12px 8px !important; margin: 0 !important; border: 0 !important; background-color: #ffffff !important;">
@@ -158,148 +177,35 @@
                         </td>
                     </tr>
 
-                    <!-- 2. Main Emerald Hero Banner ("Entry Confirmed! 🎉" + Security Badge + Top Right QR Box) -->
+                    <!-- 2. Main Hero Banner - BIG AND CENTERED -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#047857" style="background-color: #047857 !important; background-image: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%) !important; padding: 20px 22px; color: #ffffff; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#047857" cellpadding="0" cellspacing="0" border="0" class="hero-inner-table" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
+                        <td width="100%" align="center" bgcolor="#047857" style="background-color: #047857 !important; background-image: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%) !important; padding: 32px 24px 28px 24px; color: #ffffff; text-align: center; border: 0 !important;">
+                            
+                            <!-- Golden VIP Ribbon Badge -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto 12px auto; border: 0 !important;">
                                 <tr>
-                                    <!-- Left Title, Subtitle, and Confirmed Spot Badge -->
-                                    <td valign="middle" align="left" style="color: #ffffff; padding-right: 14px; border: 0 !important;">
-                                        
-                                        <!-- Top Golden VIP Badge -->
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border: 0 !important; margin-bottom: 7px;">
-                                            <tr>
-                                                <td bgcolor="#f59e0b" style="background-color: #f59e0b !important; color: #ffffff !important; padding: 3px 8px; border-radius: 3px; font-family: 'Roboto Mono', monospace; font-size: 9.5px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;">
-                                                    ★ OFFICIAL ENTRY ADMITTED
-                                                </td>
-                                            </tr>
-                                        </table>
-
-                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 23px; font-weight: 900; line-height: 1.15; color: #ffffff !important; letter-spacing: -0.4px; margin-bottom: 5px;">
-                                            Entry Confirmed! 🎉
-                                        </div>
-                                        <div style="font-family: 'Roboto', sans-serif; font-size: 12px; line-height: 1.45; color: #d1fae5 !important; margin-bottom: 12px;">
-                                            Thank you for your participation! Welcome to <strong>{{ event.title }}</strong>.
-                                        </div>
-                                        
-                                        <!-- Verified Spot Counter with Male/Female breakdown chip -->
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border: 0 !important;">
-                                            <tr>
-                                                <td bgcolor="#10b981" style="background-color: #10b981 !important; color: #ffffff !important; width: 22px; height: 22px; text-align: center; font-size: 11px; font-weight: 900; line-height: 22px; border-radius: 4px; border: 1.5px solid #ffffff; font-family: 'Roboto', sans-serif;">
-                                                    ✓
-                                                </td>
-                                                <td class="font-mono nowrap" style="padding-left: 8px; font-size: 11px; font-weight: 800; color: #ffffff !important; letter-spacing: 0.5px; font-family: 'Roboto Mono', monospace; text-transform: uppercase; white-space: nowrap;">
-                                                    {{ ticket_count|default:1 }} SPOT{{ ticket_count|pluralize }} VERIFIED
-                                                </td>
-                                                {% if male_count or female_count %}
-                                                <td class="font-mono nowrap" style="padding-left: 8px; font-size: 10px; font-weight: 700; color: #fef08a !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                                    ({% if male_count %}{{ male_count }}M{% endif %}{% if male_count and female_count %} • {% endif %}{% if female_count %}{{ female_count }}F{% endif %})
-                                                </td>
-                                                {% endif %}
-                                            </tr>
-                                        </table>
-                                    </td>
-
-                                    <!-- Right Prominent Square QR Box with Gold Border -->
-                                    <td width="120" valign="middle" align="right" style="width: 120px !important; text-align: right; border: 0 !important;">
-                                        <table role="presentation" bgcolor="#ffffff" class="email-white-box" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff !important; padding: 5px; border-radius: 8px; border: 2px solid #fef08a; box-shadow: 0 4px 12px rgba(0,0,0,0.22); display: inline-block;">
-                                            <tr>
-                                                <td align="center" bgcolor="#ffffff" style="background-color: #ffffff !important; padding: 3px;">
-                                                    <img src="{{ qr_src|default:'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PASS-CONFIRMED&margin=1' }}" alt="Verified QR Ticket" width="90" height="90" style="width: 90px; height: 90px; display: block; margin: 0 auto; background-color: #ffffff !important;" />
-                                                    <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8.5px; font-weight: 800; color: #0f172a !important; margin-top: 4px; letter-spacing: 0.5px; text-align: center; white-space: nowrap;">
-                                                        {{ attendee.pass_code|default:pass_code }}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <td bgcolor="#f59e0b" style="background-color: #f59e0b !important; color: #ffffff !important; padding: 5px 14px; border-radius: 4px; font-family: 'Roboto Mono', monospace; font-size: 10.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; text-align: center;">
+                                        ★ OFFICIAL ENTRY ADMITTED
                                     </td>
                                 </tr>
                             </table>
-                        </td>
-                    </tr>
 
-                    <!-- 3. Dark Meta Info Strip (Flush Full Width) -->
-                    <tr>
-                        <td width="100%" align="center" bgcolor="#0f172a" style="background-color: #0f172a !important; background-image: linear-gradient(#0f172a, #0f172a) !important; color: #e2e8f0; padding: 11px 20px; font-size: 11px; font-weight: 500; font-family: 'Roboto', sans-serif; border: 0 !important;">
-                            <table role="presentation" width="100%" bgcolor="#0f172a" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; background-color: transparent; border: 0 !important;">
-                                <tr>
-                                    <td align="left" valign="middle" style="color: #cbd5e1 !important; font-size: 11px; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; padding-right: 8px;">
-                                        <div class="nowrap" style="white-space: nowrap;">Date: <strong style="color: #ffffff !important;">{{ event.start_time|date:"D | d M, Y"|default:"Wed | 28 Aug, 2026" }}</strong></div>
-                                        <div class="nowrap" style="white-space: nowrap;">Time: <strong style="color: #ffffff !important;">{{ event.start_time|date:"h:i A"|default:"09:30 AM" }} IST</strong></div>
-                                    </td>
-                                    <td width="16" align="center" valign="middle" style="width: 16px !important; color: #475569 !important; font-size: 12px; border: 0; border-right: 1px solid #334155 !important;">&nbsp;</td>
-                                    <td align="right" valign="middle" style="color: #ffffff !important; font-size: 11px; font-weight: 700; line-height: 1.45; font-family: 'Roboto', sans-serif; border: 0 !important; text-align: right; padding-left: 8px;">
-                                        📍 {{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- 4. Heartfelt Gratitude & Welcome Note -->
-                    <tr>
-                        <td width="100%" align="left" bgcolor="#ffffff" class="content-side-pad" style="padding: 20px 22px 14px 22px; background-color: #ffffff !important; border: 0 !important;">
-                            <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 16px; font-weight: 800; color: #0f172a !important; margin-bottom: 5px; white-space: nowrap;">
-                                Hi {{ customer.name|title }},
+                            <!-- Big Center Title -->
+                            <div class="font-display hero-title-responsive" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 28px; font-weight: 900; line-height: 1.15; color: #ffffff !important; letter-spacing: -0.5px; margin-bottom: 8px; text-align: center;">
+                                Entry Confirmed! 🎉
                             </div>
-                            <div style="font-family: 'Roboto', sans-serif; font-size: 12.5px; color: #334155 !important; line-height: 1.6;">
-                                Thank you for your valuable participation in <strong>{{ event.title }}</strong>! Your presence has been verified at the entry gate, and you and your co-attendees are officially admitted. We are truly delighted to have you with us today in the Nizhal family.
+
+                            <!-- Big Center Subtitle -->
+                            <div style="font-family: 'Roboto', sans-serif; font-size: 14.5px; line-height: 1.5; color: #d1fae5 !important; max-width: 480px; margin: 0 auto; text-align: center;">
+                                Thank you for your participation! Welcome to <strong style="color: #ffffff !important;">{{ event.title }}</strong>.
                             </div>
+
                         </td>
                     </tr>
 
-                    <!-- 5. Three Colorful Summary KPI Cards (Exact Brand Aesthetics) -->
+                    <!-- 3. VERIFIED CHECK-IN DETAILS (Clean Structured Box) -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 0 0 18px 0 !important; margin: 0 !important; border: 0 !important;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; margin: 0 auto !important; border: 0 !important; table-layout: fixed !important;">
-                                <tr>
-                                    <!-- Card 1: Coral Red (Venue & Get Directions Button) -->
-                                    <td width="34%" valign="middle" align="center" bgcolor="#ea384d" style="background-color: #ea384d !important; background-image: linear-gradient(to bottom right, #ff4757, #ea384d) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
-                                        <div class="font-display" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 10px; font-weight: 700; line-height: 1.25; min-height: 32px; color: #ffffff !important; text-align: center; margin: 0 auto;">
-                                            {{ event.venue|default:"Bengaluru International Exhibition Centre (BIEC) & Online" }}
-                                        </div>
-                                        <div style="margin-top: 6px; text-align: center;">
-                                            <a href="https://www.google.com/maps/search/?api=1&query={{ event.venue|default:'BIEC Bangalore'|urlencode }}" target="_blank" class="font-mono nowrap" style="display: inline-block; background-color: #ffffff; color: #ea384d !important; font-size: 8px; font-weight: 900; font-family: 'Roboto Mono', monospace; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; text-decoration: none; white-space: nowrap; margin: 0 auto;">
-                                                GET DIRECTIONS
-                                            </a>
-                                        </div>
-                                    </td>
-
-                                    <!-- Card 2: Sky Blue (Tickets / Persons with Gender Chips) -->
-                                    <td width="33%" valign="middle" align="center" bgcolor="#0084ff" style="background-color: #0084ff !important; background-image: linear-gradient(to bottom right, #1e90ff, #0084ff) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
-                                        <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 26px; font-weight: 900; line-height: 1; color: #ffffff !important; text-align: center; margin: 0 auto; white-space: nowrap;">
-                                            {{ ticket_count|default:1 }}
-                                        </div>
-                                        <div class="nowrap" style="font-family: 'Roboto', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #ffffff !important; margin-top: 4px; line-height: 1.1; text-align: center; white-space: nowrap;">
-                                            TICKETS / PERSONS
-                                        </div>
-                                        {% if male_count or female_count %}
-                                        <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8.5px; font-weight: 700; color: #e0f2fe !important; margin-top: 3px; text-align: center; white-space: nowrap;">
-                                            {% if male_count %}{{ male_count }}M{% endif %}{% if male_count and female_count %} • {% endif %}{% if female_count %}{{ female_count }}F{% endif %}
-                                        </div>
-                                        {% endif %}
-                                    </td>
-
-                                    <!-- Card 3: Emerald Green (Check-in Status & Admitted Badge) -->
-                                    <td width="33%" valign="middle" align="center" bgcolor="#059669" style="background-color: #059669 !important; background-image: linear-gradient(to bottom right, #10b981, #059669) !important; padding: 14px 8px; color: #ffffff; text-align: center; border: 0 !important;">
-                                        <div class="font-display nowrap" style="font-family: 'Plus Jakarta Sans', 'Roboto', sans-serif; font-size: 20px; font-weight: 900; line-height: 1; color: #ffffff !important; text-align: center; margin: 0 auto; white-space: nowrap;">
-                                            ADMITTED ✓
-                                        </div>
-                                        <div class="nowrap" style="font-family: 'Roboto', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #ffffff !important; margin-top: 5px; text-align: center; white-space: nowrap;">
-                                            ENTRY VERIFIED
-                                        </div>
-                                        <div class="font-mono nowrap" style="font-family: 'Roboto Mono', monospace; font-size: 8px; font-weight: 600; color: #d1fae5 !important; margin-top: 3px; text-align: center; white-space: nowrap;">
-                                            NIZHAL GATEWAY
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-
-                    <!-- 6. VERIFIED CHECK-IN DETAILS (Clean Structured Box) -->
-                    <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
+                        <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 20px 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
                             <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
                                 <tr>
                                     <td colspan="2" bgcolor="#f8fafc" style="background-color: #f8fafc !important; padding: 10px 14px; border-bottom: 1px solid #cbd5e1; font-size: 11px; font-weight: 800; font-family: 'Roboto Mono', monospace; color: #334155 !important; text-transform: uppercase;">
@@ -353,7 +259,7 @@
                         </td>
                     </tr>
 
-                    <!-- 7. PARTICIPANTS LIST & GENDER BREAKDOWN (Elevated Table Box) -->
+                    <!-- 4. PARTICIPANTS LIST & GENDER BREAKDOWN (Elevated Table Box) -->
                     <tr>
                         <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
                             <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important; font-size: 11px; font-family: 'Roboto', sans-serif;">
@@ -426,22 +332,11 @@
                                         </td>
                                     </tr>
                                 {% endif %}
-                                <tr bgcolor="#f8fafc" class="nowrap" style="background-color: #f8fafc !important; font-weight: 700; border-top: 2px solid #cbd5e1 !important; white-space: nowrap;">
-                                    <td colspan="3" class="font-display nowrap" style="padding: 10px 12px; color: #0f172a !important; font-size: 12px; border: 0 !important; font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;">
-                                        Total Confirmed Attendance
-                                    </td>
-                                    <td class="font-mono nowrap" style="padding: 10px 4px; text-align: center; font-size: 12px; color: #0f172a !important; font-weight: 800; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                        {{ ticket_count|default:1 }}
-                                    </td>
-                                    <td class="font-mono nowrap" style="padding: 10px 12px; text-align: right; font-size: 12px; color: #059669 !important; font-weight: 900; border: 0 !important; font-family: 'Roboto Mono', monospace; white-space: nowrap;">
-                                        VERIFIED ✓
-                                    </td>
-                                </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- 8. VALUABLE COMMUNITY & SOUVENIR NOTE (Warmth & Gratitude Card) -->
+                    <!-- 5. VALUABLE COMMUNITY & SOUVENIR NOTE (Warmth & Gratitude Card) -->
                     <tr>
                         <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 16px 20px; background-color: #ffffff !important; border: 0 !important;">
                             <table role="presentation" width="100%" bgcolor="#f0fdf4" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1.5px solid #86efac; border-radius: 6px; overflow: hidden; background-color: #f0fdf4 !important;">
@@ -459,7 +354,7 @@
                         </td>
                     </tr>
 
-                    <!-- 9. IMPORTANT INFORMATION & CONCIERGE (Clean Structured Box) -->
+                    <!-- 6. IMPORTANT INFORMATION & CONCIERGE (Clean Structured Box) -->
                     <tr>
                         <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 18px 20px; background-color: #ffffff !important; border: 0 !important;">
                             <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background-color: #ffffff !important;">
@@ -508,16 +403,21 @@
                         </td>
                     </tr>
 
-                    <!-- 10. "ENJOY THE EVENT!" Pill Badge -->
+                    <!-- 7. ANIMATED CELEBRATION BADGE (At the end) -->
                     <tr>
-                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 4px 20px 20px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
-                            <span class="font-display nowrap" style="background-color: #047857 !important; background-image: linear-gradient(to right, #059669, #047857) !important; color: #ffffff !important; padding: 9px 32px; font-size: 12px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-radius: 24px; display: inline-block; font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap; box-shadow: 0 2px 6px rgba(4,120,87,0.3);">
-                                ✨ ENJOY THE EVENT! ✨
-                            </span>
+                        <td width="100%" align="center" bgcolor="#ffffff" style="padding: 8px 20px 22px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
+                            <div class="animated-celebrate-pill" style="display: inline-block; background-color: #047857 !important; background-image: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%) !important; color: #ffffff !important; padding: 12px 34px; font-size: 13px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-radius: 30px; border: 2px solid #86efac; box-shadow: 0 4px 18px rgba(5, 150, 105, 0.45); font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap;">
+                                <span class="animated-sparkle" style="display: inline-block; margin-right: 6px; font-size: 16px;">✨</span>
+                                <span>ENJOY THE NIZHAL EVENT!</span>
+                                <span class="animated-sparkle" style="display: inline-block; margin-left: 6px; font-size: 16px;">🎉</span>
+                            </div>
+                            <div style="margin-top: 10px; font-family: 'Roboto Mono', monospace; font-size: 10.5px; color: #059669 !important; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;">
+                                ★ OFFICIALLY ADMITTED • ENTRY VERIFIED ★
+                            </div>
                         </td>
                     </tr>
 
-                    <!-- 11. Brand Footer Bar -->
+                    <!-- 8. Brand Footer Bar -->
                     <tr>
                         <td width="100%" align="center" bgcolor="#ffffff" class="content-side-pad" style="padding: 0 20px 22px 20px; background-color: #ffffff !important; text-align: center; border: 0 !important;">
                             <table role="presentation" width="100%" bgcolor="#ffffff" cellpadding="0" cellspacing="0" border="0" style="width: 100% !important; border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; font-family: 'Roboto', sans-serif; background-color: #ffffff !important;">
