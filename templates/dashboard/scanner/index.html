@@ -8,12 +8,12 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
     /* =========================================================================
-       Nizhal Direct Camera & Centered Manual Pass Entry Scanner
+       Nizhal Minimalist Camera Scanner - Clean Consent & On/Off Controls
        ========================================================================= */
     .scanner-page {
         position: relative;
         width: 100%;
-        background-color: #050505;
+        background-color: #000000;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -36,12 +36,12 @@
             height: 640px;
             margin: 20px auto;
             border-radius: 28px;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
             border: 1px solid #e5e7eb;
         }
     }
 
-    /* Full Background Video Feed */
+    /* Live Video Feed spanning background */
     .scanner-bg-video {
         position: absolute;
         inset: 0;
@@ -52,48 +52,46 @@
         z-index: 1;
     }
 
-    /* Flip Camera Toggle Button (Top Right Corner) */
-    .scanner-flip-btn {
+    /* Top Switch Camera Button (Top Right) */
+    .scanner-switch-btn {
         position: absolute;
         top: 14px;
         right: 16px;
-        z-index: 20;
-        width: 42px;
-        height: 42px;
+        z-index: 25;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        background-color: rgba(0, 0, 0, 0.55);
+        background-color: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.25);
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 19px;
+        font-size: 20px;
         cursor: pointer;
-        transition: transform 0.15s ease, background-color 0.15s ease;
+        transition: transform 0.2s ease, background-color 0.15s ease;
         outline: none;
         -webkit-tap-highlight-color: transparent;
     }
-    .scanner-flip-btn:active {
-        transform: scale(0.92);
+    .scanner-switch-btn:active {
+        transform: rotate(180deg) scale(0.92);
         background-color: rgba(255, 255, 255, 0.25);
     }
 
-    /* Center Content Container */
-    .scanner-center-content {
+    /* Viewfinder Center Container */
+    .scanner-viewfinder-wrapper {
         position: relative;
         z-index: 10;
-        width: 100%;
-        max-width: 360px;
-        padding: 0 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 26px;
+        justify-content: center;
+        margin: auto;
     }
 
-    /* Fixed-Dimension Google Pay Target Box */
+    /* Fixed-Dimension 240px Google Pay Target Box */
     .gpay-box {
         position: relative !important;
         width: 240px !important;
@@ -144,7 +142,7 @@
         border-bottom-right-radius: 22px !important;
     }
 
-    /* Smooth Laser Scan Beam */
+    /* Animated Laser Line */
     .gpay-laser {
         position: absolute !important;
         left: 10px !important;
@@ -155,70 +153,118 @@
         pointer-events: none !important;
     }
 
-    /* Center Manual Pass Entry Form */
-    .manual-entry-box {
-        width: 100%;
+    /* Big Camera Consent / Start Screen */
+    .scanner-consent-card {
+        position: relative;
+        z-index: 15;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px 24px;
+        max-width: 320px;
+        margin: auto;
     }
 
-    .manual-input-wrapper {
-        position: relative;
+    .camera-big-icon-wrap {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(16, 185, 129, 0.12);
+        border: 2px solid rgba(16, 185, 129, 0.35);
+        color: #10b981;
+        font-size: 46px;
         display: flex;
         align-items: center;
-        background: rgba(255, 255, 255, 0.96);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 9999px;
-        padding: 5px 6px 5px 16px;
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        gap: 8px;
+        justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
     }
 
-    .manual-icon {
-        font-size: 18px;
-        color: #059669;
-        flex-shrink: 0;
+    .consent-title {
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
     }
 
-    .manual-input {
-        flex: 1;
-        min-width: 0;
-        border: none;
-        outline: none;
-        background: transparent;
-        font-size: 13.5px;
-        font-weight: 600;
-        color: #111827;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-    .manual-input::placeholder {
-        text-transform: none;
+    .consent-subtitle {
         color: #9ca3af;
-        font-weight: 500;
-        letter-spacing: normal;
-        font-size: 12.5px;
+        font-size: 13px;
+        line-height: 1.45;
+        margin-bottom: 24px;
     }
 
-    .manual-submit-btn {
+    .consent-start-btn {
         background: #059669;
         color: #ffffff;
         border: none;
         border-radius: 9999px;
-        padding: 10px 18px;
+        padding: 13px 32px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4);
+        transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    .consent-start-btn:active {
+        transform: scale(0.96);
+        background: #047857;
+    }
+
+    /* Bottom Control Bar: Turn On / Turn Off Button */
+    .scanner-bottom-bar {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        z-index: 25;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 20px;
+    }
+
+    .camera-power-btn {
+        border: none;
+        border-radius: 9999px;
+        padding: 11px 24px;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        transition: background-color 0.15s, transform 0.1s;
-        flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+        gap: 8px;
+        outline: none;
+        transition: transform 0.15s ease, background-color 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
     }
-    .manual-submit-btn:active {
-        background: #047857;
-        transform: scale(0.96);
+    .camera-power-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Turn Off Style (Red / Dark Pill) */
+    .camera-power-btn.power-off {
+        background-color: rgba(239, 68, 68, 0.9);
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+    .camera-power-btn.power-off:active {
+        background-color: #dc2626;
+    }
+
+    /* Turn On Style (Green Pill) */
+    .camera-power-btn.power-on {
+        background-color: #059669;
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+    }
+    .camera-power-btn.power-on:active {
+        background-color: #047857;
     }
 
     /* Slide-Up Bottom Sheet Animation */
@@ -235,49 +281,51 @@
 {% block content %}
 
 <!-- ========================================================================= -->
-<!-- LIVE CAMERA SCANNER + CENTER MANUAL PASS ENTRY                            -->
+<!-- MINIMALIST SCANNER (BIG CAMERA CONSENT & DEDICATED ON/OFF CONTROL)        -->
 <!-- ========================================================================= -->
 <div class="scanner-page">
 
-    <!-- Live Camera Feed (Spans Full Background) -->
+    <!-- Live Background Video Stream -->
     <video id="gpayVideo" playsinline webkit-playsinline autoplay muted class="scanner-bg-video"></video>
     <canvas id="gpayCanvas" style="display:none;"></canvas>
 
-    <!-- Flip Camera Button (Top Right) -->
-    <button type="button" onclick="flipCamera()" class="scanner-flip-btn" title="Flip Camera">
+    <!-- Switch Camera Button (Front / Rear) -->
+    <button type="button" onclick="flipCamera()" id="btnSwitchCamera" class="scanner-switch-btn" title="Switch Camera" style="display: none;">
         <i class="bi bi-camera-reverse"></i>
     </button>
 
-    <!-- Center Stack: Viewfinder Box + Centered Manual Entry -->
-    <div class="scanner-center-content">
+    <!-- 1. Initial Consent / Camera Off Screen (Big Camera Icon) -->
+    <div id="consentCard" class="scanner-consent-card">
+        <div class="camera-big-icon-wrap">
+            <i class="bi bi-camera"></i>
+        </div>
+        <h2 class="consent-title">Camera Permission</h2>
+        <p class="consent-subtitle">Tap below to allow camera access and begin scanning ticket QR codes.</p>
+        <button type="button" onclick="turnOnCamera()" class="consent-start-btn">
+            <i class="bi bi-camera-video"></i>
+            <span>Allow & Start Camera</span>
+        </button>
+    </div>
 
-        <!-- Google Pay Style 4-Colored Corner Box -->
+    <!-- 2. Active Viewfinder (Shown ONLY when camera is streaming) -->
+    <div id="viewfinderWrapper" class="scanner-viewfinder-wrapper" style="display: none;">
         <div id="targetBox" class="gpay-box">
+            <!-- 4 Distinct Google Brand Color Corners -->
             <div class="corner corner-tl"></div>
             <div class="corner corner-tr"></div>
             <div class="corner corner-bl"></div>
             <div class="corner corner-br"></div>
+            <!-- Laser Scan Line -->
             <div id="scanLaser" class="gpay-laser"></div>
         </div>
+    </div>
 
-        <!-- Centered Manual Pass Code Entry Form -->
-        <form onsubmit="handleManualSubmit(event)" class="manual-entry-box">
-            <div class="manual-input-wrapper">
-                <i class="bi bi-ticket-perforated manual-icon"></i>
-                <input type="text" 
-                       id="manualPassInput" 
-                       placeholder="Enter Pass (e.g. PASS-1234)" 
-                       autocomplete="off" 
-                       autocapitalize="characters" 
-                       spellcheck="false" 
-                       class="manual-input" />
-                <button type="submit" class="manual-submit-btn">
-                    <span>Verify</span>
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-            </div>
-        </form>
-
+    <!-- 3. Bottom Control Bar: Dedicated Turn On / Turn Off Camera Button -->
+    <div class="scanner-bottom-bar">
+        <button type="button" id="btnToggleCamera" onclick="toggleCameraPower()" class="camera-power-btn power-off" style="display: none;">
+            <i class="bi bi-camera-video-off" id="powerBtnIcon"></i>
+            <span id="powerBtnText">Turn Off Camera</span>
+        </button>
     </div>
 
 </div>
@@ -417,13 +465,17 @@
 <script>
     let videoStream = null;
     let currentFacingMode = "environment";
+    let isCameraActive = false;
     let isVerifying = false;
     let scanAnimationId = null;
+    let laserIntervalId = null;
     let barcodeDetector = null;
     let lastScannedCode = null;
     let lastScanTime = 0;
+    let availableVideoDevices = [];
+    let currentDeviceIndex = 0;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         // Native BarcodeDetector check
         if ('BarcodeDetector' in window) {
             try {
@@ -433,75 +485,66 @@
             }
         }
 
-        // Automatically start camera immediately without asking or waiting
-        startCameraDirectly();
-
-        // Laser beam animation
-        animateLaser();
+        // Enumerate video devices if available
+        await enumerateCameras();
     });
 
-    // Touch/click fallback in case mobile browser autoplay requires a user gesture
-    document.addEventListener('touchstart', resumeVideoIfPaused, { passive: true });
-    document.addEventListener('click', resumeVideoIfPaused, { passive: true });
-
-    function resumeVideoIfPaused() {
-        const video = document.getElementById('gpayVideo');
-        if (video && video.paused && videoStream) {
-            video.play().catch(e => console.warn('Play attempt on user gesture:', e));
+    async function enumerateCameras() {
+        try {
+            if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                availableVideoDevices = devices.filter(d => d.kind === 'videoinput');
+            }
+        } catch (e) {
+            availableVideoDevices = [];
         }
     }
 
-    function animateLaser() {
-        const laser = document.getElementById('scanLaser');
-        const box = document.getElementById('targetBox');
-        if (!laser || !box) return;
-        let pos = 14;
-        let dir = 1;
-        setInterval(() => {
-            const h = box.offsetHeight || 240;
-            pos += dir * 2;
-            if (pos > h - 18) dir = -1;
-            if (pos < 14) dir = 1;
-            laser.style.top = pos + 'px';
-        }, 18);
-    }
-
-    // Start Camera Video Stream with Multi-Tier Fallback
-    async function startCameraDirectly() {
+    // Turn ON Camera
+    async function turnOnCamera() {
         const video = document.getElementById('gpayVideo');
-        if (!video) return;
+        const consentCard = document.getElementById('consentCard');
+        const viewfinder = document.getElementById('viewfinderWrapper');
+        const switchBtn = document.getElementById('btnSwitchCamera');
+        const powerBtn = document.getElementById('btnToggleCamera');
+        const powerText = document.getElementById('powerBtnText');
+        const powerIcon = document.getElementById('powerBtnIcon');
 
-        if (videoStream) {
-            stopCamera();
-        }
+        stopCamera();
 
         let stream = null;
+        let constraints = { audio: false };
 
-        // Strategy 1: Ideal facingMode and 720p resolution
+        // Determine camera target
+        if (availableVideoDevices.length > 1 && availableVideoDevices[currentDeviceIndex]) {
+            constraints.video = {
+                deviceId: { exact: availableVideoDevices[currentDeviceIndex].deviceId },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            };
+        } else {
+            constraints.video = {
+                facingMode: { ideal: currentFacingMode },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            };
+        }
+
         try {
-            stream = await navigator.mediaDevices.getUserMedia({
-                audio: false,
-                video: {
-                    facingMode: { ideal: currentFacingMode },
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            });
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
         } catch (e1) {
-            console.warn('Strategy 1 camera failed:', e1);
-            // Strategy 2: Simple facingMode
+            console.warn('Constraint attempt 1 failed:', e1);
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
                     audio: false,
                     video: { facingMode: currentFacingMode }
                 });
             } catch (e2) {
-                console.warn('Strategy 2 camera failed:', e2);
-                // Strategy 3: Any available video device
+                console.warn('Constraint attempt 2 failed:', e2);
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 } catch (e3) {
-                    console.error('All camera attempts failed:', e3);
+                    alert('Camera access denied or unavailable. Please enable camera permission in your browser.');
                     return;
                 }
             }
@@ -515,18 +558,73 @@
             try {
                 await video.play();
             } catch (playErr) {
-                console.warn('Video play caught:', playErr);
+                console.warn('Video play catch:', playErr);
             }
 
-            // Start Scanning Frame Loop
+            isCameraActive = true;
+            await enumerateCameras();
+
+            // Reveal camera UI and hide consent screen
+            consentCard.style.display = 'none';
+            viewfinder.style.display = 'flex';
+            powerBtn.style.display = 'inline-flex';
+            powerBtn.className = 'camera-power-btn power-off';
+            powerIcon.className = 'bi bi-camera-video-off';
+            powerText.innerText = 'Turn Off Camera';
+
+            // Show Switch Camera button on mobile or multiple devices
+            switchBtn.style.display = 'flex';
+
             startScanningLoop();
+            startLaserAnimation();
         }
     }
 
+    // Turn OFF Camera
+    function turnOffCamera() {
+        stopCamera();
+        isCameraActive = false;
+
+        const video = document.getElementById('gpayVideo');
+        if (video) video.srcObject = null;
+
+        const consentCard = document.getElementById('consentCard');
+        const viewfinder = document.getElementById('viewfinderWrapper');
+        const switchBtn = document.getElementById('btnSwitchCamera');
+        const powerBtn = document.getElementById('btnToggleCamera');
+        const powerText = document.getElementById('powerBtnText');
+        const powerIcon = document.getElementById('powerBtnIcon');
+
+        if (viewfinder) viewfinder.style.display = 'none';
+        if (switchBtn) switchBtn.style.display = 'none';
+        if (consentCard) consentCard.style.display = 'flex';
+
+        if (powerBtn) {
+            powerBtn.style.display = 'inline-flex';
+            powerBtn.className = 'camera-power-btn power-on';
+            powerIcon.className = 'bi bi-camera-video';
+            powerText.innerText = 'Turn On Camera';
+        }
+    }
+
+    // Toggle Camera Power
+    function toggleCameraPower() {
+        if (isCameraActive) {
+            turnOffCamera();
+        } else {
+            turnOnCamera();
+        }
+    }
+
+    // Stop tracks and loops
     function stopCamera() {
         if (scanAnimationId) {
             cancelAnimationFrame(scanAnimationId);
             scanAnimationId = null;
+        }
+        if (laserIntervalId) {
+            clearInterval(laserIntervalId);
+            laserIntervalId = null;
         }
         if (videoStream) {
             videoStream.getTracks().forEach(track => track.stop());
@@ -536,8 +634,34 @@
 
     // Switch Front / Rear Camera
     async function flipCamera() {
+        if (!isCameraActive) return;
+
+        // Toggle facing mode
         currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
-        await startCameraDirectly();
+
+        // Cycle through enumerated devices if available
+        if (availableVideoDevices.length > 1) {
+            currentDeviceIndex = (currentDeviceIndex + 1) % availableVideoDevices.length;
+        }
+
+        await turnOnCamera();
+    }
+
+    // Animated Laser Line
+    function startLaserAnimation() {
+        if (laserIntervalId) clearInterval(laserIntervalId);
+        const laser = document.getElementById('scanLaser');
+        const box = document.getElementById('targetBox');
+        if (!laser || !box) return;
+        let pos = 14;
+        let dir = 1;
+        laserIntervalId = setInterval(() => {
+            const h = box.offsetHeight || 240;
+            pos += dir * 2;
+            if (pos > h - 18) dir = -1;
+            if (pos < 14) dir = 1;
+            laser.style.top = pos + 'px';
+        }, 18);
     }
 
     // Continuous Frame Scanning Loop
@@ -548,13 +672,13 @@
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
         async function scanFrame() {
-            if (!videoStream || video.readyState !== video.HAVE_ENOUGH_DATA || isVerifying) {
+            if (!videoStream || video.readyState !== video.HAVE_ENOUGH_DATA || isVerifying || !isCameraActive) {
                 scanAnimationId = requestAnimationFrame(scanFrame);
                 return;
             }
 
             try {
-                // 1. Try Hardware-Accelerated Native BarcodeDetector (0ms GPU)
+                // 1. Hardware-Accelerated Native BarcodeDetector (0ms GPU)
                 if (barcodeDetector) {
                     const barcodes = await barcodeDetector.detect(video);
                     if (barcodes && barcodes.length > 0) {
@@ -565,7 +689,7 @@
                     }
                 }
 
-                // 2. Fallback to jsQR Canvas scanning
+                // 2. jsQR Canvas fallback scanning
                 if (window.jsQR) {
                     canvas.width = Math.min(video.videoWidth, 640);
                     canvas.height = Math.min(video.videoHeight, 480);
@@ -579,7 +703,7 @@
                     }
                 }
             } catch (e) {
-                // Frame processing catch
+                // Ignore transient frame errors
             }
 
             scanAnimationId = requestAnimationFrame(scanFrame);
@@ -597,18 +721,6 @@
         lastScanTime = now;
         lastScannedCode = text;
         verifyPassCode(text);
-    }
-
-    // Centered Manual Pass Code Submission
-    function handleManualSubmit(e) {
-        e.preventDefault();
-        const input = document.getElementById('manualPassInput');
-        if (!input) return;
-        const code = input.value.trim();
-        if (!code) return;
-        verifyPassCode(code);
-        input.value = '';
-        input.blur();
     }
 
     // Verify Pass Code via Backend API
@@ -650,7 +762,7 @@
         }
     }
 
-    // Slide-up bottom sheet display helpers
+    // Result sheet helpers
     function showSuccessSheet(data) {
         document.getElementById('sheetSuccessBlock').classList.remove('hidden');
         document.getElementById('sheetDuplicateBlock').classList.add('hidden');
@@ -709,8 +821,6 @@
         document.getElementById('resultModal').classList.add('hidden');
         lastScannedCode = null;
         isVerifying = false;
-        const input = document.getElementById('manualPassInput');
-        if (input) input.value = '';
     }
 
     function handleBackdropClick(event) {
