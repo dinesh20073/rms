@@ -1,0 +1,436 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block header_title %}Scrapbook & Media{% endblock %}
+
+{% block content %}
+<style>
+.media-ctrl {
+    display: block !important;
+    width: 100% !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 6px 12px !important;
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+    color: #202124 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #dadce0 !important;
+    border-radius: 8px !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+.media-ctrl:hover {
+    border-color: #5f6368 !important;
+}
+.media-ctrl:focus {
+    border-color: #1a73e8 !important;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2) !important;
+}
+select.media-ctrl {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 10px center !important;
+    background-size: 14px !important;
+    padding-right: 32px !important;
+    cursor: pointer !important;
+}
+</style>
+
+<div class="p-2.5 sm:p-4 lg:p-6 max-w-7xl mx-auto space-y-2.5 sm:space-y-4 pb-16 sm:pb-8">
+
+    <!-- Header bar -->
+    <div class="google-card p-3 sm:p-4 flex flex-row items-center justify-between gap-2">
+        <div>
+            <h2 class="text-sm sm:text-base font-semibold font-display text-[#202124] flex items-center gap-2">
+                <i data-lucide="camera" class="w-4 h-4 text-[#1a73e8]"></i>
+                <span>Scrapbook & Media</span>
+                <span class="bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded">
+                    {{ total_count }} Total
+                </span>
+            </h2>
+            <p class="text-[11px] text-[#5f6368] hidden sm:block">
+                Manage live photos, video clips, and scribbled thoughts for <em>our little scrapbook ♡</em>.
+            </p>
+        </div>
+
+        <button 
+            type="button" 
+            onclick="openMediaModal()"
+            class="google-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5 shadow-none cursor-pointer"
+        >
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Add Memory</span>
+        </button>
+    </div>
+
+    <!-- Alert Messages -->
+    {% if messages %}
+    <div class="space-y-2">
+        {% for message in messages %}
+        <div class="p-3 text-xs sm:text-sm flex items-center justify-between border rounded-lg {% if message.tags == 'error' %}bg-[#fce8e6] text-[#c5221f] border-[#fad2cf]{% else %}bg-[#e6f4ea] text-[#137333] border-[#ceead6]{% endif %}">
+            <div class="flex items-center gap-2 font-medium">
+                <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle-2{% endif %}" class="w-4 h-4 shrink-0"></i>
+                <span>{{ message }}</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-xs opacity-75 hover:opacity-100 cursor-pointer p-1">✕</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 4 Stats KPI Strip: Images, Video, Total, Hidden -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <!-- Stat 1: Total -->
+        <div class="google-card p-3 sm:p-4 flex flex-col justify-between hover:border-[#1a73e8] transition">
+            <div class="flex items-center justify-between text-[#5f6368] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
+                <span class="truncate">Total</span>
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-bold font-display text-[#202124] tracking-tight">
+                {{ total_count }}
+            </div>
+            <div class="mt-2 pt-2 flex items-center justify-between text-[10px] sm:text-[11px] border-t border-[#dadce0] text-[#5f6368]">
+                <span>All memories</span>
+                <span class="text-[#1a73e8] font-medium font-mono">100%</span>
+            </div>
+        </div>
+
+        <!-- Stat 2: Images -->
+        <div class="google-card p-3 sm:p-4 flex flex-col justify-between hover:border-[#1a73e8] transition">
+            <div class="flex items-center justify-between text-[#1a73e8] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
+                <span class="truncate">Images</span>
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0">
+                    <i data-lucide="image" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-bold font-display text-[#1a73e8] tracking-tight">
+                {{ image_count }}
+            </div>
+            <div class="mt-2 pt-2 flex items-center justify-between text-[10px] sm:text-[11px] border-t border-[#dadce0] text-[#5f6368]">
+                <span>Photos & polaroids</span>
+                <span class="font-medium text-[#1a73e8]">Images</span>
+            </div>
+        </div>
+
+        <!-- Stat 3: Video -->
+        <div class="google-card p-3 sm:p-4 flex flex-col justify-between hover:border-[#b06000] transition">
+            <div class="flex items-center justify-between text-[#b06000] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
+                <span class="truncate">Video</span>
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#fef7e0] text-[#b06000] flex items-center justify-center shrink-0">
+                    <i data-lucide="video" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-bold font-display text-[#b06000] tracking-tight">
+                {{ video_count }}
+            </div>
+            <div class="mt-2 pt-2 flex items-center justify-between text-[10px] sm:text-[11px] border-t border-[#feefc3] text-[#b06000]">
+                <span>Video clips</span>
+                <span class="font-medium text-[#b06000]">Videos</span>
+            </div>
+        </div>
+
+        <!-- Stat 4: Total Hidden -->
+        <div class="google-card p-3 sm:p-4 flex flex-col justify-between hover:border-[#5f6368] transition">
+            <div class="flex items-center justify-between text-[#5f6368] text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
+                <span class="truncate">Hidden</span>
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#f1f3f4] text-[#5f6368] flex items-center justify-center shrink-0">
+                    <i data-lucide="eye-off" class="w-4 h-4"></i>
+                </div>
+            </div>
+            <div class="text-xl sm:text-2xl font-bold font-display text-[#5f6368] tracking-tight">
+                {{ hidden_count }}
+            </div>
+            <div class="mt-2 pt-2 flex items-center justify-between text-[10px] sm:text-[11px] border-t border-[#dadce0] text-[#5f6368]">
+                <span>Hidden from users</span>
+                <span class="font-medium">{% if hidden_count > 0 %}{{ hidden_count }} inactive{% else %}0 hidden{% endif %}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memories Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {% for item in media_list %}
+        <div class="google-card flex flex-col justify-between hover:border-[#1a73e8] transition group relative border-t-2 {% if item.is_published %}border-t-[#137333]{% else %}border-t-[#5f6368]{% endif %} overflow-hidden">
+            <div class="p-3 sm:p-4 space-y-3">
+                <!-- Top Header Row: Media Type, Live/Hidden Status, and Priority -->
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded border {% if item.media_type == 'video' %}bg-[#fef7e0] text-[#b06000] border-[#feefc3]{% elif item.media_type == 'link' %}bg-[#f1f3f4] text-[#3c4043] border-[#dadce0]{% else %}bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc]{% endif %} flex items-center gap-1">
+                            {% if item.media_type == 'video' %}
+                            <i data-lucide="video" class="w-3 h-3"></i> Video
+                            {% elif item.media_type == 'link' %}
+                            <i data-lucide="link" class="w-3 h-3"></i> Link
+                            {% else %}
+                            <i data-lucide="image" class="w-3 h-3"></i> Photo
+                            {% endif %}
+                        </span>
+
+                        {% if item.is_published %}
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-[#137333] bg-[#e6f4ea] px-2 py-0.5 rounded border border-[#ceead6] flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#137333]"></span> Live
+                        </span>
+                        {% else %}
+                        <span class="text-[10px] sm:text-[11px] font-semibold text-[#5f6368] bg-[#f1f3f4] px-2 py-0.5 rounded border border-[#dadce0] flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#5f6368]"></span> Hidden
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <span class="text-[10px] font-mono text-[#5f6368] bg-[#f1f3f4] px-1.5 py-0.5 rounded">
+                        #{{ item.sort_order }}
+                    </span>
+                </div>
+
+                <!-- Media Preview Frame -->
+                <div class="relative w-full h-44 rounded-lg bg-[#f1f3f4] border border-[#dadce0] overflow-hidden group/img">
+                    {% if item.media_type == 'video' %}
+                    <div class="w-full h-full flex flex-col items-center justify-center bg-black/85 text-white gap-1.5">
+                        <i data-lucide="play-circle" class="w-10 h-10 text-white/90"></i>
+                        <span class="text-[11px] font-medium tracking-wide">Video Memory</span>
+                    </div>
+                    {% else %}
+                    <img 
+                        src="{{ item.preview_url }}" 
+                        alt="{{ item.title }}" 
+                        class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                        onerror="this.src='https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80'"
+                    >
+                    {% endif %}
+
+                    {% if 'drive.google.com' in item.url %}
+                    <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                        <i data-lucide="hard-drive" class="w-3 h-3 text-[#38bdf8]"></i>
+                        <span>Google Drive</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Title & Handwritten Caption -->
+                <div>
+                    <h3 class="text-xs sm:text-sm font-semibold font-display text-[#202124] group-hover:text-[#1a73e8] transition leading-snug line-clamp-1">
+                        {{ item.title }}
+                    </h3>
+                    <p class="text-[11px] text-[#5f6368] italic mt-1 line-clamp-2">
+                        &ldquo;{{ item.description|default:"No handwritten caption" }}&rdquo;
+                    </p>
+                </div>
+            </div>
+
+            <!-- Integrated Action Bar with Hide Toggle -->
+            <div class="p-3 pt-2 sm:px-4 sm:pb-3 border-t border-[#dadce0] bg-[#f8f9fa] flex items-center justify-between gap-2">
+                <!-- Hide / Unhide button -->
+                <form method="POST" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="toggle_publish">
+                    <input type="hidden" name="media_id" value="{{ item.id }}">
+                    <button 
+                        type="submit" 
+                        class="google-btn-outlined text-[11px] py-1 px-2.5 flex items-center gap-1.5 cursor-pointer hover:bg-white"
+                        title="{% if item.is_published %}Hide from scrapbook{% else %}Show on scrapbook{% endif %}"
+                    >
+                        <i data-lucide="{% if item.is_published %}eye-off{% else %}eye{% endif %}" class="w-3 h-3 text-[#1a73e8]"></i>
+                        <span>{% if item.is_published %}Hide{% else %}Unhide{% endif %}</span>
+                    </button>
+                </form>
+
+                <div class="flex items-center gap-1.5">
+                    <a 
+                        href="{{ item.url }}" 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        class="google-btn-tonal text-[11px] py-1 px-2.5 flex items-center gap-1"
+                        title="Open Source Asset in New Tab"
+                    >
+                        <i data-lucide="external-link" class="w-3 h-3 text-[#1a73e8]"></i>
+                        <span>View</span>
+                    </a>
+
+                    <!-- Delete button with confirm -->
+                    <form method="POST" onsubmit="return confirm('Remove memory: {{ item.title }}?');" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="media_id" value="{{ item.id }}">
+                        <button 
+                            type="submit" 
+                            class="p-1.5 rounded hover:bg-[#fce8e6] text-[#5f6368] hover:text-[#d93025] transition cursor-pointer"
+                            title="Delete memory"
+                        >
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full google-card p-12 text-center text-[#5f6368]">
+            <i data-lucide="camera" class="w-10 h-10 mx-auto text-[#dadce0] mb-3"></i>
+            <h3 class="text-sm font-semibold font-display text-[#202124]">No memories added yet</h3>
+            <p class="text-xs text-[#5f6368] mt-1 mb-4">Add your first scrapbook memory to sync it immediately with Nizhal Community.</p>
+            <button 
+                type="button" 
+                onclick="openMediaModal()" 
+                class="google-btn-primary text-xs py-1.5 px-3.5 inline-flex items-center gap-1.5"
+            >
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Add First Memory</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- Modal: Add New Memory -->
+<div id="addMediaModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="relative bg-white rounded-xl shadow-2xl max-w-lg w-full p-4 sm:p-6 border border-[#dadce0] transition-all">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3.5 border-b border-[#dadce0] mb-4">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center">
+                    <i data-lucide="camera" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm sm:text-base font-semibold font-display text-[#202124]">
+                        Add Scrapbook Memory
+                    </h3>
+                    <p class="text-[11px] text-[#5f6368]">Saved directly to Supabase</p>
+                </div>
+            </div>
+            <button 
+                type="button" 
+                onclick="closeMediaModal()"
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#f1f3f4] text-[#5f6368] hover:text-[#202124] transition cursor-pointer"
+            >
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <form method="POST" class="space-y-3.5">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+
+            <div>
+                <label class="block text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider mb-1">
+                    Memory Title *
+                </label>
+                <input 
+                    type="text" 
+                    name="title" 
+                    required 
+                    placeholder="e.g. Campfire Reflections & Acoustic Notes"
+                    class="media-ctrl"
+                >
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider mb-1">
+                    Media URL * (HTTPS or Google Drive link)
+                </label>
+                <input 
+                    type="url" 
+                    name="url" 
+                    required 
+                    placeholder="https://... or Google Drive share link"
+                    class="media-ctrl"
+                >
+                <p class="text-[11px] text-[#5f6368] mt-1 flex items-center gap-1">
+                    <i data-lucide="info" class="w-3 h-3 text-[#1a73e8]"></i>
+                    <span>Google Drive share links (Viewer access) are automatically converted into high-res images.</span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider mb-1">
+                        Media Type
+                    </label>
+                    <select name="media_type" class="media-ctrl">
+                        <option value="image">Photo / Image</option>
+                        <option value="video">Video (MP4 / Drive)</option>
+                        <option value="link">Link / Social Post</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider mb-1">
+                        Display Priority
+                    </label>
+                    <input 
+                        type="number" 
+                        name="sort_order" 
+                        value="0"
+                        class="media-ctrl"
+                        placeholder="0 = highest priority"
+                    >
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider mb-1">
+                    Handwritten Caption / Note (Shown on Polaroid)
+                </label>
+                <textarea 
+                    name="description" 
+                    rows="2" 
+                    placeholder="listening deeply, warmth & good souls ♡"
+                    class="media-ctrl"
+                    style="height: auto !important; min-height: 60px !important; resize: vertical;"
+                ></textarea>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+                <input 
+                    type="checkbox" 
+                    id="modal_is_published" 
+                    name="is_published" 
+                    checked 
+                    class="w-4 h-4 text-[#1a73e8] border-[#dadce0] rounded cursor-pointer"
+                >
+                <label for="modal_is_published" class="text-xs font-semibold text-[#202124] cursor-pointer">
+                    Live on Scrapbook (Uncheck to keep hidden)
+                </label>
+            </div>
+
+            <!-- Footer Controls -->
+            <div class="flex justify-end gap-2 pt-4 border-t border-[#dadce0]">
+                <button 
+                    type="button" 
+                    onclick="closeMediaModal()"
+                    class="google-btn-outlined text-xs py-1.5 px-3.5 cursor-pointer"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="submit" 
+                    class="google-btn-primary text-xs py-1.5 px-4 cursor-pointer"
+                >
+                    Save Memory
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openMediaModal() {
+    document.getElementById('addMediaModal').classList.remove('hidden');
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function closeMediaModal() {
+    document.getElementById('addMediaModal').classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) window.lucide.createIcons();
+});
+</script>
+{% endblock %}

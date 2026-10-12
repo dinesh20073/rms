@@ -330,6 +330,11 @@
                 <a href="{% url 'dashboard-database' %}" class="pc-sidebar-link {% if 'database' in request.resolver_match.url_name %}active{% endif %}" title="Attendee Database">
                     <i class="bi bi-database"></i>
                 </a>
+
+                <!-- 8. Scrapbook & Media -->
+                <a href="{% url 'dashboard-media' %}" class="pc-sidebar-link {% if 'media' in request.resolver_match.url_name %}active{% endif %}" title="Scrapbook & Media">
+                    <i class="bi bi-camera-fill"></i>
+                </a>
             </div>
 
             <!-- Sidebar Bottom: Compact Square Logout ONLY (Sharp Square) -->
@@ -402,6 +407,10 @@
             <a href="{% url 'dashboard-database' %}" class="mobile-drawer-link {% if 'database' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="bi bi-database"></i>
                 <span>Attendee Database</span>
+            </a>
+            <a href="{% url 'dashboard-media' %}" class="mobile-drawer-link {% if 'media' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-camera-fill text-[#e11d48]"></i>
+                <span>Scrapbook & Media</span>
             </a>
         </div>
 

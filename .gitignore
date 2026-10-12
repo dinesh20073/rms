@@ -27,7 +27,7 @@ db.sqlite3-journal
 staticfiles/
 
 # Media (user uploads)
-media/
+/media/
 
 # Node / Tailwind
 node_modules/

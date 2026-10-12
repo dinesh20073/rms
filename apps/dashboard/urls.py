@@ -44,4 +44,5 @@ urlpatterns = [
     path('scanner/resend-email/', views.scanner_resend_email_api, name='dashboard-scanner-resend-email'),
     path('scanner/resend-email-api/', views.scanner_resend_email_api, name='dashboard-scanner-resend-email-api'),
     path('scanner/resend-email/<str:pass_code>/', views.scanner_resend_email_api, name='dashboard-scanner-resend-email-code'),
+    path('media/', views.media_dashboard_view, name='dashboard-media'),
 ]

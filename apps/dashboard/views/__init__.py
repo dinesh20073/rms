@@ -66,3 +66,7 @@ from apps.dashboard.views.scanner import (
     scanner_stats_api,
     scanner_resend_email_api,
 )
+
+from apps.dashboard.views.media import (
+    media_dashboard_view,
+)
