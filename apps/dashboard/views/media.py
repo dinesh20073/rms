@@ -39,6 +39,35 @@ def media_dashboard_view(request):
                     messages.error(request, f'Error adding memory: {str(e)}')
             return redirect('dashboard-media')
 
+        elif action in ('update', 'edit'):
+            media_id = request.POST.get('media_id', '').strip()
+            title = request.POST.get('title', '').strip()
+            url = request.POST.get('url', '').strip()
+            description = request.POST.get('description', '').strip()
+            media_type = request.POST.get('media_type', 'image').strip()
+            try:
+                sort_order = int(request.POST.get('sort_order', 0))
+            except ValueError:
+                sort_order = 0
+            is_published = request.POST.get('is_published') == 'on'
+
+            if not media_id or not title or not url:
+                messages.error(request, 'Memory ID, Title, and URL are required.')
+            elif not url.startswith('https://'):
+                messages.error(request, 'URL must use HTTPS protocol.')
+            else:
+                try:
+                    with connection.cursor() as cursor:
+                        cursor.execute("""
+                            UPDATE public.media
+                            SET title = %s, description = %s, url = %s, media_type = %s, sort_order = %s, is_published = %s
+                            WHERE id = %s
+                        """, [title, description, url, media_type, sort_order, is_published, media_id])
+                    messages.success(request, f'Memory "{title}" updated successfully! ♡')
+                except Exception as e:
+                    messages.error(request, f'Error updating memory: {str(e)}')
+            return redirect('dashboard-media')
+
         elif action == 'toggle_publish':
             media_id = request.POST.get('media_id')
             if media_id:

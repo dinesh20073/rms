@@ -34,6 +34,20 @@ export default function MediaDashboardPage() {
     is_published: true,
   });
 
+  // Edit State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    id: '',
+    title: '',
+    description: '',
+    url: '',
+    category: 'general',
+    media_type: 'image',
+    sort_order: 0,
+    is_published: true,
+  });
+
   // Load API Key from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('NIZHAL_ADMIN_API_KEY');
@@ -114,6 +128,62 @@ export default function MediaDashboardPage() {
       setError(err.message);
     } finally {
       setFormLoading(false);
+    }
+  };
+
+  // Open Edit Modal
+  const handleOpenEdit = (item: MediaItem) => {
+    setEditFormData({
+      id: item.id,
+      title: item.title,
+      description: item.description || '',
+      url: item.url,
+      category: item.category || 'general',
+      media_type: item.media_type || 'image',
+      sort_order: item.sort_order ?? 0,
+      is_published: item.is_published,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  // Handle Update
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEditLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/media', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          id: editFormData.id,
+          title: editFormData.title,
+          description: editFormData.description,
+          url: editFormData.url,
+          category: editFormData.category,
+          media_type: editFormData.media_type,
+          sort_order: Number(editFormData.sort_order),
+          is_published: editFormData.is_published,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update memory');
+      }
+
+      setSuccessMsg('Memory updated successfully! ♡');
+      setTimeout(() => setSuccessMsg(null), 4000);
+      setIsEditModalOpen(false);
+      fetchMedia();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -340,11 +410,26 @@ export default function MediaDashboardPage() {
                     </button>
 
                     <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => handleOpenEdit(item)}
+                        style={{
+                          color: '#38bdf8',
+                          background: '#0f172a',
+                          border: '1px solid #334155',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Edit
+                      </button>
                       <a
                         href={item.url}
                         target="_blank"
                         rel="noreferrer"
-                        style={{ color: '#38bdf8', textDecoration: 'none', padding: '4px 8px', background: '#0f172a', borderRadius: '4px' }}
+                        style={{ color: '#94a3b8', textDecoration: 'none', padding: '4px 8px', background: '#0f172a', borderRadius: '4px' }}
                       >
                         View
                       </a>
@@ -497,6 +582,151 @@ export default function MediaDashboardPage() {
                     style={{ background: '#1a73e8', color: '#fff', border: 'none', padding: '10px 22px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                   >
                     {formLoading ? 'Saving...' : 'Save Memory'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal: Edit Memory */}
+        {isEditModalOpen && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.7)',
+              backdropFilter: 'blur(4px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 50,
+              padding: '20px',
+            }}
+          >
+            <div
+              style={{
+                background: '#1e293b',
+                border: '1px solid #334155',
+                borderRadius: '16px',
+                maxWidth: '520px',
+                width: '100%',
+                padding: '24px',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #334155', paddingBottom: '12px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 600 }}>Edit Scrapbook Memory</h2>
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '20px', cursor: 'pointer' }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '6px' }}>
+                    Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Campfire Reflections & Acoustic Notes"
+                    value={editFormData.title}
+                    onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                    style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', padding: '10px 12px', color: '#fff', fontSize: '14px' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '6px' }}>
+                    Media URL * (HTTPS or Google Drive link)
+                  </label>
+                  <input
+                    type="url"
+                    required
+                    placeholder="https://images.unsplash.com/... or Google Drive share link"
+                    value={editFormData.url}
+                    onChange={(e) => setEditFormData({ ...editFormData, url: e.target.value })}
+                    style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', padding: '10px 12px', color: '#fff', fontSize: '14px' }}
+                  />
+                  <span style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                    Google Drive links (Viewer permission) are auto-converted to high-res images!
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '6px' }}>
+                      Media Type
+                    </label>
+                    <select
+                      value={editFormData.media_type}
+                      onChange={(e) => setEditFormData({ ...editFormData, media_type: e.target.value as any })}
+                      style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', padding: '10px 12px', color: '#fff', fontSize: '14px' }}
+                    >
+                      <option value="image">Photo / Image</option>
+                      <option value="video">Video (MP4 / Drive)</option>
+                      <option value="link">Link / Social Post</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '6px' }}>
+                      Sort Priority
+                    </label>
+                    <input
+                      type="number"
+                      value={editFormData.sort_order}
+                      onChange={(e) => setEditFormData({ ...editFormData, sort_order: parseInt(e.target.value, 10) || 0 })}
+                      placeholder="0 = highest priority"
+                      style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', padding: '10px 12px', color: '#fff', fontSize: '14px' }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '6px' }}>
+                    Handwritten Caption / Note (Shown on Polaroid)
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="listening deeply, warmth & good souls ♡"
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                    style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', padding: '10px 12px', color: '#fff', fontSize: '14px' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    id="isPublishedEditModal"
+                    checked={editFormData.is_published}
+                    onChange={(e) => setEditFormData({ ...editFormData, is_published: e.target.checked })}
+                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="isPublishedEditModal" style={{ fontSize: '13px', color: '#f8fafc', cursor: 'pointer' }}>
+                    Live on Scrapbook (Uncheck to keep hidden)
+                  </label>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    style={{ background: '#334155', color: '#fff', border: 'none', padding: '10px 18px', borderRadius: '8px', cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editLoading}
+                    style={{ background: '#1a73e8', color: '#fff', border: 'none', padding: '10px 22px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    {editLoading ? 'Updating...' : 'Update Memory'}
                   </button>
                 </div>
               </form>
